@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cream: #fbf4f1;
+  --color-ink: #42302e;
+  --color-accent: #c57c69;
+  --color-accent-dark: #b0654f;
+  --color-rose: #d89a8a;
+  --color-pink: #f3ded7;
+  --color-blush: #f5e6e0;
+  --color-muted: #8a6f6a;
+  --color-muted2: #7a605b;
+  --color-line: #f1e2dc;
+  --color-line2: #eeddd7;
+  --font-sans: var(--font-jost), system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-jost), system-ui, sans-serif;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+::selection {
+  background: var(--color-pink);
+  color: var(--color-ink);
+}
+
+@keyframes striaUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reveal {
+  opacity: 0;
+}
+.reveal.in {
+  animation: striaUp 0.85s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
