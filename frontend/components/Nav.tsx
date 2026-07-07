@@ -40,20 +40,20 @@ export function Nav() {
       {/* main nav */}
       <nav className="flex items-center justify-between border-b border-ink/[0.06] bg-cream/[0.88] px-[clamp(18px,5vw,56px)] py-[14px] backdrop-blur-[14px]">
         <a
-          href="#top"
+          href="/"
           className="text-[23px] font-semibold tracking-[-0.02em] text-ink"
         >
           stria<span className="text-rose">.</span>
         </a>
         <div className="flex items-center gap-[clamp(11px,2vw,28px)]">
           <NavServices />
-          <a href="#gallery" className="text-[13px] text-muted">
+          <a href="/#gallery" className="text-[13px] text-muted">
             {t.navGallery}
           </a>
-          <a href="#about" className="hidden text-[13px] text-muted sm:inline">
+          <a href="/#about" className="hidden text-[13px] text-muted sm:inline">
             {t.navAbout}
           </a>
-          <a href="#contact" className="hidden text-[13px] text-muted sm:inline">
+          <a href="/#contact" className="hidden text-[13px] text-muted sm:inline">
             {t.navContact}
           </a>
           <button

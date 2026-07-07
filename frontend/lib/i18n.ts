@@ -11,6 +11,7 @@ export const IMG = {
 
 export type Service = {
   id: string;
+  slug: string;
   tag: LS;
   name: LS;
   desc: LS;
@@ -20,6 +21,7 @@ export type Service = {
 export const SERVICES: Service[] = [
   {
     id: "svc1",
+    slug: "microblading",
     tag: { tr: "Kaş", en: "Brows" },
     name: { tr: "Microblading", en: "Microblading" },
     desc: {
@@ -30,6 +32,7 @@ export const SERVICES: Service[] = [
   },
   {
     id: "svc2",
+    slug: "kas-pudralama",
     tag: { tr: "Kaş", en: "Brows" },
     name: { tr: "Kaş Pudralama", en: "Powder Brows" },
     desc: {
@@ -40,6 +43,7 @@ export const SERVICES: Service[] = [
   },
   {
     id: "svc3",
+    slug: "eyeliner",
     tag: { tr: "Göz", en: "Eyes" },
     name: { tr: "Eyeliner", en: "Eyeliner" },
     desc: {
@@ -50,6 +54,7 @@ export const SERVICES: Service[] = [
   },
   {
     id: "svc4",
+    slug: "dipliner",
     tag: { tr: "Göz", en: "Eyes" },
     name: { tr: "Dipliner", en: "Lash-line Enhancement" },
     desc: {
@@ -60,6 +65,7 @@ export const SERVICES: Service[] = [
   },
   {
     id: "svc5",
+    slug: "dudak-renklendirme",
     tag: { tr: "Dudak", en: "Lips" },
     name: { tr: "Dudak Renklendirme", en: "Lip Blush" },
     desc: {
@@ -70,6 +76,7 @@ export const SERVICES: Service[] = [
   },
   {
     id: "svc6",
+    slug: "kas-laminasyon",
     tag: { tr: "Kaş", en: "Brows" },
     name: { tr: "Kaş Laminasyon", en: "Brow Lamination" },
     desc: {
@@ -80,6 +87,7 @@ export const SERVICES: Service[] = [
   },
   {
     id: "svc7",
+    slug: "kirpik-lifting",
     tag: { tr: "Kirpik", en: "Lashes" },
     name: { tr: "Kirpik Lifting", en: "Lash Lift" },
     desc: {

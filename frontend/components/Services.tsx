@@ -1,7 +1,7 @@
 "use client";
 
+import Link from "next/link";
 import { useLang } from "@/components/LanguageProvider";
-import { site } from "@/lib/site";
 import { SERVICES } from "@/lib/i18n";
 import { ImageSlot } from "@/components/ImageSlot";
 
@@ -38,7 +38,11 @@ export function Services() {
               </span>
             </div>
             <div className="flex flex-1 flex-col gap-[11px] px-[26px] pb-[22px] pt-6">
-              <h3 className="text-[22px] leading-[1.15]">{s.name[lang]}</h3>
+              <h3 className="text-[22px] leading-[1.15]">
+                <Link href={`/hizmetler/${s.slug}`} className="text-ink hover:text-accent">
+                  {s.name[lang]}
+                </Link>
+              </h3>
               <p className="flex-1 text-sm leading-[1.6] text-muted">
                 {s.desc[lang]}
               </p>
@@ -46,15 +50,13 @@ export function Services() {
                 <span className="text-[11px] uppercase tracking-[0.06em] text-accent">
                   {t.priceNote}
                 </span>
-                <a
-                  href={site.wa}
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label={s.name[lang]}
-                  className="flex h-8 w-8 items-center justify-center rounded-full bg-cream text-base text-ink"
+                <Link
+                  href={`/hizmetler/${s.slug}`}
+                  aria-label={`${s.name[lang]} — detaylar`}
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-cream text-base text-ink transition-colors hover:bg-pink"
                 >
                   →
-                </a>
+                </Link>
               </div>
             </div>
           </div>

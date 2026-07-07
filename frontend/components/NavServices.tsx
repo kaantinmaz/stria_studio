@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useLang } from "@/components/LanguageProvider";
+import Link from "next/link";
 import { SERVICES, IMG } from "@/lib/i18n";
-import { site } from "@/lib/site";
 import { ImageSlot } from "@/components/ImageSlot";
 
 // Hizmetler mega-menu: full service list + a featured service (Microblading).
@@ -77,23 +77,21 @@ export function NavServices() {
                   {t.featuredHint}
                 </div>
               </div>
-              <a
-                href={site.wa}
-                target="_blank"
-                rel="noreferrer"
+              <Link
+                href={`/hizmetler/${featured.slug}`}
                 onClick={() => setOpen(false)}
                 className="mt-auto inline-flex items-center justify-center gap-2 rounded-[22px] bg-ink px-4 py-[10px] text-[12.5px] text-cream"
               >
-                {t.navCta}
-              </a>
+                İncele →
+              </Link>
             </div>
 
             {/* full list */}
             <div className="grid grid-cols-1 gap-1 p-4 sm:grid-cols-2">
               {SERVICES.map((s) => (
-                <a
+                <Link
                   key={s.id}
-                  href="#services"
+                  href={`/hizmetler/${s.slug}`}
                   onClick={() => setOpen(false)}
                   className="group flex items-center justify-between gap-2 rounded-[14px] px-3 py-[10px] transition-colors hover:bg-white"
                 >
@@ -101,8 +99,15 @@ export function NavServices() {
                   <span className="text-[10px] uppercase tracking-[0.1em] text-accent opacity-0 transition-opacity group-hover:opacity-100">
                     {s.tag[lang]}
                   </span>
-                </a>
+                </Link>
               ))}
+              <Link
+                href="/hizmetler"
+                onClick={() => setOpen(false)}
+                className="col-span-full mt-1 rounded-[14px] px-3 py-[10px] text-[13px] font-medium text-accent hover:bg-white"
+              >
+                Tüm hizmetler →
+              </Link>
             </div>
           </div>
         </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useLang } from "@/components/LanguageProvider";
 import { site } from "@/lib/site";
 import { SERVICES } from "@/lib/i18n";
@@ -12,10 +13,10 @@ export function Footer() {
   const { lang, t } = useLang();
 
   const explore = [
-    { href: "#services", label: t.navServices },
-    { href: "#gallery", label: t.navGallery },
-    { href: "#about", label: t.navAbout },
-    { href: "#contact", label: t.navContact },
+    { href: "/hizmetler", label: t.navServices },
+    { href: "/#gallery", label: t.navGallery },
+    { href: "/#about", label: t.navAbout },
+    { href: "/#contact", label: t.navContact },
   ];
 
   return (
@@ -58,13 +59,15 @@ export function Footer() {
 
         {/* services */}
         <div>
-          <div className={heading}>{t.navServices}</div>
+          <Link href="/hizmetler" className={`${heading} block hover:text-cream`}>
+            {t.navServices}
+          </Link>
           <ul className="flex flex-col gap-[14px]">
             {SERVICES.map((s) => (
               <li key={s.id}>
-                <a href="#services" className={link}>
+                <Link href={`/hizmetler/${s.slug}`} className={link}>
                   {s.name[lang]}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
@@ -76,9 +79,9 @@ export function Footer() {
           <ul className="flex flex-col gap-[14px]">
             {explore.map((e) => (
               <li key={e.href}>
-                <a href={e.href} className={link}>
+                <Link href={e.href} className={link}>
                   {e.label}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>

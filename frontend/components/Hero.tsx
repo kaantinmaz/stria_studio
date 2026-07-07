@@ -62,8 +62,9 @@ export function Hero() {
         <div className="relative h-[min(72vh,600px)] overflow-hidden rounded-[200px_200px_32px_32px] shadow-[0_40px_90px_-50px_rgba(197,124,105,0.7)]">
           <ImageSlot
             src={IMG.hero}
-            alt="Stria Studio"
+            alt="Stria Studio — Ankara kalıcı makyaj stüdyosu"
             sizes="(max-width: 768px) 100vw, 45vw"
+            priority
           />
         </div>
 
