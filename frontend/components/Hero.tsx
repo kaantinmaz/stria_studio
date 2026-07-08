@@ -1,7 +1,8 @@
 "use client";
 
 import { useLang } from "@/components/LanguageProvider";
-import { site } from "@/lib/site";
+import { useSettings } from "@/components/SettingsProvider";
+import { phoneHref } from "@/lib/content";
 import { IMG } from "@/lib/i18n";
 import { ImageSlot } from "@/components/ImageSlot";
 import { PhoneIcon, WhatsAppIcon } from "@/components/Icons";
@@ -9,6 +10,7 @@ import { CallLabel } from "@/components/CallLabel";
 
 export function Hero() {
   const { t } = useLang();
+  const settings = useSettings();
 
   return (
     <header
@@ -28,7 +30,7 @@ export function Hero() {
         </p>
         <div className="reveal in mb-[30px] flex flex-wrap gap-3">
           <a
-            href={site.wa}
+            href={settings.whatsapp}
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center gap-[9px] rounded-[28px] bg-ink px-7 py-[15px] text-sm text-cream"
@@ -37,7 +39,7 @@ export function Hero() {
             {t.heroCtaPrimary}
           </a>
           <a
-            href={site.phoneHref}
+            href={phoneHref(settings.phone)}
             className="inline-flex items-center gap-[9px] rounded-[28px] border border-line2 bg-white px-7 py-[15px] text-sm text-ink"
           >
             <PhoneIcon size={15} />

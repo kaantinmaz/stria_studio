@@ -3,9 +3,9 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useLang } from "@/components/LanguageProvider";
-import { site } from "@/lib/site";
+import { useSettings } from "@/components/SettingsProvider";
 import { useServices } from "@/components/ServicesProvider";
-import { pickLang } from "@/lib/content";
+import { pickLang, phoneHref, formatHours } from "@/lib/content";
 import { PhoneIcon, PinIcon, WhatsAppIcon } from "@/components/Icons";
 
 const heading = "mb-4 text-[13px] font-medium uppercase tracking-[0.14em] text-cream";
@@ -13,6 +13,7 @@ const link = "text-[13px] leading-none text-[#d6c3bd] transition-colors hover:te
 
 export function Footer() {
   const { lang, t } = useLang();
+  const settings = useSettings();
   const services = useServices();
 
   const explore = [
@@ -43,7 +44,7 @@ export function Footer() {
           </div>
           <div className="mt-3 flex gap-3">
             <a
-              href={site.ig}
+              href={settings.instagram}
               target="_blank"
               rel="noreferrer"
               aria-label="Instagram"
@@ -54,7 +55,7 @@ export function Footer() {
               </svg>
             </a>
             <a
-              href={site.wa}
+              href={settings.whatsapp}
               target="_blank"
               rel="noreferrer"
               aria-label="WhatsApp"
@@ -101,23 +102,23 @@ export function Footer() {
           <ul className="flex flex-col gap-[14px]">
             <li className="flex items-start gap-[10px] text-[13px] leading-[1.5]">
               <PinIcon size={14} className="mt-[2px] flex-none text-rose" />
-              {site.address}
+              {settings.address}
             </li>
             <li>
-              <a href={site.phoneHref} className={`flex items-center gap-[10px] ${link}`}>
+              <a href={phoneHref(settings.phone)} className={`flex items-center gap-[10px] ${link}`}>
                 <PhoneIcon size={14} className="flex-none text-rose" />
-                {t.phone}
+                {settings.phone}
               </a>
             </li>
             <li>
-              <a href={site.ig} target="_blank" rel="noreferrer" className={link}>
-                {site.igHandle}
+              <a href={settings.instagram} target="_blank" rel="noreferrer" className={link}>
+                {settings.instagram_handle}
               </a>
             </li>
-            <li className="text-[13px] leading-[1.5]">{t.barHours}</li>
+            <li className="text-[13px] leading-[1.5]">{formatHours(settings.hours, lang)}</li>
           </ul>
           <a
-            href={site.wa}
+            href={settings.whatsapp}
             target="_blank"
             rel="noreferrer"
             className="mt-5 inline-flex items-center gap-2 rounded-[24px] bg-rose px-5 py-[11px] text-[12.5px] text-white"

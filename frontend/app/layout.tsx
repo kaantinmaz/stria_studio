@@ -3,11 +3,12 @@ import { Jost } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/components/LanguageProvider";
 import { ServicesProvider } from "@/components/ServicesProvider";
+import { SettingsProvider } from "@/components/SettingsProvider";
 import { WhatsAppFab } from "@/components/WhatsAppFab";
 import { JsonLd } from "@/components/JsonLd";
 import { beautySalonSchema } from "@/components/schema";
 import { site } from "@/lib/site";
-import { getServices } from "@/lib/content";
+import { getServices, getSettings, SETTINGS_FALLBACK } from "@/lib/content";
 
 const jost = Jost({
   subsets: ["latin"],
@@ -37,15 +38,17 @@ export const metadata: Metadata = {
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const services = await getServices();
+  const [services, settings] = await Promise.all([getServices(), getSettings()]);
   return (
     <html lang="tr" className={jost.variable}>
       <body>
-        <JsonLd data={beautySalonSchema()} />
+        <JsonLd data={beautySalonSchema(settings ?? SETTINGS_FALLBACK)} />
         <LanguageProvider>
-          <ServicesProvider services={services}>{children}</ServicesProvider>
+          <SettingsProvider settings={settings}>
+            <ServicesProvider services={services}>{children}</ServicesProvider>
+            <WhatsAppFab />
+          </SettingsProvider>
         </LanguageProvider>
-        <WhatsAppFab />
       </body>
     </html>
   );

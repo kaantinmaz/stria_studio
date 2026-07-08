@@ -1,37 +1,38 @@
 import { site } from "@/lib/site";
 import { absUrl } from "@/lib/seo";
+import { phoneHref, type Settings } from "@/lib/content";
 
 // LocalBusiness (BeautySalon) — site-wide identity. @id is referenced by
 // per-service Service schema via `provider`.
-export function beautySalonSchema() {
+export function beautySalonSchema(s: Settings) {
   return {
     "@context": "https://schema.org",
     "@type": "BeautySalon",
     "@id": absUrl("/#business"),
     name: site.nap.name,
     url: site.siteUrl,
-    telephone: site.phoneHref.replace("tel:", ""),
+    telephone: phoneHref(s.phone).replace("tel:", ""),
     image: absUrl("/images/hero.png"),
     address: {
       "@type": "PostalAddress",
-      streetAddress: site.nap.streetAddress,
-      addressLocality: site.nap.locality,
-      addressRegion: site.nap.region,
-      postalCode: site.nap.postalCode,
-      addressCountry: site.nap.country,
+      streetAddress: s.street_address,
+      addressLocality: s.locality,
+      addressRegion: s.region,
+      postalCode: s.postal_code,
+      addressCountry: s.country,
     },
     geo: {
       "@type": "GeoCoordinates",
-      latitude: site.geo.lat,
-      longitude: site.geo.lng,
+      latitude: Number(s.lat),
+      longitude: Number(s.lng),
     },
-    openingHoursSpecification: site.hours.map((h) => ({
+    openingHoursSpecification: s.hours.map((h) => ({
       "@type": "OpeningHoursSpecification",
       dayOfWeek: h.days,
       opens: h.open,
       closes: h.close,
     })),
-    sameAs: [site.ig, site.gbpUrl].filter(Boolean),
+    sameAs: [s.instagram, site.gbpUrl].filter(Boolean),
     priceRange: "₺₺",
   };
 }
