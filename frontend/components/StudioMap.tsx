@@ -1,7 +1,9 @@
-import { site } from "@/lib/site";
+"use client";
+
+import { useSettings } from "@/components/SettingsProvider";
 
 export function StudioMap() {
-  const { lat, lng } = site.geo;
+  const { lat, lng } = useSettings();
   const src = `https://www.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
   return (
     <section className="px-[clamp(18px,5vw,56px)] pb-[clamp(64px,8vw,120px)]">

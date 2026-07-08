@@ -8,7 +8,7 @@ import { WhatsAppFab } from "@/components/WhatsAppFab";
 import { JsonLd } from "@/components/JsonLd";
 import { beautySalonSchema } from "@/components/schema";
 import { site } from "@/lib/site";
-import { getServices, getSettings } from "@/lib/content";
+import { getServices, getSettings, SETTINGS_FALLBACK } from "@/lib/content";
 
 const jost = Jost({
   subsets: ["latin"],
@@ -42,7 +42,7 @@ export default async function RootLayout({
   return (
     <html lang="tr" className={jost.variable}>
       <body>
-        <JsonLd data={beautySalonSchema()} />
+        <JsonLd data={beautySalonSchema(settings ?? SETTINGS_FALLBACK)} />
         <LanguageProvider>
           <SettingsProvider settings={settings}>
             <ServicesProvider services={services}>{children}</ServicesProvider>
