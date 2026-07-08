@@ -1,6 +1,5 @@
 import { site } from "@/lib/site";
 import { absUrl } from "@/lib/seo";
-import type { ServiceSeo } from "@/lib/services";
 
 // LocalBusiness (BeautySalon) — site-wide identity. @id is referenced by
 // per-service Service schema via `provider`.
@@ -37,13 +36,16 @@ export function beautySalonSchema() {
   };
 }
 
-export function serviceSchema(svc: ServiceSeo, name: string) {
+export function serviceSchema(
+  svc: { slug: string; intro_tr: string | null; desc_tr: string },
+  name: string,
+) {
   return {
     "@context": "https://schema.org",
     "@type": "Service",
     name,
     serviceType: name,
-    description: svc.intro,
+    description: svc.intro_tr || svc.desc_tr,
     url: absUrl(`/hizmetler/${svc.slug}`),
     provider: { "@id": absUrl("/#business") },
     areaServed: { "@type": "City", name: "Ankara" },

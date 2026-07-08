@@ -47,7 +47,7 @@ export function BlogList({
         {posts.length === 0 ? (
           <p className="text-muted">{lang === "tr" ? "Henüz yazı yok." : "No posts yet."}</p>
         ) : (
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-6">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,300px),1fr))] gap-6">
             {posts.map((p) => (
               <Link
                 key={p.slug}

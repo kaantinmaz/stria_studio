@@ -26,7 +26,7 @@ export function Gallery() {
         </p>
       </div>
 
-      <div className="mx-auto grid max-w-[1160px] grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-[14px] [grid-auto-rows:250px]">
+      <div className="mx-auto grid max-w-[1160px] grid-cols-[repeat(auto-fill,minmax(min(100%,210px),1fr))] gap-[14px] [grid-auto-rows:250px]">
         {GALLERY.map((g) => (
           <div
             key={g.id}

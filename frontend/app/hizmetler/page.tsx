@@ -6,7 +6,9 @@ import { ImageSlot } from "@/components/ImageSlot";
 import { JsonLd } from "@/components/JsonLd";
 import { breadcrumbSchema } from "@/components/schema";
 import { buildMetadata } from "@/lib/seo";
-import { SERVICES } from "@/lib/i18n";
+import { getServices } from "@/lib/content";
+
+export const revalidate = 300;
 
 export const metadata = buildMetadata({
   title: "Hizmetler · Ankara Kalıcı Makyaj | Stria Studio",
@@ -20,7 +22,8 @@ const crumbs = [
   { name: "Hizmetler", path: "/hizmetler" },
 ];
 
-export default function HizmetlerHub() {
+export default async function HizmetlerHub() {
+  const services = await getServices();
   return (
     <>
       <Nav />
@@ -43,27 +46,27 @@ export default function HizmetlerHub() {
         </div>
 
         <div className="grid grid-cols-[repeat(auto-fill,minmax(290px,1fr))] gap-[18px]">
-          {SERVICES.map((s) => (
+          {services.map((s) => (
             <Link
-              key={s.id}
+              key={s.slug}
               href={`/hizmetler/${s.slug}`}
               className="group flex flex-col overflow-hidden rounded-[24px] border border-line bg-white transition duration-300 hover:-translate-y-1 hover:shadow-[0_30px_60px_-40px_rgba(66,48,46,0.5)]"
             >
               <div className="relative h-[200px]">
                 <ImageSlot
-                  src={s.img}
-                  alt={s.name.tr}
-                  placeholder={s.name.tr}
+                  src={s.image ?? ""}
+                  alt={s.name_tr}
+                  placeholder={s.name_tr}
                   sizes="(max-width: 768px) 100vw, 300px"
                 />
                 <span className="absolute left-3 top-3 rounded-[16px] bg-cream/[0.92] px-[11px] py-[6px] text-[10px] uppercase tracking-[0.12em] text-accent backdrop-blur-[4px]">
-                  {s.tag.tr}
+                  {s.tag_tr}
                 </span>
               </div>
               <div className="flex flex-1 flex-col gap-2 px-[26px] pb-[22px] pt-6">
-                <h2 className="text-[22px] leading-[1.15]">{s.name.tr}</h2>
+                <h2 className="text-[22px] leading-[1.15]">{s.name_tr}</h2>
                 <p className="flex-1 text-sm leading-[1.6] text-muted">
-                  {s.desc.tr}
+                  {s.desc_tr}
                 </p>
                 <span className="pt-2 text-[13px] font-medium text-accent">
                   Detaylar →

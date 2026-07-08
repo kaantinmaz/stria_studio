@@ -4,23 +4,25 @@ import { Faq } from "@/components/Faq";
 import { WhatsAppIcon, PhoneIcon } from "@/components/Icons";
 import { CallLabel } from "@/components/CallLabel";
 import { site } from "@/lib/site";
-import { SERVICES, type Service } from "@/lib/i18n";
-import { type ServiceSeo } from "@/lib/services";
+import { type ServiceFull, type ServiceListItem } from "@/lib/content";
 
 // Server-rendered TR service page body. Content lands in the HTML for Google + AI.
 export function ServicePage({
   svc,
-  display,
+  services,
 }: {
-  svc: ServiceSeo;
-  display: Service;
+  svc: ServiceFull;
+  services: ServiceListItem[];
 }) {
-  const name = display.name.tr;
+  const name = svc.name_tr;
   // Work photos — owner fills svc.gallery; until then show 3 fillable placeholders.
   const shots = svc.gallery?.length ? svc.gallery : ["", "", ""];
   const related = svc.related
-    .map((slug) => SERVICES.find((s) => s.slug === slug))
-    .filter((s): s is Service => Boolean(s));
+    .map((slug) => {
+      const item = services.find((s) => s.slug === slug);
+      return item ? { slug, name: item.name_tr } : null;
+    })
+    .filter((r): r is { slug: string; name: string } => Boolean(r));
 
   return (
     <article>
@@ -28,13 +30,13 @@ export function ServicePage({
       <header className="mx-auto grid max-w-[1160px] grid-cols-1 items-center gap-[clamp(28px,4.5vw,64px)] px-[clamp(18px,5vw,56px)] pb-12 pt-8 md:grid-cols-[1.05fr_0.95fr]">
         <div>
           <div className="mb-4 inline-flex items-center gap-2 rounded-[22px] bg-pink px-4 py-2 text-[11px] uppercase tracking-[0.14em] text-accent">
-            {display.tag.tr} · Ankara
+            {svc.tag_tr} · Ankara
           </div>
           <h1 className="mb-5 text-[clamp(32px,4.6vw,58px)] leading-[1.05]">
             {name} <span className="text-accent">Ankara</span>
           </h1>
           <p className="mb-7 max-w-[520px] text-[clamp(15px,1.4vw,18px)] leading-[1.7] text-muted">
-            {svc.intro}
+            {svc.intro_tr}
           </p>
           <div className="flex flex-wrap gap-3">
             <a
@@ -57,7 +59,7 @@ export function ServicePage({
         </div>
         <div className="relative h-[min(56vh,460px)] overflow-hidden rounded-[32px] shadow-[0_40px_90px_-50px_rgba(197,124,105,0.7)]">
           <ImageSlot
-            src={display.img}
+            src={svc.image ?? ""}
             alt={`${name} — Stria Studio Ankara`}
             placeholder={name}
             sizes="(max-width: 768px) 100vw, 45vw"
@@ -70,7 +72,7 @@ export function ServicePage({
         <div>
           <h2 className="mb-5 text-[clamp(22px,2.4vw,30px)]">Neden {name}?</h2>
           <ul className="flex flex-col gap-3">
-            {svc.benefits.map((b) => (
+            {svc.benefits_tr.map((b) => (
               <li key={b} className="flex items-start gap-3 text-[15px] leading-[1.6] text-muted2">
                 <span className="mt-[2px] flex h-[18px] w-[18px] flex-none items-center justify-center rounded-full bg-pink text-[11px] text-accent">
                   ✓
@@ -83,7 +85,7 @@ export function ServicePage({
         <div>
           <h2 className="mb-5 text-[clamp(22px,2.4vw,30px)]">Nasıl uygulanır?</h2>
           <ol className="flex flex-col gap-3">
-            {svc.process.map((p, i) => (
+            {svc.process_tr.map((p, i) => (
               <li key={p} className="flex items-start gap-3 text-[15px] leading-[1.6] text-muted2">
                 <span className="mt-[1px] flex h-[22px] w-[22px] flex-none items-center justify-center rounded-full bg-ink text-[11px] text-cream">
                   {i + 1}
@@ -94,18 +96,18 @@ export function ServicePage({
           </ol>
           <div className="mt-6 rounded-[18px] bg-blush px-5 py-4 text-[14px] leading-[1.6] text-muted2">
             <span className="font-medium text-ink">Bakım: </span>
-            {svc.aftercare}
+            {svc.aftercare_tr}
           </div>
         </div>
       </section>
 
-      {/* work gallery — owner drops photos into ServiceSeo.gallery */}
+      {/* work gallery — owner drops photos into ServiceFull.gallery */}
       <section className="mx-auto max-w-[1160px] px-[clamp(18px,5vw,56px)] py-[clamp(32px,5vw,64px)]">
         <h2 className="mb-2 text-[clamp(22px,2.4vw,30px)]">Çalışmalarımızdan</h2>
         <p className="mb-7 max-w-[520px] text-[15px] leading-[1.6] text-muted">
           {name} uygulamalarımızdan örnek görüntüler.
         </p>
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-4">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,220px),1fr))] gap-4">
           {shots.map((src, i) => (
             <div
               key={i}
@@ -123,7 +125,7 @@ export function ServicePage({
       </section>
 
       {/* FAQ */}
-      <Faq title="Sıkça Sorulan Sorular" items={svc.faq} />
+      <Faq title="Sıkça Sorulan Sorular" items={svc.faq_tr} />
 
       {/* related */}
       {related.length > 0 && (
@@ -136,7 +138,7 @@ export function ServicePage({
                 href={`/hizmetler/${r.slug}`}
                 className="inline-flex items-center gap-2 rounded-[24px] border border-line bg-white px-5 py-3 text-sm text-ink transition-colors hover:border-accent hover:text-accent"
               >
-                {r.name.tr}
+                {r.name}
                 <span className="text-accent">→</span>
               </Link>
             ))}

@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useLang } from "@/components/LanguageProvider";
 import { site } from "@/lib/site";
-import { SERVICES } from "@/lib/i18n";
+import { useServices } from "@/components/ServicesProvider";
+import { pickLang } from "@/lib/content";
 import { PhoneIcon, PinIcon, WhatsAppIcon } from "@/components/Icons";
 
 const heading = "mb-4 text-[13px] font-medium uppercase tracking-[0.14em] text-cream";
@@ -11,6 +13,7 @@ const link = "text-[13px] leading-none text-[#d6c3bd] transition-colors hover:te
 
 export function Footer() {
   const { lang, t } = useLang();
+  const services = useServices();
 
   const explore = [
     { href: "/hizmetler", label: t.navServices },
@@ -25,9 +28,13 @@ export function Footer() {
       <div className="mx-auto grid max-w-[1160px] grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1.3fr]">
         {/* brand + social */}
         <div>
-          <div className="mb-3 text-[26px] font-semibold tracking-[-0.02em] text-cream">
-            stria<span className="text-rose">.</span>
-          </div>
+          <Image
+            src="/logo.png"
+            alt="Stria Studio"
+            width={772}
+            height={371}
+            className="mb-4 h-10 w-auto [filter:brightness(0)_invert(1)]"
+          />
           <p className="mb-6 max-w-[280px] text-[13px] leading-[1.6]">
             {t.footerTag}
           </p>
@@ -64,10 +71,10 @@ export function Footer() {
             {t.navServices}
           </Link>
           <ul className="flex flex-col gap-[14px]">
-            {SERVICES.map((s) => (
-              <li key={s.id}>
-                <Link href={`/hizmetler/${s.slug}`} className={link}>
-                  {s.name[lang]}
+            {services.map((s) => (
+              <li key={s.slug}>
+                <Link href={s.url} className={link}>
+                  {pickLang(s.name_tr, s.name_en, lang)}
                 </Link>
               </li>
             ))}
