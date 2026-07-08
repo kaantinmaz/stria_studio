@@ -3,16 +3,19 @@
 import { useState } from "react";
 import { useLang } from "@/components/LanguageProvider";
 import { site } from "@/lib/site";
-import { SERVICES } from "@/lib/i18n";
+import { useServices } from "@/components/ServicesProvider";
+import { pickLang } from "@/lib/content";
 
 type Status = "idle" | "sending" | "ok" | "err";
 
+// text-base (16px) so iOS Safari doesn't auto-zoom the viewport on input focus.
 const field =
-  "w-full rounded-[14px] border border-line bg-cream px-4 py-3 text-sm text-ink outline-none transition focus:border-accent focus:bg-white";
+  "w-full rounded-[14px] border border-line bg-cream px-4 py-3 text-base text-ink outline-none transition focus:border-accent focus:bg-white";
 const label = "mb-[6px] block text-[11px] uppercase tracking-[0.12em] text-accent";
 
 export function ContactForm() {
   const { lang, t } = useLang();
+  const services = useServices();
   const [status, setStatus] = useState<Status>("idle");
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -93,11 +96,14 @@ export function ContactForm() {
               <option value="" disabled>
                 {t.formServicePick}
               </option>
-              {SERVICES.map((s) => (
-                <option key={s.id} value={s.name[lang]}>
-                  {s.name[lang]}
-                </option>
-              ))}
+              {services.map((s) => {
+                const name = pickLang(s.name_tr, s.name_en, lang);
+                return (
+                  <option key={s.slug} value={name}>
+                    {name}
+                  </option>
+                );
+              })}
               <option value={t.formServiceOther}>{t.formServiceOther}</option>
             </select>
           </div>
