@@ -1,5 +1,7 @@
 import { Nav } from "@/components/Nav";
 import { Hero } from "@/components/Hero";
+import { ServiceStrip } from "@/components/ServiceStrip";
+import { PromoVideo } from "@/components/PromoVideo";
 import { Services } from "@/components/Services";
 import { Gallery } from "@/components/Gallery";
 import { About } from "@/components/About";
@@ -17,6 +19,8 @@ export default function Home() {
       <JsonLd data={faqSchema(HOME_FAQ)} />
       <main>
         <Hero />
+        <ServiceStrip />
+        <PromoVideo />
         <Services />
         <Gallery />
         <About />
