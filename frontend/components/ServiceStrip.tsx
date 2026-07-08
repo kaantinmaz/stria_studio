@@ -18,32 +18,30 @@ export function ServiceStrip() {
         <div className="mb-5 text-center text-xs uppercase tracking-[0.14em] text-accent">
           {lang === "tr" ? "Öne Çıkan Hizmetler" : "Featured Services"}
         </div>
-        <div className="grid grid-cols-2 gap-[14px] md:grid-cols-4">
+        <div className="grid grid-cols-1 gap-[14px] sm:grid-cols-2 lg:grid-cols-4">
           {services.map((s) => {
             const name = pickLang(s.name_tr, s.name_en, lang);
             return (
               <Link
                 key={s.slug}
                 href={s.url}
-                className="group overflow-hidden rounded-[22px] border border-line bg-white transition duration-300 hover:-translate-y-1 hover:shadow-[0_30px_60px_-40px_rgba(66,48,46,0.5)]"
+                className="group flex items-center gap-[13px] rounded-[20px] bg-cream/[0.92] p-3 pl-3 pr-4 text-ink shadow-[0_20px_40px_-18px_rgba(66,48,46,0.4)] backdrop-blur-[10px] transition duration-300 hover:-translate-y-1"
               >
-                <div className="relative h-[150px]">
-                  <ImageSlot
-                    src={s.image ?? ""}
-                    alt={name}
-                    placeholder={name}
-                    sizes="(max-width: 768px) 50vw, 280px"
-                  />
-                  <span className="absolute left-2 top-2 rounded-[14px] bg-cream/90 px-2 py-1 text-[9px] uppercase tracking-[0.12em] text-accent">
+                <div className="relative h-14 w-14 flex-none overflow-hidden rounded-[14px]">
+                  <ImageSlot src={s.image ?? ""} alt={name} placeholder={name} sizes="56px" />
+                </div>
+                <div className="min-w-0">
+                  <div className="mb-[3px] text-[10px] uppercase tracking-[0.1em] text-accent">
                     {pickLang(s.tag_tr, s.tag_en, lang)}
-                  </span>
+                  </div>
+                  <div className="text-base font-medium leading-[1.1]">{name}</div>
+                  <div className="mt-[1px] line-clamp-1 text-[11px] text-muted">
+                    {pickLang(s.desc_tr, s.desc_en, lang)}
+                  </div>
                 </div>
-                <div className="flex items-center justify-between gap-2 px-4 py-[13px]">
-                  <span className="text-[14px] font-medium leading-tight text-ink group-hover:text-accent">
-                    {name}
-                  </span>
-                  <span className="flex-none text-accent">→</span>
-                </div>
+                <span className="ml-auto flex h-[30px] w-[30px] flex-none items-center justify-center rounded-full bg-ink text-[15px] text-cream transition-colors group-hover:bg-accent">
+                  →
+                </span>
               </Link>
             );
           })}
