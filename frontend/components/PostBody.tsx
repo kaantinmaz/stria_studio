@@ -29,7 +29,7 @@ export function PostBody({ post }: { post: PostFull }) {
 
         {/* body is trusted HTML authored by the owner in the admin editor */}
         <div
-          className="prose-stria flex flex-col gap-4 text-[16px] leading-[1.75] text-muted2 [&_a]:text-accent [&_h2]:mt-8 [&_h2]:text-[26px] [&_h2]:text-ink [&_h3]:mt-6 [&_h3]:text-[20px] [&_h3]:text-ink [&_img]:rounded-[18px] [&_li]:ml-5 [&_li]:list-disc [&_strong]:text-ink"
+          className="prose-stria flex flex-col gap-4 text-[16px] leading-[1.75] text-muted2 [&_a]:text-accent [&_h2]:mt-8 [&_h2]:text-[26px] [&_h2]:text-ink [&_h3]:mt-6 [&_h3]:text-[20px] [&_h3]:text-ink [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded-[18px] [&_li]:ml-5 [&_li]:list-disc [&_strong]:text-ink"
           dangerouslySetInnerHTML={{ __html: body }}
         />
 

@@ -13,7 +13,7 @@ export function Hero() {
   return (
     <header
       id="top"
-      className="mx-auto grid max-w-[1280px] grid-cols-1 items-center gap-[clamp(28px,4.5vw,72px)] px-[clamp(18px,5vw,56px)] pb-16 pt-[158px] md:grid-cols-[minmax(0,1.06fr)_minmax(0,0.94fr)]"
+      className="mx-auto grid max-w-[1280px] grid-cols-1 items-center gap-[clamp(28px,4.5vw,72px)] px-[clamp(18px,5vw,56px)] pb-16 pt-[116px] sm:pt-[158px] md:grid-cols-[minmax(0,1.06fr)_minmax(0,0.94fr)]"
     >
       <div>
         <div className="reveal in mb-[26px] inline-flex items-center gap-2 rounded-[22px] bg-pink px-4 py-2 text-[11px] uppercase tracking-[0.14em] text-accent">
@@ -72,7 +72,7 @@ export function Hero() {
         {/* featured service card */}
         <a
           href="#services"
-          className="absolute bottom-[26px] left-[-14px] flex items-center gap-[13px] rounded-[20px] bg-cream/[0.92] p-3 pl-3 pr-4 text-ink shadow-[0_20px_40px_-18px_rgba(66,48,46,0.4)] backdrop-blur-[10px]"
+          className="absolute bottom-[26px] left-2 flex items-center gap-[13px] rounded-[20px] bg-cream/[0.92] p-3 pl-3 pr-4 text-ink shadow-[0_20px_40px_-18px_rgba(66,48,46,0.4)] backdrop-blur-[10px] sm:left-[-14px]"
         >
           <div className="relative h-14 w-14 flex-none overflow-hidden rounded-[14px]">
             <ImageSlot src={IMG.micro} alt={t.featuredName} sizes="56px" />
@@ -94,7 +94,7 @@ export function Hero() {
         </a>
 
         {/* rating chip */}
-        <div className="absolute right-[-8px] top-6 rounded-[18px] bg-ink px-4 py-3 text-center text-cream shadow-[0_20px_40px_-18px_rgba(66,48,46,0.5)]">
+        <div className="absolute right-2 top-6 rounded-[18px] bg-ink px-4 py-3 text-center text-cream shadow-[0_20px_40px_-18px_rgba(66,48,46,0.5)] sm:right-[-8px]">
           <div className="text-[22px] font-medium leading-none tracking-[-0.02em]">
             5.0
           </div>
