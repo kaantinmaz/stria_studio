@@ -1,12 +1,14 @@
 "use client";
 
 import { useLang } from "@/components/LanguageProvider";
-import { site } from "@/lib/site";
+import { useSettings } from "@/components/SettingsProvider";
+import { phoneHref } from "@/lib/content";
 import { WhatsAppIcon } from "@/components/Icons";
 import { ContactForm } from "@/components/ContactForm";
 
 export function Contact() {
   const { t } = useLang();
+  const settings = useSettings();
 
   return (
     <section id="contact" className="px-[clamp(18px,5vw,56px)] py-[clamp(64px,8vw,120px)]">
@@ -23,7 +25,7 @@ export function Contact() {
           </p>
           <div className="reveal mb-8 flex flex-wrap gap-3">
             <a
-              href={site.wa}
+              href={settings.whatsapp}
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-[9px] rounded-[28px] bg-rose px-7 py-[15px] text-sm text-white"
@@ -32,10 +34,10 @@ export function Contact() {
               {t.heroCtaPrimary}
             </a>
             <a
-              href={site.phoneHref}
+              href={phoneHref(settings.phone)}
               className="rounded-[28px] border border-line2 bg-white px-7 py-[15px] text-sm text-ink"
             >
-              {t.phone}
+              {settings.phone}
             </a>
           </div>
 

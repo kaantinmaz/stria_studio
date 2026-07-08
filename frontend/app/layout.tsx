@@ -46,9 +46,9 @@ export default async function RootLayout({
         <LanguageProvider>
           <SettingsProvider settings={settings}>
             <ServicesProvider services={services}>{children}</ServicesProvider>
+            <WhatsAppFab />
           </SettingsProvider>
         </LanguageProvider>
-        <WhatsAppFab />
       </body>
     </html>
   );

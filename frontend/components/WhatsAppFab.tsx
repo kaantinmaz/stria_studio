@@ -1,11 +1,15 @@
-import { site } from "@/lib/site";
+"use client";
+
+import { useSettings } from "@/components/SettingsProvider";
 import { WhatsAppIcon } from "@/components/Icons";
 
 // Sticky bottom-right WhatsApp button with a pulsing ring.
 export function WhatsAppFab() {
+  const settings = useSettings();
+
   return (
     <a
-      href={site.wa}
+      href={settings.whatsapp}
       target="_blank"
       rel="noreferrer"
       aria-label="WhatsApp"

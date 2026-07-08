@@ -3,12 +3,14 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useLang } from "@/components/LanguageProvider";
-import { site } from "@/lib/site";
+import { useSettings } from "@/components/SettingsProvider";
+import { phoneHref, formatHours } from "@/lib/content";
 import { PhoneIcon, PinIcon, WhatsAppIcon } from "@/components/Icons";
 import { NavServices } from "@/components/NavServices";
 
 export function Nav() {
   const { lang, t, toggle } = useLang();
+  const settings = useSettings();
   const [menuOpen, setMenuOpen] = useState(false);
 
   // Close the mobile menu on Escape.
@@ -32,17 +34,17 @@ export function Nav() {
       {/* contact bar */}
       <div className="flex flex-wrap items-center justify-center gap-x-[clamp(14px,2.4vw,28px)] gap-y-1 bg-ink px-5 py-[9px] text-xs tracking-[0.02em] text-[#e7d3cc]">
         <a
-          href={site.phoneHref}
+          href={phoneHref(settings.phone)}
           className="inline-flex items-center gap-[7px] font-medium text-cream"
         >
           <PhoneIcon size={13} />
-          {t.phone}
+          {settings.phone}
         </a>
         <span className="hidden opacity-40 sm:inline">·</span>
-        <span className="hidden sm:inline">{t.barHours}</span>
+        <span className="hidden sm:inline">{formatHours(settings.hours, lang)}</span>
         <span className="hidden opacity-40 sm:inline">·</span>
         <a
-          href={site.ig}
+          href={settings.instagram}
           target="_blank"
           rel="noreferrer"
           className="hidden text-[#e7d3cc] sm:inline"
@@ -52,7 +54,7 @@ export function Nav() {
         <span className="hidden opacity-40 sm:inline">·</span>
         <span className="hidden items-center gap-[6px] sm:inline-flex">
           <PinIcon size={12} className="text-rose" />
-          {t.barLoc}
+          {settings.address}
         </span>
       </div>
 
@@ -91,14 +93,14 @@ export function Nav() {
             {lang === "tr" ? "EN" : "TR"}
           </button>
           <a
-            href={site.phoneHref}
+            href={phoneHref(settings.phone)}
             className="hidden items-center gap-[7px] rounded-[24px] border border-[#e3c9c1] px-4 py-[10px] text-[12.5px] text-ink lg:inline-flex"
           >
             <PhoneIcon size={13} />
             {t.callLabel}
           </a>
           <a
-            href={site.wa}
+            href={settings.whatsapp}
             target="_blank"
             rel="noreferrer"
             className="rounded-[24px] bg-rose px-5 py-[11px] text-[12.5px] text-white"
@@ -110,7 +112,7 @@ export function Nav() {
         {/* mobile cluster */}
         <div className="flex items-center gap-2 md:hidden">
           <a
-            href={site.wa}
+            href={settings.whatsapp}
             target="_blank"
             rel="noreferrer"
             aria-label={t.navCta}
@@ -162,7 +164,7 @@ export function Nav() {
           </nav>
           <div className="mt-4 flex items-center gap-3">
             <a
-              href={site.phoneHref}
+              href={phoneHref(settings.phone)}
               className="inline-flex flex-1 items-center justify-center gap-2 rounded-[24px] border border-[#e3c9c1] bg-white px-4 py-[12px] text-[13px] text-ink"
             >
               <PhoneIcon size={14} />

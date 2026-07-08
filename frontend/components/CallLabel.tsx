@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { site } from "@/lib/site";
+import { useSettings } from "@/components/SettingsProvider";
 
 // Swaps the call CTA text between the label ("Hemen Ara") and the phone number.
 export function CallLabel({ label }: { label: string }) {
+  const settings = useSettings();
   const [showPhone, setShowPhone] = useState(false);
 
   useEffect(() => {
@@ -12,7 +13,7 @@ export function CallLabel({ label }: { label: string }) {
     return () => clearInterval(id);
   }, []);
 
-  const text = showPhone ? site.phoneLocal : label;
+  const text = showPhone ? settings.phone_local : label;
 
   return (
     // key remounts the span so callFade replays on every swap;
