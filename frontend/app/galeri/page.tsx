@@ -4,6 +4,7 @@ import { Footer } from "@/components/Footer";
 import { JsonLd } from "@/components/JsonLd";
 import { breadcrumbSchema } from "@/components/schema";
 import { buildMetadata } from "@/lib/seo";
+import { getGallery } from "@/lib/content";
 
 export const metadata = buildMetadata({
   title: "Galeri · Stria Studio · Ankara",
@@ -12,7 +13,11 @@ export const metadata = buildMetadata({
   path: "/galeri",
 });
 
-export default function GaleriPage() {
+export const revalidate = 300;
+
+export default async function GaleriPage() {
+  const gallery = await getGallery();
+
   return (
     <>
       <Nav />
@@ -23,7 +28,7 @@ export default function GaleriPage() {
         ])}
       />
       <main className="pt-[132px]">
-        <Gallery />
+        <Gallery items={gallery} />
       </main>
       <Footer />
     </>

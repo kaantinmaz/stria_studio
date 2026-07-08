@@ -6,26 +6,30 @@ import { Services } from "@/components/Services";
 import { Gallery } from "@/components/Gallery";
 import { About } from "@/components/About";
 import { Contact } from "@/components/Contact";
-import { Faq } from "@/components/Faq";
+import { HomeFaq } from "@/components/HomeFaq";
 import { Footer } from "@/components/Footer";
 import { JsonLd } from "@/components/JsonLd";
 import { faqSchema } from "@/components/schema";
-import { HOME_FAQ } from "@/lib/services";
+import { getGallery, getFaqs } from "@/lib/content";
 
-export default function Home() {
+export const revalidate = 300;
+
+export default async function Home() {
+  const [gallery, faqs] = await Promise.all([getGallery(), getFaqs()]);
+
   return (
     <>
       <Nav />
-      <JsonLd data={faqSchema(HOME_FAQ)} />
+      <JsonLd data={faqSchema(faqs.map((f) => ({ q: f.q_tr, a: f.a_tr })))} />
       <main>
         <Hero />
         <ServiceStrip />
         <PromoVideo />
         <Services />
-        <Gallery />
+        <Gallery items={gallery} />
         <About />
         <Contact />
-        <Faq title="Sıkça Sorulan Sorular" items={HOME_FAQ} />
+        <HomeFaq faqs={faqs} title="Sıkça Sorulan Sorular" />
       </main>
       <Footer />
     </>
