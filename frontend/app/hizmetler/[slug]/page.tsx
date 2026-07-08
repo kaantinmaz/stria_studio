@@ -7,35 +7,34 @@ import { ServicePage } from "@/components/ServicePage";
 import { JsonLd } from "@/components/JsonLd";
 import { serviceSchema, faqSchema, breadcrumbSchema } from "@/components/schema";
 import { buildMetadata } from "@/lib/seo";
-import { SERVICE_SEO, getServiceSeo } from "@/lib/services";
-import { SERVICES } from "@/lib/i18n";
+import { getService, getServices, getServiceSlugs } from "@/lib/content";
 
 type Params = { params: Promise<{ slug: string }> };
 
-export function generateStaticParams() {
-  return SERVICE_SEO.map((s) => ({ slug: s.slug }));
-}
+export const revalidate = 300;
 
-export const dynamicParams = false;
+export async function generateStaticParams() {
+  const slugs = await getServiceSlugs();
+  return slugs.map((slug) => ({ slug }));
+}
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
-  const svc = getServiceSeo(slug);
+  const svc = await getService(slug);
   if (!svc) return {};
   return buildMetadata({
-    title: svc.seoTitle,
-    description: svc.seoDesc,
+    title: svc.seo_title_tr || `${svc.name_tr} · Stria Studio`,
+    description: svc.seo_desc_tr || svc.desc_tr,
     path: `/hizmetler/${svc.slug}`,
   });
 }
 
 export default async function ServiceRoute({ params }: Params) {
   const { slug } = await params;
-  const svc = getServiceSeo(slug);
-  const display = SERVICES.find((s) => s.slug === slug);
-  if (!svc || !display) notFound();
+  const [svc, services] = await Promise.all([getService(slug), getServices()]);
+  if (!svc) notFound();
 
-  const name = display.name.tr;
+  const name = svc.name_tr;
   const crumbs = [
     { name: "Ana Sayfa", path: "/" },
     { name: "Hizmetler", path: "/hizmetler" },
@@ -46,10 +45,10 @@ export default async function ServiceRoute({ params }: Params) {
     <>
       <Nav />
       <JsonLd data={serviceSchema(svc, name)} />
-      <JsonLd data={faqSchema(svc.faq)} />
+      <JsonLd data={faqSchema(svc.faq_tr)} />
       <JsonLd data={breadcrumbSchema(crumbs)} />
       <Breadcrumbs items={crumbs} />
-      <ServicePage svc={svc} display={display} />
+      <ServicePage svc={svc} services={services} />
       <Footer />
     </>
   );
