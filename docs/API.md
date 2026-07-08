@@ -274,11 +274,35 @@ görünür (frontend blogda ISR ile ~5 dk içinde).
 
 ---
 
+## Hizmet Güncelleme (ekleme/düzenleme)
+
+Hizmetler için de halka açık yazma API'si **yoktur** (`/api/services` salt-okunur).
+Hizmetler **admin panelinden** eklenir/düzenlenir/sıralanır:
+
+1. **Panel:** `http://127.0.0.1:8002/admin/services` (prod: `https://<api-domaini>/admin/services`)
+2. **Giriş:** `owner@striastudio.com` / `change-me-now` (bkz. "Blog Ekleme" — aynı hesap)
+3. **Services → New/Edit** →
+   - **Türkçe / English** sekmeleri: ad, tag, açıklama, intro, bakım, faydalar[], süreç[], SSS[{q,a}]. (EN boş bırakılırsa site TR'ye düşer.)
+   - **SEO** sekmesi: slug (yeni kayıtta ad'dan otomatik), meta title/desc (tr/en), anahtar kelimeler.
+   - **Görseller & Diğer**: kapak görseli + galeri (çoklu upload), ilgili hizmetler, `sort_order` (sıra), `is_active` (yayın).
+4. Kaydet.
+
+**Etki:**
+- `sort_order` değişince homepage şeridi + `/hizmetler` + Footer + Nav mega-menü sırası değişir.
+- `is_active = false` → hizmet listeden ve `/api/services`'ten kalkar, detay sayfası `404`.
+- Değişiklikler `GET /api/services` ve `GET /api/services/{slug}`'te anında, frontend'de ISR ile ~5 dk içinde görünür.
+
+> Kapak/galeri görselleri `storage` diskine yüklenir; API bunları tam URL olarak
+> döner (`GET /api/services/{slug}` → `image`/`gallery`). Programatik güncelleme
+> gerekirse token korumalı `PUT /api/services/{slug}` eklenebilir (Sanctum) — şu an yok.
+
+---
+
 ## Hata kodları özeti
 
 | Kod | Anlam |
 |---|---|
 | `200` | Başarılı (okuma) |
 | `201` | Oluşturuldu (iletişim formu) |
-| `404` | Yazı bulunamadı / yayınlanmamış |
+| `404` | Yazı/hizmet bulunamadı, yayınlanmamış veya pasif |
 | `422` | Doğrulama hatası (iletişim formu alanları) |
