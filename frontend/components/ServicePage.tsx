@@ -1,12 +1,14 @@
+"use client";
+
 import Link from "next/link";
 import { ImageSlot } from "@/components/ImageSlot";
 import { Faq } from "@/components/Faq";
 import { WhatsAppIcon, PhoneIcon } from "@/components/Icons";
 import { CallLabel } from "@/components/CallLabel";
-import { site } from "@/lib/site";
-import { type ServiceFull, type ServiceListItem } from "@/lib/content";
+import { useSettings } from "@/components/SettingsProvider";
+import { phoneHref, type ServiceFull, type ServiceListItem } from "@/lib/content";
 
-// Server-rendered TR service page body. Content lands in the HTML for Google + AI.
+// Client-rendered TR service page body (settings-driven contact links).
 export function ServicePage({
   svc,
   services,
@@ -14,6 +16,7 @@ export function ServicePage({
   svc: ServiceFull;
   services: ServiceListItem[];
 }) {
+  const settings = useSettings();
   const name = svc.name_tr;
   // Work photos — owner fills svc.gallery; until then show 3 fillable placeholders.
   const shots = svc.gallery?.length ? svc.gallery : ["", "", ""];
@@ -40,7 +43,7 @@ export function ServicePage({
           </p>
           <div className="flex flex-wrap gap-3">
             <a
-              href={site.wa}
+              href={settings.whatsapp}
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-[9px] rounded-[28px] bg-ink px-7 py-[15px] text-sm text-cream"
@@ -49,7 +52,7 @@ export function ServicePage({
               WhatsApp'tan Randevu
             </a>
             <a
-              href={site.phoneHref}
+              href={phoneHref(settings.phone)}
               className="inline-flex items-center gap-[9px] rounded-[28px] border border-line2 bg-white px-7 py-[15px] text-sm text-ink"
             >
               <PhoneIcon size={15} />

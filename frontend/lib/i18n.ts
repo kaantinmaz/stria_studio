@@ -60,8 +60,6 @@ export type Dict = {
   navBlog: string;
   navCta: string;
   callLabel: string;
-  barHours: string;
-  barLoc: string;
   heroKicker: string;
   heroTitle: string;
   heroText: string;
@@ -85,7 +83,6 @@ export type Dict = {
   contactKicker: string;
   contactTitle: string;
   contactText: string;
-  phone: string;
   mapPh: string;
   footerTag: string;
   footerExplore: string;
@@ -119,8 +116,6 @@ export const UI: Record<Lang, Dict> = {
     navBlog: "Blog",
     navCta: "Randevu Al",
     callLabel: "Ara",
-    barHours: "Pzt – Cmt · 10:00 – 19:00",
-    barLoc: "[Mahalle] Cd. No: 00, Çankaya / Ankara",
     heroKicker: "Ankara · Kalıcı Makyaj & Güzellik Stüdyosu",
     heroTitle: "Sen, en doğal\nhalinle güzelsin",
     heroText:
@@ -154,7 +149,6 @@ export const UI: Record<Lang, Dict> = {
     contactTitle: "Hadi randevunu oluşturalım",
     contactText:
       "Sorular ve randevu için WhatsApp'tan yaz ya da bizi ara. En kısa sürede dönüş yapıyoruz.",
-    phone: "+90 507 732 30 26",
     mapPh: "Harita · Çankaya, Ankara",
     footerTag: "Ankara'da microblading, kalıcı makyaj ve kaş–kirpik bakımı.",
     footerExplore: "Keşfet",
@@ -190,8 +184,6 @@ export const UI: Record<Lang, Dict> = {
     navBlog: "Blog",
     navCta: "Book Now",
     callLabel: "Call",
-    barHours: "Mon – Sat · 10:00 – 19:00",
-    barLoc: "[Street] St. No: 00, Çankaya / Ankara",
     heroKicker: "Ankara · Permanent Makeup & Beauty Studio",
     heroTitle: "You, at your\nmost natural",
     heroText:
@@ -225,7 +217,6 @@ export const UI: Record<Lang, Dict> = {
     contactTitle: "Let's book your appointment",
     contactText:
       "Message us on WhatsApp or call for questions and bookings. We reply as soon as we can.",
-    phone: "+90 507 732 30 26",
     mapPh: "Map · Çankaya, Ankara",
     footerTag:
       "Microblading, permanent makeup and brow & lash care in Ankara.",
