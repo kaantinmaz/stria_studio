@@ -29,7 +29,11 @@ class PostForm
                                     ->required()
                                     ->maxLength(180)
                                     ->live(onBlur: true)
-                                    ->afterStateUpdated(fn (?string $state, Set $set) => $set('slug', Str::slug($state))),
+                                    ->afterStateUpdated(function (?string $state, Set $set, string $operation) {
+                                        if ($operation === 'create') {
+                                            $set('slug', Str::slug((string) $state));
+                                        }
+                                    }),
                                 Textarea::make('excerpt_tr')
                                     ->required()
                                     ->rows(2)
