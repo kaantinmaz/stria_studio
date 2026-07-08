@@ -17,6 +17,7 @@ export function Footer() {
     { href: "/galeri", label: t.navGallery },
     { href: "/hakkimizda", label: t.navAbout },
     { href: "/iletisim", label: t.navContact },
+    { href: "/blog", label: t.navBlog },
   ];
 
   return (

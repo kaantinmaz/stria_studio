@@ -1,9 +1,20 @@
 import type { MetadataRoute } from "next";
 import { absUrl } from "@/lib/seo";
 import { SERVICE_SEO } from "@/lib/services";
+import { getAllPostSlugs } from "@/lib/blog";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
+  const slugs = await getAllPostSlugs();
+  const blog = [
+    { url: absUrl("/blog"), lastModified: now, changeFrequency: "weekly" as const, priority: 0.8 },
+    ...slugs.map((s) => ({
+      url: absUrl(`/blog/${s}`),
+      lastModified: now,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
+  ];
   return [
     { url: absUrl("/"), lastModified: now, changeFrequency: "monthly", priority: 1 },
     {
@@ -21,5 +32,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly" as const,
       priority: 0.8,
     })),
+    ...blog,
   ];
 }

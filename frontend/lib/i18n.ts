@@ -146,6 +146,7 @@ export type Dict = {
   navGallery: string;
   navAbout: string;
   navContact: string;
+  navBlog: string;
   navCta: string;
   callLabel: string;
   barHours: string;
@@ -204,6 +205,7 @@ export const UI: Record<Lang, Dict> = {
     navGallery: "Galeri",
     navAbout: "Hakkımızda",
     navContact: "İletişim",
+    navBlog: "Blog",
     navCta: "Randevu Al",
     callLabel: "Ara",
     barHours: "Pzt – Cmt · 10:00 – 19:00",
@@ -274,6 +276,7 @@ export const UI: Record<Lang, Dict> = {
     navGallery: "Gallery",
     navAbout: "About",
     navContact: "Contact",
+    navBlog: "Blog",
     navCta: "Book Now",
     callLabel: "Call",
     barHours: "Mon – Sat · 10:00 – 19:00",

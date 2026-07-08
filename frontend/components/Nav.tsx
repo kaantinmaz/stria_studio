@@ -56,6 +56,9 @@ export function Nav() {
           <a href="/iletisim" className="hidden text-[13px] text-muted sm:inline">
             {t.navContact}
           </a>
+          <a href="/blog" className="hidden text-[13px] text-muted sm:inline">
+            {t.navBlog}
+          </a>
           <button
             onClick={toggle}
             className="cursor-pointer rounded-[20px] border border-line2 bg-white px-3 py-[7px] text-[11px] tracking-[0.1em] text-muted"
