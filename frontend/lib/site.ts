@@ -1,8 +1,9 @@
 // Placeholder contact details from the design — the owner swaps these in one place.
 export const site = {
-  phone: "+90 500 000 00 00",
-  phoneHref: "tel:+905000000000",
-  wa: "https://wa.me/905000000000",
+  phone: "+90 507 732 30 26",
+  phoneLocal: "0507 732 30 26",
+  phoneHref: "tel:+905077323026",
+  wa: "https://wa.me/905077323026",
   ig: "https://instagram.com/striastudio",
   igHandle: "@striastudio",
   address: "Çankaya, Ankara",

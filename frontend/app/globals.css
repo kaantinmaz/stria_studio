@@ -53,9 +53,39 @@ h3 {
   }
 }
 
+/* Content is visible by default so it never disappears if JS fails to run.
+   Only once the reveal observer is live (html.reveal-ready) do we hide-then-animate. */
 .reveal {
+  opacity: 1;
+}
+.reveal-ready .reveal {
   opacity: 0;
 }
-.reveal.in {
+.reveal-ready .reveal.in {
   animation: striaUp 0.85s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+
+/* Animated call CTA: label ↔ phone number swap */
+@keyframes callFade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Sticky WhatsApp button pulse ring */
+@keyframes waPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.55);
+  }
+  70% {
+    box-shadow: 0 0 0 16px rgba(37, 211, 102, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
+  }
 }

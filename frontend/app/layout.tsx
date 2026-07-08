@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Jost } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/components/LanguageProvider";
+import { WhatsAppFab } from "@/components/WhatsAppFab";
 import { JsonLd } from "@/components/JsonLd";
 import { beautySalonSchema } from "@/components/schema";
 import { site } from "@/lib/site";
@@ -39,6 +40,7 @@ export default function RootLayout({
       <body>
         <JsonLd data={beautySalonSchema()} />
         <LanguageProvider>{children}</LanguageProvider>
+        <WhatsAppFab />
       </body>
     </html>
   );

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ImageSlot } from "@/components/ImageSlot";
 import { Faq } from "@/components/Faq";
 import { WhatsAppIcon, PhoneIcon } from "@/components/Icons";
+import { CallLabel } from "@/components/CallLabel";
 import { site } from "@/lib/site";
 import { SERVICES, type Service } from "@/lib/i18n";
 import { type ServiceSeo } from "@/lib/services";
@@ -15,6 +16,8 @@ export function ServicePage({
   display: Service;
 }) {
   const name = display.name.tr;
+  // Work photos — owner fills svc.gallery; until then show 3 fillable placeholders.
+  const shots = svc.gallery?.length ? svc.gallery : ["", "", ""];
   const related = svc.related
     .map((slug) => SERVICES.find((s) => s.slug === slug))
     .filter((s): s is Service => Boolean(s));
@@ -48,7 +51,7 @@ export function ServicePage({
               className="inline-flex items-center gap-[9px] rounded-[28px] border border-line2 bg-white px-7 py-[15px] text-sm text-ink"
             >
               <PhoneIcon size={15} />
-              Hemen Ara
+              <CallLabel label="Hemen Ara" />
             </a>
           </div>
         </div>
@@ -93,6 +96,29 @@ export function ServicePage({
             <span className="font-medium text-ink">Bakım: </span>
             {svc.aftercare}
           </div>
+        </div>
+      </section>
+
+      {/* work gallery — owner drops photos into ServiceSeo.gallery */}
+      <section className="mx-auto max-w-[1160px] px-[clamp(18px,5vw,56px)] py-[clamp(32px,5vw,64px)]">
+        <h2 className="mb-2 text-[clamp(22px,2.4vw,30px)]">Çalışmalarımızdan</h2>
+        <p className="mb-7 max-w-[520px] text-[15px] leading-[1.6] text-muted">
+          {name} uygulamalarımızdan örnek görüntüler.
+        </p>
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-4">
+          {shots.map((src, i) => (
+            <div
+              key={i}
+              className="relative aspect-[4/5] overflow-hidden rounded-[22px] border border-line bg-white"
+            >
+              <ImageSlot
+                src={src}
+                placeholder={`${name} · görsel ${i + 1}`}
+                alt={`${name} çalışma örneği ${i + 1} — Stria Studio Ankara`}
+                sizes="(max-width: 768px) 50vw, 280px"
+              />
+            </div>
+          ))}
         </div>
       </section>
 
