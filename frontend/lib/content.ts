@@ -1,5 +1,40 @@
 import { site } from "@/lib/site";
 
+export type Hours = { days: string[]; open: string; close: string };
+export type Settings = {
+  phone: string;
+  phone_local: string;
+  whatsapp: string;
+  instagram: string;
+  instagram_handle: string;
+  address: string;
+  street_address: string;
+  locality: string;
+  region: string;
+  postal_code: string;
+  country: string;
+  lat: number | string | null;
+  lng: number | string | null;
+  hours: Hours[];
+};
+
+export const SETTINGS_FALLBACK: Settings = {
+  phone: "+90 507 732 30 26",
+  phone_local: "0507 732 30 26",
+  whatsapp: "https://wa.me/905077323026",
+  instagram: "https://instagram.com/striastudio",
+  instagram_handle: "@striastudio",
+  address: "Çankaya, Ankara",
+  street_address: "[Mahalle] Cd. No: 00",
+  locality: "Çankaya",
+  region: "Ankara",
+  postal_code: "06000",
+  country: "TR",
+  lat: 39.9208,
+  lng: 32.8541,
+  hours: [{ days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"], open: "10:00", close: "19:00" }],
+};
+
 export type ServiceListItem = {
   slug: string;
   name_tr: string;
@@ -69,4 +104,34 @@ export async function getService(slug: string): Promise<ServiceFull | null> {
 export async function getServiceSlugs(): Promise<string[]> {
   const list = await getServices();
   return list.map((s) => s.slug);
+}
+
+export async function getSettings(): Promise<Settings | null> {
+  const out = await api<{ data: Settings }>("/settings");
+  return out?.data ?? null;
+}
+
+export function phoneHref(phone: string): string {
+  return "tel:" + (phone || "").replace(/[^\d+]/g, "");
+}
+
+const DAY_NAMES: Record<string, { tr: string; en: string }> = {
+  Monday: { tr: "Pzt", en: "Mon" },
+  Tuesday: { tr: "Sal", en: "Tue" },
+  Wednesday: { tr: "Çar", en: "Wed" },
+  Thursday: { tr: "Per", en: "Thu" },
+  Friday: { tr: "Cum", en: "Fri" },
+  Saturday: { tr: "Cmt", en: "Sat" },
+  Sunday: { tr: "Paz", en: "Sun" },
+};
+
+export function formatHours(hours: Hours[], lang: "tr" | "en"): string {
+  if (!hours?.length) return "";
+  return hours
+    .map((h) => {
+      const ds = h.days.map((d) => DAY_NAMES[d]?.[lang] ?? d);
+      const dayLabel = ds.length > 1 ? `${ds[0]} – ${ds[ds.length - 1]}` : ds[0];
+      return `${dayLabel} · ${h.open} – ${h.close}`;
+    })
+    .join(", ");
 }
