@@ -14,9 +14,9 @@ export function Footer() {
 
   const explore = [
     { href: "/hizmetler", label: t.navServices },
-    { href: "/#gallery", label: t.navGallery },
-    { href: "/#about", label: t.navAbout },
-    { href: "/#contact", label: t.navContact },
+    { href: "/galeri", label: t.navGallery },
+    { href: "/hakkimizda", label: t.navAbout },
+    { href: "/iletisim", label: t.navContact },
   ];
 
   return (
