@@ -12,6 +12,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.9,
     },
+    { url: absUrl("/galeri"), lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: absUrl("/hakkimizda"), lastModified: now, changeFrequency: "yearly", priority: 0.6 },
+    { url: absUrl("/iletisim"), lastModified: now, changeFrequency: "yearly", priority: 0.6 },
     ...SERVICE_SEO.map((s) => ({
       url: absUrl(`/hizmetler/${s.slug}`),
       lastModified: now,
