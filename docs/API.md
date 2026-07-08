@@ -5,13 +5,13 @@ Halka açık (public), salt-okunur içerik API'si + iletişim formu. Blog **yazm
 
 ## Base URL'ler
 
-| Ortam | Blog · Kategori · Etiket · İletişim (Laravel) | Hizmetler (Next) |
-|---|---|---|
-| **Geliştirme** | `http://127.0.0.1:8002/api` | `http://127.0.0.1:3001/api` |
-| **Prod** | `https://<api-domaini>/api` | `https://<site-domaini>/api` |
+| Ortam | API base (Laravel) |
+|---|---|
+| **Geliştirme** | `http://127.0.0.1:8002/api` |
+| **Prod** | `https://<api-domaini>/api` |
 
-> Blog/iletişim dinamik veri → Laravel backend'de. Hizmetler statik site içeriği
-> → Next uygulamasında. İki ayrı base URL bu yüzden.
+> Blog, kategori, etiket, hizmetler, iletişim — hepsi Laravel backend'de,
+> tek base URL.
 
 ## Genel kurallar
 
@@ -133,14 +133,16 @@ GET /api/tags
 ## 5. Hizmetler — Listeleme
 
 ```
-GET /api/services          (Next base: :3001/api)
+GET /api/services          (Laravel base: :8002/api)
 ```
 
-7 hizmeti çift dil döner. Statik içerik; auth/filtre yok.
+7 hizmeti çift dil döner. Auth/filtre yok. Veri DB'den gelir; **admin
+panelinden** yönetilir (bkz. "Blog Ekleme" bölümündeki panel girişi) — statik
+dosya değil.
 
 **Örnek**
 ```bash
-curl "http://127.0.0.1:3001/api/services"
+curl "http://127.0.0.1:8002/api/services"
 ```
 
 **Cevap `200`**
