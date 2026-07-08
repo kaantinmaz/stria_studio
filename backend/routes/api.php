@@ -3,6 +3,7 @@
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\SettingController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/contact', [ContactController::class, 'store']);
@@ -14,3 +15,5 @@ Route::get('/tags', [BlogController::class, 'tags']);
 
 Route::get('/services', [ServiceController::class, 'index']);
 Route::get('/services/{slug}', [ServiceController::class, 'show']);
+
+Route::get('/settings', [SettingController::class, 'show']);
