@@ -9,17 +9,6 @@ export const IMG = {
   dipliner: "/images/dipliner.png",
 } as const;
 
-export type GalleryItem = { id: string; img: string; ph: LS };
-
-export const GALLERY: GalleryItem[] = [
-  { id: "mg1", img: IMG.micro, ph: { tr: "Microblading", en: "Microblading" } },
-  { id: "mg2", img: IMG.dipliner, ph: { tr: "Kirpik / göz", en: "Lashes / eye" } },
-  { id: "mg3", img: IMG.hero, ph: { tr: "Stüdyo", en: "Studio" } },
-  { id: "mg4", img: IMG.powder, ph: { tr: "Kaş pudralama", en: "Powder brows" } },
-  { id: "mg5", img: IMG.eyeliner, ph: { tr: "Eyeliner", en: "Eyeliner" } },
-  { id: "mg6", img: "", ph: { tr: "Çalışmanızı ekleyin", en: "Add your work" } },
-];
-
 export type TrustItem = { stat: LS; label: LS };
 
 export const TRUST: TrustItem[] = [

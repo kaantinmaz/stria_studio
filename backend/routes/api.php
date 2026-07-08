@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\FaqController;
+use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SettingController;
 use Illuminate\Support\Facades\Route;
@@ -17,3 +19,6 @@ Route::get('/services', [ServiceController::class, 'index']);
 Route::get('/services/{slug}', [ServiceController::class, 'show']);
 
 Route::get('/settings', [SettingController::class, 'show']);
+
+Route::get('/gallery', [GalleryController::class, 'index']);
+Route::get('/faqs', [FaqController::class, 'index']);

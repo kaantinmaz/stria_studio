@@ -1,10 +1,10 @@
 "use client";
 
 import { useLang } from "@/components/LanguageProvider";
-import { GALLERY } from "@/lib/i18n";
+import { pickLang, type GalleryItem2 } from "@/lib/content";
 import { ImageSlot } from "@/components/ImageSlot";
 
-export function Gallery() {
+export function Gallery({ items }: { items: GalleryItem2[] }) {
   const { lang, t } = useLang();
 
   return (
@@ -27,19 +27,22 @@ export function Gallery() {
       </div>
 
       <div className="mx-auto grid max-w-[1160px] grid-cols-[repeat(auto-fill,minmax(min(100%,210px),1fr))] gap-[14px] [grid-auto-rows:250px]">
-        {GALLERY.map((g) => (
-          <div
-            key={g.id}
-            className="reveal relative overflow-hidden rounded-[22px]"
-          >
-            <ImageSlot
-              src={g.img}
-              alt={g.ph[lang]}
-              placeholder={g.ph[lang]}
-              sizes="(max-width: 768px) 100vw, 280px"
-            />
-          </div>
-        ))}
+        {items.map((g, i) => {
+          const alt = pickLang(g.alt_tr, g.alt_en, lang);
+          return (
+            <div
+              key={i}
+              className="reveal relative overflow-hidden rounded-[22px]"
+            >
+              <ImageSlot
+                src={g.image ?? ""}
+                alt={alt}
+                placeholder={alt}
+                sizes="(max-width: 768px) 100vw, 280px"
+              />
+            </div>
+          );
+        })}
       </div>
     </section>
   );

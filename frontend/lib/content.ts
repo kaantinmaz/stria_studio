@@ -111,6 +111,19 @@ export async function getSettings(): Promise<Settings | null> {
   return out?.data ?? null;
 }
 
+export type GalleryItem2 = { image: string | null; alt_tr: string; alt_en: string | null };
+export type FaqItem = { q_tr: string; q_en: string | null; a_tr: string; a_en: string | null };
+
+export async function getGallery(): Promise<GalleryItem2[]> {
+  const out = await api<{ data: GalleryItem2[] }>("/gallery");
+  return out?.data ?? [];
+}
+
+export async function getFaqs(): Promise<FaqItem[]> {
+  const out = await api<{ data: FaqItem[] }>("/faqs");
+  return out?.data ?? [];
+}
+
 export function phoneHref(phone: string): string {
   return "tel:" + (phone || "").replace(/[^\d+]/g, "");
 }
