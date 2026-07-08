@@ -30,7 +30,17 @@ class ServiceApiTest extends TestCase
         $this->getJson('/api/services/micro')
             ->assertOk()
             ->assertJsonPath('data.slug', 'micro')
+            ->assertJsonPath('data.image', '/images/micro.png')
             ->assertJsonStructure(['data' => ['intro_tr', 'benefits_tr', 'faq_tr', 'gallery', 'related']]);
+    }
+
+    public function test_uploaded_image_path_becomes_storage_url(): void
+    {
+        Service::factory()->create(['slug' => 'up', 'is_active' => true, 'image' => 'services/x.png']);
+
+        $this->getJson('/api/services/up')
+            ->assertOk()
+            ->assertJsonPath('data.image', asset('storage/services/x.png'));
     }
 
     public function test_inactive_service_is_404(): void

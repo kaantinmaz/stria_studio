@@ -18,10 +18,19 @@ class ServiceListResource extends JsonResource
             'tag_en' => $this->tag_en,
             'desc_tr' => $this->desc_tr,
             'desc_en' => $this->desc_en,
-            'image' => $this->image && Str::startsWith($this->image, '/storage')
-                ? asset(ltrim($this->image, '/'))
-                : $this->image,
+            'image' => $this->imageUrl($this->image),
             'url' => '/hizmetler/'.$this->slug,
         ];
+    }
+
+    protected function imageUrl(?string $p): ?string
+    {
+        if (! $p) {
+            return null;
+        }
+
+        return Str::startsWith($p, ['http://', 'https://', '/'])
+            ? $p                       // already absolute (http) or root-relative (/images, /storage)
+            : asset('storage/'.$p);    // Filament upload like "services/x.png" -> storage URL (asset() uses request host)
     }
 }

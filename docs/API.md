@@ -130,7 +130,7 @@ GET /api/tags
 
 ---
 
-## 5. Hizmetler — Listeleme
+## 5a. Hizmetler — Listeleme
 
 ```
 GET /api/services          (Laravel base: :8002/api)
@@ -165,8 +165,55 @@ curl "http://127.0.0.1:8002/api/services"
 ```
 
 - `url`: sitedeki hizmet detay sayfasının yolu.
-- Tek hizmetin tam SEO içeriği (intro, benefits, process, FAQ) API'de değil;
-  `/hizmetler/{slug}` sayfasında sunulur.
+- `image`: yüklü görsel varsa tam storage URL'i, kök-göreli statik yol (`/images/...`)
+  ise olduğu gibi döner; görsel yoksa `null`.
+
+---
+
+## 5b. Hizmet — Tek
+
+```
+GET /api/services/{slug}          (Laravel base: :8002/api)
+```
+
+Listeye ek olarak tam SEO/içerik alanlarını döner.
+
+**Örnek**
+```bash
+curl "http://127.0.0.1:8002/api/services/microblading"
+```
+
+**Cevap `200`**
+```json
+{
+  "data": {
+    "slug": "microblading",
+    "name_tr": "Microblading", "name_en": "Microblading",
+    "tag_tr": "Kaş", "tag_en": "Brows",
+    "desc_tr": "...", "desc_en": "...",
+    "image": "/images/micro.png",
+    "url": "/hizmetler/microblading",
+    "seo_title_tr": null, "seo_title_en": null,
+    "seo_desc_tr": null, "seo_desc_en": null,
+    "keywords_tr": [], "keywords_en": [],
+    "intro_tr": "...", "intro_en": "...",
+    "aftercare_tr": "...", "aftercare_en": "...",
+    "benefits_tr": ["Doğal görünüm"], "benefits_en": ["Natural look"],
+    "process_tr": ["Danışma", "Uygulama"], "process_en": ["Consultation", "Application"],
+    "faq_tr": [ { "q": "Kaç seans sürer?", "a": "Genellikle 1-2 seans." } ],
+    "faq_en": [ { "q": "How many sessions?", "a": "Usually 1-2 sessions." } ],
+    "gallery": ["http://127.0.0.1:8002/storage/services/1.png"],
+    "related": ["microshading"]
+  }
+}
+```
+
+- `benefits_*` / `process_*`: string dizisi.
+- `faq_*`: `{ q, a }` nesne dizisi.
+- `gallery`: görsel URL dizisi (yüklü dosyalar storage URL'ine, kök-göreli
+  yollar olduğu gibi döner — bkz. `image` notu yukarıda).
+- `related`: ilgili hizmet slug'larının dizisi.
+- Pasif (`is_active = false`) veya olmayan slug → **`404`**.
 
 ---
 
