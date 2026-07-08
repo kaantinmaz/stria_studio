@@ -47,14 +47,17 @@ export function Nav() {
         </a>
         <div className="flex items-center gap-[clamp(11px,2vw,28px)]">
           <NavServices />
-          <a href="/#gallery" className="text-[13px] text-muted">
+          <a href="/galeri" className="text-[13px] text-muted">
             {t.navGallery}
           </a>
-          <a href="/#about" className="hidden text-[13px] text-muted sm:inline">
+          <a href="/hakkimizda" className="hidden text-[13px] text-muted sm:inline">
             {t.navAbout}
           </a>
-          <a href="/#contact" className="hidden text-[13px] text-muted sm:inline">
+          <a href="/iletisim" className="hidden text-[13px] text-muted sm:inline">
             {t.navContact}
+          </a>
+          <a href="/blog" className="hidden text-[13px] text-muted sm:inline">
+            {t.navBlog}
           </a>
           <button
             onClick={toggle}

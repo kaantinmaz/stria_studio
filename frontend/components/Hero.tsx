@@ -5,6 +5,7 @@ import { site } from "@/lib/site";
 import { IMG } from "@/lib/i18n";
 import { ImageSlot } from "@/components/ImageSlot";
 import { PhoneIcon, WhatsAppIcon } from "@/components/Icons";
+import { CallLabel } from "@/components/CallLabel";
 
 export function Hero() {
   const { t } = useLang();
@@ -40,7 +41,7 @@ export function Hero() {
             className="inline-flex items-center gap-[9px] rounded-[28px] border border-line2 bg-white px-7 py-[15px] text-sm text-ink"
           >
             <PhoneIcon size={15} />
-            {t.heroCtaSecondary}
+            <CallLabel label={t.heroCtaSecondary} />
           </a>
         </div>
         <div className="reveal in flex flex-wrap gap-x-[22px] gap-y-4">

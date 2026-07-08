@@ -28,6 +28,9 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   // Scroll-reveal: mirror the design's IntersectionObserver behaviour.
   useEffect(() => {
+    // This code only runs from a loaded JS chunk. Marking the doc here (not in
+    // CSS/inline) guarantees content stays visible if the chunk never loads.
+    document.documentElement.classList.add("reveal-ready");
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {

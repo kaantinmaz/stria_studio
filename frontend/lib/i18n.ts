@@ -146,6 +146,7 @@ export type Dict = {
   navGallery: string;
   navAbout: string;
   navContact: string;
+  navBlog: string;
   navCta: string;
   callLabel: string;
   barHours: string;
@@ -169,6 +170,7 @@ export type Dict = {
   aboutKicker: string;
   aboutTitle: string;
   aboutText: string;
+  aboutStoryLong: string;
   contactKicker: string;
   contactTitle: string;
   contactText: string;
@@ -203,6 +205,7 @@ export const UI: Record<Lang, Dict> = {
     navGallery: "Galeri",
     navAbout: "Hakkımızda",
     navContact: "İletişim",
+    navBlog: "Blog",
     navCta: "Randevu Al",
     callLabel: "Ara",
     barHours: "Pzt – Cmt · 10:00 – 19:00",
@@ -234,11 +237,13 @@ export const UI: Record<Lang, Dict> = {
     aboutTitle: "Rahat, güvenli ve tamamen sana özel",
     aboutText:
       "Her uygulamaya yüz analizi ve simetri ölçümüyle başlıyoruz. Steril ortam, kaliteli pigmentler ve doğallıktan ödün vermeyen bir anlayış — Stria'da güzellik abartısız ve sana ait kalıyor.",
+    aboutStoryLong:
+      "Stria Studio, Ankara Çankaya'da kalıcı makyaj ve güzellik alanında; doğallığı, sterilizasyonu ve kişiye özel tasarımı merkezine alan bir stüdyodur. Her uygulamaya ücretsiz ön görüşme, yüz analizi ve simetri ölçümüyle başlıyor; kaliteli pigmentler ve tek kullanımlık ekipmanla, abartısız ve size ait bir sonuç hedefliyoruz.",
     contactKicker: "İletişim",
     contactTitle: "Hadi randevunu oluşturalım",
     contactText:
       "Sorular ve randevu için WhatsApp'tan yaz ya da bizi ara. En kısa sürede dönüş yapıyoruz.",
-    phone: "+90 500 000 00 00",
+    phone: "+90 507 732 30 26",
     mapPh: "Harita · Çankaya, Ankara",
     footerTag: "Ankara'da microblading, kalıcı makyaj ve kaş–kirpik bakımı.",
     footerExplore: "Keşfet",
@@ -246,7 +251,7 @@ export const UI: Record<Lang, Dict> = {
     footerRights: "Tüm hakları saklıdır.",
     info: [
       { label: "Adres", value: "Çankaya, Ankara" },
-      { label: "Telefon", value: "+90 500 000 00 00" },
+      { label: "Telefon", value: "+90 507 732 30 26" },
       { label: "Instagram", value: "@striastudio" },
       { label: "Çalışma Saatleri", value: "Pzt – Cmt · 10:00 – 19:00" },
     ],
@@ -271,6 +276,7 @@ export const UI: Record<Lang, Dict> = {
     navGallery: "Gallery",
     navAbout: "About",
     navContact: "Contact",
+    navBlog: "Blog",
     navCta: "Book Now",
     callLabel: "Call",
     barHours: "Mon – Sat · 10:00 – 19:00",
@@ -302,11 +308,13 @@ export const UI: Record<Lang, Dict> = {
     aboutTitle: "Relaxed, safe and entirely yours",
     aboutText:
       "Every treatment begins with facial analysis and symmetry mapping. A sterile space, premium pigments and an approach that never oversteps — at Stria, beauty stays understated and unmistakably yours.",
+    aboutStoryLong:
+      "Stria Studio is a permanent-makeup and beauty studio in Çankaya, Ankara, built around natural results, strict sterilisation and per-face design. Every treatment starts with a free consultation, face analysis and symmetry measurement; with quality pigments and single-use tools we aim for an understated result that stays truly yours.",
     contactKicker: "Contact",
     contactTitle: "Let's book your appointment",
     contactText:
       "Message us on WhatsApp or call for questions and bookings. We reply as soon as we can.",
-    phone: "+90 500 000 00 00",
+    phone: "+90 507 732 30 26",
     mapPh: "Map · Çankaya, Ankara",
     footerTag:
       "Microblading, permanent makeup and brow & lash care in Ankara.",
@@ -315,7 +323,7 @@ export const UI: Record<Lang, Dict> = {
     footerRights: "All rights reserved.",
     info: [
       { label: "Address", value: "Çankaya, Ankara" },
-      { label: "Phone", value: "+90 500 000 00 00" },
+      { label: "Phone", value: "+90 507 732 30 26" },
       { label: "Instagram", value: "@striastudio" },
       { label: "Hours", value: "Mon – Sat · 10:00 – 19:00" },
     ],

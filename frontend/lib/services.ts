@@ -13,6 +13,7 @@ export type ServiceSeo = {
   aftercare: string;
   faq: { q: string; a: string }[]; // ≥3
   related: string[]; // other slugs
+  gallery?: string[]; // owner: paths to real work photos, e.g. "/images/micro-1.png"
 };
 
 export const SERVICE_SEO: ServiceSeo[] = [
