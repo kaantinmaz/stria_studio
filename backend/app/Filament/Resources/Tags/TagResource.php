@@ -18,7 +18,17 @@ class TagResource extends Resource
 {
     protected static ?string $model = Tag::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedHashtag;
+
+    protected static string|\UnitEnum|null $navigationGroup = 'İçerik';
+
+    protected static ?string $navigationLabel = 'Etiketler';
+
+    protected static ?int $navigationSort = 4;
+
+    protected static ?string $modelLabel = 'Etiket';
+
+    protected static ?string $pluralModelLabel = 'Etiketler';
 
     public static function form(Schema $schema): Schema
     {

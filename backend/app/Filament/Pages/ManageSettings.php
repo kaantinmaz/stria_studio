@@ -17,7 +17,11 @@ class ManageSettings extends Page
 {
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedCog6Tooth;
 
-    protected static ?string $navigationLabel = 'Ayarlar';
+    protected static string|\UnitEnum|null $navigationGroup = 'Ayarlar';
+
+    protected static ?string $navigationLabel = 'Site Ayarları';
+
+    protected static ?int $navigationSort = 1;
 
     protected string $view = 'filament.pages.manage-settings';
 

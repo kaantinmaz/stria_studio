@@ -28,8 +28,18 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->brandName('Stria Studio')
+            ->brandLogo(asset('logo.png'))
+            ->brandLogoHeight('2rem')
+            ->favicon(asset('favicon.ico'))
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::hex('#c57c69'),
+            ])
+            ->font('Jost')
+            ->sidebarCollapsibleOnDesktop()
+            ->navigationGroups([
+                'İçerik',
+                'Ayarlar',
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
