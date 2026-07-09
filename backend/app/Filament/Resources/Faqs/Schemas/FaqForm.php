@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Faqs\Schemas;
 
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -13,6 +14,11 @@ class FaqForm
     {
         return $schema
             ->components([
+                Select::make('site')
+                    ->label('Site')
+                    ->placeholder('Ana site (Stria Studio)')
+                    ->options(collect(config('microsites'))->mapWithKeys(fn ($c, $k) => [$k => $c['name']])->all())
+                    ->native(false),
                 TextInput::make('q_tr')
                     ->required(),
                 TextInput::make('q_en'),

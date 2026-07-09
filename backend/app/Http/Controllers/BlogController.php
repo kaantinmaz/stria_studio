@@ -14,6 +14,7 @@ class BlogController extends Controller
     public function index(Request $request)
     {
         $posts = Post::published()
+            ->whereNull('site') // main site only; microsite rows served via /microsites/{site}
             ->with(['category', 'tags'])
             ->when($request->query('category'), fn ($q, $slug) =>
                 $q->whereHas('category', fn ($c) => $c->where('slug', $slug)))
@@ -27,7 +28,7 @@ class BlogController extends Controller
 
     public function show(string $slug)
     {
-        $post = Post::published()->with(['category', 'tags'])->where('slug', $slug)->firstOrFail();
+        $post = Post::published()->whereNull('site')->with(['category', 'tags'])->where('slug', $slug)->firstOrFail();
         return new PostApiResource($post);
     }
 

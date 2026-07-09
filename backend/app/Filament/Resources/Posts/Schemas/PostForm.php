@@ -86,6 +86,12 @@ class PostForm
                     ->multiple()
                     ->searchable()
                     ->preload(),
+                Select::make('site')
+                    ->label('Site')
+                    ->placeholder('Ana site (Stria Studio)')
+                    ->helperText('Boş bırakılırsa ana sitede yayınlanır. Bir mikrosit seçilirse yalnızca o sitede görünür.')
+                    ->options(collect(config('microsites'))->mapWithKeys(fn ($c, $k) => [$k => $c['name']])->all())
+                    ->native(false),
                 Toggle::make('is_published'),
                 DateTimePicker::make('published_at')
                     ->default(now()),

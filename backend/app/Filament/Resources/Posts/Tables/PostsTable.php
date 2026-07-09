@@ -20,6 +20,11 @@ class PostsTable
                 TextColumn::make('title_tr')
                     ->searchable()
                     ->limit(40),
+                TextColumn::make('site')
+                    ->label('Site')
+                    ->badge()
+                    ->placeholder('Ana site')
+                    ->formatStateUsing(fn (?string $state) => $state ? (config("microsites.$state.name") ?? $state) : 'Ana site'),
                 TextColumn::make('category.name_tr')
                     ->badge(),
                 IconColumn::make('is_published')
@@ -29,6 +34,9 @@ class PostsTable
                     ->sortable(),
             ])
             ->filters([
+                SelectFilter::make('site')
+                    ->label('Site')
+                    ->options(collect(config('microsites'))->mapWithKeys(fn ($c, $k) => [$k => $c['name']])->all()),
                 SelectFilter::make('category')
                     ->relationship('category', 'name_tr'),
                 TernaryFilter::make('is_published'),

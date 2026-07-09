@@ -9,6 +9,6 @@ class FaqController extends Controller
 {
     public function index()
     {
-        return FaqResource::collection(Faq::active()->get());
+        return FaqResource::collection(Faq::active()->whereNull('site')->get());
     }
 }

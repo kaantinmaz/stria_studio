@@ -7,6 +7,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 class FaqsTable
@@ -18,13 +19,20 @@ class FaqsTable
                 TextColumn::make('q_tr')
                     ->limit(50)
                     ->searchable(),
+                TextColumn::make('site')
+                    ->label('Site')
+                    ->badge()
+                    ->placeholder('Ana site')
+                    ->formatStateUsing(fn (?string $state) => $state ? (config("microsites.$state.name") ?? $state) : 'Ana site'),
                 IconColumn::make('is_active')
                     ->boolean(),
                 TextColumn::make('sort_order')
                     ->sortable(),
             ])
             ->filters([
-                //
+                SelectFilter::make('site')
+                    ->label('Site')
+                    ->options(collect(config('microsites'))->mapWithKeys(fn ($c, $k) => [$k => $c['name']])->all()),
             ])
             ->defaultSort('sort_order')
             ->recordActions([

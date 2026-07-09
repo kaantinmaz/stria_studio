@@ -9,6 +9,6 @@ class GalleryController extends Controller
 {
     public function index()
     {
-        return GalleryImageResource::collection(GalleryImage::active()->get());
+        return GalleryImageResource::collection(GalleryImage::active()->whereNull('site')->get());
     }
 }
