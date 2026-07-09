@@ -1,0 +1,279 @@
+openapi: 3.1.0
+info:
+  title: Mikroblading Ankara — Microsite API
+  version: "1.0.0"
+  description: >
+    Public, read-only content API for the mikrobladingankara.com microsite,
+    served by the shared Stria Studio Laravel backend. All content is scoped by
+    the `site` slug. Unknown site slugs return 404.
+  contact:
+    name: Stria Studio
+    url: https://mikrobladingankara.com/iletisim
+servers:
+  - url: http://127.0.0.1:8002/api
+    description: Local development (MAMP)
+  - url: https://api.striastudio.com/api
+    description: Production (example — set to your live API host)
+tags:
+  - name: content
+    description: Read-only microsite content
+  - name: lead
+    description: Contact / appointment requests
+paths:
+  /microsites/{site}/service:
+    get:
+      tags: [content]
+      summary: Pinned service detail
+      description: Returns the service this microsite is dedicated to (e.g. microblading).
+      parameters:
+        - $ref: "#/components/parameters/Site"
+      responses:
+        "200":
+          description: Service object
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: "#/components/schemas/Service" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /microsites/{site}/posts:
+    get:
+      tags: [content]
+      summary: List blog posts
+      parameters:
+        - $ref: "#/components/parameters/Site"
+        - name: page
+          in: query
+          schema: { type: integer, minimum: 1, default: 1 }
+        - name: tag
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Paginated post list
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PaginatedPosts" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /microsites/{site}/posts/{slug}:
+    get:
+      tags: [content]
+      summary: Single blog post
+      parameters:
+        - $ref: "#/components/parameters/Site"
+        - name: slug
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Post object with body
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: "#/components/schemas/PostFull" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /microsites/{site}/faqs:
+    get:
+      tags: [content]
+      summary: List FAQs
+      parameters:
+        - $ref: "#/components/parameters/Site"
+      responses:
+        "200":
+          description: FAQ list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/Faq" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /microsites/{site}/gallery:
+    get:
+      tags: [content]
+      summary: List gallery images
+      parameters:
+        - $ref: "#/components/parameters/Site"
+      responses:
+        "200":
+          description: Gallery list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/GalleryImage" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /microsites/{site}/settings:
+    get:
+      tags: [content]
+      summary: Studio settings (NAP, hours, socials)
+      parameters:
+        - $ref: "#/components/parameters/Site"
+      responses:
+        "200":
+          description: Settings object
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: "#/components/schemas/Settings" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /microsites/{site}/contact:
+    post:
+      tags: [lead]
+      summary: Submit a contact / appointment request
+      description: Creates a lead tagged with the microsite. Rate limited to 30/min.
+      parameters:
+        - $ref: "#/components/parameters/Site"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ContactRequest" }
+      responses:
+        "201":
+          description: Lead created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean, example: true }
+                  id: { type: integer, example: 42 }
+        "422": { $ref: "#/components/responses/ValidationError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { description: Too many requests (rate limited) }
+components:
+  parameters:
+    Site:
+      name: site
+      in: path
+      required: true
+      description: Microsite slug (must be registered in backend config/microsites.php).
+      schema: { type: string, example: mikroblading-ankara }
+  responses:
+    NotFound:
+      description: Unknown microsite or resource
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message: { type: string, example: "Unknown microsite: foo" }
+    ValidationError:
+      description: Request body failed validation
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message: { type: string }
+              errors: { type: object, additionalProperties: { type: array, items: { type: string } } }
+  schemas:
+    Service:
+      type: object
+      properties:
+        slug: { type: string, example: microblading }
+        name_tr: { type: string }
+        tag_tr: { type: string }
+        desc_tr: { type: string }
+        image: { type: [string, "null"] }
+        intro_tr: { type: [string, "null"] }
+        aftercare_tr: { type: [string, "null"] }
+        keywords_tr: { type: array, items: { type: string } }
+        benefits_tr: { type: array, items: { type: string } }
+        process_tr: { type: array, items: { type: string } }
+        faq_tr:
+          type: array
+          items:
+            type: object
+            properties:
+              q: { type: string }
+              a: { type: string }
+        gallery: { type: array, items: { type: string } }
+    PostList:
+      type: object
+      properties:
+        id: { type: integer }
+        slug: { type: string }
+        title_tr: { type: string }
+        excerpt_tr: { type: string }
+        cover_url: { type: [string, "null"] }
+        published_at: { type: [string, "null"], format: date-time }
+        category:
+          type: [object, "null"]
+          properties:
+            slug: { type: string }
+            name_tr: { type: string }
+    PostFull:
+      allOf:
+        - $ref: "#/components/schemas/PostList"
+        - type: object
+          properties:
+            body_tr: { type: string, description: "HTML" }
+            meta_title_tr: { type: [string, "null"] }
+            meta_desc_tr: { type: [string, "null"] }
+    PaginatedPosts:
+      type: object
+      properties:
+        data:
+          type: array
+          items: { $ref: "#/components/schemas/PostList" }
+        meta:
+          type: object
+          properties:
+            current_page: { type: integer }
+            last_page: { type: integer }
+            total: { type: integer }
+    Faq:
+      type: object
+      properties:
+        q_tr: { type: string }
+        a_tr: { type: string }
+    GalleryImage:
+      type: object
+      properties:
+        image: { type: [string, "null"] }
+        alt_tr: { type: string }
+    Settings:
+      type: object
+      properties:
+        phone: { type: string }
+        phone_local: { type: string }
+        whatsapp: { type: string }
+        instagram: { type: string }
+        instagram_handle: { type: string }
+        street_address: { type: string }
+        locality: { type: string }
+        region: { type: string }
+        postal_code: { type: string }
+        country: { type: string }
+        lat: { type: [number, string, "null"] }
+        lng: { type: [number, string, "null"] }
+        hours:
+          type: array
+          items:
+            type: object
+            properties:
+              days: { type: array, items: { type: string } }
+              open: { type: string }
+              close: { type: string }
+    ContactRequest:
+      type: object
+      required: [name, phone]
+      properties:
+        name: { type: string, maxLength: 120 }
+        phone: { type: string, maxLength: 40 }
+        email: { type: [string, "null"], format: email, maxLength: 160 }
+        preferred_date: { type: [string, "null"], format: date }
+        message: { type: [string, "null"], maxLength: 2000 }

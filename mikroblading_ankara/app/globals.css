@@ -1,0 +1,121 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cream: #fbf4f1;
+  --color-ink: #42302e;
+  --color-accent: #b26a4f;
+  --color-accent-dark: #8f5138;
+  --color-rose: #d89a8a;
+  --color-pink: #f3ded7;
+  --color-blush: #f5e6e0;
+  --color-muted: #8a6f6a;
+  --color-muted2: #7a605b;
+  --color-line: #f1e2dc;
+  --color-line2: #eeddd7;
+  --font-sans: var(--font-jost), system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-jost), system-ui, sans-serif;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+::selection {
+  background: var(--color-pink);
+  color: var(--color-ink);
+}
+
+/* Sticky WhatsApp button pulse ring */
+@keyframes waPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.55);
+  }
+  70% {
+    box-shadow: 0 0 0 16px rgba(37, 211, 102, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
+  }
+}
+
+/* --- Blog / article body (server-rendered HTML from the CMS) --- */
+.prose {
+  color: var(--color-ink);
+  line-height: 1.75;
+  font-size: 1.0625rem;
+}
+.prose > * + * {
+  margin-top: 1.1em;
+}
+.prose h2 {
+  font-size: 1.5rem;
+  margin-top: 2em;
+  line-height: 1.3;
+}
+.prose h3 {
+  font-size: 1.2rem;
+  margin-top: 1.6em;
+}
+.prose p,
+.prose li {
+  color: var(--color-muted2);
+}
+.prose strong {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+.prose ul,
+.prose ol {
+  padding-left: 1.3em;
+}
+.prose ul {
+  list-style: disc;
+}
+.prose ol {
+  list-style: decimal;
+}
+.prose li + li {
+  margin-top: 0.4em;
+}
+.prose a {
+  color: var(--color-accent-dark);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  margin: 1.5em 0;
+}
+.prose th,
+.prose td {
+  border: 1px solid var(--color-line2);
+  padding: 10px 14px;
+  text-align: left;
+}
+.prose thead th {
+  background: var(--color-blush);
+  color: var(--color-ink);
+  font-weight: 600;
+}
+.prose tbody tr:nth-child(even) {
+  background: rgba(245, 230, 224, 0.4);
+}
