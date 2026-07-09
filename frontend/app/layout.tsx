@@ -5,6 +5,7 @@ import { LanguageProvider } from "@/components/LanguageProvider";
 import { ServicesProvider } from "@/components/ServicesProvider";
 import { SettingsProvider } from "@/components/SettingsProvider";
 import { WhatsAppFab } from "@/components/WhatsAppFab";
+import { Analytics } from "@/components/Analytics";
 import { JsonLd } from "@/components/JsonLd";
 import { beautySalonSchema } from "@/components/schema";
 import { site } from "@/lib/site";
@@ -47,6 +48,7 @@ export default async function RootLayout({
           <SettingsProvider settings={settings}>
             <ServicesProvider services={services}>{children}</ServicesProvider>
             <WhatsAppFab />
+            <Analytics />
           </SettingsProvider>
         </LanguageProvider>
       </body>

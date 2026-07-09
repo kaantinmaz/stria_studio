@@ -6,6 +6,7 @@ use App\Http\Controllers\FaqController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\TrackController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/contact', [ContactController::class, 'store']);
@@ -22,3 +23,5 @@ Route::get('/settings', [SettingController::class, 'show']);
 
 Route::get('/gallery', [GalleryController::class, 'index']);
 Route::get('/faqs', [FaqController::class, 'index']);
+
+Route::post('/track', [TrackController::class, 'store'])->middleware('throttle:120,1');
