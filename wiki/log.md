@@ -8,3 +8,4 @@ Append-only timeline. Newest at top. One line per operation: `YYYY-MM-DD — OP 
 - 2026-07-07 — BUILD — Scaffolded Next.js frontend + Laravel backend; ported Minimal design (7 sections, TR/EN, appointment form → leads). Verified: build passes, POST /api/contact inserts leads, CORS OK. Added decisions/2026-07-07-stack-and-dev-servers.
 - 2026-07-07 — INGEST — Added raw/stria-studio-design.md (Minimal design source); downloaded 5 studio images to frontend/public/images.
 - 2026-07-07 — SETUP — Wiki scaffold created (schema, index, log, prompts, empty category folders).
+- 2026-07-09 — Added decision [microsite-architecture]; built mikroblading_ankara microsite + backend `site` scoping.
