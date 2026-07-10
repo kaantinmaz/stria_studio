@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { getSettings, getFaqs, getGallery, getPosts, SETTINGS_FALLBACK } from "@/lib/content";
 import { hero, whatIs, benefits, process, pricing, about, faqFallback } from "@/lib/copy";
 import { Container, Section } from "@/components/Section";
@@ -11,8 +12,7 @@ import { Reviews } from "@/components/Reviews";
 import { Faq } from "@/components/Faq";
 import { BlogList } from "@/components/BlogList";
 import { StudioMap } from "@/components/StudioMap";
-import { ImageSlot } from "@/components/ImageSlot";
-import { CheckIcon, ArrowIcon } from "@/components/Icons";
+import { ArrowIcon } from "@/components/Icons";
 import { JsonLd } from "@/components/JsonLd";
 import { serviceSchema, faqSchema } from "@/lib/schema";
 
@@ -52,15 +52,16 @@ export default async function HomePage() {
             <div className="mt-8">
               <CTAButtons settings={s} />
             </div>
-            <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-[14px] text-muted2">
-              {["Steril, tek kullanımlık ekipman", "Yüze özel tasarım", "12–18 ay kalıcı"].map((t) => (
-                <li key={t} className="flex items-center gap-2">
-                  <CheckIcon className="h-4 w-4 text-accent" /> {t}
-                </li>
-              ))}
-            </ul>
           </div>
-          <ImageSlot src={null} alt="Mikroblading kaş tasarımı — Ankara Stria Studio" ratio="aspect-[4/5]" className="rounded-[28px]" />
+          <Image
+            src="/hero1.png"
+            alt="Mikroblading Ankara — kıl tekniğiyle doğal kaş tasarımı, Stria Studio Çankaya"
+            width={1126}
+            height={1397}
+            priority
+            sizes="(max-width: 1024px) 100vw, 45vw"
+            className="mx-auto h-auto w-full max-w-[520px] rounded-[28px] shadow-sm"
+          />
         </Container>
       </section>
 
