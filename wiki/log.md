@@ -9,3 +9,4 @@ Append-only timeline. Newest at top. One line per operation: `YYYY-MM-DD — OP 
 - 2026-07-07 — INGEST — Added raw/stria-studio-design.md (Minimal design source); downloaded 5 studio images to frontend/public/images.
 - 2026-07-07 — SETUP — Wiki scaffold created (schema, index, log, prompts, empty category folders).
 - 2026-07-09 — Added decision [microsite-architecture]; built mikroblading_ankara microsite + backend `site` scoping.
+- 2026-07-10 — Built 2nd microsite kastasarimi/ (kaş tasarımı, port 3002); generalized MicrositeSeeder over data/*.json; created kas-tasarimi service.

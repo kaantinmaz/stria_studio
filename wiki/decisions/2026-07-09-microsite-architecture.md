@@ -1,7 +1,7 @@
 # Decision: Per-service SEO microsites on the shared backend
 
 **Date:** 2026-07-09
-**Status:** Accepted (first instance built: `mikrobladingankara.com`)
+**Status:** Accepted. Instances built: `mikrobladingankara.com` (`mikroblading_ankara/`, port 3001), `kastasarimiankara.com` (`kastasarimi/`, port 3002). Seeder generalized to loop `database/seeders/data/*.json` (site = filename) and upsert the pinned service when the JSON provides one.
 
 ## Context
 
