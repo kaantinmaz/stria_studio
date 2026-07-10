@@ -10,4 +10,9 @@ return [
         'service' => 'microblading',
         'url' => 'https://mikrobladingankara.com',
     ],
+    'kas-tasarimi-ankara' => [
+        'name' => 'Kaş Tasarımı Ankara',
+        'service' => 'kas-tasarimi',
+        'url' => 'https://kastasarimiankara.com',
+    ],
 ];

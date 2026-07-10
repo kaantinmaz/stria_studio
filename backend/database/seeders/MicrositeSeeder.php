@@ -5,33 +5,66 @@ namespace Database\Seeders;
 use App\Models\Faq;
 use App\Models\GalleryImage;
 use App\Models\Post;
+use App\Models\Service;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 
-// Seeds content scoped to the mikroblading-ankara microsite. Idempotent:
-// posts are upserted by (site, slug); faqs/gallery are reset for the site.
+// Seeds content for every microsite that has a data file in seeders/data/.
+// Site slug = filename (e.g. data/kas-tasarimi-ankara.json -> site
+// "kas-tasarimi-ankara"). Idempotent: posts upserted by (site, slug);
+// faqs/gallery reset for the site; the pinned service upserted if provided.
 class MicrositeSeeder extends Seeder
 {
-    private string $site = 'mikroblading-ankara';
-
     public function run(): void
     {
-        $path = database_path('seeders/data/mikroblading-ankara.json');
-        if (! is_file($path)) {
-            $this->command?->warn("MicrositeSeeder: content file missing at $path — skipped.");
+        $dir = database_path('seeders/data');
+        if (! is_dir($dir)) {
+            $this->command?->warn("MicrositeSeeder: no data dir at $dir — skipped.");
 
             return;
         }
 
-        $data = json_decode(file_get_contents($path), true, 512, JSON_THROW_ON_ERROR);
+        foreach (glob("$dir/*.json") as $file) {
+            $site = basename($file, '.json');
+            $data = json_decode(file_get_contents($file), true, 512, JSON_THROW_ON_ERROR);
+            $this->seedSite($site, $data);
+        }
+    }
 
-        // Blog posts — spread published dates over recent weeks for a natural feed.
+    private function seedSite(string $site, array $data): void
+    {
+        // Optional: upsert the service this microsite pins to (slug from config).
+        if (! empty($data['service']) && ($slug = config("microsites.$site.service"))) {
+            $svc = $data['service'];
+            Service::updateOrCreate(
+                ['slug' => $slug],
+                [
+                    'name_tr' => $svc['name_tr'],
+                    'name_en' => $svc['name_tr'],
+                    'tag_tr' => $svc['tag_tr'] ?? 'Kaş',
+                    'tag_en' => $svc['tag_tr'] ?? 'Brows',
+                    'desc_tr' => $svc['desc_tr'],
+                    'desc_en' => $svc['desc_tr'],
+                    'seo_title_tr' => $svc['seo_title_tr'] ?? null,
+                    'seo_desc_tr' => $svc['seo_desc_tr'] ?? null,
+                    'keywords_tr' => $svc['keywords_tr'] ?? [],
+                    'intro_tr' => $svc['intro_tr'] ?? null,
+                    'aftercare_tr' => $svc['aftercare_tr'] ?? null,
+                    'benefits_tr' => $svc['benefits_tr'] ?? [],
+                    'process_tr' => $svc['process_tr'] ?? [],
+                    'faq_tr' => $svc['faq_tr'] ?? [],
+                    'is_active' => true,
+                    'sort_order' => 50,
+                ]
+            );
+        }
+
         foreach (($data['posts'] ?? []) as $i => $p) {
             Post::updateOrCreate(
-                ['site' => $this->site, 'slug' => $p['slug']],
+                ['site' => $site, 'slug' => $p['slug']],
                 [
                     'title_tr' => $p['title_tr'],
-                    'title_en' => $p['title_tr'], // TR-only microsite; mirror to satisfy NOT NULL
+                    'title_en' => $p['title_tr'],
                     'excerpt_tr' => $p['excerpt_tr'],
                     'excerpt_en' => $p['excerpt_tr'],
                     'body_tr' => $p['body_tr'],
@@ -44,11 +77,10 @@ class MicrositeSeeder extends Seeder
             );
         }
 
-        // FAQs — replace the site's set.
-        Faq::where('site', $this->site)->delete();
+        Faq::where('site', $site)->delete();
         foreach (($data['faqs'] ?? []) as $i => $f) {
             Faq::create([
-                'site' => $this->site,
+                'site' => $site,
                 'q_tr' => $f['q_tr'],
                 'a_tr' => $f['a_tr'],
                 'sort_order' => $i,
@@ -56,11 +88,10 @@ class MicrositeSeeder extends Seeder
             ]);
         }
 
-        // Gallery — placeholder rows (owner uploads real before/after photos in admin).
-        GalleryImage::where('site', $this->site)->delete();
+        GalleryImage::where('site', $site)->delete();
         foreach (($data['gallery_alts'] ?? []) as $i => $alt) {
             GalleryImage::create([
-                'site' => $this->site,
+                'site' => $site,
                 'image' => null,
                 'alt_tr' => $alt,
                 'sort_order' => $i,
@@ -69,11 +100,12 @@ class MicrositeSeeder extends Seeder
         }
 
         $this->command?->info(sprintf(
-            'MicrositeSeeder: %d posts, %d faqs, %d gallery rows for %s.',
+            'MicrositeSeeder[%s]: %d posts, %d faqs, %d gallery%s.',
+            $site,
             count($data['posts'] ?? []),
             count($data['faqs'] ?? []),
             count($data['gallery_alts'] ?? []),
-            $this->site
+            ! empty($data['service']) ? ', +service' : ''
         ));
     }
 }
