@@ -1,18 +1,26 @@
 @import "tailwindcss";
 
+/* ── Kaş Tasarımı Ankara — "Klinik / Precision Minimal" design system ──
+   Bright white base, cool sage accent, near-black green ink, hairline rules,
+   sharp corners, generous whitespace. Deliberately distinct from the warm
+   cream/terracotta mikroblading microsite. Token NAMES are reused so the
+   shared component classes recolor globally. */
 @theme {
-  --color-cream: #fbf4f1;
-  --color-ink: #42302e;
-  --color-accent: #b26a4f;
-  --color-accent-dark: #8f5138;
-  --color-rose: #d89a8a;
-  --color-pink: #f3ded7;
-  --color-blush: #f5e6e0;
-  --color-muted: #8a6f6a;
-  --color-muted2: #7a605b;
-  --color-line: #f1e2dc;
-  --color-line2: #eeddd7;
-  --font-sans: var(--font-jost), system-ui, sans-serif;
+  --color-cream: #ffffff; /* page base */
+  --color-ink: #18201c; /* near-black cool green: text + dark sections */
+  --color-accent: #5e7c6b; /* sage — primary accent */
+  --color-accent-dark: #3f5c4c; /* darker sage — hover */
+  --color-rose: #7e9a88; /* light sage */
+  --color-pink: #dce6de; /* selection */
+  --color-blush: #eef2ee; /* mist — alternating section bg */
+  --color-muted: #7c857f; /* muted cool gray */
+  --color-muted2: #565f59; /* stronger muted text */
+  --color-line: #e4e8e4; /* hairline */
+  --color-line2: #dbe1db; /* hairline (slightly darker) */
+
+  --font-display: var(--font-space-grotesk), system-ui, sans-serif;
+  --font-body: var(--font-inter), system-ui, sans-serif;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
 }
 
 html {
@@ -23,7 +31,7 @@ body {
   margin: 0;
   background: var(--color-cream);
   color: var(--color-ink);
-  font-family: var(--font-jost), system-ui, sans-serif;
+  font-family: var(--font-body);
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
@@ -33,8 +41,48 @@ h1,
 h2,
 h3 {
   margin: 0;
+  font-family: var(--font-display);
   font-weight: 500;
   letter-spacing: -0.02em;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+/* Utility label — uppercase, tracked, with a short leading rule (clinical eyebrow). */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-accent-dark);
+}
+.eyebrow::before {
+  content: "";
+  width: 28px;
+  height: 1px;
+  background: var(--color-accent);
+}
+
+/* Full-width hairline divider with a centered sage tick (precision motif). */
+.rule-tick {
+  position: relative;
+  height: 1px;
+  background: var(--color-line2);
+}
+.rule-tick::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -3px;
+  width: 7px;
+  height: 7px;
+  transform: translateX(-50%) rotate(45deg);
+  background: var(--color-accent);
 }
 
 ::selection {
@@ -45,19 +93,19 @@ h3 {
 /* Sticky WhatsApp button pulse ring */
 @keyframes waPulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.55);
+    box-shadow: 0 0 0 0 rgba(94, 124, 107, 0.5);
   }
   70% {
-    box-shadow: 0 0 0 16px rgba(37, 211, 102, 0);
+    box-shadow: 0 0 0 16px rgba(94, 124, 107, 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
+    box-shadow: 0 0 0 0 rgba(94, 124, 107, 0);
   }
 }
 
-/* --- Blog / article body (server-rendered HTML from the CMS) --- */
+/* ── Blog / article body (server-rendered CMS HTML) ── */
 .prose {
-  color: var(--color-ink);
+  color: var(--color-muted2);
   line-height: 1.75;
   font-size: 1.0625rem;
 }
@@ -65,17 +113,17 @@ h3 {
   margin-top: 1.1em;
 }
 .prose h2 {
+  font-family: var(--font-display);
   font-size: 1.5rem;
+  color: var(--color-ink);
   margin-top: 2em;
-  line-height: 1.3;
+  line-height: 1.25;
 }
 .prose h3 {
+  font-family: var(--font-display);
   font-size: 1.2rem;
+  color: var(--color-ink);
   margin-top: 1.6em;
-}
-.prose p,
-.prose li {
-  color: var(--color-muted2);
 }
 .prose strong {
   color: var(--color-ink);
@@ -115,7 +163,8 @@ h3 {
   background: var(--color-blush);
   color: var(--color-ink);
   font-weight: 600;
+  font-family: var(--font-display);
 }
 .prose tbody tr:nth-child(even) {
-  background: rgba(245, 230, 224, 0.4);
+  background: rgba(238, 242, 238, 0.6);
 }

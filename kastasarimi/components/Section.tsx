@@ -31,9 +31,7 @@ export function Section({
   return (
     <section id={id} className={`py-14 sm:py-20 ${className}`}>
       <Container className={narrow ? "max-w-[820px]" : ""}>
-        {eyebrow && (
-          <p className="mb-3 text-[11px] uppercase tracking-[0.18em] text-accent">{eyebrow}</p>
-        )}
+        {eyebrow && <span className="eyebrow mb-4">{eyebrow}</span>}
         {heading && (
           <h2 className="max-w-[720px] text-[clamp(24px,3.4vw,36px)] leading-tight text-ink">
             {heading}

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Jost } from "next/font/google";
+import { Space_Grotesk, Inter } from "next/font/google";
 import "./globals.css";
 import { site } from "@/lib/site";
 import { getSettings, SETTINGS_FALLBACK } from "@/lib/content";
@@ -10,10 +10,17 @@ import { Footer } from "@/components/Footer";
 import { WhatsAppFab } from "@/components/WhatsAppFab";
 import { Analytics } from "@/components/Analytics";
 
-const jost = Jost({
+const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
-  variable: "--font-jost",
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-space-grotesk",
+  display: "swap",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-inter",
   display: "swap",
 });
 
@@ -48,7 +55,7 @@ export default async function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   const settings = (await getSettings()) ?? SETTINGS_FALLBACK;
   return (
-    <html lang="tr" className={jost.variable}>
+    <html lang="tr" className={`${spaceGrotesk.variable} ${inter.variable}`}>
       <body>
         <JsonLd data={beautySalonSchema(settings)} />
         <Nav whatsapp={settings.whatsapp} />

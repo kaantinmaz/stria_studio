@@ -7,7 +7,7 @@ export function StudioMap({ settings }: { settings: Settings }) {
     `${site.studio} ${settings.street_address} ${settings.locality} ${settings.region}`,
   );
   return (
-    <div className="overflow-hidden rounded-[20px] border border-line">
+    <div className="overflow-hidden rounded-[2px] border border-line">
       <iframe
         title="Stria Studio — Ankara Çankaya konum haritası"
         src={`https://www.google.com/maps?q=${query}&output=embed`}

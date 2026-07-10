@@ -5,7 +5,7 @@ export function PricingTable({
   rows: { name: string; detail: string; price: string }[];
 }) {
   return (
-    <div className="mt-8 overflow-x-auto rounded-[20px] border border-line bg-white">
+    <div className="mt-8 overflow-x-auto rounded-[2px] border border-line bg-white">
       <table className="w-full border-collapse text-left text-[15px]">
         <thead>
           <tr className="bg-blush text-ink">

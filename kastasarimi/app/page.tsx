@@ -11,8 +11,8 @@ import { Reviews } from "@/components/Reviews";
 import { Faq } from "@/components/Faq";
 import { BlogList } from "@/components/BlogList";
 import { StudioMap } from "@/components/StudioMap";
-import { ImageSlot } from "@/components/ImageSlot";
-import { CheckIcon, ArrowIcon } from "@/components/Icons";
+import { BrowMap } from "@/components/BrowMap";
+import { ArrowIcon } from "@/components/Icons";
 import { JsonLd } from "@/components/JsonLd";
 import { serviceSchema, faqSchema } from "@/lib/schema";
 
@@ -41,26 +41,28 @@ export default async function HomePage() {
       <JsonLd data={faqSchema(faqs)} />
 
       {/* Hero */}
-      <section className="border-b border-line bg-gradient-to-b from-blush/60 to-cream">
-        <Container className="grid items-center gap-10 py-16 sm:py-20 lg:grid-cols-[1.1fr_0.9fr]">
+      <section className="border-b border-line bg-white">
+        <Container className="grid items-center gap-12 py-20 sm:py-24 lg:grid-cols-[1.05fr_0.95fr]">
           <div>
-            <p className="mb-4 text-[12px] uppercase tracking-[0.2em] text-accent">{hero.eyebrow}</p>
-            <h1 className="text-[clamp(32px,5vw,52px)] font-medium leading-[1.08] tracking-tight text-ink">
+            <span className="eyebrow">{hero.eyebrow}</span>
+            <h1 className="mt-6 text-[clamp(34px,5.2vw,56px)] leading-[1.04] text-ink">
               {hero.title}
             </h1>
-            <p className="mt-5 max-w-[540px] text-[18px] leading-relaxed text-muted2">{hero.subtitle}</p>
-            <div className="mt-8">
+            <p className="mt-6 max-w-[520px] text-[18px] leading-relaxed text-muted2">{hero.subtitle}</p>
+            <div className="mt-9">
               <CTAButtons settings={s} />
             </div>
-            <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-[14px] text-muted2">
-              {["Altın oran ile haritalama", "Yüze özel form", "İplik / ağda şekillendirme"].map((t) => (
-                <li key={t} className="flex items-center gap-2">
-                  <CheckIcon className="h-4 w-4 text-accent" /> {t}
+            <ul className="mt-10 flex flex-wrap gap-x-8 gap-y-3 text-[12px] uppercase tracking-[0.14em] text-muted">
+              {["Altın oran haritalama", "Yüze özel form", "İplik / ağda"].map((t) => (
+                <li key={t} className="flex items-center gap-2.5">
+                  <span className="h-1.5 w-1.5 bg-accent" aria-hidden="true" /> {t}
                 </li>
               ))}
             </ul>
           </div>
-          <ImageSlot src={null} alt="Kaş tasarımı — Ankara Stria Studio" ratio="aspect-[4/5]" className="rounded-[28px]" />
+          <div className="border border-line bg-blush/60 p-5 sm:p-7">
+            <BrowMap className="w-full" />
+          </div>
         </Container>
       </section>
 
@@ -72,7 +74,7 @@ export default async function HomePage() {
       </section>
 
       {/* What is (answer-first) */}
-      <Section id="kaş tasarımı-nedir" narrow>
+      <Section id="kas-tasarimi-nedir" narrow>
         <h2 className="text-[clamp(24px,3.4vw,34px)] leading-tight text-ink">{whatIs.heading}</h2>
         <p className="mt-5 text-[19px] leading-relaxed text-muted2">{whatIs.answer}</p>
       </Section>
@@ -81,7 +83,7 @@ export default async function HomePage() {
       <Section eyebrow="Avantajlar" heading={benefits.heading} intro={benefits.intro} className="bg-blush/40">
         <div className="mt-10 grid gap-5 sm:grid-cols-2">
           {benefits.items.map((b) => (
-            <div key={b.title} className="rounded-[20px] border border-line bg-white p-6">
+            <div key={b.title} className="rounded-[2px] border border-line bg-white p-6">
               <h3 className="text-[18px] text-ink">{b.title}</h3>
               <p className="mt-2 text-[15px] leading-relaxed text-muted2">{b.text}</p>
             </div>

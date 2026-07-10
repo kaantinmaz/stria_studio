@@ -17,7 +17,7 @@ export function Gallery({ items, limit }: { items: GalleryItem[]; limit?: number
           key={i}
           src={g.image}
           alt={g.alt_tr}
-          className="rounded-[18px]"
+          className="rounded-[2px]"
         />
       ))}
     </div>

@@ -33,13 +33,13 @@ export default async function BlogIndexPage({
         {last_page > 1 && (
           <nav className="mt-10 flex items-center justify-center gap-3 text-[14px]" aria-label="Sayfalama">
             {current > 1 && (
-              <Link href={`/blog?page=${current - 1}`} className="rounded-full border border-line px-4 py-2 text-muted2 hover:text-accent-dark">
+              <Link href={`/blog?page=${current - 1}`} className="rounded-none border border-line px-4 py-2 text-muted2 hover:text-accent-dark">
                 ← Önceki
               </Link>
             )}
             <span className="text-muted">Sayfa {current} / {last_page}</span>
             {current < last_page && (
-              <Link href={`/blog?page=${current + 1}`} className="rounded-full border border-line px-4 py-2 text-muted2 hover:text-accent-dark">
+              <Link href={`/blog?page=${current + 1}`} className="rounded-none border border-line px-4 py-2 text-muted2 hover:text-accent-dark">
                 Sonraki →
               </Link>
             )}

@@ -22,7 +22,7 @@ export function Nav({ whatsapp }: { whatsapp: string }) {
     <header className="sticky top-0 z-40 border-b border-line bg-cream/85 backdrop-blur">
       <div className="mx-auto flex max-w-[1180px] items-center justify-between px-5 py-4">
         <Link href="/" className="flex flex-col leading-none" onClick={() => setOpen(false)}>
-          <span className="text-[19px] font-medium tracking-tight text-ink">
+          <span className="font-display text-[19px] font-medium tracking-tight text-ink">
             Kaş Tasarımı<span className="text-accent"> Ankara</span>
           </span>
           <span className="mt-[3px] text-[10px] uppercase tracking-[0.22em] text-muted">
@@ -44,7 +44,7 @@ export function Nav({ whatsapp }: { whatsapp: string }) {
             href={whatsapp}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2 text-[13px] text-cream transition hover:bg-accent-dark"
+            className="inline-flex items-center gap-2 rounded-none bg-ink px-4 py-2 text-[13px] text-cream transition hover:bg-accent-dark"
           >
             <WhatsAppIcon className="h-4 w-4" /> Randevu
           </a>
@@ -53,7 +53,7 @@ export function Nav({ whatsapp }: { whatsapp: string }) {
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-line text-ink lg:hidden"
+          className="flex h-10 w-10 items-center justify-center rounded-none border border-line text-ink lg:hidden"
           aria-label="Menüyü aç/kapat"
           aria-expanded={open}
         >
@@ -77,7 +77,7 @@ export function Nav({ whatsapp }: { whatsapp: string }) {
             href={whatsapp}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-4 inline-flex items-center gap-2 rounded-full bg-ink px-5 py-3 text-sm text-cream"
+            className="mt-4 inline-flex items-center gap-2 rounded-none bg-ink px-5 py-3 text-sm text-cream"
           >
             <WhatsAppIcon className="h-4 w-4" /> WhatsApp'tan Randevu
           </a>

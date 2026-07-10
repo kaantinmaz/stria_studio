@@ -9,7 +9,7 @@ export function Footer({ settings }: { settings: Settings }) {
     <footer className="mt-24 border-t border-line bg-blush/50">
       <div className="mx-auto grid max-w-[1180px] gap-10 px-5 py-14 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <p className="text-[18px] font-medium text-ink">
+          <p className="font-display text-[18px] font-medium text-ink">
             Kaş Tasarımı<span className="text-accent"> Ankara</span>
           </p>
           <p className="mt-3 text-sm leading-relaxed text-muted2">
