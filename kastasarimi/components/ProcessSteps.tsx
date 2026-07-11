@@ -6,7 +6,7 @@ export function ProcessSteps({ steps }: { steps: { title: string; text: string }
           key={i}
           className="grid grid-cols-[auto_1fr] gap-x-6 border-b border-line py-7 sm:grid-cols-[80px_1fr]"
         >
-          <span className="font-display text-[clamp(28px,4vw,44px)] leading-none text-accent">
+          <span className="font-display text-[clamp(28px,4vw,44px)] leading-none text-accent" aria-hidden="true">
             {String(i + 1).padStart(2, "0")}
           </span>
           <div>

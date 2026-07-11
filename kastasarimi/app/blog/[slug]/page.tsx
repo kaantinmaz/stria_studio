@@ -68,7 +68,7 @@ export default async function PostPage({
       <article className="py-12">
         <Container className="max-w-[760px]">
           {post.published_at && (
-            <p className="text-[12px] uppercase tracking-[0.14em] text-accent">{formatDate(post.published_at)}</p>
+            <p className="text-[12px] uppercase tracking-[0.14em] text-accent-dark">{formatDate(post.published_at)}</p>
           )}
           <h1 className="mt-3 text-[clamp(28px,4vw,40px)] leading-tight text-ink">{post.title_tr}</h1>
           <p className="mt-4 text-[18px] leading-relaxed text-muted2">{post.excerpt_tr}</p>

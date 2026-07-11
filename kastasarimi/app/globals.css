@@ -17,7 +17,6 @@
   --color-line: #e4dccb; /* hairline */
   --color-line2: #d9cfbb;
 
-  --font-fraunces: var(--font-fraunces-src), Georgia, serif;
   --font-display: var(--font-fraunces-src), Georgia, serif;
   --font-body: var(--font-inter), system-ui, sans-serif;
   --font-sans: var(--font-inter), system-ui, sans-serif;
@@ -60,7 +59,7 @@ h3 {
   font-weight: 500;
   letter-spacing: 0.24em;
   text-transform: uppercase;
-  color: var(--color-muted);
+  color: var(--color-muted2);
 }
 .eyebrow::before {
   content: "";
@@ -96,7 +95,7 @@ h3 {
   font-size: 11px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--color-muted);
+  color: var(--color-muted2);
 }
 
 /* Large italic editorial quote (reviews). */

@@ -36,7 +36,7 @@ export function Section({
         {eyebrow && <span className="eyebrow mb-5">{eyebrow}</span>}
         {heading && (
           <div className="flex items-baseline gap-4 sm:gap-6">
-            {index && <span className="section-index shrink-0">{index}</span>}
+            {index && <span className="section-index shrink-0" aria-hidden="true">{index}</span>}
             <h2 className="max-w-[760px] text-[clamp(27px,3.8vw,46px)] leading-[1.06] text-ink">
               {heading}
             </h2>

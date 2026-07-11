@@ -29,7 +29,7 @@ export default async function AboutPage() {
         <h2 className="mt-12 text-[22px] text-ink">Neden bizi tercih etmelisiniz?</h2>
         <ul className="mt-5 grid gap-3 sm:grid-cols-2">
           {about.credentials.map((c) => (
-            <li key={c} className="flex items-start gap-3 rounded-[2px] border border-line bg-white px-4 py-4 text-[15px] text-muted2">
+            <li key={c} className="flex items-start gap-3 rounded-[2px] border border-line bg-cream px-4 py-4 text-[15px] text-muted2">
               <CheckIcon className="mt-[2px] h-5 w-5 shrink-0 text-accent" />
               <span>{c}</span>
             </li>

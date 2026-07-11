@@ -8,7 +8,7 @@ export function TrustBar() {
           <p className="font-display text-[clamp(28px,3.4vw,40px)] font-medium leading-none text-ink">
             {it.stat}
           </p>
-          <p className="mt-2 text-[11px] uppercase tracking-[0.16em] text-muted">{it.label}</p>
+          <p className="mt-2 text-[11px] uppercase tracking-[0.16em] text-muted2">{it.label}</p>
         </div>
       ))}
     </div>

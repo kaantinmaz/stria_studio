@@ -6,7 +6,7 @@ export function Reviews() {
       {reviews.items.map((r) => (
         <figure key={r.name} className="bg-cream p-8">
           <blockquote className="pull-quote">“{r.text}”</blockquote>
-          <figcaption className="mt-6 text-[11px] uppercase tracking-[0.16em] text-muted">
+          <figcaption className="mt-6 text-[11px] uppercase tracking-[0.16em] text-muted2">
             {r.name}
           </figcaption>
         </figure>

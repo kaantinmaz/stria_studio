@@ -48,7 +48,7 @@ export default async function HowItWorksPage() {
       <Breadcrumbs items={[{ name: "Nasıl Yapılır", path: "/kas-tasarimi-nasil-yapilir" }]} />
 
       <Section narrow>
-        <p className="mb-3 text-[11px] uppercase tracking-[0.18em] text-accent">Son güncelleme: {LAST_UPDATED}</p>
+        <p className="mb-3 text-[11px] uppercase tracking-[0.18em] text-accent-dark">Son güncelleme: {LAST_UPDATED}</p>
         <h1 className="text-[clamp(28px,4vw,42px)] leading-tight text-ink">{process.heading}</h1>
         <p className="mt-5 text-[19px] leading-relaxed text-muted2">{whatIs.answer}</p>
         <p className="mt-4 text-[17px] leading-relaxed text-muted2">{process.intro}</p>

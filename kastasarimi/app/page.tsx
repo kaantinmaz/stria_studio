@@ -78,7 +78,7 @@ export default async function HomePage() {
       {/* What is (answer-first) */}
       <Section id="kas-tasarimi-nedir" narrow>
         <div className="flex items-baseline gap-4 sm:gap-6">
-          <span className="section-index shrink-0">01</span>
+          <span className="section-index shrink-0" aria-hidden="true">01</span>
           <h2 className="text-[clamp(27px,3.8vw,46px)] leading-[1.06] text-ink">{whatIs.heading}</h2>
         </div>
         <p className="mt-5 text-[19px] leading-relaxed text-muted2">{whatIs.answer}</p>
@@ -89,7 +89,7 @@ export default async function HomePage() {
         <ul className="mt-12 border-t border-line">
           {benefits.items.map((b, i) => (
             <li key={b.title} className="grid grid-cols-[auto_1fr] gap-x-6 border-b border-line py-7 sm:grid-cols-[64px_1fr]">
-              <span className="font-display text-[22px] leading-none text-accent">{String(i + 1).padStart(2, "0")}</span>
+              <span className="font-display text-[22px] leading-none text-accent" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
               <div>
                 <h3 className="font-display text-[20px] font-medium text-ink">{b.title}</h3>
                 <p className="mt-2 max-w-[560px] text-[15px] leading-relaxed text-muted2">{b.text}</p>

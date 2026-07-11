@@ -111,15 +111,15 @@ export default function ApiDocsPage() {
       <Section eyebrow="Geliştiriciler" heading="API Dokümantasyonu"
         intro="Kaş Tasarımı Ankara microsite'i içeriğini ortak Stria Studio backend'inden çeker. Aşağıdaki uçlar salt-okunur ve site slug'ına göre kapsamlandırılmıştır.">
         <div className="mt-6 flex flex-wrap gap-3 text-[14px]">
-          <a href="/openapi.yaml" className="rounded-[2px] border border-line bg-white px-4 py-2 text-accent-dark hover:bg-blush/50">
+          <a href="/openapi.yaml" className="rounded-[2px] border border-line bg-cream px-4 py-2 text-accent-dark hover:bg-blush/50">
             OpenAPI 3.1 şeması (openapi.yaml)
           </a>
-          <span className="rounded-[2px] border border-line bg-white px-4 py-2 text-muted2">
+          <span className="rounded-[2px] border border-line bg-cream px-4 py-2 text-muted2">
             Site slug: <code className="text-ink">{site.slug}</code>
           </span>
         </div>
 
-        <div className="mt-8 rounded-[2px] border border-line bg-white p-5 text-[14px] text-muted2">
+        <div className="mt-8 rounded-[2px] border border-line bg-cream p-5 text-[14px] text-muted2">
           <p><strong className="text-ink">Base URL:</strong> <code>{`{API_URL}/api/microsites/{site}`}</code></p>
           <p className="mt-2"><strong className="text-ink">Örnek:</strong> <code>{`GET {API_URL}/api/microsites/${site.slug}/posts`}</code></p>
           <p className="mt-2">Bilinmeyen <code>site</code> slug'ı <code>404</code> döner. Tüm yanıtlar JSON'dur.</p>
@@ -127,7 +127,7 @@ export default function ApiDocsPage() {
 
         <div className="mt-8 space-y-4">
           {endpoints.map((e) => (
-            <div key={e.method + e.path} className="overflow-hidden rounded-[2px] border border-line bg-white">
+            <div key={e.method + e.path} className="overflow-hidden rounded-[2px] border border-line bg-cream">
               <div className="flex flex-wrap items-center gap-3 border-b border-line px-5 py-3">
                 <span className={`rounded px-2.5 py-1 text-[12px] font-semibold ${methodColor[e.method]}`}>{e.method}</span>
                 <code className="text-[14px] text-ink">{e.path}</code>

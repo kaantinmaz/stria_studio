@@ -47,7 +47,7 @@ export default async function PricingPage() {
       <Breadcrumbs items={[{ name: "Kaş Tasarımı Fiyatları", path: "/kas-tasarimi-fiyatlari" }]} />
 
       <Section>
-        <p className="mb-3 text-[11px] uppercase tracking-[0.18em] text-accent">Son güncelleme: {LAST_UPDATED}</p>
+        <p className="mb-3 text-[11px] uppercase tracking-[0.18em] text-accent-dark">Son güncelleme: {LAST_UPDATED}</p>
         <h1 className="max-w-[760px] text-[clamp(28px,4vw,42px)] leading-tight text-ink">{pricing.heading}</h1>
         <p className="mt-5 max-w-[680px] text-[18px] leading-relaxed text-muted2">{pricing.intro}</p>
         <PricingTable rows={pricing.rows} />
