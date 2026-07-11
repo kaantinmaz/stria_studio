@@ -74,7 +74,7 @@ export default async function PostPage({
           <p className="mt-4 text-[18px] leading-relaxed text-muted2">{post.excerpt_tr}</p>
 
           <div className="my-8">
-            <ImageSlot src={post.cover_url} alt={post.title_tr} ratio="aspect-[16/9]" className="rounded-[16px]" />
+            <ImageSlot src={post.cover_url} alt={post.title_tr} ratio="aspect-[16/9]" className="rounded-[2px]" />
           </div>
 
           <PostBody html={post.body_tr} />
