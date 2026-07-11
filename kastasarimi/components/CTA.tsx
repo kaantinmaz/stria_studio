@@ -12,25 +12,25 @@ export function CTAButtons({
 }) {
   const wa =
     variant === "dark"
-      ? "bg-accent text-white hover:bg-accent-dark"
-      : "bg-ink text-white hover:bg-accent-dark";
+      ? "bg-white text-ink hover:bg-pink"
+      : "bg-accent text-white hover:bg-accent-dark";
   const call =
     variant === "dark"
-      ? "border border-cream/35 text-cream hover:bg-cream/10"
-      : "border border-ink/25 text-ink hover:border-ink hover:bg-ink/[0.03]";
+      ? "border border-cream/40 text-cream hover:bg-cream/10"
+      : "border border-accent/45 text-accent-dark hover:bg-accent/10";
   return (
     <div className="flex flex-wrap gap-3">
       <a
         href={settings.whatsapp}
         target="_blank"
         rel="noopener noreferrer"
-        className={`inline-flex items-center gap-2.5 rounded-none px-7 py-[15px] text-[14px] tracking-[0.02em] transition ${wa}`}
+        className={`inline-flex items-center gap-2.5 rounded-full px-7 py-[15px] text-[14px] tracking-[0.02em] transition ${wa}`}
       >
         <WhatsAppIcon className="h-[18px] w-[18px]" /> WhatsApp'tan Randevu
       </a>
       <a
         href={phoneHref(settings.phone)}
-        className={`inline-flex items-center gap-2.5 rounded-none px-7 py-[15px] text-[14px] tracking-[0.02em] transition ${call}`}
+        className={`inline-flex items-center gap-2.5 rounded-full px-7 py-[15px] text-[14px] tracking-[0.02em] transition ${call}`}
       >
         <PhoneIcon className="h-[18px] w-[18px]" /> {settings.phone_local}
       </a>
@@ -43,7 +43,7 @@ export function CTABanner({ settings }: { settings: Settings }) {
   return (
     <section className="py-4">
       <div className="mx-auto max-w-[1180px] px-5">
-        <div className="rounded-[2px] bg-ink px-6 py-12 text-center sm:px-12">
+        <div className="rounded-[16px] bg-ink px-6 py-12 text-center sm:px-12">
           <h2 className="mx-auto max-w-[560px] text-[clamp(22px,3vw,32px)] leading-tight text-cream">
             Ankara'da doğal kaşlar için ücretsiz ön görüşme
           </h2>

@@ -13,22 +13,22 @@ import { howToSchema, faqSchema } from "@/lib/schema";
 export const metadata: Metadata = buildMetadata({
   title: "Kaş Tasarımı Nasıl Yapılır? Adım Adım Süreç",
   description:
-    "Kaş tasarımı nasıl yapılır? Kaş analizinden haritalama, şekillendirme (iplik/ağda) ve boyamaya kadar adım adım süreç, süresi ve dikkat edilecekler. Ankara Stria Studio rehberi.",
+    "Kaş tasarımı nasıl yapılır? Ön görüşme ve altın oran tasarımından kıl tekniğiyle uygulamaya ve rötuşa kadar adım adım süreç, süresi ve iyileşme. Ankara Stria Studio rehberi.",
   path: "/kas-tasarimi-nasil-yapilir",
 });
 
 const howFaqs = [
   {
     q: "Kaş tasarımı işlemi ne kadar sürer?",
-    a: "Analiz, haritalama ve şekillendirme dahil yaklaşık 30–45 dakika sürer. Boyama eklenirse birkaç dakika uzar.",
+    a: "Tasarım ve kıl kıl uygulama dahil ilk seans yaklaşık 90 dakika sürer. Rötuş seansı daha kısadır.",
   },
   {
-    q: "İşlemden sonra hemen dışarı çıkabilir miyim?",
-    a: "Evet, aynı anda günlük hayatınıza dönersiniz. İplik/ağda sonrası hafif kızarıklık olabilir, kısa sürede geçer.",
+    q: "İşlemden sonra ne zaman normale dönerim?",
+    a: "Aynı gün günlük hayatınıza dönebilirsiniz. Kaşlar ilk birkaç gün bir ton koyu görünür, 7–10 günde doğal tonuna oturur.",
   },
   {
-    q: "İşlemden sonra nelere dikkat etmeliyim?",
-    a: "İlk birkaç saat sıcak su ve makyajdan kaçının. Boyama yaptıysanız ilk 24 saat suyla temizlemeyin; formun korunması için 3–4 haftada bir bakım önerilir.",
+    q: "İyileşme sürecinde nelere dikkat etmeliyim?",
+    a: "İlk 7–10 gün kaşları ıslatmaktan, terlemekten, güneşten ve makyajdan uzak tutun; verilen bakım kremini uygulayın.",
   },
 ];
 

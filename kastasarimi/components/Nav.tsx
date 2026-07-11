@@ -44,7 +44,7 @@ export function Nav({ whatsapp }: { whatsapp: string }) {
             href={whatsapp}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-none bg-ink px-4 py-2 text-[13px] text-cream transition hover:bg-accent-dark"
+            className="inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2 text-[13px] text-cream transition hover:bg-accent-dark"
           >
             <WhatsAppIcon className="h-4 w-4" /> Randevu
           </a>
@@ -53,7 +53,7 @@ export function Nav({ whatsapp }: { whatsapp: string }) {
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="flex h-10 w-10 items-center justify-center rounded-none border border-line text-ink lg:hidden"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-line text-ink lg:hidden"
           aria-label="Menüyü aç/kapat"
           aria-expanded={open}
         >
@@ -77,7 +77,7 @@ export function Nav({ whatsapp }: { whatsapp: string }) {
             href={whatsapp}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-4 inline-flex items-center gap-2 rounded-none bg-ink px-5 py-3 text-sm text-cream"
+            className="mt-4 inline-flex items-center gap-2 rounded-full bg-ink px-5 py-3 text-sm text-cream"
           >
             <WhatsAppIcon className="h-4 w-4" /> WhatsApp'tan Randevu
           </a>

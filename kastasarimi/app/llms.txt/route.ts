@@ -14,14 +14,14 @@ export function GET(): Response {
 
   const body = `# Kaş Tasarımı Ankara — Stria Studio
 
-> Ankara Çankaya'da kaş tasarımı yapan güzellik stüdyosu: altın oran ile kaş haritalama, yüze özel form tasarımı, iplik/ağda ile şekillendirme ve isteğe bağlı kaş boyama (henna). Doğal, kalıcı olmayan, düzenli bakımla sürdürülen bir işlemdir. Son güncelleme: ${LAST_UPDATED}.
+> Ankara Çankaya'da kişiye özel, kalıcı kaş tasarımı yapan güzellik stüdyosu. Yüz simetrisi ve altın oran ölçümüne göre belirlenen kaş formu, kıl tekniğiyle tek tek işlenir; sonuç doğal ve 12–18 ay kalıcıdır. Son güncelleme: ${LAST_UPDATED}.
 
 ## Hizmet
-- Hizmet: Kaş tasarımı, kaş haritalama, iplik/ağda ile şekillendirme, kaş boyama (henna)
+- Hizmet: Kişiye özel kalıcı kaş tasarımı (kıl tekniği)
 - Konum: Çankaya, Ankara, Türkiye
-- Kalıcılık: Şekillendirme kalıcı değildir (3–4 haftada bir bakım); kaş boyama 2–4 hafta
-- Uygulama süresi: ~30–45 dakika
-- İlgili kalıcı işlemler: microblading, kaş pudralama (ayrı hizmet)
+- Kalıcılık: 12–18 ay (yıllık yenileme ile korunur)
+- Uygulama süresi: ~90 dakika (ilk seans)
+- Rötuş: 4–6 hafta sonra (paketlere dahil)
 
 ## Fiyatlar (${LAST_UPDATED}, Ankara)
 ${priceLines}

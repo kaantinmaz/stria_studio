@@ -3,7 +3,7 @@
 export function Faq({ items }: { items: { q: string; a: string }[] }) {
   if (!items.length) return null;
   return (
-    <div className="mt-8 divide-y divide-line rounded-[2px] border border-line bg-white">
+    <div className="mt-8 divide-y divide-line rounded-[16px] border border-line bg-white">
       {items.map((f, i) => (
         <details key={i} className="group px-5 py-1 [&_summary::-webkit-details-marker]:hidden">
           <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-[16px] font-medium text-ink">

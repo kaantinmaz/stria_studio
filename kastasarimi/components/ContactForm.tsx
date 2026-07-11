@@ -6,7 +6,7 @@ import { site } from "@/lib/site";
 type Status = "idle" | "sending" | "ok" | "err";
 
 const field =
-  "w-full rounded-[2px] border border-line bg-cream px-4 py-3 text-base text-ink outline-none transition focus:border-accent focus:bg-white";
+  "w-full rounded-[16px] border border-line bg-cream px-4 py-3 text-base text-ink outline-none transition focus:border-accent focus:bg-white";
 const label = "mb-[6px] block text-[11px] uppercase tracking-[0.12em] text-accent";
 
 export function ContactForm() {
@@ -39,7 +39,7 @@ export function ContactForm() {
   }
 
   return (
-    <div className="rounded-[2px] border border-line bg-white p-[clamp(24px,3vw,40px)]">
+    <div className="rounded-[16px] border border-line bg-white p-[clamp(24px,3vw,40px)]">
       <h3 className="mb-5 text-[22px]">Randevu / Bilgi Formu</h3>
       <form onSubmit={onSubmit} className="flex flex-col gap-4">
         <div>
@@ -73,7 +73,7 @@ export function ContactForm() {
         <button
           type="submit"
           disabled={status === "sending"}
-          className="mt-1 inline-flex items-center justify-center rounded-[2px] bg-ink px-7 py-[15px] text-sm text-cream transition hover:bg-accent-dark disabled:opacity-60"
+          className="mt-1 inline-flex items-center justify-center rounded-[16px] bg-ink px-7 py-[15px] text-sm text-cream transition hover:bg-accent-dark disabled:opacity-60"
         >
           {status === "sending" ? "Gönderiliyor…" : "Randevu Talebi Gönder"}
         </button>

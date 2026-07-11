@@ -13,22 +13,22 @@ import { serviceSchema, faqSchema } from "@/lib/schema";
 export const metadata: Metadata = buildMetadata({
   title: "Kaş Tasarımı Fiyatları 2026 (Ankara) | Güncel Fiyat Listesi",
   description:
-    "Ankara'da kaş tasarımı fiyatları 2026: şekillendirme, boyama (henna) dahil paket ve düzenli bakım fiyat aralıkları. Stria Studio güncel fiyat listesi ve neyi kapsadığı.",
+    "Ankara'da kaş tasarımı fiyatları 2026: tek seans, rötuş dahil paket ve yıllık yenileme fiyat aralıkları. Stria Studio güncel fiyat listesi ve neyi kapsadığı.",
   path: "/kas-tasarimi-fiyatlari",
 });
 
 const priceFaqs = [
   {
     q: "Kaş tasarımı fiyatına neler dahil?",
-    a: "Ücretsiz kaş analizi, altın oran ile haritalama, form tasarımı ve iplik/ağda ile şekillendirme fiyata dahildir. Kaş boyama (henna) pakete göre eklenir.",
+    a: "Ücretsiz ön görüşme, yüz analizi, altın oran ile form tasarımı, steril tek kullanımlık ekipman ve kıl tekniğiyle uygulama fiyata dahildir. Rötuş, seçtiğiniz pakete göre dahildir.",
   },
   {
-    q: "Kaş boyama ayrı ücretlendirilir mi?",
-    a: "Boyama dahil pakette henna/boya fiyata dahildir. Yalnızca şekillendirme seçilirse boyama ayrı, indirimli eklenir.",
+    q: "Rötuş ayrı ücretlendirilir mi?",
+    a: "Rötuş dahil pakette ilk rötuş ücretsizdir. Tek seans seçilirse rötuş ayrı, indirimli ücretlendirilir.",
   },
   {
     q: "Neden fiyatlar arasında fark var?",
-    a: "Fiyat; uygulanan yönteme (iplik, ağda), boyama eklenip eklenmemesine ve kaş yapısının gerektirdiği çalışma süresine göre değişir.",
+    a: "Fiyat; uygulayıcının deneyimine, kullanılan pigment kalitesine ve kaş yapısının gerektirdiği çalışma süresine göre değişir.",
   },
 ];
 

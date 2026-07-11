@@ -11,7 +11,7 @@ import { Reviews } from "@/components/Reviews";
 import { Faq } from "@/components/Faq";
 import { BlogList } from "@/components/BlogList";
 import { StudioMap } from "@/components/StudioMap";
-import { BrowMap } from "@/components/BrowMap";
+import { BrowFlourish } from "@/components/BrowFlourish";
 import { ArrowIcon } from "@/components/Icons";
 import { JsonLd } from "@/components/JsonLd";
 import { serviceSchema, faqSchema } from "@/lib/schema";
@@ -41,27 +41,27 @@ export default async function HomePage() {
       <JsonLd data={faqSchema(faqs)} />
 
       {/* Hero */}
-      <section className="border-b border-line bg-white">
-        <Container className="grid items-center gap-12 py-20 sm:py-24 lg:grid-cols-[1.05fr_0.95fr]">
+      <section className="border-b border-line bg-gradient-to-br from-blush via-cream to-pink/50">
+        <Container className="grid items-center gap-12 py-20 sm:py-28 lg:grid-cols-[1.05fr_0.95fr]">
           <div>
             <span className="eyebrow">{hero.eyebrow}</span>
-            <h1 className="mt-6 text-[clamp(34px,5.2vw,56px)] leading-[1.04] text-ink">
+            <h1 className="mt-6 text-[clamp(38px,6vw,66px)] font-medium leading-[1.02] text-ink">
               {hero.title}
             </h1>
             <p className="mt-6 max-w-[520px] text-[18px] leading-relaxed text-muted2">{hero.subtitle}</p>
             <div className="mt-9">
               <CTAButtons settings={s} />
             </div>
-            <ul className="mt-10 flex flex-wrap gap-x-8 gap-y-3 text-[12px] uppercase tracking-[0.14em] text-muted">
-              {["Altın oran haritalama", "Yüze özel form", "İplik / ağda"].map((t) => (
+            <ul className="mt-10 flex flex-wrap gap-x-8 gap-y-3 text-[12px] uppercase tracking-[0.16em] text-muted">
+              {["Kişiye özel tasarım", "Kıl kıl doğal", "12–18 ay kalıcı"].map((t) => (
                 <li key={t} className="flex items-center gap-2.5">
-                  <span className="h-1.5 w-1.5 bg-accent" aria-hidden="true" /> {t}
+                  <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true" /> {t}
                 </li>
               ))}
             </ul>
           </div>
-          <div className="border border-line bg-blush/60 p-5 sm:p-7">
-            <BrowMap className="w-full" />
+          <div className="rounded-[28px] border border-line bg-white/70 p-5 shadow-[0_20px_60px_-30px_rgba(152,80,95,0.4)] sm:p-8">
+            <BrowFlourish className="w-full" />
           </div>
         </Container>
       </section>
@@ -83,7 +83,7 @@ export default async function HomePage() {
       <Section eyebrow="Avantajlar" heading={benefits.heading} intro={benefits.intro} className="bg-blush/40">
         <div className="mt-10 grid gap-5 sm:grid-cols-2">
           {benefits.items.map((b) => (
-            <div key={b.title} className="rounded-[2px] border border-line bg-white p-6">
+            <div key={b.title} className="rounded-[16px] border border-line bg-white p-6">
               <h3 className="text-[18px] text-ink">{b.title}</h3>
               <p className="mt-2 text-[15px] leading-relaxed text-muted2">{b.text}</p>
             </div>

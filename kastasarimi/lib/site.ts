@@ -19,10 +19,10 @@ export const site = {
   keywords: [
     "kaş tasarımı ankara",
     "ankara kaş tasarımı",
-    "kaş şekillendirme ankara",
-    "kaş haritalama ankara",
-    "kaş boyama ankara",
+    "kalıcı kaş ankara",
+    "kıl tekniği kaş ankara",
+    "kişiye özel kaş tasarımı",
     "çankaya kaş tasarımı",
-    "iplik kaş alma ankara",
+    "doğal kaş tasarımı ankara",
   ],
 } as const;
