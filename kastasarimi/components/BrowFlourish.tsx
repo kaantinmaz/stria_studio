@@ -1,10 +1,10 @@
-// Signature element (feminine / rose-gold): an elegant brow drawn as individual
-// "kıl tekniği" hair strokes — delicate rose-gold curves fanning along a brow
-// arch. Communicates the hair-by-hair design service while staying soft and
-// decorative (no technical measurement labels).
-const ROSE = "#8a6a4f"; // cognac accent
-const ROSE_DEEP = "#171412"; // ink
-const ROSE_LIGHT = "#b79a7e"; // muted tan
+// Signature element (Atelier editorial): an elegant brow drawn as individual
+// "kıl tekniği" hair strokes — fine ink + cognac curves fanning along a brow
+// arch. Communicates the hair-by-hair design service as a framed editorial
+// plate (no technical measurement labels).
+const INK = "#171412"; // ink
+const ACCENT = "#8a6a4f"; // cognac accent
+const TAN = "#b79a7e"; // muted tan
 
 const N = 17;
 const strokes = Array.from({ length: N }, (_, i) => {
@@ -45,7 +45,7 @@ export function BrowFlourish({ className = "" }: { className?: string }) {
       {/* soft baseline arch under the brow */}
       <path
         d="M84,286 C170,258 250,246 300,254 C348,262 388,278 414,296"
-        stroke={ROSE_LIGHT}
+        stroke={TAN}
         strokeWidth="1.2"
         opacity="0.6"
         strokeLinecap="round"
@@ -56,7 +56,7 @@ export function BrowFlourish({ className = "" }: { className?: string }) {
         <path
           key={i}
           d={s.d}
-          stroke={i % 3 === 0 ? ROSE_DEEP : ROSE}
+          stroke={i % 3 === 0 ? INK : ACCENT}
           strokeWidth="1.7"
           strokeLinecap="round"
           opacity={s.op}
@@ -66,22 +66,22 @@ export function BrowFlourish({ className = "" }: { className?: string }) {
       {/* flowing flourish lines */}
       <path
         d="M70,360 C180,330 320,332 420,300"
-        stroke={ROSE}
+        stroke={ACCENT}
         strokeWidth="1"
         opacity="0.35"
         strokeLinecap="round"
       />
       <path
         d="M120,392 C210,372 300,372 380,352"
-        stroke={ROSE_LIGHT}
+        stroke={TAN}
         strokeWidth="1"
         opacity="0.35"
         strokeLinecap="round"
       />
 
-      {/* small rose-gold marker dots at brow ends */}
-      <circle cx="90" cy="279" r="3.2" fill={ROSE_DEEP} />
-      <circle cx="410" cy="292" r="3.2" fill={ROSE_DEEP} />
+      {/* small ink marker dots at brow ends */}
+      <circle cx="90" cy="279" r="3.2" fill={INK} />
+      <circle cx="410" cy="292" r="3.2" fill={INK} />
     </svg>
   );
 }
