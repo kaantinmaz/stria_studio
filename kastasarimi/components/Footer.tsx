@@ -30,7 +30,7 @@ export function Footer({ settings }: { settings: Settings }) {
         </div>
 
         <div>
-          <p className="mb-3 text-[11px] uppercase tracking-[0.16em] text-accent">Sayfalar</p>
+          <p className="mb-3 text-[11px] uppercase tracking-[0.18em] text-muted">Sayfalar</p>
           <ul className="space-y-2 text-sm text-muted2">
             <li><Link href="/kas-tasarimi-fiyatlari" className="hover:text-accent-dark">Fiyatlar</Link></li>
             <li><Link href="/kas-tasarimi-nasil-yapilir" className="hover:text-accent-dark">Nasıl Yapılır</Link></li>
@@ -42,7 +42,7 @@ export function Footer({ settings }: { settings: Settings }) {
         </div>
 
         <div>
-          <p className="mb-3 text-[11px] uppercase tracking-[0.16em] text-accent">İletişim</p>
+          <p className="mb-3 text-[11px] uppercase tracking-[0.18em] text-muted">İletişim</p>
           <ul className="space-y-2 text-sm text-muted2">
             <li className="flex items-start gap-2">
               <MapPinIcon className="mt-[2px] h-4 w-4 shrink-0" />
@@ -56,7 +56,7 @@ export function Footer({ settings }: { settings: Settings }) {
         </div>
 
         <div>
-          <p className="mb-3 text-[11px] uppercase tracking-[0.16em] text-accent">Geliştiriciler</p>
+          <p className="mb-3 text-[11px] uppercase tracking-[0.18em] text-muted">Geliştiriciler</p>
           <ul className="space-y-2 text-sm text-muted2">
             <li><Link href="/api-docs" className="hover:text-accent-dark">API Dokümantasyonu</Link></li>
             <li><a href="/openapi.yaml" className="hover:text-accent-dark">openapi.yaml</a></li>
