@@ -2,9 +2,9 @@
 // "kıl tekniği" hair strokes — delicate rose-gold curves fanning along a brow
 // arch. Communicates the hair-by-hair design service while staying soft and
 // decorative (no technical measurement labels).
-const ROSE = "#b76e79";
-const ROSE_DEEP = "#98505f";
-const ROSE_LIGHT = "#cb9aa8";
+const ROSE = "#8a6a4f"; // cognac accent
+const ROSE_DEEP = "#171412"; // ink
+const ROSE_LIGHT = "#b79a7e"; // muted tan
 
 const N = 17;
 const strokes = Array.from({ length: N }, (_, i) => {
@@ -35,8 +35,8 @@ export function BrowFlourish({ className = "" }: { className?: string }) {
     >
       <defs>
         <radialGradient id="bf-glow" cx="52%" cy="46%" r="55%">
-          <stop offset="0%" stopColor="#f6dde5" />
-          <stop offset="100%" stopColor="#f6dde5" stopOpacity="0" />
+          <stop offset="0%" stopColor="#efe7da" />
+          <stop offset="100%" stopColor="#efe7da" stopOpacity="0" />
         </radialGradient>
       </defs>
 
