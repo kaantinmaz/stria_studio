@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Inter } from "next/font/google";
+import { Fraunces, Inter } from "next/font/google";
 import "./globals.css";
 import { site } from "@/lib/site";
 import { getSettings, SETTINGS_FALLBACK } from "@/lib/content";
@@ -10,10 +10,11 @@ import { Footer } from "@/components/Footer";
 import { WhatsAppFab } from "@/components/WhatsAppFab";
 import { Analytics } from "@/components/Analytics";
 
-const spaceGrotesk = Space_Grotesk({
+const fraunces = Fraunces({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
-  variable: "--font-space-grotesk",
+  style: ["normal", "italic"],
+  variable: "--font-fraunces-src",
   display: "swap",
 });
 
@@ -55,7 +56,7 @@ export default async function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   const settings = (await getSettings()) ?? SETTINGS_FALLBACK;
   return (
-    <html lang="tr" className={`${spaceGrotesk.variable} ${inter.variable}`}>
+    <html lang="tr" className={`${fraunces.variable} ${inter.variable}`}>
       <body>
         <JsonLd data={beautySalonSchema(settings)} />
         <Nav whatsapp={settings.whatsapp} />

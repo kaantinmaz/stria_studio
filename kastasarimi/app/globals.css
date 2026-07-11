@@ -1,24 +1,24 @@
 @import "tailwindcss";
 
-/* ── Kaş Tasarımı Ankara — "Klinik / Precision Minimal" design system ──
-   Bright white base, cool sage accent, near-black green ink, hairline rules,
-   sharp corners, generous whitespace. Deliberately distinct from the warm
-   cream/terracotta mikroblading microsite. Token NAMES are reused so the
-   shared component classes recolor globally. */
+/* ── Kaş Tasarımı Ankara — "Atelier" editorial design system ──
+   Warm paper base, near-black ink, single cognac accent, Fraunces editorial
+   serif display, hairline rules, numbered sections. Token NAMES are reused so
+   shared components recolor globally. */
 @theme {
-  --color-cream: #ffffff; /* page base */
-  --color-ink: #18201c; /* near-black cool green: text + dark sections */
-  --color-accent: #5e7c6b; /* sage — primary accent */
-  --color-accent-dark: #3f5c4c; /* darker sage — hover */
-  --color-rose: #7e9a88; /* light sage */
-  --color-pink: #dce6de; /* selection */
-  --color-blush: #eef2ee; /* mist — alternating section bg */
-  --color-muted: #7c857f; /* muted cool gray */
-  --color-muted2: #565f59; /* stronger muted text */
-  --color-line: #e4e8e4; /* hairline */
-  --color-line2: #dbe1db; /* hairline (slightly darker) */
+  --color-cream: #f5f1e8; /* warm paper base */
+  --color-ink: #171412; /* warm near-black: text + dark sections */
+  --color-accent: #8a6a4f; /* cognac — primary accent */
+  --color-accent-dark: #6e5038; /* deeper cognac — links on light, hover */
+  --color-rose: #b79a7e; /* muted tan (light-accent tint) */
+  --color-pink: #eae0d2; /* selection tint */
+  --color-blush: #efe7da; /* warm paper — alternating section bg */
+  --color-muted: #8a8178; /* muted warm-grey label text */
+  --color-muted2: #5c554e; /* stronger body/muted text */
+  --color-line: #e4dccb; /* hairline */
+  --color-line2: #d9cfbb;
 
-  --font-display: var(--font-space-grotesk), system-ui, sans-serif;
+  --font-fraunces: var(--font-fraunces-src), Georgia, serif;
+  --font-display: var(--font-fraunces-src), Georgia, serif;
   --font-body: var(--font-inter), system-ui, sans-serif;
   --font-sans: var(--font-inter), system-ui, sans-serif;
 }
@@ -43,46 +43,70 @@ h3 {
   margin: 0;
   font-family: var(--font-display);
   font-weight: 500;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.015em;
 }
 
 .font-display {
   font-family: var(--font-display);
 }
 
-/* Utility label — uppercase, tracked, with a short leading rule (clinical eyebrow). */
+/* Editorial eyebrow — tracked small-caps label preceded by a short ink hairline. */
 .eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  font-family: var(--font-body);
   font-size: 11px;
   font-weight: 500;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
-  color: var(--color-accent-dark);
+  color: var(--color-muted);
 }
 .eyebrow::before {
   content: "";
-  width: 28px;
+  width: 24px;
   height: 1px;
-  background: var(--color-accent);
+  background: var(--color-ink);
+  opacity: 0.45;
 }
 
-/* Full-width hairline divider with a centered sage tick (precision motif). */
-.rule-tick {
-  position: relative;
+/* Plain full-width hairline. */
+.rule {
   height: 1px;
   background: var(--color-line2);
 }
-.rule-tick::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: -3px;
-  width: 7px;
-  height: 7px;
-  transform: translateX(-50%) rotate(45deg);
-  background: var(--color-accent);
+
+/* Big editorial section numeral (01, 02 …). */
+.section-index {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(26px, 3.6vw, 40px);
+  line-height: 1;
+  color: var(--color-accent);
+}
+
+/* Framed figure + small-caps caption (hero brow plate). */
+.plate {
+  border: 1px solid var(--color-line2);
+  background: var(--color-cream);
+  padding: clamp(20px, 3vw, 40px);
+}
+.plate-caption {
+  font-family: var(--font-body);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+/* Large italic editorial quote (reviews). */
+.pull-quote {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(19px, 2.1vw, 25px);
+  line-height: 1.42;
+  color: var(--color-ink);
 }
 
 ::selection {
@@ -90,23 +114,23 @@ h3 {
   color: var(--color-ink);
 }
 
-/* Sticky WhatsApp button pulse ring */
+/* Sticky WhatsApp button pulse ring (cognac) */
 @keyframes waPulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(94, 124, 107, 0.5);
+    box-shadow: 0 0 0 0 rgba(138, 106, 79, 0.5);
   }
   70% {
-    box-shadow: 0 0 0 16px rgba(94, 124, 107, 0);
+    box-shadow: 0 0 0 16px rgba(138, 106, 79, 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(94, 124, 107, 0);
+    box-shadow: 0 0 0 0 rgba(138, 106, 79, 0);
   }
 }
 
 /* ── Blog / article body (server-rendered CMS HTML) ── */
 .prose {
   color: var(--color-muted2);
-  line-height: 1.75;
+  line-height: 1.8;
   font-size: 1.0625rem;
 }
 .prose > * + * {
@@ -114,14 +138,16 @@ h3 {
 }
 .prose h2 {
   font-family: var(--font-display);
-  font-size: 1.5rem;
+  font-size: 1.85rem;
+  font-weight: 500;
   color: var(--color-ink);
   margin-top: 2em;
-  line-height: 1.25;
+  line-height: 1.2;
 }
 .prose h3 {
   font-family: var(--font-display);
-  font-size: 1.2rem;
+  font-size: 1.4rem;
+  font-weight: 500;
   color: var(--color-ink);
   margin-top: 1.6em;
 }
@@ -156,7 +182,7 @@ h3 {
 .prose th,
 .prose td {
   border: 1px solid var(--color-line2);
-  padding: 10px 14px;
+  padding: 11px 15px;
   text-align: left;
 }
 .prose thead th {
@@ -164,7 +190,8 @@ h3 {
   color: var(--color-ink);
   font-weight: 600;
   font-family: var(--font-display);
+  font-size: 1.05rem;
 }
 .prose tbody tr:nth-child(even) {
-  background: rgba(238, 242, 238, 0.6);
+  background: rgba(234, 224, 210, 0.5);
 }
