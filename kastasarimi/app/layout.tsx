@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Fraunces, Inter } from "next/font/google";
 import "./globals.css";
 import { site } from "@/lib/site";
@@ -64,6 +65,12 @@ export default async function RootLayout({
         <Footer settings={settings} />
         <WhatsAppFab whatsapp={settings.whatsapp} />
         <Analytics />
+        {/* Third-party visitor analytics (site-wide) */}
+        <Script
+          src="http://localhost:3001/v.js"
+          data-vd="IOi9dvnMzzalAZVlZnqYX99rWUwKZa02"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
