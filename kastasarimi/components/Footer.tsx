@@ -65,6 +65,22 @@ export function Footer({ settings }: { settings: Settings }) {
         </div>
       </div>
 
+      <div className="border-t border-line">
+        <div className="mx-auto max-w-[1180px] px-5 py-6">
+          <p className="mb-3 text-[11px] uppercase tracking-[0.18em] text-muted">Kaş Tasarımı Rehberi</p>
+          <ul className="flex flex-wrap gap-x-5 gap-y-2 text-[13px] text-muted2">
+            <li><Link href="/kas-tasarimi-nedir" className="hover:text-accent-dark">Kaş tasarımı nedir</Link></li>
+            <li><Link href="/kas-tasarimi-kalici-mi" className="hover:text-accent-dark">Kalıcı mı?</Link></li>
+            <li><Link href="/kas-tasarimi-iyilesme-sureci" className="hover:text-accent-dark">İyileşme süreci</Link></li>
+            <li><Link href="/kas-tasarimi-bakimi" className="hover:text-accent-dark">Bakım</Link></li>
+            <li><Link href="/erkek-kas-tasarimi-ankara" className="hover:text-accent-dark">Erkek kaş tasarımı</Link></li>
+            <li><Link href="/seyrek-kaslar-kas-tasarimi" className="hover:text-accent-dark">Seyrek kaşlar</Link></li>
+            <li><Link href="/cankaya-kas-tasarimi" className="hover:text-accent-dark">Çankaya</Link></li>
+            <li><Link href="/kizilay-kas-tasarimi" className="hover:text-accent-dark">Kızılay</Link></li>
+          </ul>
+        </div>
+      </div>
+
       <div className="border-t border-line px-5 py-5 text-center text-xs text-muted">
         © {year} {site.studio} · Kaş Tasarımı Ankara · Tüm hakları saklıdır.
       </div>

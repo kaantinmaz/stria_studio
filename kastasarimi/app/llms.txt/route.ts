@@ -37,6 +37,16 @@ Not: ${pricing.note}
 - [Hakkımızda](${u("/hakkimizda")}): deneyim ve hijyen
 - [İletişim](${u("/iletisim")}): randevu, adres, telefon
 
+## Kaş tasarımı rehberi
+- [Kaş tasarımı nedir](${u("/kas-tasarimi-nedir")}): tanım, altın oran, kıl tekniği
+- [Kaş tasarımı kalıcı mı](${u("/kas-tasarimi-kalici-mi")}): 12–18 ay kalıcılık, yenileme
+- [Acır mı & iyileşme süreci](${u("/kas-tasarimi-iyilesme-sureci")}): konfor, 7–10 gün iyileşme
+- [Kaş tasarımı bakımı](${u("/kas-tasarimi-bakimi")}): öncesi & sonrası bakım
+- [Erkek kaş tasarımı Ankara](${u("/erkek-kas-tasarimi-ankara")}): erkeklere özel doğal form
+- [Seyrek kaşlar için kaş tasarımı](${u("/seyrek-kaslar-kas-tasarimi")}): seyrek/dökük kaş dolgusu
+- [Çankaya kaş tasarımı](${u("/cankaya-kas-tasarimi")}): konum ve ulaşım
+- [Kızılay kaş tasarımı](${u("/kizilay-kas-tasarimi")}): Kızılay'dan erişim
+
 ## API
 - [API dokümantasyonu](${u("/api-docs")})
 - [OpenAPI şeması](${u("/openapi.yaml")})
