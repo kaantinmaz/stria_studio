@@ -10,9 +10,10 @@ export function Container({
   return <div className={`mx-auto max-w-[1180px] px-5 ${className}`}>{children}</div>;
 }
 
-// A page section with an optional eyebrow + heading + intro.
+// A page section with an optional numeral index + eyebrow + heading + intro.
 export function Section({
   id,
+  index,
   eyebrow,
   heading,
   intro,
@@ -21,6 +22,7 @@ export function Section({
   className = "",
 }: {
   id?: string;
+  index?: string;
   eyebrow?: string;
   heading?: string;
   intro?: string;
@@ -29,15 +31,18 @@ export function Section({
   className?: string;
 }) {
   return (
-    <section id={id} className={`py-14 sm:py-20 ${className}`}>
+    <section id={id} className={`py-16 sm:py-24 ${className}`}>
       <Container className={narrow ? "max-w-[820px]" : ""}>
-        {eyebrow && <span className="eyebrow mb-4">{eyebrow}</span>}
+        {eyebrow && <span className="eyebrow mb-5">{eyebrow}</span>}
         {heading && (
-          <h2 className="max-w-[720px] text-[clamp(24px,3.4vw,36px)] leading-tight text-ink">
-            {heading}
-          </h2>
+          <div className="flex items-baseline gap-4 sm:gap-6">
+            {index && <span className="section-index shrink-0">{index}</span>}
+            <h2 className="max-w-[760px] text-[clamp(27px,3.8vw,46px)] leading-[1.06] text-ink">
+              {heading}
+            </h2>
+          </div>
         )}
-        {intro && <p className="mt-4 max-w-[680px] text-[17px] leading-relaxed text-muted2">{intro}</p>}
+        {intro && <p className="mt-5 max-w-[680px] text-[17px] leading-relaxed text-muted2">{intro}</p>}
         {children}
       </Container>
     </section>
