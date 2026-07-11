@@ -30,12 +30,12 @@ export function Nav({ whatsapp }: { whatsapp: string }) {
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-6 lg:flex" aria-label="Ana menü">
+        <nav className="hidden items-center gap-7 lg:flex" aria-label="Ana menü">
           {LINKS.map((l) => (
             <Link
               key={l.href}
               href={l.href}
-              className="text-[14px] text-muted2 transition hover:text-accent-dark"
+              className="text-[12px] uppercase tracking-[0.12em] text-muted2 transition hover:text-accent-dark"
             >
               {l.label}
             </Link>
@@ -44,7 +44,7 @@ export function Nav({ whatsapp }: { whatsapp: string }) {
             href={whatsapp}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2 text-[13px] text-cream transition hover:bg-accent-dark"
+            className="inline-flex items-center gap-2 border-b border-ink pb-0.5 text-[12px] uppercase tracking-[0.12em] text-ink transition hover:border-accent-dark hover:text-accent-dark"
           >
             <WhatsAppIcon className="h-4 w-4" /> Randevu
           </a>
@@ -77,7 +77,7 @@ export function Nav({ whatsapp }: { whatsapp: string }) {
             href={whatsapp}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-4 inline-flex items-center gap-2 rounded-full bg-ink px-5 py-3 text-sm text-cream"
+            className="mt-4 inline-flex items-center gap-2 bg-ink px-5 py-3 text-[13px] uppercase tracking-[0.1em] text-cream"
           >
             <WhatsAppIcon className="h-4 w-4" /> WhatsApp'tan Randevu
           </a>
