@@ -41,28 +41,30 @@ export default async function HomePage() {
       <JsonLd data={faqSchema(faqs)} />
 
       {/* Hero */}
-      <section className="border-b border-line bg-gradient-to-br from-blush via-cream to-pink/50">
-        <Container className="grid items-center gap-12 py-20 sm:py-28 lg:grid-cols-[1.05fr_0.95fr]">
+      <section className="border-b border-line">
+        <Container className="grid items-center gap-12 py-20 sm:py-28 lg:grid-cols-[1.1fr_0.9fr]">
           <div>
             <span className="eyebrow">{hero.eyebrow}</span>
-            <h1 className="mt-6 text-[clamp(38px,6vw,66px)] font-medium leading-[1.02] text-ink">
+            <h1 className="mt-7 text-[clamp(40px,7vw,84px)] font-medium leading-[0.98] tracking-[-0.02em] text-ink">
               {hero.title}
             </h1>
-            <p className="mt-6 max-w-[520px] text-[18px] leading-relaxed text-muted2">{hero.subtitle}</p>
+            <div className="rule mt-8 max-w-[420px]" />
+            <p className="mt-8 max-w-[500px] text-[18px] leading-relaxed text-muted2">{hero.subtitle}</p>
             <div className="mt-9">
               <CTAButtons settings={s} />
             </div>
-            <ul className="mt-10 flex flex-wrap gap-x-8 gap-y-3 text-[12px] uppercase tracking-[0.16em] text-muted">
+            <ul className="mt-11 flex flex-wrap gap-x-8 gap-y-3 text-[11px] uppercase tracking-[0.16em] text-muted">
               {["Kişiye özel tasarım", "Kıl kıl doğal", "12–18 ay kalıcı"].map((t) => (
                 <li key={t} className="flex items-center gap-2.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true" /> {t}
+                  <span className="h-1 w-1 rounded-full bg-accent" aria-hidden="true" /> {t}
                 </li>
               ))}
             </ul>
           </div>
-          <div className="rounded-[28px] border border-line bg-white/70 p-5 shadow-[0_20px_60px_-30px_rgba(152,80,95,0.4)] sm:p-8">
+          <figure className="plate">
             <BrowFlourish className="w-full" />
-          </div>
+            <figcaption className="plate-caption mt-4">Fig. 01 — Kıl tekniği</figcaption>
+          </figure>
         </Container>
       </section>
 
@@ -75,24 +77,30 @@ export default async function HomePage() {
 
       {/* What is (answer-first) */}
       <Section id="kas-tasarimi-nedir" narrow>
-        <h2 className="text-[clamp(24px,3.4vw,34px)] leading-tight text-ink">{whatIs.heading}</h2>
+        <div className="flex items-baseline gap-4 sm:gap-6">
+          <span className="section-index shrink-0">01</span>
+          <h2 className="text-[clamp(27px,3.8vw,46px)] leading-[1.06] text-ink">{whatIs.heading}</h2>
+        </div>
         <p className="mt-5 text-[19px] leading-relaxed text-muted2">{whatIs.answer}</p>
       </Section>
 
       {/* Benefits */}
-      <Section eyebrow="Avantajlar" heading={benefits.heading} intro={benefits.intro} className="bg-blush/40">
-        <div className="mt-10 grid gap-5 sm:grid-cols-2">
-          {benefits.items.map((b) => (
-            <div key={b.title} className="rounded-[16px] border border-line bg-white p-6">
-              <h3 className="text-[18px] text-ink">{b.title}</h3>
-              <p className="mt-2 text-[15px] leading-relaxed text-muted2">{b.text}</p>
-            </div>
+      <Section index="02" eyebrow="Avantajlar" heading={benefits.heading} intro={benefits.intro} className="bg-blush/40">
+        <ul className="mt-12 border-t border-line">
+          {benefits.items.map((b, i) => (
+            <li key={b.title} className="grid grid-cols-[auto_1fr] gap-x-6 border-b border-line py-7 sm:grid-cols-[64px_1fr]">
+              <span className="font-display text-[22px] leading-none text-accent">{String(i + 1).padStart(2, "0")}</span>
+              <div>
+                <h3 className="font-display text-[20px] font-medium text-ink">{b.title}</h3>
+                <p className="mt-2 max-w-[560px] text-[15px] leading-relaxed text-muted2">{b.text}</p>
+              </div>
+            </li>
           ))}
-        </div>
+        </ul>
       </Section>
 
       {/* Process */}
-      <Section eyebrow="Süreç" heading={process.heading} intro={process.intro}>
+      <Section index="03" eyebrow="Süreç" heading={process.heading} intro={process.intro}>
         <ProcessSteps steps={process.steps} />
         <Link href="/kas-tasarimi-nasil-yapilir" className="mt-6 inline-flex items-center gap-1.5 text-[15px] text-accent-dark">
           Adım adım detaylı anlatım <ArrowIcon className="h-4 w-4" />
@@ -100,7 +108,7 @@ export default async function HomePage() {
       </Section>
 
       {/* Pricing */}
-      <Section eyebrow="Fiyatlar" heading={pricing.heading} intro={pricing.intro} className="bg-blush/40">
+      <Section index="04" eyebrow="Fiyatlar" heading={pricing.heading} intro={pricing.intro} className="bg-blush/40">
         <PricingTable rows={pricing.rows} />
         <p className="mt-4 text-[13px] text-muted">{pricing.note}</p>
         <Link href="/kas-tasarimi-fiyatlari" className="mt-4 inline-flex items-center gap-1.5 text-[15px] text-accent-dark">
@@ -109,7 +117,7 @@ export default async function HomePage() {
       </Section>
 
       {/* Gallery */}
-      <Section eyebrow="Galeri" heading="Öncesi & sonrası çalışmalarımız">
+      <Section index="05" eyebrow="Galeri" heading="Öncesi & sonrası çalışmalarımız">
         <Gallery items={gallery} limit={6} />
         <Link href="/galeri" className="mt-6 inline-flex items-center gap-1.5 text-[15px] text-accent-dark">
           Tüm galeriyi gör <ArrowIcon className="h-4 w-4" />
@@ -117,12 +125,12 @@ export default async function HomePage() {
       </Section>
 
       {/* Reviews */}
-      <Section eyebrow="Yorumlar" heading="Ankara'dan danışan yorumları" className="bg-blush/40">
+      <Section index="06" eyebrow="Yorumlar" heading="Ankara'dan danışan yorumları" className="bg-blush/40">
         <Reviews />
       </Section>
 
       {/* FAQ */}
-      <Section id="sss" eyebrow="S.S.S." heading="Sıkça sorulan sorular" narrow>
+      <Section id="sss" index="07" eyebrow="S.S.S." heading="Sıkça sorulan sorular" narrow>
         <Faq items={faqs} />
         <Link href="/sss" className="mt-6 inline-flex items-center gap-1.5 text-[15px] text-accent-dark">
           Tüm soruları gör <ArrowIcon className="h-4 w-4" />
@@ -130,7 +138,7 @@ export default async function HomePage() {
       </Section>
 
       {/* Blog */}
-      <Section eyebrow="Blog" heading="Kaş Tasarımı rehberi">
+      <Section index="08" eyebrow="Blog" heading="Kaş Tasarımı rehberi">
         <BlogList posts={posts} />
         <Link href="/blog" className="mt-6 inline-flex items-center gap-1.5 text-[15px] text-accent-dark">
           Tüm yazılar <ArrowIcon className="h-4 w-4" />
@@ -138,7 +146,7 @@ export default async function HomePage() {
       </Section>
 
       {/* Location */}
-      <Section eyebrow="Konum" heading="Ankara Çankaya'dayız" className="bg-blush/40">
+      <Section index="09" eyebrow="Konum" heading="Ankara Çankaya'dayız" className="bg-blush/40">
         <div className="mt-8 grid gap-8 lg:grid-cols-2">
           <div>
             <p className="text-[16px] leading-relaxed text-muted2">{about.paragraphs[0]}</p>
