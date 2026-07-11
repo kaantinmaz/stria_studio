@@ -10,9 +10,9 @@ export const LAST_UPDATED = "Temmuz 2026";
 
 export const hero = {
   eyebrow: "Ankara · Çankaya · Stria Studio",
-  title: "Kaş Tasarımı Ankara — Kişiye Özel Kalıcı Kaşlar",
+  title: "Kaş Tasarımı Ankara",
   subtitle:
-    "Yüz hatlarınıza özel tasarlanan, kıl tekniğiyle tek tek işlenen doğal ve kalıcı kaşlar. Altın oran ölçümüyle simetrik form, steril uygulama, 12–18 ay kalıcılık.",
+    "Yüz hatlarınıza göre çizilen, kıl tekniğiyle tek tek işlenen kalıcı kaşlar. Altın oran ölçümü, steril uygulama, 12–18 ay kalıcılık.",
   primaryCta: "WhatsApp'tan Randevu Al",
   secondaryCta: "Fiyatları Gör",
 };
@@ -27,7 +27,7 @@ export const whatIs = {
 export const benefits = {
   heading: "Kaş tasarımı kimler için uygun?",
   intro:
-    "Kaşları seyrek, açık renk, asimetrik ya da şekilsiz olan; makyajsız da dolgun ve bakımlı kaşlar isteyen herkes için idealdir.",
+    "Kaşları seyrek, açık renkli, asimetrik veya şekilsiz olan; makyajsız da dolgun, bakımlı kaş isteyen herkes için.",
   items: [
     {
       title: "Doğal kıl görünümü",
@@ -54,19 +54,19 @@ export const process = {
     "İşlem, ücretsiz ön görüşmeden rötuşa kadar dört adımda tamamlanır ve yaklaşık 90 dakika sürer.",
   steps: [
     {
-      title: "1. Ücretsiz ön görüşme ve analiz",
+      title: "Ücretsiz ön görüşme ve analiz",
       text: "Kaş yapınız, cilt tipiniz ve beklentileriniz değerlendirilir; uygunluk kontrol edilir.",
     },
     {
-      title: "2. Tasarım ve altın oran ölçümü",
+      title: "Tasarım ve altın oran ölçümü",
       text: "Kaş formu yüz hatlarınıza göre çizilir, renk belirlenir. Onayınız olmadan işleme başlanmaz.",
     },
     {
-      title: "3. Kıl kıl uygulama",
+      title: "Kıl kıl uygulama",
       text: "Anestezik krem sonrası her kıl tek tek işlenir (~90 dk). İşlem konforludur.",
     },
     {
-      title: "4. Rötuş seansı (4–6 hafta sonra)",
+      title: "Rötuş seansı (4–6 hafta sonra)",
       text: "İyileşme sonrası açılan bölgeler tamamlanır; kalıcılık ve netlik pekiştirilir.",
     },
   ],
