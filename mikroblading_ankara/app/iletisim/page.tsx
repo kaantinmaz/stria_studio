@@ -19,7 +19,7 @@ export default async function ContactPage() {
   return (
     <>
       <Breadcrumbs items={[{ name: "İletişim", path: "/iletisim" }]} />
-      <Section eyebrow="İletişim" heading="Randevu & iletişim"
+      <Section as="h1" eyebrow="İletişim" heading="Randevu & iletişim"
         intro="Ücretsiz ön görüşme için formu doldurun ya da WhatsApp'tan yazın. En kısa sürede size dönüş yaparız.">
         <div className="mt-8 grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
           <div className="space-y-6">

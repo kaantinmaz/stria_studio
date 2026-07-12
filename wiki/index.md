@@ -15,7 +15,7 @@ _(none yet)_
 - [microsite-architecture](decisions/2026-07-09-microsite-architecture.md) — per-service SEO microsites (mikrobladingankara.com) on shared backend; `site` column scoping, `/api/microsites/{site}/*`, Filament Site selector, isolation guard.
 
 ## Issues
-_(none yet)_
+- [mikroblading-seo-geo-audit](issues/2026-07-12-mikroblading-seo-geo-audit.md) — 2026-07-12 audit: fixed missing H1 (Section `as="h1"`) + api-docs noindex; open owner blockers (gallery photos, real NAP, reviews→AggregateRating, launch/GSC).
 
 ## Syntheses
 _(none yet)_

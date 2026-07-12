@@ -4,12 +4,17 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { buildMetadata } from "@/lib/seo";
 import { site } from "@/lib/site";
 
-export const metadata: Metadata = buildMetadata({
-  title: "API Dokümantasyonu — Mikroblading Ankara",
-  description:
-    "Mikroblading Ankara microsite içerik API'si (blog, SSS, galeri, hizmet, ayarlar, iletişim) için geliştirici dokümantasyonu ve OpenAPI şeması.",
-  path: "/api-docs",
-});
+// Thin, developer-facing page — kept for humans (footer link) but noindex so it
+// doesn't dilute the microsite's commercial topical focus. Also dropped from sitemap.
+export const metadata: Metadata = {
+  ...buildMetadata({
+    title: "API Dokümantasyonu — Mikroblading Ankara",
+    description:
+      "Mikroblading Ankara microsite içerik API'si (blog, SSS, galeri, hizmet, ayarlar, iletişim) için geliştirici dokümantasyonu ve OpenAPI şeması.",
+    path: "/api-docs",
+  }),
+  robots: { index: false, follow: true },
+};
 
 const BASE = "/api/microsites/{site}";
 
@@ -108,7 +113,7 @@ export default function ApiDocsPage() {
   return (
     <>
       <Breadcrumbs items={[{ name: "API Dokümantasyonu", path: "/api-docs" }]} />
-      <Section eyebrow="Geliştiriciler" heading="API Dokümantasyonu"
+      <Section as="h1" eyebrow="Geliştiriciler" heading="API Dokümantasyonu"
         intro="Mikroblading Ankara microsite'i içeriğini ortak Stria Studio backend'inden çeker. Aşağıdaki uçlar salt-okunur ve site slug'ına göre kapsamlandırılmıştır.">
         <div className="mt-6 flex flex-wrap gap-3 text-[14px]">
           <a href="/openapi.yaml" className="rounded-full border border-line bg-white px-4 py-2 text-accent-dark hover:bg-blush/50">

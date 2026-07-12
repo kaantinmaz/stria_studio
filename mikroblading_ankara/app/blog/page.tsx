@@ -26,7 +26,7 @@ export default async function BlogIndexPage({
   return (
     <>
       <Breadcrumbs items={[{ name: "Blog", path: "/blog" }]} />
-      <Section eyebrow="Blog" heading="Mikroblading rehberi"
+      <Section as="h1" eyebrow="Blog" heading="Mikroblading rehberi"
         intro="Kıl tekniği kaş uygulaması, fiyatlar, bakım ve iyileşme hakkında uzman içerikleri.">
         <BlogList posts={res.data} />
 

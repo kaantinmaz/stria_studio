@@ -11,6 +11,8 @@ export function Container({
 }
 
 // A page section with an optional eyebrow + heading + intro.
+// `as` sets the heading tag: default "h2" for in-page sections; pages that use a
+// Section as their primary page heading pass as="h1" so every page has one H1.
 export function Section({
   id,
   eyebrow,
@@ -19,6 +21,7 @@ export function Section({
   children,
   narrow = false,
   className = "",
+  as: Heading = "h2",
 }: {
   id?: string;
   eyebrow?: string;
@@ -27,6 +30,7 @@ export function Section({
   children?: ReactNode;
   narrow?: boolean;
   className?: string;
+  as?: "h1" | "h2";
 }) {
   return (
     <section id={id} className={`py-14 sm:py-20 ${className}`}>
@@ -35,9 +39,9 @@ export function Section({
           <p className="mb-3 text-[11px] uppercase tracking-[0.18em] text-accent">{eyebrow}</p>
         )}
         {heading && (
-          <h2 className="max-w-[720px] text-[clamp(24px,3.4vw,36px)] leading-tight text-ink">
+          <Heading className="max-w-[720px] text-[clamp(24px,3.4vw,36px)] leading-tight text-ink">
             {heading}
-          </h2>
+          </Heading>
         )}
         {intro && <p className="mt-4 max-w-[680px] text-[17px] leading-relaxed text-muted2">{intro}</p>}
         {children}

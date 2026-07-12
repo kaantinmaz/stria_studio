@@ -19,7 +19,7 @@ export default async function GalleryPage() {
   return (
     <>
       <Breadcrumbs items={[{ name: "Galeri", path: "/galeri" }]} />
-      <Section eyebrow="Galeri" heading="Öncesi & sonrası çalışmalarımız"
+      <Section as="h1" eyebrow="Galeri" heading="Öncesi & sonrası çalışmalarımız"
         intro="Kıl tekniğiyle yapılan doğal ve yüze özel kaş tasarımlarından örnekler. Her uygulama kişiye özeldir; sonuçlar cilt tipine göre değişebilir.">
         <Gallery items={gallery} />
       </Section>
