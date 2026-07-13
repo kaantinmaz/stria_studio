@@ -126,6 +126,15 @@ export default async function HomePage() {
         <Link href="/sss" className="mt-6 inline-flex items-center gap-1.5 text-[15px] text-accent-dark">
           Tüm soruları gör <ArrowIcon className="h-4 w-4" />
         </Link>
+        <div className="mt-10">
+          <p className="mb-3 text-[11px] uppercase tracking-[0.18em] text-muted">İlgili konular</p>
+          <ul className="flex flex-wrap gap-x-5 gap-y-2 text-[14px] text-accent-dark">
+            <li><Link href="/erkek-mikroblading-ankara" className="hover:underline">Erkek mikroblading</Link></li>
+            <li><Link href="/seyrek-kaslar-mikroblading" className="hover:underline">Seyrek kaşlar</Link></li>
+            <li><Link href="/cankaya-mikroblading" className="hover:underline">Çankaya mikroblading</Link></li>
+            <li><Link href="/kizilay-mikroblading" className="hover:underline">Kızılay ulaşım rehberi</Link></li>
+          </ul>
+        </div>
       </Section>
 
       {/* Blog */}

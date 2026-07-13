@@ -31,6 +31,10 @@ Not: ${pricing.note}
 - [Anasayfa](${u("/")}): Mikroblading Ankara genel bilgi
 - [Mikroblading nedir & nasıl yapılır](${u("/mikroblading-nasil-yapilir")}): adım adım işlem ve iyileşme
 - [Fiyatlar](${u("/mikroblading-fiyatlari")}): güncel fiyat listesi
+- [Çankaya mikroblading](${u("/cankaya-mikroblading")}): Çankaya stüdyo konumu, ulaşım ve rötuş ziyaretleri
+- [Kızılay mikroblading](${u("/kizilay-mikroblading")}): Kızılay'dan metro, otobüs ve dolmuş bağlantılarıyla ulaşım
+- [Erkek mikroblading Ankara](${u("/erkek-mikroblading-ankara")}): doğal erkek kaş formu, kıl tekniği ve mahremiyet
+- [Seyrek kaşlar için mikroblading](${u("/seyrek-kaslar-mikroblading")}): seyrek kaş, kaş dökülmesi ve kıl tekniği uygunluğu
 - [Galeri](${u("/galeri")}): öncesi & sonrası
 - [Blog](${u("/blog")}): mikroblading rehberleri
 - [S.S.S.](${u("/sss")}): sıkça sorulan sorular

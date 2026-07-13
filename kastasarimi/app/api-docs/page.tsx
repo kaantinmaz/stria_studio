@@ -4,12 +4,15 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { buildMetadata } from "@/lib/seo";
 import { site } from "@/lib/site";
 
-export const metadata: Metadata = buildMetadata({
-  title: "API Dokümantasyonu — Kaş Tasarımı Ankara",
-  description:
-    "Kaş Tasarımı Ankara microsite içerik API'si (blog, SSS, galeri, hizmet, ayarlar, iletişim) için geliştirici dokümantasyonu ve OpenAPI şeması.",
-  path: "/api-docs",
-});
+export const metadata: Metadata = {
+  ...buildMetadata({
+    title: "API Dokümantasyonu — Kaş Tasarımı Ankara",
+    description:
+      "Kaş Tasarımı Ankara microsite içerik API'si (blog, SSS, galeri, hizmet, ayarlar, iletişim) için geliştirici dokümantasyonu ve OpenAPI şeması.",
+    path: "/api-docs",
+  }),
+  robots: { index: false, follow: true },
+};
 
 const BASE = "/api/microsites/{site}";
 
@@ -108,7 +111,7 @@ export default function ApiDocsPage() {
   return (
     <>
       <Breadcrumbs items={[{ name: "API Dokümantasyonu", path: "/api-docs" }]} />
-      <Section eyebrow="Geliştiriciler" heading="API Dokümantasyonu"
+      <Section as="h1" eyebrow="Geliştiriciler" heading="API Dokümantasyonu"
         intro="Kaş Tasarımı Ankara microsite'i içeriğini ortak Stria Studio backend'inden çeker. Aşağıdaki uçlar salt-okunur ve site slug'ına göre kapsamlandırılmıştır.">
         <div className="mt-6 flex flex-wrap gap-3 text-[14px]">
           <a href="/openapi.yaml" className="rounded-[2px] border border-line bg-cream px-4 py-2 text-accent-dark hover:bg-blush/50">

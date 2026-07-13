@@ -21,6 +21,9 @@ html {
 
 body {
   margin: 0;
+  /* Shifts in-flow content down by the campaign bar's height when it shows.
+     The fixed nav stays viewport-pinned; Nav.tsx sets --promo-h (0 otherwise). */
+  padding-top: var(--promo-h, 0px);
   background: var(--color-cream);
   color: var(--color-ink);
   font-family: var(--font-jost), system-ui, sans-serif;

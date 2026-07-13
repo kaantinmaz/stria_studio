@@ -3,6 +3,13 @@ export type LS = { tr: string; en: string };
 
 export const IMG = {
   hero: "/images/hero.png",
+  // Hero slider slides — add/remove paths here to change the rotation.
+  heroSlides: [
+    "/images/hero.png",
+    "/images/powder.png",
+    "/images/eyeliner.png",
+    "/images/dipliner.png",
+  ],
   micro: "/images/micro.png",
   powder: "/images/powder.png",
   eyeliner: "/images/eyeliner.png",
@@ -47,6 +54,7 @@ export type Dict = {
   navAbout: string;
   navContact: string;
   navBlog: string;
+  navFaq: string;
   navCta: string;
   callLabel: string;
   heroKicker: string;
@@ -103,6 +111,7 @@ export const UI: Record<Lang, Dict> = {
     navAbout: "Hakkımızda",
     navContact: "İletişim",
     navBlog: "Blog",
+    navFaq: "S.S.S.",
     navCta: "Randevu Al",
     callLabel: "Ara",
     heroKicker: "Ankara · Kalıcı Makyaj & Güzellik Stüdyosu",
@@ -171,6 +180,7 @@ export const UI: Record<Lang, Dict> = {
     navAbout: "About",
     navContact: "Contact",
     navBlog: "Blog",
+    navFaq: "FAQ",
     navCta: "Book Now",
     callLabel: "Call",
     heroKicker: "Ankara · Permanent Makeup & Beauty Studio",

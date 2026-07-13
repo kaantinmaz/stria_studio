@@ -34,7 +34,12 @@ export function beautySalonSchema(s: Settings) {
       opens: h.open,
       closes: h.close,
     })),
-    sameAs: [s.instagram || site.instagram, site.gbpUrl].filter(Boolean),
+    sameAs: [
+      s.instagram || site.instagram,
+      site.gbpUrl,
+      "https://striastudio.com",
+      "https://mikrobladingankara.com",
+    ].filter(Boolean),
   };
 }
 
@@ -95,6 +100,7 @@ export function blogPostingSchema(opts: {
   description: string;
   path: string;
   datePublished: string | null;
+  dateModified?: string | null;
   image?: string | null;
 }) {
   return {
@@ -105,7 +111,7 @@ export function blogPostingSchema(opts: {
     url: absUrl(opts.path),
     mainEntityOfPage: absUrl(opts.path),
     datePublished: opts.datePublished ?? undefined,
-    dateModified: opts.datePublished ?? undefined,
+    dateModified: opts.dateModified ?? opts.datePublished ?? undefined,
     image: opts.image ? [opts.image] : [absUrl("/og")],
     author: { "@type": "Organization", name: site.studio },
     publisher: {

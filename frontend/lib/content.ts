@@ -16,6 +16,11 @@ export type Settings = {
   lat: number | string | null;
   lng: number | string | null;
   hours: Hours[];
+  campaign_enabled: boolean;
+  campaign_text_tr: string;
+  campaign_text_en: string;
+  header_code: string | null;
+  footer_code: string | null;
 };
 
 export const SETTINGS_FALLBACK: Settings = {
@@ -33,6 +38,11 @@ export const SETTINGS_FALLBACK: Settings = {
   lat: 39.9208,
   lng: 32.8541,
   hours: [{ days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"], open: "10:00", close: "19:00" }],
+  campaign_enabled: false,
+  campaign_text_tr: "",
+  campaign_text_en: "",
+  header_code: null,
+  footer_code: null,
 };
 
 export type ServiceListItem = {
@@ -78,10 +88,10 @@ export function pickLang(
   return lang === "en" ? (en || tr || "") : (tr || "");
 }
 
-async function api<T>(path: string): Promise<T | null> {
+async function api<T>(path: string, revalidate = 300): Promise<T | null> {
   try {
     const res = await fetch(`${site.apiUrl}/api${path}`, {
-      next: { revalidate: 300 },
+      next: { revalidate },
       headers: { Accept: "application/json" },
     });
     if (!res.ok) return null;
@@ -107,7 +117,8 @@ export async function getServiceSlugs(): Promise<string[]> {
 }
 
 export async function getSettings(): Promise<Settings | null> {
-  const out = await api<{ data: Settings }>("/settings");
+  // Short cache: admins toggle the campaign bar / contact info and expect it live.
+  const out = await api<{ data: Settings }>("/settings", 30);
   return out?.data ?? null;
 }
 

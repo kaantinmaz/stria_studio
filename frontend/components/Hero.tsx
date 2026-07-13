@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useLang } from "@/components/LanguageProvider";
 import { useSettings } from "@/components/SettingsProvider";
 import { phoneHref } from "@/lib/content";
@@ -11,6 +12,18 @@ import { CallLabel } from "@/components/CallLabel";
 export function Hero() {
   const { t } = useLang();
   const settings = useSettings();
+  const slides = IMG.heroSlides;
+  const [slide, setSlide] = useState(0);
+
+  useEffect(() => {
+    if (slides.length < 2) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const id = setInterval(
+      () => setSlide((n) => (n + 1) % slides.length),
+      5000,
+    );
+    return () => clearInterval(id);
+  }, [slides.length]);
 
   return (
     <header
@@ -63,12 +76,38 @@ export function Hero() {
 
       <div className="reveal in relative">
         <div className="relative h-[min(72vh,600px)] overflow-hidden rounded-[200px_200px_32px_32px] shadow-[0_40px_90px_-50px_rgba(197,124,105,0.7)]">
-          <ImageSlot
-            src={IMG.hero}
-            alt="Stria Studio — Ankara kalıcı makyaj stüdyosu"
-            sizes="(max-width: 768px) 100vw, 45vw"
-            priority
-          />
+          {slides.map((src, i) => (
+            <div
+              key={src}
+              className={`absolute inset-0 transition-opacity duration-700 ${
+                i === slide ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              <ImageSlot
+                src={src}
+                alt="Stria Studio — Ankara kalıcı makyaj stüdyosu"
+                sizes="(max-width: 768px) 100vw, 45vw"
+                priority={i === 0}
+              />
+            </div>
+          ))}
+
+          {slides.length > 1 && (
+            <div className="absolute bottom-5 left-1/2 z-10 flex -translate-x-1/2 gap-2">
+              {slides.map((src, i) => (
+                <button
+                  key={src}
+                  type="button"
+                  aria-label={`Görsel ${i + 1}`}
+                  aria-current={i === slide}
+                  onClick={() => setSlide(i)}
+                  className={`h-2 rounded-full transition-all ${
+                    i === slide ? "w-5 bg-cream" : "w-2 bg-cream/60"
+                  }`}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* featured service card */}

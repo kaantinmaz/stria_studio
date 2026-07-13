@@ -45,9 +45,16 @@ export default async function PostPage({
     "@type": "BlogPosting",
     headline: post.title_tr,
     description: post.excerpt_tr,
+    url: absUrl(`/blog/${post.slug}`),
     datePublished: post.published_at,
-    image: post.cover_url ?? absUrl("/images/hero.png"),
+    dateModified: post.updated_at ?? post.published_at,
+    image: post.cover_url ?? absUrl("/og"),
     author: { "@type": "Organization", name: "Stria Studio" },
+    publisher: {
+      "@type": "Organization",
+      name: "Stria Studio",
+      logo: { "@type": "ImageObject", url: absUrl("/logo.png") },
+    },
     mainEntityOfPage: absUrl(`/blog/${post.slug}`),
   };
 

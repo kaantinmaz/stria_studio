@@ -6,7 +6,11 @@ import { phoneHref } from "@/lib/content";
 import { WhatsAppIcon } from "@/components/Icons";
 import { ContactForm } from "@/components/ContactForm";
 
-export function Contact() {
+export function Contact({
+  headingAs: Heading = "h2",
+}: {
+  headingAs?: "h1" | "h2";
+}) {
   const { t } = useLang();
   const settings = useSettings();
 
@@ -17,9 +21,9 @@ export function Contact() {
           <div className="reveal mb-[14px] text-xs uppercase tracking-[0.14em] text-accent">
             {t.contactKicker}
           </div>
-          <h2 className="reveal mb-[22px] text-[clamp(30px,4.2vw,56px)] leading-[1.06]">
+          <Heading className="reveal mb-[22px] text-[clamp(30px,4.2vw,56px)] leading-[1.06]">
             {t.contactTitle}
-          </h2>
+          </Heading>
           <p className="reveal mb-8 max-w-[420px] text-base leading-[1.7] text-muted">
             {t.contactText}
           </p>

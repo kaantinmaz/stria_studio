@@ -12,6 +12,7 @@ export type PostList = {
   excerpt_en: string;
   cover_url: string | null;
   published_at: string | null;
+  updated_at: string | null;
   category: { slug: string; name_tr: string; name_en: string } | null;
   tags: Tag[];
 };

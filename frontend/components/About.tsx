@@ -4,7 +4,11 @@ import { useLang } from "@/components/LanguageProvider";
 import { IMG, TRUST } from "@/lib/i18n";
 import { ImageSlot } from "@/components/ImageSlot";
 
-export function About() {
+export function About({
+  headingAs: Heading = "h2",
+}: {
+  headingAs?: "h1" | "h2";
+}) {
   const { lang, t } = useLang();
 
   return (
@@ -24,9 +28,9 @@ export function About() {
           <div className="reveal mb-[14px] text-xs uppercase tracking-[0.14em] text-accent">
             {t.aboutKicker}
           </div>
-          <h2 className="reveal mb-5 text-[clamp(28px,3.8vw,48px)] leading-[1.12]">
+          <Heading className="reveal mb-5 text-[clamp(28px,3.8vw,48px)] leading-[1.12]">
             {t.aboutTitle}
-          </h2>
+          </Heading>
           <p className="reveal mb-[34px] text-base leading-[1.72] text-muted2">
             {t.aboutText}
           </p>

@@ -60,6 +60,7 @@ export default async function PostPage({
           description: post.excerpt_tr,
           path: `/blog/${slug}`,
           datePublished: post.published_at,
+          dateModified: post.updated_at,
           image: post.cover_url,
         })}
       />
@@ -67,9 +68,12 @@ export default async function PostPage({
 
       <article className="py-12">
         <Container className="max-w-[760px]">
-          {post.published_at && (
-            <p className="text-[12px] uppercase tracking-[0.14em] text-accent">{formatDate(post.published_at)}</p>
-          )}
+          <div className="flex flex-wrap gap-x-4 gap-y-1 text-[12px] uppercase tracking-[0.14em] text-accent">
+            {post.published_at && <p>{formatDate(post.published_at)}</p>}
+            {post.updated_at && post.updated_at.slice(0, 10) !== post.published_at?.slice(0, 10) && (
+              <p>Güncelleme: {formatDate(post.updated_at)}</p>
+            )}
+          </div>
           <h1 className="mt-3 text-[clamp(28px,4vw,40px)] leading-tight text-ink">{post.title_tr}</h1>
           <p className="mt-4 text-[18px] leading-relaxed text-muted2">{post.excerpt_tr}</p>
 

@@ -31,9 +31,15 @@ export const metadata: Metadata = {
     type: "website",
     locale: "tr_TR",
     siteName: "Stria Studio",
-    images: [{ url: "/images/hero.png" }],
+    images: [{ url: "/og" }],
   },
   twitter: { card: "summary_large_image" },
+  other: {
+    "geo.region": "TR-06",
+    "geo.placename": "Çankaya, Ankara",
+    "geo.position": "39.9208;32.8541",
+    ICBM: "39.9208, 32.8541",
+  },
 };
 
 export default async function RootLayout({
@@ -43,6 +49,11 @@ export default async function RootLayout({
   return (
     <html lang="tr" className={jost.variable}>
       <body>
+        {/* Admin-managed raw code. Server-rendered so injected <script> tags run
+            (innerHTML scripts wouldn't). Intentionally unescaped — admin-only. */}
+        {settings?.header_code && (
+          <div dangerouslySetInnerHTML={{ __html: settings.header_code }} />
+        )}
         <JsonLd data={beautySalonSchema(settings ?? SETTINGS_FALLBACK)} />
         <LanguageProvider>
           <SettingsProvider settings={settings}>
@@ -51,6 +62,9 @@ export default async function RootLayout({
             <Analytics />
           </SettingsProvider>
         </LanguageProvider>
+        {settings?.footer_code && (
+          <div dangerouslySetInnerHTML={{ __html: settings.footer_code }} />
+        )}
       </body>
     </html>
   );

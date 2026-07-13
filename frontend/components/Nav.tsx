@@ -1,10 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLang } from "@/components/LanguageProvider";
 import { useSettings } from "@/components/SettingsProvider";
-import { phoneHref, formatHours } from "@/lib/content";
+import { phoneHref, formatHours, pickLang } from "@/lib/content";
 import { PhoneIcon, PinIcon, WhatsAppIcon } from "@/components/Icons";
 import { NavServices } from "@/components/NavServices";
 
@@ -12,6 +12,18 @@ export function Nav() {
   const { lang, t, toggle } = useLang();
   const settings = useSettings();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  // Campaign bar. Admin toggles it (campaign_enabled); a visitor can dismiss it,
+  // which we remember per-message so a new campaign shows again.
+  const promoText = pickLang(
+    settings.campaign_text_tr,
+    settings.campaign_text_en,
+    lang,
+  );
+  const promoActive = settings.campaign_enabled && !!promoText;
+  const [promoOpen, setPromoOpen] = useState(true);
+  const promoRef = useRef<HTMLDivElement>(null);
+  const showPromo = promoActive && promoOpen;
 
   // Close the mobile menu on Escape.
   useEffect(() => {
@@ -21,16 +33,56 @@ export function Nav() {
     return () => document.removeEventListener("keydown", onKey);
   }, [menuOpen]);
 
+  // Hide if this exact message was already dismissed (runs client-side only,
+  // so first paint matches SSR and there's no hydration mismatch).
+  useEffect(() => {
+    if (!promoActive) return;
+    if (localStorage.getItem("promo_dismissed") === settings.campaign_text_tr) {
+      setPromoOpen(false);
+    }
+  }, [promoActive, settings.campaign_text_tr]);
+
+  // Push page content down by the bar's real height (see globals.css --promo-h).
+  useEffect(() => {
+    const h = showPromo && promoRef.current ? promoRef.current.offsetHeight : 0;
+    document.documentElement.style.setProperty("--promo-h", `${h}px`);
+    return () => document.documentElement.style.setProperty("--promo-h", "0px");
+  }, [showPromo, promoText]);
+
+  const dismissPromo = () => {
+    localStorage.setItem("promo_dismissed", settings.campaign_text_tr);
+    setPromoOpen(false);
+  };
+
   const links = [
     { href: "/hizmetler", label: t.navServices },
     { href: "/galeri", label: t.navGallery },
     { href: "/hakkimizda", label: t.navAbout },
     { href: "/iletisim", label: t.navContact },
     { href: "/blog", label: t.navBlog },
+    { href: "/sss", label: t.navFaq },
   ];
 
   return (
     <div className="fixed inset-x-0 top-0 z-50">
+      {/* campaign bar */}
+      {showPromo && (
+        <div
+          ref={promoRef}
+          className="relative flex items-center justify-center bg-rose px-11 py-[9px] text-center text-xs font-medium tracking-[0.02em] text-white"
+        >
+          <span>{promoText}</span>
+          <button
+            type="button"
+            aria-label={lang === "tr" ? "Kapat" : "Close"}
+            onClick={dismissPromo}
+            className="absolute right-3 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-white/80 hover:bg-white/15 hover:text-white"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       {/* contact bar */}
       <div className="flex flex-wrap items-center justify-center gap-x-[clamp(14px,2.4vw,28px)] gap-y-1 bg-ink px-5 py-[9px] text-xs tracking-[0.02em] text-[#e7d3cc]">
         <a
@@ -85,6 +137,9 @@ export function Nav() {
           </a>
           <a href="/blog" className="text-[13px] text-muted hover:text-ink">
             {t.navBlog}
+          </a>
+          <a href="/sss" className="text-[13px] text-muted hover:text-ink">
+            {t.navFaq}
           </a>
           <button
             onClick={toggle}

@@ -59,8 +59,17 @@ export default async function RootLayout({
   return (
     <html lang="tr" className={`${fraunces.variable} ${inter.variable}`}>
       <body>
+        {/* Admin-managed raw code (analytics/GTM/pixel). Server-rendered so injected
+            <script> tags run; intentionally unescaped — admin-only, per-site. */}
+        {settings.header_code && (
+          <div dangerouslySetInnerHTML={{ __html: settings.header_code }} />
+        )}
         <JsonLd data={beautySalonSchema(settings)} />
-        <Nav whatsapp={settings.whatsapp} />
+        <Nav
+          whatsapp={settings.whatsapp}
+          campaignEnabled={settings.campaign_enabled}
+          campaignText={settings.campaign_text_tr}
+        />
         <main>{children}</main>
         <Footer settings={settings} />
         <WhatsAppFab whatsapp={settings.whatsapp} />
@@ -71,6 +80,9 @@ export default async function RootLayout({
           data-vd="IOi9dvnMzzalAZVlZnqYX99rWUwKZa02"
           strategy="afterInteractive"
         />
+        {settings.footer_code && (
+          <div dangerouslySetInnerHTML={{ __html: settings.footer_code }} />
+        )}
       </body>
     </html>
   );

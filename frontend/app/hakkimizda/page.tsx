@@ -9,7 +9,7 @@ import { buildMetadata } from "@/lib/seo";
 export const metadata = buildMetadata({
   title: "Hakkımızda · Stria Studio · Ankara",
   description:
-    "Stria Studio — Ankara Çankaya'da doğallık, sterilizasyon ve kişiye özel tasarım odaklı kalıcı makyaj stüdyosu.",
+    "Stria Studio'yu tanıyın: Ankara Çankaya'da kalıcı makyaj, microblading ve kaş-kirpik uygulamalarında doğallık, hijyen ve kişiye özel tasarım.",
   path: "/hakkimizda",
 });
 
@@ -24,7 +24,7 @@ export default function HakkimizdaPage() {
         ])}
       />
       <main className="pt-[132px]">
-        <About />
+        <About headingAs="h1" />
         <AboutStory />
       </main>
       <Footer />

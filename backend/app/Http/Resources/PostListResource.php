@@ -18,6 +18,7 @@ class PostListResource extends JsonResource
             'excerpt_en' => $this->excerpt_en,
             'cover_url' => $this->cover_path ? asset('storage/'.$this->cover_path) : null,
             'published_at' => $this->published_at?->toIso8601String(),
+            'updated_at' => $this->updated_at?->toIso8601String(),
             'category' => $this->whenLoaded('category', fn () => $this->category ? [
                 'slug' => $this->category->slug,
                 'name_tr' => $this->category->name_tr,

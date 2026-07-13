@@ -9,6 +9,8 @@ export function PostBody({ post }: { post: PostFull }) {
   const { lang } = useLang();
   const title = lang === "tr" ? post.title_tr : post.title_en;
   const body = lang === "tr" ? post.body_tr : post.body_en;
+  const showUpdated =
+    post.updated_at !== null && post.updated_at.slice(0, 10) !== post.published_at?.slice(0, 10);
 
   return (
     <article className="px-[clamp(18px,5vw,56px)] py-[clamp(32px,5vw,64px)]">
@@ -19,7 +21,14 @@ export function PostBody({ post }: { post: PostFull }) {
           </span>
         )}
         <h1 className="mb-3 mt-2 text-[clamp(30px,4vw,52px)] leading-[1.08]">{title}</h1>
-        <time className="text-[13px] text-muted2">{fmtDate(post.published_at, lang)}</time>
+        <div className="flex flex-wrap gap-x-4 gap-y-1 text-[13px] text-muted2">
+          <time>{fmtDate(post.published_at, lang)}</time>
+          {showUpdated && (
+            <time dateTime={post.updated_at ?? undefined}>
+              {lang === "tr" ? "Son güncelleme:" : "Updated:"} {fmtDate(post.updated_at, lang)}
+            </time>
+          )}
+        </div>
 
         {post.cover_url && (
           <div className="relative my-8 h-[min(52vh,460px)] overflow-hidden rounded-[28px]">

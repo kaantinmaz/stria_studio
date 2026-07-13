@@ -11,7 +11,7 @@ export const revalidate = 300;
 export const metadata = buildMetadata({
   title: "Blog · Stria Studio · Ankara",
   description:
-    "Kalıcı makyaj, microblading ve bakım üzerine Stria Studio blogu — Ankara Çankaya.",
+    "Kalıcı makyaj, microblading, kaş-kirpik bakımı ve uygulama sonrası süreç hakkında uzman ipuçlarını Stria Studio Ankara Çankaya blogunda keşfedin.",
   path: "/blog",
 });
 

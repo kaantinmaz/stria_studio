@@ -5,7 +5,7 @@ import { Footer } from "@/components/Footer";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ServicePage } from "@/components/ServicePage";
 import { JsonLd } from "@/components/JsonLd";
-import { serviceSchema, faqSchema, breadcrumbSchema } from "@/components/schema";
+import { serviceSchema, faqSchema, howToSchema, breadcrumbSchema } from "@/components/schema";
 import { buildMetadata } from "@/lib/seo";
 import { getService, getServices, getServiceSlugs } from "@/lib/content";
 
@@ -46,6 +46,15 @@ export default async function ServiceRoute({ params }: Params) {
       <Nav />
       <JsonLd data={serviceSchema(svc, name)} />
       <JsonLd data={faqSchema(svc.faq_tr)} />
+      {svc.process_tr.length > 0 && (
+        <JsonLd
+          data={howToSchema({
+            name: `${name} nasıl yapılır?`,
+            description: svc.intro_tr || svc.desc_tr,
+            steps: svc.process_tr,
+          })}
+        />
+      )}
       <JsonLd data={breadcrumbSchema(crumbs)} />
       <Breadcrumbs items={crumbs} />
       <ServicePage svc={svc} services={services} />

@@ -27,7 +27,7 @@ export function buildMetadata(opts: {
       siteName: "Stria Studio",
       locale: "tr_TR",
       type: "website",
-      images: [{ url: absUrl(opts.image ?? "/images/hero.png") }],
+      images: [{ url: absUrl(opts.image ?? "/og") }],
     },
     twitter: {
       card: "summary_large_image",

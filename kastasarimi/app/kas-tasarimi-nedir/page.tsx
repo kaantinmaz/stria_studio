@@ -13,7 +13,7 @@ import { ArrowIcon } from "@/components/Icons";
 export const metadata: Metadata = buildMetadata({
   title: "Kaş Tasarımı Nedir? Kıl Tekniği ve Altın Oran | Ankara",
   description:
-    "Kaş tasarımı nedir? Yüz simetrisi ve altın oran ölçümüne göre belirlenen kaş formunun kıl tekniğiyle tek tek işlenerek 12–18 ay kalıcı hale getirilmesidir. Ankara Çankaya, Stria Studio.",
+    "Kaş tasarımı nedir? Yüz simetrisi ve altın oranla belirlenen kaş formunun kıl tekniğiyle uygulanmasını, doğal görünümü ve kalıcılığını öğrenin.",
   path: "/kas-tasarimi-nedir",
 });
 

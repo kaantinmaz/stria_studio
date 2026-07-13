@@ -27,6 +27,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: absUrl("/galeri"), lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: absUrl("/hakkimizda"), lastModified: now, changeFrequency: "yearly", priority: 0.6 },
     { url: absUrl("/iletisim"), lastModified: now, changeFrequency: "yearly", priority: 0.6 },
+    { url: absUrl("/sss"), lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     ...serviceSlugs.map((slug) => ({
       url: absUrl(`/hizmetler/${slug}`),
       lastModified: now,

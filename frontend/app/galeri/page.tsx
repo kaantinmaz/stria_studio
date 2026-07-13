@@ -9,7 +9,7 @@ import { getGallery } from "@/lib/content";
 export const metadata = buildMetadata({
   title: "Galeri · Stria Studio · Ankara",
   description:
-    "Stria Studio çalışmalarından örnekler — Ankara Çankaya'da microblading, kalıcı makyaj ve kaş–kirpik uygulamaları.",
+    "Stria Studio galerisinde Ankara Çankaya'da uygulanan microblading, kalıcı makyaj ve kaş-kirpik çalışmalarından doğal sonuçları ve örnekleri inceleyin.",
   path: "/galeri",
 });
 
@@ -28,7 +28,7 @@ export default async function GaleriPage() {
         ])}
       />
       <main className="pt-[132px]">
-        <Gallery items={gallery} />
+        <Gallery items={gallery} headingAs="h1" />
       </main>
       <Footer />
     </>

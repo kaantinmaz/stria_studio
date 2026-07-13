@@ -25,7 +25,7 @@ export default async function FaqPage() {
     <>
       <JsonLd data={faqSchema(faqs)} />
       <Breadcrumbs items={[{ name: "S.S.S.", path: "/sss" }]} />
-      <Section eyebrow="S.S.S." heading="Sıkça sorulan sorular" narrow
+      <Section as="h1" eyebrow="S.S.S." heading="Sıkça sorulan sorular" narrow
         intro="Kaş Tasarımı hakkında en çok merak edilenleri derledik. Yanıtını bulamadığınız bir soru varsa WhatsApp'tan yazabilirsiniz.">
         <Faq items={faqs} />
       </Section>

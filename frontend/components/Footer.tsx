@@ -22,6 +22,7 @@ export function Footer() {
     { href: "/hakkimizda", label: t.navAbout },
     { href: "/iletisim", label: t.navContact },
     { href: "/blog", label: t.navBlog },
+    { href: "/sss", label: t.navFaq },
   ];
 
   return (

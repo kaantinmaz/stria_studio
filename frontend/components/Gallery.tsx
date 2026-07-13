@@ -4,7 +4,13 @@ import { useLang } from "@/components/LanguageProvider";
 import { pickLang, type GalleryItem2 } from "@/lib/content";
 import { ImageSlot } from "@/components/ImageSlot";
 
-export function Gallery({ items }: { items: GalleryItem2[] }) {
+export function Gallery({
+  items,
+  headingAs: Heading = "h2",
+}: {
+  items: GalleryItem2[];
+  headingAs?: "h1" | "h2";
+}) {
   const { lang, t } = useLang();
 
   return (
@@ -17,9 +23,9 @@ export function Gallery({ items }: { items: GalleryItem2[] }) {
           <div className="mb-3 text-xs uppercase tracking-[0.14em] text-accent">
             {t.galleryKicker}
           </div>
-          <h2 className="text-[clamp(30px,4vw,52px)] leading-[1.1]">
+          <Heading className="text-[clamp(30px,4vw,52px)] leading-[1.1]">
             {t.galleryTitle}
-          </h2>
+          </Heading>
         </div>
         <p className="reveal max-w-[320px] text-sm leading-[1.6] text-muted">
           {t.galleryText}

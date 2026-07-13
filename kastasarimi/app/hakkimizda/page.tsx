@@ -19,7 +19,7 @@ export default async function AboutPage() {
   return (
     <>
       <Breadcrumbs items={[{ name: "Hakkımızda", path: "/hakkimizda" }]} />
-      <Section narrow eyebrow="Hakkımızda" heading={about.heading}>
+      <Section as="h1" narrow eyebrow="Hakkımızda" heading={about.heading}>
         <div className="mt-6 space-y-4">
           {about.paragraphs.map((p, i) => (
             <p key={i} className="text-[17px] leading-relaxed text-muted2">{p}</p>

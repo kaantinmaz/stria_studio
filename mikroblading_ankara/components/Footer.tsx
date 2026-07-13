@@ -65,6 +65,20 @@ export function Footer({ settings }: { settings: Settings }) {
         </div>
       </div>
 
+      <div className="border-t border-line">
+        <div className="mx-auto max-w-[1180px] px-5 py-6">
+          <p className="mb-3 text-[11px] uppercase tracking-[0.16em] text-accent">Mikroblading Rehberi</p>
+          <ul className="flex flex-wrap gap-x-5 gap-y-2 text-[13px] text-muted2">
+            <li><Link href="/mikroblading-nasil-yapilir" className="hover:text-accent-dark">Mikroblading nasıl yapılır?</Link></li>
+            <li><Link href="/mikroblading-fiyatlari" className="hover:text-accent-dark">Mikroblading fiyatları</Link></li>
+            <li><Link href="/erkek-mikroblading-ankara" className="hover:text-accent-dark">Erkek mikroblading</Link></li>
+            <li><Link href="/seyrek-kaslar-mikroblading" className="hover:text-accent-dark">Seyrek kaşlar</Link></li>
+            <li><Link href="/cankaya-mikroblading" className="hover:text-accent-dark">Çankaya</Link></li>
+            <li><Link href="/kizilay-mikroblading" className="hover:text-accent-dark">Kızılay</Link></li>
+          </ul>
+        </div>
+      </div>
+
       <div className="border-t border-line px-5 py-5 text-center text-xs text-muted">
         © {year} {site.studio} · Mikroblading Ankara · Tüm hakları saklıdır.
       </div>

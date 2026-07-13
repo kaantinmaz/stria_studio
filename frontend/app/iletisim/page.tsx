@@ -9,7 +9,7 @@ import { buildMetadata } from "@/lib/seo";
 export const metadata = buildMetadata({
   title: "İletişim · Stria Studio · Ankara",
   description:
-    "Stria Studio Ankara Çankaya — randevu ve sorular için WhatsApp, telefon ve konum bilgileri.",
+    "Ankara Çankaya'daki Stria Studio'ya ulaşın; kalıcı makyaj, microblading ve kaş-kirpik uygulamaları için WhatsApp'tan bilgi alın ve randevu oluşturun.",
   path: "/iletisim",
 });
 
@@ -24,7 +24,7 @@ export default function IletisimPage() {
         ])}
       />
       <main className="pt-[132px]">
-        <Contact />
+        <Contact headingAs="h1" />
         <StudioMap />
       </main>
       <Footer />

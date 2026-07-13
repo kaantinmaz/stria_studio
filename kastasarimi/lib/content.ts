@@ -19,6 +19,10 @@ export type Settings = {
   lat: number | string | null;
   lng: number | string | null;
   hours: Hours[];
+  campaign_enabled: boolean;
+  campaign_text_tr: string;
+  header_code: string | null;
+  footer_code: string | null;
 };
 
 // Used when the backend is unreachable (e.g. build with API down). Owner edits
@@ -44,6 +48,10 @@ export const SETTINGS_FALLBACK: Settings = {
       close: "19:00",
     },
   ],
+  campaign_enabled: false,
+  campaign_text_tr: "",
+  header_code: null,
+  footer_code: null,
 };
 
 export type ServiceFull = {
@@ -70,6 +78,7 @@ export type PostList = {
   excerpt_tr: string;
   cover_url: string | null;
   published_at: string | null;
+  updated_at: string | null;
   category: { slug: string; name_tr: string } | null;
 };
 
@@ -95,10 +104,10 @@ function base(path: string): string {
   return `${site.apiUrl}/api/microsites/${site.slug}${path}`;
 }
 
-async function api<T>(url: string): Promise<T | null> {
+async function api<T>(url: string, revalidate = REVALIDATE): Promise<T | null> {
   try {
     const res = await fetch(url, {
-      next: { revalidate: REVALIDATE },
+      next: { revalidate },
       headers: { Accept: "application/json" },
     });
     if (!res.ok) return null;
@@ -114,7 +123,8 @@ export async function getService(): Promise<ServiceFull | null> {
 }
 
 export async function getSettings(): Promise<Settings | null> {
-  const out = await api<{ data: Settings }>(base("/settings"));
+  // Short cache: admins toggle the campaign bar / code injection and expect it live.
+  const out = await api<{ data: Settings }>(base("/settings"), 300);
   return out?.data ?? null;
 }
 

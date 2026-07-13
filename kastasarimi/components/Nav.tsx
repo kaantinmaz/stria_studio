@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { site } from "@/lib/site";
 import { WhatsAppIcon } from "@/components/Icons";
 
@@ -15,10 +15,47 @@ const LINKS = [
   { href: "/iletisim", label: "İletişim" },
 ];
 
-export function Nav({ whatsapp }: { whatsapp: string }) {
+export function Nav({
+  whatsapp,
+  campaignEnabled = false,
+  campaignText = "",
+}: {
+  whatsapp: string;
+  campaignEnabled?: boolean;
+  campaignText?: string;
+}) {
   const [open, setOpen] = useState(false);
 
+  // Campaign bar — admin toggles it per site; a visitor can dismiss it, remembered
+  // per message so a new campaign shows again. Client-only check → no SSR mismatch.
+  const promoActive = campaignEnabled && !!campaignText;
+  const [promoOpen, setPromoOpen] = useState(true);
+  useEffect(() => {
+    if (promoActive && localStorage.getItem("promo_dismissed") === campaignText) {
+      setPromoOpen(false);
+    }
+  }, [promoActive, campaignText]);
+  const showPromo = promoActive && promoOpen;
+  const dismissPromo = () => {
+    localStorage.setItem("promo_dismissed", campaignText);
+    setPromoOpen(false);
+  };
+
   return (
+    <>
+      {showPromo && (
+        <div className="relative flex items-center justify-center bg-ink px-11 py-2 text-center text-[12px] font-medium tracking-[0.02em] text-cream">
+          <span>{campaignText}</span>
+          <button
+            type="button"
+            aria-label="Kapat"
+            onClick={dismissPromo}
+            className="absolute right-3 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-cream/80 hover:bg-white/15 hover:text-cream"
+          >
+            ✕
+          </button>
+        </div>
+      )}
     <header className="sticky top-0 z-40 border-b border-line bg-cream/85 backdrop-blur">
       <div className="mx-auto flex max-w-[1180px] items-center justify-between px-5 py-4">
         <Link href="/" className="flex flex-col leading-none" onClick={() => setOpen(false)}>
@@ -84,5 +121,6 @@ export function Nav({ whatsapp }: { whatsapp: string }) {
         </nav>
       )}
     </header>
+    </>
   );
 }

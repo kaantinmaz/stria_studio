@@ -13,7 +13,7 @@ import { howToSchema, faqSchema } from "@/lib/schema";
 export const metadata: Metadata = buildMetadata({
   title: "Kaş Tasarımı Nasıl Yapılır? Adım Adım Süreç",
   description:
-    "Kaş tasarımı nasıl yapılır? Ön görüşme ve altın oran tasarımından kıl tekniğiyle uygulamaya ve rötuşa kadar adım adım süreç, süresi ve iyileşme. Ankara Stria Studio rehberi.",
+    "Kaş tasarımı nasıl yapılır? Ön görüşme, altın oranla çizim, kıl tekniği uygulaması, rötuş süresi ve iyileşme adımlarını Stria Studio rehberinde öğrenin.",
   path: "/kas-tasarimi-nasil-yapilir",
 });
 

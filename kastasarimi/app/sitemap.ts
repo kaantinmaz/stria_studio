@@ -25,7 +25,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: absUrl("/sss"), lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: absUrl("/hakkimizda"), lastModified: now, changeFrequency: "yearly", priority: 0.6 },
     { url: absUrl("/iletisim"), lastModified: now, changeFrequency: "yearly", priority: 0.6 },
-    { url: absUrl("/api-docs"), lastModified: now, changeFrequency: "yearly", priority: 0.3 },
   ];
 
   const posts: MetadataRoute.Sitemap = slugs.map((s) => ({

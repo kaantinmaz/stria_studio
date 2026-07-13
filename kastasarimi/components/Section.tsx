@@ -11,6 +11,8 @@ export function Container({
 }
 
 // A page section with an optional numeral index + eyebrow + heading + intro.
+// `as` sets the heading tag: default "h2" for in-page sections; pages that use a
+// Section as their primary page heading pass as="h1" so every page has one H1.
 export function Section({
   id,
   index,
@@ -20,6 +22,7 @@ export function Section({
   children,
   narrow = false,
   className = "",
+  as: Heading = "h2",
 }: {
   id?: string;
   index?: string;
@@ -29,6 +32,7 @@ export function Section({
   children?: ReactNode;
   narrow?: boolean;
   className?: string;
+  as?: "h1" | "h2";
 }) {
   return (
     <section id={id} className={`py-16 sm:py-24 ${className}`}>
@@ -37,9 +41,9 @@ export function Section({
         {heading && (
           <div className="flex items-baseline gap-4 sm:gap-6">
             {index && <span className="section-index shrink-0" aria-hidden="true">{index}</span>}
-            <h2 className="max-w-[760px] text-[clamp(27px,3.8vw,46px)] leading-[1.06] text-ink">
+            <Heading className="max-w-[760px] text-[clamp(27px,3.8vw,46px)] leading-[1.06] text-ink">
               {heading}
-            </h2>
+            </Heading>
           </div>
         )}
         {intro && <p className="mt-5 max-w-[680px] text-[17px] leading-relaxed text-muted2">{intro}</p>}

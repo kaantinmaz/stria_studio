@@ -32,7 +32,12 @@ export function beautySalonSchema(s: Settings) {
       opens: h.open,
       closes: h.close,
     })),
-    sameAs: [s.instagram, site.gbpUrl].filter(Boolean),
+    sameAs: [
+      s.instagram,
+      "https://mikrobladingankara.com",
+      "https://kastasarimiankara.com",
+      site.gbpUrl,
+    ].filter(Boolean),
     priceRange: "₺₺",
   };
 }
@@ -61,6 +66,20 @@ export function faqSchema(faq: { q: string; a: string }[]) {
       "@type": "Question",
       name: f.q,
       acceptedAnswer: { "@type": "Answer", text: f.a },
+    })),
+  };
+}
+
+export function howToSchema(opts: { name: string; description: string; steps: string[] }) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    name: opts.name,
+    description: opts.description,
+    step: opts.steps.map((s, i) => ({
+      "@type": "HowToStep",
+      position: i + 1,
+      text: s,
     })),
   };
 }
