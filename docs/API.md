@@ -8,7 +8,7 @@ Halka açık (public), salt-okunur içerik API'si + iletişim formu. Blog **yazm
 | Ortam | API base (Laravel) |
 |---|---|
 | **Geliştirme** | `http://127.0.0.1:8002/api` |
-| **Prod** | `https://<api-domaini>/api` |
+| **Prod** | `https://admin.striastudio.com.tr/api` |
 
 > Blog, kategori, etiket, hizmetler, iletişim — hepsi Laravel backend'de,
 > tek base URL.
@@ -259,7 +259,7 @@ curl -X POST "http://127.0.0.1:8002/api/contact" \
 Halka açık yazma API'si **yoktur** (bilinçli — güvenlik yüzeyini açmamak için).
 Yazılar **admin panelinden** eklenir/düzenlenir:
 
-1. **Panel:** `http://127.0.0.1:8002/admin` (prod: `https://<api-domaini>/admin`)
+1. **Panel:** `http://127.0.0.1:8002/admin` (prod: `https://admin.striastudio.com.tr/admin`)
 2. **Giriş:** `owner@striastudio.com` / `change-me-now`
    *(değiştir: `.env`'e `OWNER_EMAIL`/`OWNER_PASSWORD` ekle → `php artisan db:seed --class=OwnerUserSeeder`)*
 3. **Posts → New** → TR/EN sekmelerinde başlık/özet/içerik doldur, kapak yükle,
@@ -279,7 +279,7 @@ görünür (frontend blogda ISR ile ~5 dk içinde).
 Hizmetler için de halka açık yazma API'si **yoktur** (`/api/services` salt-okunur).
 Hizmetler **admin panelinden** eklenir/düzenlenir/sıralanır:
 
-1. **Panel:** `http://127.0.0.1:8002/admin/services` (prod: `https://<api-domaini>/admin/services`)
+1. **Panel:** `http://127.0.0.1:8002/admin/services` (prod: `https://admin.striastudio.com.tr/admin/services`)
 2. **Giriş:** `owner@striastudio.com` / `change-me-now` (bkz. "Blog Ekleme" — aynı hesap)
 3. **Services → New/Edit** →
    - **Türkçe / English** sekmeleri: ad, tag, açıklama, intro, bakım, faydalar[], süreç[], SSS[{q,a}]. (EN boş bırakılırsa site TR'ye düşer.)
