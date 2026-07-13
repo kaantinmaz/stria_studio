@@ -256,12 +256,13 @@ curl -X POST "http://127.0.0.1:8002/api/contact" \
 
 ## Blog Ekleme (yazı oluşturma)
 
-Halka açık yazma API'si **yoktur** (bilinçli — güvenlik yüzeyini açmamak için).
-Yazılar **admin panelinden** eklenir/düzenlenir:
+İki yol: **admin paneli** (elle) ve **token korumalı yazma API'si** (otomasyon).
+
+### A. Admin paneli
 
 1. **Panel:** `http://127.0.0.1:8002/admin` (prod: `https://admin.striastudio.com.tr/admin`)
-2. **Giriş:** `owner@striastudio.com` / `change-me-now`
-   *(değiştir: `.env`'e `OWNER_EMAIL`/`OWNER_PASSWORD` ekle → `php artisan db:seed --class=OwnerUserSeeder`)*
+2. **Giriş:** `OWNER_EMAIL` / `OWNER_PASSWORD` (`.env`) — değiştir:
+   `php artisan db:seed --class=OwnerUserSeeder`
 3. **Posts → New** → TR/EN sekmelerinde başlık/özet/içerik doldur, kapak yükle,
    kategori & etiket seç, SEO sekmesinde (opsiyonel) meta override gir.
 4. **is_published** aç + **published_at** ayarla → kaydet.
@@ -269,8 +270,42 @@ Yazılar **admin panelinden** eklenir/düzenlenir:
 Yayınlanan yazı anında `GET /api/posts` ve `GET /api/posts/{slug}` uçlarında
 görünür (frontend blogda ISR ile ~5 dk içinde).
 
-> Programatik (dış sistemden) yazı ekleme gerekirse token korumalı
-> `POST /api/posts` eklenebilir (Laravel Sanctum kurulumu gerekir) — şu an yok.
+### B. Yazma API'si (otomasyon)
+
+Auth: `Authorization: Bearer <ADMIN_API_TOKEN>` — token backend `.env`'de
+(`ADMIN_API_TOKEN`). Token tanımlı değilse uçlar kapalıdır (her istek `401`).
+
+```
+POST   /api/admin/posts          # oluştur / güncelle (upsert: site+slug)
+DELETE /api/admin/posts/{slug}   # sil (?site= ile microsite; yoksa ana site)
+```
+
+**Alanlar** (`POST /api/admin/posts`, JSON):
+
+| Alan | Zorunlu | Açıklama |
+|---|---|---|
+| `slug` | ✅ | Upsert anahtarı (site+slug) |
+| `title_tr`, `body_tr` | ✅ | Gövde **HTML** |
+| `title_en`, `excerpt_tr/en`, `body_en` | — | EN boşsa TR'ye düşer |
+| `meta_title_tr/en`, `meta_desc_tr/en` | — | SEO override |
+| `site` | — | `null`/yok = ana site; veya microsite slug'ı (`config/microsites.php`) |
+| `category` | — | Kategori slug'ı; yoksa otomatik oluşur (`category_name_tr/en` ile adlandır) |
+| `tags[]` | — | Etiket adları; yoksa otomatik oluşur |
+| `is_published` | — | default `true` |
+| `published_at` | — | default şimdi |
+| `cover_url` | — | jpg/png/webp, ≤5 MB; indirilip `storage`'a kaydedilir |
+
+**Örnek:**
+
+```bash
+curl -X POST https://admin.striastudio.com.tr/api/admin/posts \
+  -H "Authorization: Bearer $ADMIN_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"slug":"ornek-yazi","title_tr":"Örnek Yazı","body_tr":"<p>İçerik…</p>","category":"bakim","tags":["kaş","bakım"]}'
+```
+
+Yanıt: `201` (yeni) / `200` (güncellendi) + `{ "data": { …, "url": "/blog/ornek-yazi" } }`.
+Canlı döküman: `https://striastudio.com.tr/api-docs` (noindex).
 
 ---
 
@@ -303,6 +338,8 @@ Hizmetler **admin panelinden** eklenir/düzenlenir/sıralanır:
 | Kod | Anlam |
 |---|---|
 | `200` | Başarılı (okuma) |
-| `201` | Oluşturuldu (iletişim formu) |
+| `201` | Oluşturuldu (iletişim formu, yazma API'si yeni kayıt) |
+| `204` | Silindi (yazma API'si) |
+| `401` | Token eksik/yanlış (yazma API'si) |
 | `404` | Yazı/hizmet bulunamadı, yayınlanmamış veya pasif |
 | `422` | Doğrulama hatası (iletişim formu alanları) |

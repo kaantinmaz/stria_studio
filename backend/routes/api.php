@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminPostController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\FaqController;
@@ -26,6 +27,11 @@ Route::get('/gallery', [GalleryController::class, 'index']);
 Route::get('/faqs', [FaqController::class, 'index']);
 
 Route::post('/track', [TrackController::class, 'store'])->middleware('throttle:120,1');
+
+Route::prefix('admin')->middleware(App\Http\Middleware\EnsureAdminApiToken::class)->group(function () {
+    Route::post('/posts', [AdminPostController::class, 'store']);
+    Route::delete('/posts/{slug}', [AdminPostController::class, 'destroy']);
+});
 
 // Per-service SEO microsites (e.g. mikrobladingankara.com). Site-scoped, read-only + contact.
 Route::prefix('microsites/{site}')->group(function () {
