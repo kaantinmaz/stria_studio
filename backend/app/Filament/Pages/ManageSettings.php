@@ -5,7 +5,9 @@ namespace App\Filament\Pages;
 use App\Models\Setting;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Tabs;
@@ -32,13 +34,40 @@ class ManageSettings extends Page
 
     public function mount(): void
     {
-        $this->form->fill(Setting::current()->attributesToArray());
+        $this->loadSite(null);
+    }
+
+    /** Site slug => label for the switcher. '' (empty) = the main site. */
+    private function siteOptions(): array
+    {
+        $options = ['' => 'Ana Site (Stria Studio)'];
+        foreach (config('microsites', []) as $slug => $cfg) {
+            $options[$slug] = $cfg['name'];
+        }
+
+        return $options;
+    }
+
+    /** Load a site's settings row into the form. NULL = main site. */
+    private function loadSite(?string $site): void
+    {
+        $row = Setting::forSite($site)->attributesToArray();
+        $row['editing_site'] = $site ?? '';
+        $this->form->fill($row);
     }
 
     public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
+                Select::make('editing_site')
+                    ->label('Düzenlenen site')
+                    ->helperText('Her sitenin ayarları ayrıdır. Site seçin, kaydedin.')
+                    ->options($this->siteOptions())
+                    ->selectablePlaceholder(false)
+                    ->live()
+                    ->dehydrated(false)
+                    ->afterStateUpdated(fn ($state) => $this->loadSite($state === '' ? null : $state)),
                 Tabs::make()
                     ->tabs([
                         Tab::make('İletişim')
@@ -49,6 +78,17 @@ class ManageSettings extends Page
                                 TextInput::make('instagram'),
                                 TextInput::make('instagram_handle'),
                                 TextInput::make('address'),
+                            ]),
+                        Tab::make('Kampanya')
+                            ->schema([
+                                Toggle::make('campaign_enabled')
+                                    ->label('Kampanya barı göster'),
+                                TextInput::make('campaign_text_tr')
+                                    ->label('Kampanya metni (TR)')
+                                    ->maxLength(255),
+                                TextInput::make('campaign_text_en')
+                                    ->label('Kampanya metni (EN)')
+                                    ->maxLength(255),
                             ]),
                         Tab::make('Adres/NAP')
                             ->schema([
@@ -64,6 +104,19 @@ class ManageSettings extends Page
                                     ->numeric(),
                                 TextInput::make('lng')
                                     ->numeric(),
+                            ]),
+                        Tab::make('Kod Enjeksiyonu')
+                            ->schema([
+                                Textarea::make('header_code')
+                                    ->label('Header kodu (<body> başı)')
+                                    ->helperText('Analytics, GTM, pixel, özel CSS. Ham olarak eklenir — dikkatli kullan.')
+                                    ->rows(8)
+                                    ->extraInputAttributes(['style' => 'font-family: monospace;']),
+                                Textarea::make('footer_code')
+                                    ->label('Footer kodu (</body> öncesi)')
+                                    ->helperText('Sohbet widget’ı, geç yüklenen scriptler.')
+                                    ->rows(8)
+                                    ->extraInputAttributes(['style' => 'font-family: monospace;']),
                             ]),
                         Tab::make('Çalışma Saatleri')
                             ->schema([
@@ -94,10 +147,15 @@ class ManageSettings extends Page
 
     public function save(): void
     {
-        Setting::current()->update($this->form->getState());
+        $selected = $this->data['editing_site'] ?? '';
+        $site = $selected === '' ? null : $selected;
+
+        // getState() excludes the switcher (dehydrated) — only real columns are saved.
+        Setting::forSite($site)->update($this->form->getState());
 
         Notification::make()
             ->title('Ayarlar kaydedildi')
+            ->body($site ? config("microsites.$site.name") : 'Ana Site')
             ->success()
             ->send();
     }

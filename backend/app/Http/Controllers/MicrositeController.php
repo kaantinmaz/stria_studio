@@ -19,8 +19,8 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 // Public, read-only API for per-service SEO microsites (e.g. mikrobladingankara.com).
-// Content is scoped by the `site` slug; the studio identity (NAP/hours) is shared
-// with the main site — same physical business — so settings reuse Setting::current().
+// Content and settings are scoped by the `site` slug; each site has its own settings
+// row (NAP, campaign bar, code injection) via Setting::forSite($site).
 class MicrositeController extends Controller
 {
     // Resolve + validate the microsite slug against config/microsites.php.
@@ -90,7 +90,7 @@ class MicrositeController extends Controller
     {
         $this->config($site);
 
-        return new SettingResource(Setting::current());
+        return new SettingResource(Setting::forSite($site));
     }
 
     public function contact(Request $request, string $site): JsonResponse

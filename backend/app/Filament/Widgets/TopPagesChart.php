@@ -2,11 +2,14 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Widgets\Concerns\ScopesBySite;
 use App\Models\Visit;
 use Filament\Widgets\ChartWidget;
 
 class TopPagesChart extends ChartWidget
 {
+    use ScopesBySite;
+
     protected ?string $heading = 'En Çok Görüntülenen Sayfalar';
 
     protected static ?int $sort = 0;
@@ -15,7 +18,8 @@ class TopPagesChart extends ChartWidget
 
     protected function getData(): array
     {
-        $counts = Visit::selectRaw('path, count(*) c')
+        $counts = $this->scopeSite(Visit::query())
+            ->selectRaw('path, count(*) c')
             ->groupBy('path')
             ->orderByDesc('c')
             ->limit(8)

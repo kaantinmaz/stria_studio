@@ -10,12 +10,15 @@ class SettingModelTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_current_returns_single_row(): void
+    public function test_current_returns_the_single_main_row(): void
     {
         $a = Setting::current();
         $b = Setting::current();
         $this->assertSame($a->id, $b->id);
-        $this->assertSame(1, Setting::count());
+        // current() is the main site (site = NULL); per-site rows may also exist,
+        // but there is exactly one main row and it is never duplicated.
+        $this->assertNull($a->site);
+        $this->assertSame(1, Setting::whereNull('site')->count());
     }
 
     public function test_hours_casts_to_array(): void

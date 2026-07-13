@@ -2,18 +2,21 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Widgets\Concerns\ScopesBySite;
 use App\Models\Visit;
 use Filament\Widgets\ChartWidget;
 
 class TrafficSourcesChart extends ChartWidget
 {
+    use ScopesBySite;
+
     protected ?string $heading = 'Trafik Kaynağı';
 
     protected static ?int $sort = -1;
 
     protected function getData(): array
     {
-        $counts = Visit::selectRaw('source, count(*) c')->groupBy('source')->pluck('c', 'source');
+        $counts = $this->scopeSite(Visit::query())->selectRaw('source, count(*) c')->groupBy('source')->pluck('c', 'source');
 
         $labels = [
             'ai' => 'Yapay Zeka',

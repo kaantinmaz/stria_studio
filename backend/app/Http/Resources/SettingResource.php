@@ -24,6 +24,11 @@ class SettingResource extends JsonResource
             'lat' => $this->lat,
             'lng' => $this->lng,
             'hours' => $this->hours ?? [],
+            'campaign_enabled' => (bool) $this->campaign_enabled,
+            'campaign_text_tr' => $this->campaign_text_tr,
+            'campaign_text_en' => $this->campaign_text_en,
+            'header_code' => $this->header_code,
+            'footer_code' => $this->footer_code,
         ];
     }
 }

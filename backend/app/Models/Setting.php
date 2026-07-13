@@ -15,10 +15,18 @@ class Setting extends Model
         'hours' => 'array',
         'lat' => 'decimal:7',
         'lng' => 'decimal:7',
+        'campaign_enabled' => 'boolean',
     ];
+
+    // Settings row for a given site slug; NULL = the main site. Each microsite has
+    // its own row (see the add_site_to_settings migration).
+    public static function forSite(?string $site = null): self
+    {
+        return static::firstOrCreate(['site' => $site]);
+    }
 
     public static function current(): self
     {
-        return static::firstOrCreate(['id' => 1]);
+        return static::forSite(null);
     }
 }

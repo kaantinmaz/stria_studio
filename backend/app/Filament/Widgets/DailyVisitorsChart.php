@@ -2,12 +2,15 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Widgets\Concerns\ScopesBySite;
 use App\Models\Visit;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Carbon;
 
 class DailyVisitorsChart extends ChartWidget
 {
+    use ScopesBySite;
+
     protected ?string $heading = 'Günlük Ziyaretçi (son 30 gün)';
 
     protected static ?int $sort = -2;
@@ -21,7 +24,7 @@ class DailyVisitorsChart extends ChartWidget
         for ($i = 29; $i >= 0; $i--) {
             $day = Carbon::today()->subDays($i);
             $labels[] = $day->format('d.m');
-            $counts[] = Visit::whereDate('created_at', $day)
+            $counts[] = $this->scopeSite(Visit::whereDate('created_at', $day))
                 ->distinct('visitor_id')->count('visitor_id');
         }
 

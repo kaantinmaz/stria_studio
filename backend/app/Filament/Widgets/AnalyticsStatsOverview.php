@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Widgets\Concerns\ScopesBySite;
 use App\Models\Event;
 use App\Models\Visit;
 use Filament\Widgets\StatsOverviewWidget;
@@ -9,15 +10,17 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class AnalyticsStatsOverview extends StatsOverviewWidget
 {
+    use ScopesBySite;
+
     protected static ?int $sort = -3;
 
     protected function getStats(): array
     {
-        $today = Visit::whereDate('created_at', today())->distinct('visitor_id')->count('visitor_id');
-        $week = Visit::where('created_at', '>=', now()->subDays(7))->distinct('visitor_id')->count('visitor_id');
-        $views = Visit::count();
-        $wa = Event::where('name', 'whatsapp_click')->count();
-        $call = Event::where('name', 'call_click')->count();
+        $today = $this->scopeSite(Visit::whereDate('created_at', today()))->distinct('visitor_id')->count('visitor_id');
+        $week = $this->scopeSite(Visit::where('created_at', '>=', now()->subDays(7)))->distinct('visitor_id')->count('visitor_id');
+        $views = $this->scopeSite(Visit::query())->count();
+        $wa = $this->scopeSite(Event::where('name', 'whatsapp_click'))->count();
+        $call = $this->scopeSite(Event::where('name', 'call_click'))->count();
 
         return [
             Stat::make('Bugün tekil ziyaretçi', (string) $today),
