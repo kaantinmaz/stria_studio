@@ -12,8 +12,8 @@ info:
 servers:
   - url: http://127.0.0.1:8002/api
     description: Local development (MAMP)
-  - url: https://api.striastudio.com/api
-    description: Production (example — set to your live API host)
+  - url: https://admin.striastudio.com.tr/api
+    description: Production (shared backend)
 tags:
   - name: content
     description: Read-only microsite content
