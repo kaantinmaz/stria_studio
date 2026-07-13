@@ -28,6 +28,20 @@ Guidelines for any LLM/agent working in this repo. These bias toward **caution o
 
 **Success looks like:** fewer unnecessary diffs, fewer rewrites, clarifying questions asked earlier.
 
+## 5. Model Routing (project policy)
+
+**Fable 5** (the session model) is the *thinking* layer: planning, architecture, decomposition, review, and integration. **Coding and detail work is always delegated** to one of:
+
+| Delegate | How | Use for |
+|---|---|---|
+| **Codex 5.6** (`gpt-5.6-sol`) | `codex exec --skip-git-repo-check -m gpt-5.6-sol -c model_reasoning_effort=high --sandbox workspace-write --full-auto "<brief>"` (read-only sandbox for review lanes) | Parallel lanes/fleets, mechanical multi-file edits, isolated implementation briefs |
+| **Opus 4.8** | `claude -p --model opus "<brief>"` (Claude Code CLI, non-interactive) | High-stakes single edits, nuanced refactors, code review |
+
+Rules:
+- The orchestrator (Fable 5) writes the brief, defines acceptance criteria, and **verifies the delegate's output itself** (run tests/build). Delegate completions are claims, not evidence.
+- Independent briefs fire in parallel (background), never serially.
+- Trivial one-liners (typo, config value) may be done inline — don't spawn a delegate for a 1-line diff.
+
 ---
 
 ## Project Facts
