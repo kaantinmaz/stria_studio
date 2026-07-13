@@ -10,12 +10,12 @@ class GalleryImageSeeder extends Seeder
     public function run(): void
     {
         $items = [
-            ['image' => '/images/micro.png', 'alt_tr' => 'Microblading', 'alt_en' => 'Microblading'],
-            ['image' => '/images/dipliner.png', 'alt_tr' => 'Kirpik / göz', 'alt_en' => 'Lashes / eye'],
-            ['image' => '/images/hero.png', 'alt_tr' => 'Stüdyo', 'alt_en' => 'Studio'],
-            ['image' => '/images/powder.png', 'alt_tr' => 'Kaş pudralama', 'alt_en' => 'Powder brows'],
-            ['image' => '/images/eyeliner.png', 'alt_tr' => 'Eyeliner', 'alt_en' => 'Eyeliner'],
-            ['image' => '', 'alt_tr' => 'Çalışmanızı ekleyin', 'alt_en' => 'Add your work'],
+            ['image' => '/images/gallery-1.png', 'alt_tr' => 'Kaş ve kirpik sonucu', 'alt_en' => 'Brow and lash result'],
+            ['image' => '/images/gallery-2.png', 'alt_tr' => 'Microblading sonucu', 'alt_en' => 'Microblading result'],
+            ['image' => '/images/gallery-3.png', 'alt_tr' => 'Dudak renklendirme', 'alt_en' => 'Lip blush'],
+            ['image' => '/images/gallery-4.png', 'alt_tr' => 'Kirpik lifting', 'alt_en' => 'Lash lift'],
+            ['image' => '/images/gallery-5.png', 'alt_tr' => 'Stüdyo uygulama anı', 'alt_en' => 'In-studio treatment'],
+            ['image' => '/images/gallery-6.png', 'alt_tr' => 'Kaş tasarımı profili', 'alt_en' => 'Brow design profile'],
         ];
         GalleryImage::query()->delete();
         foreach ($items as $i => $it) {

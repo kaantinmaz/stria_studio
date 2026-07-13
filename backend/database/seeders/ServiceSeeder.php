@@ -170,7 +170,7 @@ class ServiceSeeder extends Seeder
                 'tag_tr' => 'Dudak', 'tag_en' => 'Lips',
                 'desc_tr' => 'Dudaklara doğal renk, tanım ve dolgunluk kazandıran kalıcı renklendirme.',
                 'desc_en' => 'Restores natural colour, definition and fullness with a soft lip-blush tint.',
-                'image' => '',
+                'image' => '/images/dudak.png',
                 'seo_title_tr' => 'Dudak Renklendirme Ankara | Lip Blush',
                 'seo_desc_tr' => "Ankara'da dudak renklendirme (lip blush): dudaklara doğal renk, tanım ve dolgunluk. Solgun dudaklara canlılık. Randevu için yazın.",
                 'keywords_tr' => [
@@ -208,7 +208,7 @@ class ServiceSeeder extends Seeder
                 'tag_tr' => 'Kaş', 'tag_en' => 'Brows',
                 'desc_tr' => 'Kaş kıllarını şekillendirerek daha dolgun, bakımlı ve düzenli bir görünüm.',
                 'desc_en' => 'Sets and lifts brow hairs for a fuller, groomed and lasting shape.',
-                'image' => '',
+                'image' => '/images/laminasyon.png',
                 'seo_title_tr' => 'Kaş Laminasyonu Ankara | Brow Lamination',
                 'seo_desc_tr' => "Ankara'da kaş laminasyonu: kaş kıllarını şekillendirip sabitler, dolgun ve bakımlı görünüm. İğnesiz, ~6 hafta etkili. Randevu alın.",
                 'keywords_tr' => [
@@ -246,7 +246,7 @@ class ServiceSeeder extends Seeder
                 'tag_tr' => 'Kirpik', 'tag_en' => 'Lashes',
                 'desc_tr' => 'Kendi kirpiklerinizi kıvırarak uzatan, doğal ve kalıcı bir kirpik bakımı.',
                 'desc_en' => 'Lifts and curls your own lashes for a longer, natural, low-maintenance look.',
-                'image' => '',
+                'image' => '/images/kirpik.png',
                 'seo_title_tr' => 'Kirpik Lifting Ankara | Lash Lift',
                 'seo_desc_tr' => "Ankara'da kirpik lifting (lash lift): kendi kirpiklerinizi kıvırıp uzun gösterir. Maskarasız açık bakış, ~6–8 hafta kalıcı. Randevu alın.",
                 'keywords_tr' => [
