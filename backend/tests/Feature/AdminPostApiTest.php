@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Post;
 use App\Models\Tag;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class AdminPostApiTest extends TestCase
@@ -17,6 +18,7 @@ class AdminPostApiTest extends TestCase
         parent::setUp();
 
         config(['services.admin_api.token' => 'test-token']);
+        config(['services.indexnow.key' => null]);
     }
 
     public function test_request_without_token_is_unauthorized(): void
@@ -102,6 +104,56 @@ class AdminPostApiTest extends TestCase
             ->assertJsonPath('data.site', $site);
 
         $this->assertSame($site, Post::sole()->site);
+    }
+
+    public function test_publishing_main_site_post_submits_url_to_indexnow(): void
+    {
+        config([
+            'services.indexnow.key' => 'test-indexnow-key',
+            'services.indexnow.host' => 'striastudio.com.tr',
+        ]);
+        Http::fake();
+
+        $this->withToken('test-token')
+            ->postJson('/api/admin/posts', $this->postData(['is_published' => true]))
+            ->assertCreated();
+
+        Http::assertSentCount(1);
+        Http::assertSent(function ($request) {
+            return $request->url() === 'https://api.indexnow.org/indexnow'
+                && $request['host'] === 'striastudio.com.tr'
+                && $request['key'] === 'test-indexnow-key'
+                && $request['keyLocation'] === 'https://striastudio.com.tr/test-indexnow-key.txt'
+                && $request['urlList'] === ['https://striastudio.com.tr/blog/ilk-yazi'];
+        });
+    }
+
+    public function test_publishing_microsite_post_does_not_submit_to_indexnow(): void
+    {
+        config(['services.indexnow.key' => 'test-indexnow-key']);
+        Http::fake();
+        $site = array_key_first(config('microsites'));
+
+        $this->withToken('test-token')
+            ->postJson('/api/admin/posts', $this->postData([
+                'site' => $site,
+                'is_published' => true,
+            ]))
+            ->assertCreated();
+
+        Http::assertNothingSent();
+    }
+
+    public function test_publishing_succeeds_without_indexnow_key_and_sends_no_request(): void
+    {
+        config(['services.indexnow.key' => null]);
+        Http::fake();
+
+        $this->withToken('test-token')
+            ->postJson('/api/admin/posts', $this->postData(['is_published' => true]))
+            ->assertCreated();
+
+        Http::assertNothingSent();
     }
 
     public function test_delete_removes_post_and_unknown_slug_returns_not_found(): void

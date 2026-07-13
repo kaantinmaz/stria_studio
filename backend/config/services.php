@@ -39,4 +39,9 @@ return [
         'token' => env('ADMIN_API_TOKEN'),
     ],
 
+    'indexnow' => [
+        'key' => env('INDEXNOW_KEY'),
+        'host' => env('INDEXNOW_HOST', 'striastudio.com.tr'),
+    ],
+
 ];

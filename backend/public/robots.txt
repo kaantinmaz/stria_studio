@@ -1,2 +1,4 @@
+# API + admin backend (admin.striastudio.com.tr) — not for search indexes.
+# The public sites are striastudio.com.tr and the microsites.
 User-agent: *
-Disallow:
+Disallow: /

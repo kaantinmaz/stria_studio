@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\Tag;
+use App\Support\IndexNow;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -91,6 +92,12 @@ class AdminPostController extends Controller
         });
         $post->tags()->sync($tagIds);
 
+        if ($post->site === null && $post->is_published) {
+            IndexNow::submit([
+                'https://'.config('services.indexnow.host').'/blog/'.$post->slug,
+            ]);
+        }
+
         return response()->json([
             'data' => [
                 'id' => $post->id,
@@ -108,6 +115,12 @@ class AdminPostController extends Controller
             ->firstOrFail();
 
         $post->delete();
+
+        if ($post->site === null) {
+            IndexNow::submit([
+                'https://'.config('services.indexnow.host').'/blog/'.$post->slug,
+            ]);
+        }
 
         return response()->json(null, 204);
     }
