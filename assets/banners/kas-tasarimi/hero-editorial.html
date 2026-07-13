@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<title>Kaş Tasarımı — Hero Banner (Editorial)</title>
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&display=swap");
+
+  :root {
+    --cream:#f5f1e8; --ink:#171412; --accent:#8a6a4f; --accent-dark:#6e5038;
+    --tan:#b79a7e; --pink:#eae0d2; --blush:#efe7da; --muted:#8a8178;
+    --muted2:#5c554e; --line:#e4dccb; --line2:#d9cfbb;
+    --display:"Fraunces",Georgia,serif; --body:"Inter",system-ui,sans-serif;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#c9c1b2; display:flex; align-items:center; justify-content:center; min-height:100vh; }
+
+  .banner {
+    width:1920px; height:720px; position:relative; overflow:hidden;
+    background:var(--cream); color:var(--ink);
+    font-family:var(--body); -webkit-font-smoothing:antialiased;
+    display:grid; grid-template-columns:1.12fr 0.88fr; align-items:center;
+  }
+  /* faint oversized watermark numeral, editorial signature */
+  .watermark {
+    position:absolute; right:38%; bottom:-120px; font-family:var(--display);
+    font-weight:500; font-size:520px; line-height:1; color:var(--ink);
+    opacity:0.035; pointer-events:none; user-select:none;
+  }
+  /* hairline frame inset */
+  .frameline { position:absolute; inset:34px; border:1px solid var(--line2); pointer-events:none; }
+
+  /* ── LEFT: editorial copy ── */
+  .col-left { padding:0 0 0 120px; position:relative; z-index:2; max-width:1000px; }
+  .brandmark {
+    display:flex; align-items:center; gap:12px; margin-bottom:34px;
+    font-family:var(--body); font-size:13px; font-weight:600;
+    letter-spacing:0.34em; text-transform:uppercase; color:var(--ink);
+  }
+  .brandmark .dot { width:7px; height:7px; border-radius:50%; background:var(--accent); }
+
+  .eyebrow {
+    display:inline-flex; align-items:center; gap:14px;
+    font-family:var(--body); font-size:14px; font-weight:500;
+    letter-spacing:0.24em; text-transform:uppercase; color:var(--muted2);
+  }
+  .eyebrow::before { content:""; width:30px; height:1px; background:var(--ink); opacity:.45; }
+
+  h1 {
+    font-family:var(--display); font-weight:500; font-size:100px;
+    line-height:0.94; letter-spacing:-0.022em; color:var(--ink);
+    margin-top:22px;
+  }
+  h1 em { font-style:italic; font-weight:400; color:var(--accent-dark); }
+
+  .rule { height:1px; background:var(--line2); width:440px; margin-top:28px; }
+
+  .subtitle {
+    margin-top:26px; max-width:640px; font-size:22px; line-height:1.55;
+    color:var(--muted2);
+  }
+
+  .cta-row { margin-top:38px; display:flex; align-items:center; gap:22px; }
+  .btn-primary {
+    display:inline-flex; align-items:center; gap:13px;
+    background:var(--accent); color:var(--cream); text-decoration:none;
+    font-family:var(--body); font-size:19px; font-weight:600; letter-spacing:.01em;
+    padding:20px 34px; border-radius:2px;
+    box-shadow:0 14px 34px -14px rgba(110,80,56,.6);
+  }
+  .btn-primary svg { width:22px; height:22px; }
+  .btn-secondary {
+    display:inline-flex; align-items:center; gap:9px;
+    color:var(--accent-dark); text-decoration:none;
+    font-family:var(--body); font-size:19px; font-weight:500;
+    border-bottom:1px solid var(--tan); padding-bottom:3px;
+  }
+
+  .features {
+    margin-top:40px; display:flex; gap:38px;
+    font-size:13px; font-weight:500; letter-spacing:0.16em; text-transform:uppercase;
+    color:var(--muted);
+  }
+  .features li { list-style:none; display:flex; align-items:center; gap:11px; }
+  .features .fdot { width:5px; height:5px; border-radius:50%; background:var(--accent); }
+
+  /* ── RIGHT: framed brow plate ── */
+  .col-right { display:flex; align-items:center; justify-content:center; padding-right:96px; z-index:2; }
+  .plate {
+    border:1px solid var(--line2); background:var(--cream);
+    padding:46px 52px 30px; position:relative;
+  }
+  .plate svg.brow { width:520px; height:auto; display:block; }
+  .plate-caption {
+    margin-top:14px; font-family:var(--body); font-size:13px;
+    letter-spacing:.18em; text-transform:uppercase; color:var(--muted2);
+    display:flex; justify-content:space-between;
+  }
+</style>
+</head>
+<body>
+  <div class="banner">
+    <div class="watermark">01</div>
+    <div class="frameline"></div>
+
+    <div class="col-left">
+      <div class="brandmark"><span class="dot"></span> STRIA STUDIO</div>
+      <span class="eyebrow">Ankara · Çankaya · Kıl Tekniği</span>
+      <h1>Kaş<br>Tasarımı<br><em>Ankara</em></h1>
+      <div class="rule"></div>
+      <p class="subtitle">Yüz hatlarınıza göre çizilen, kıl tekniğiyle tek tek işlenen kalıcı kaşlar. Altın oran ölçümü, steril uygulama.</p>
+      <div class="cta-row">
+        <a class="btn-primary" href="#">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm5.8 14.13c-.25.7-1.44 1.33-1.98 1.38-.53.05-1.03.24-3.47-.72-2.93-1.15-4.8-4.15-4.95-4.35-.14-.2-1.18-1.57-1.18-2.99s.74-2.12 1.01-2.41c.26-.29.57-.36.76-.36.19 0 .38 0 .55.01.18.01.42-.07.65.5.25.6.85 2.06.92 2.21.07.15.12.32.02.51-.09.19-.14.31-.28.48-.14.16-.29.37-.42.49-.14.14-.29.29-.12.57.16.29.73 1.2 1.56 1.94 1.07.95 1.98 1.25 2.26 1.4.28.14.44.12.6-.07.16-.19.69-.8.88-1.08.18-.29.37-.24.62-.14.25.09 1.61.76 1.89.9.28.14.46.21.53.32.07.12.07.67-.18 1.37Z"/></svg>
+          WhatsApp'tan Randevu Al
+        </a>
+        <a class="btn-secondary" href="#">Fiyatları Gör →</a>
+      </div>
+      <ul class="features">
+        <li><span class="fdot"></span> Kişiye özel tasarım</li>
+        <li><span class="fdot"></span> Kıl kıl doğal</li>
+        <li><span class="fdot"></span> 12–18 ay kalıcı</li>
+      </ul>
+    </div>
+
+    <div class="col-right">
+      <figure class="plate">
+        <svg class="brow" id="brow" viewBox="0 0 480 520" fill="none" role="img" aria-label="Kıl tekniğiyle çizilen doğal kaş"></svg>
+        <figcaption class="plate-caption"><span>Fig. 01 — Kıl tekniği</span><span>STRIA STUDIO</span></figcaption>
+      </figure>
+    </div>
+  </div>
+
+<script>
+  // BrowFlourish — same algorithm as the live site component.
+  (function () {
+    var INK = "#171412", ACCENT = "#8a6a4f", TAN = "#b79a7e", N = 17, NS = "http://www.w3.org/2000/svg";
+    var svg = document.getElementById("brow");
+    // glow + baseline
+    svg.innerHTML =
+      '<defs><radialGradient id="bf-glow" cx="52%" cy="46%" r="55%">' +
+      '<stop offset="0%" stop-color="#efe7da"/><stop offset="100%" stop-color="#efe7da" stop-opacity="0"/>' +
+      '</radialGradient></defs>' +
+      '<circle cx="250" cy="240" r="200" fill="url(#bf-glow)"/>' +
+      '<path d="M84,286 C170,258 250,246 300,254 C348,262 388,278 414,296" stroke="' + TAN + '" stroke-width="1.2" opacity="0.6" stroke-linecap="round"/>';
+    for (var i = 0; i < N; i++) {
+      var t = i / (N - 1);
+      var x = 95 + t * 300;
+      var archY = 255 - 58 * Math.sin(t * Math.PI * 0.92) + 26 * t;
+      var len = 24 + 18 * Math.sin(t * Math.PI);
+      var tilt = -16 + t * 34;
+      var d = "M" + x.toFixed(1) + "," + (archY + len).toFixed(1) +
+              " Q" + (x + tilt * 0.4).toFixed(1) + "," + archY.toFixed(1) +
+              " " + (x + tilt).toFixed(1) + "," + (archY - len).toFixed(1);
+      var op = 0.55 + 0.4 * Math.sin(t * Math.PI);
+      var p = document.createElementNS(NS, "path");
+      p.setAttribute("d", d);
+      p.setAttribute("stroke", i % 3 === 0 ? INK : ACCENT);
+      p.setAttribute("stroke-width", "1.7");
+      p.setAttribute("stroke-linecap", "round");
+      p.setAttribute("opacity", op);
+      svg.appendChild(p);
+    }
+    var extra =
+      '<path d="M70,360 C180,330 320,332 420,300" stroke="' + ACCENT + '" stroke-width="1" opacity="0.35" stroke-linecap="round"/>' +
+      '<path d="M120,392 C210,372 300,372 380,352" stroke="' + TAN + '" stroke-width="1" opacity="0.35" stroke-linecap="round"/>' +
+      '<circle cx="90" cy="279" r="3.2" fill="' + INK + '"/><circle cx="410" cy="292" r="3.2" fill="' + INK + '"/>';
+    svg.insertAdjacentHTML("beforeend", extra);
+  })();
+</script>
+</body>
+</html>
