@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getSettings, SETTINGS_FALLBACK } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
 import { Section } from "@/components/Section";
+import { ImageSlot } from "@/components/ImageSlot";
 import { StudioMap } from "@/components/StudioMap";
 import { CTAButtons, CTABanner } from "@/components/CTA";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
@@ -57,6 +58,12 @@ export default async function Page() {
           Stüdyomuza metro veya otobüsle kolayca ulaşılır; form yüz hatlarınıza göre belirlenir,
           kıl tekniğiyle tek tek işlenir ve 12–18 ay kalıcı, doğal bir sonuç elde edilir.
         </p>
+        <ImageSlot
+          src="/images/topics/kizilay-kas-tasarimi.png"
+          alt="Kızılay'a yakın stüdyoda doğal kaş tasarımı uygulaması"
+          ratio="aspect-[16/9]"
+          className="mt-8 rounded-[2px] border border-line"
+        />
         <div className="mt-8">
           <CTAButtons settings={s} />
         </div>

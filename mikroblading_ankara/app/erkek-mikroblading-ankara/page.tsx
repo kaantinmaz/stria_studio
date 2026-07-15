@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getSettings, SETTINGS_FALLBACK } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
 import { Section } from "@/components/Section";
+import { ImageSlot } from "@/components/ImageSlot";
 import { CTAButtons, CTABanner } from "@/components/CTA";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Faq } from "@/components/Faq";
@@ -56,6 +57,12 @@ export default async function ErkekMicrobladingPage() {
           yüz oranları, kaş yoğunluğu ve kişisel beklenti birlikte değerlendirilerek çizilir.
           Kıl tekniğinin uygunluğu cilt ve kaş yapısına göre belirlenir.
         </p>
+        <ImageSlot
+          src="/images/topics/erkek-mikroblading-ankara.png"
+          alt="Erkek mikroblading Ankara — doğal kıl yönüne uygun kaş tasarımı"
+          ratio="aspect-[16/9]"
+          className="mt-8 max-w-[920px] rounded-[24px] border border-line bg-blush"
+        />
         <div className="mt-8"><CTAButtons settings={s} /></div>
       </Section>
 

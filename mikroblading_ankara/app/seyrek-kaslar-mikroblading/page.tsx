@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getSettings, SETTINGS_FALLBACK } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
 import { Section } from "@/components/Section";
+import { ImageSlot } from "@/components/ImageSlot";
 import { CTAButtons, CTABanner } from "@/components/CTA";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Faq } from "@/components/Faq";
@@ -56,6 +57,12 @@ export default async function SeyrekKaslarMicrobladingPage() {
           cilt yapısı, boşlukların genişliği ve kaş dökülmesinin aktif olup olmamasına göre
           değerlendirilir. İşlem, dökülmenin nedenini tedavi eden tıbbi bir yöntem değildir.
         </p>
+        <ImageSlot
+          src="/images/topics/seyrek-kaslar-mikroblading.png"
+          alt="Seyrek kaşlar için mikroblading — boşlukları tamamlayan doğal kıl tekniği"
+          ratio="aspect-[16/9]"
+          className="mt-8 max-w-[920px] rounded-[24px] border border-line bg-blush"
+        />
         <div className="mt-8"><CTAButtons settings={s} /></div>
       </Section>
 

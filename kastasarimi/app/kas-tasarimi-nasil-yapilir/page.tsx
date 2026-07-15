@@ -3,6 +3,7 @@ import { getSettings, SETTINGS_FALLBACK } from "@/lib/content";
 import { process, whatIs, LAST_UPDATED } from "@/lib/copy";
 import { buildMetadata } from "@/lib/seo";
 import { Section } from "@/components/Section";
+import { ImageSlot } from "@/components/ImageSlot";
 import { ProcessSteps } from "@/components/ProcessSteps";
 import { CTABanner } from "@/components/CTA";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
@@ -52,6 +53,12 @@ export default async function HowItWorksPage() {
         <h1 className="text-[clamp(28px,4vw,42px)] leading-tight text-ink">{process.heading}</h1>
         <p className="mt-5 text-[19px] leading-relaxed text-muted2">{whatIs.answer}</p>
         <p className="mt-4 text-[17px] leading-relaxed text-muted2">{process.intro}</p>
+        <ImageSlot
+          src="/images/topics/kas-tasarimi-nasil-yapilir.png"
+          alt="Altın oran ölçümüyle kaş formunun adım adım çizilmesi"
+          ratio="aspect-[16/9]"
+          className="mt-8 rounded-[2px] border border-line"
+        />
       </Section>
 
       <Section>

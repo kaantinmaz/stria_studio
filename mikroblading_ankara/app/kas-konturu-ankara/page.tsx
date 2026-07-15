@@ -4,6 +4,7 @@ import { getSettings, SETTINGS_FALLBACK } from "@/lib/content";
 import { LAST_UPDATED } from "@/lib/copy";
 import { buildMetadata } from "@/lib/seo";
 import { Section } from "@/components/Section";
+import { ImageSlot } from "@/components/ImageSlot";
 import { CTAButtons, CTABanner } from "@/components/CTA";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Faq } from "@/components/Faq";
@@ -67,6 +68,12 @@ export default async function KasKonturuAnkaraPage() {
           dolgun gölge etkisi bırakan kaş pudralamayla yapılır. Amaç, boşlukları kapatıp kaşa
           simetrik ve bakımlı bir çerçeve kazandırmaktır.
         </p>
+        <ImageSlot
+          src="/images/topics/kas-konturu-ankara.png"
+          alt="Kaş kontürü Ankara — yüz hatlarına uygun kalıcı kaş tasarımı"
+          ratio="aspect-[16/9]"
+          className="mt-8 max-w-[920px] rounded-[24px] border border-line bg-blush"
+        />
         <div className="mt-8"><CTAButtons settings={s} /></div>
       </Section>
 

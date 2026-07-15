@@ -28,9 +28,11 @@ export function BlogList({ posts }: { posts: PostList[] }) {
     <div className="mt-8 grid gap-6 md:grid-cols-3">
       {posts.map((p) => (
         <article key={p.id} className="group overflow-hidden rounded-[2px] border border-line bg-cream">
-          <Link href={`/blog/${p.slug}`}>
-            <ImageSlot src={p.cover_url} alt={p.title_tr} ratio="aspect-[16/10]" />
-          </Link>
+          {p.cover_url && (
+            <Link href={`/blog/${p.slug}`}>
+              <ImageSlot src={p.cover_url} alt={p.title_tr} ratio="aspect-[16/9]" />
+            </Link>
+          )}
           <div className="p-5">
             {p.published_at && (
               <p className="text-[12px] uppercase tracking-[0.12em] text-accent-dark">

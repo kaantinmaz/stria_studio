@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getSettings, SETTINGS_FALLBACK } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
 import { Section } from "@/components/Section";
+import { ImageSlot } from "@/components/ImageSlot";
 import { ProcessSteps } from "@/components/ProcessSteps";
 import { CTAButtons, CTABanner } from "@/components/CTA";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
@@ -97,6 +98,12 @@ export default async function Page() {
           nemlendiriciyi düzenli uygulayın. Bu kurallara uymak sonucun netliğini ve kalıcılığını
           doğrudan etkiler.
         </p>
+        <ImageSlot
+          src="/images/topics/kas-tasarimi-bakimi.png"
+          alt="Kaş tasarımı sonrası ilk günlerde nazik bakım uygulaması"
+          ratio="aspect-[16/9]"
+          className="mt-8 rounded-[2px] border border-line"
+        />
         <div className="mt-8">
           <CTAButtons settings={s} />
         </div>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getSettings, SETTINGS_FALLBACK } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
 import { Section } from "@/components/Section";
+import { ImageSlot } from "@/components/ImageSlot";
 import { StudioMap } from "@/components/StudioMap";
 import { CTAButtons, CTABanner } from "@/components/CTA";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
@@ -61,6 +62,12 @@ export default async function CayyoluMicrobladingPage() {
           Eskişehir Yolu koridoruyla stüdyoya rahat bağlanır. En uygun rota, kalkış noktanıza ve
           saate göre değişir; randevu öncesinde haritadan canlı güzergâhı açıp adresi doğrulayın.
         </p>
+        <ImageSlot
+          src="/images/topics/cayyolu-mikroblading.png"
+          alt="Çayyolu ve Ümitköy'den mikroblading randevusuna ulaşım"
+          ratio="aspect-[16/9]"
+          className="mt-8 max-w-[920px] rounded-[24px] border border-line bg-blush"
+        />
         <div className="mt-8"><CTAButtons settings={s} /></div>
       </Section>
 

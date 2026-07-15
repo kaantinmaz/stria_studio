@@ -4,6 +4,7 @@ import { getSettings, SETTINGS_FALLBACK } from "@/lib/content";
 import { LAST_UPDATED } from "@/lib/copy";
 import { buildMetadata } from "@/lib/seo";
 import { Section } from "@/components/Section";
+import { ImageSlot } from "@/components/ImageSlot";
 import { CTAButtons, CTABanner } from "@/components/CTA";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Faq } from "@/components/Faq";
@@ -67,6 +68,12 @@ export default async function KaliciKasAnkaraPage() {
           teknik mikroblading (kıl tekniği) ve kaş pudralamadır; her tel çizilir ya da yumuşak
           gölge verilir. Sonuç makyajsız, bakımlı kaşlardır ve tekniğe göre 12 ay–3 yıl kalır.
         </p>
+        <ImageSlot
+          src="/images/topics/kalici-kas-ankara.png"
+          alt="Kalıcı kaş Ankara — mikroblading ve pudralama teknikleri"
+          ratio="aspect-[16/9]"
+          className="mt-8 max-w-[920px] rounded-[24px] border border-line bg-blush"
+        />
         <div className="mt-8"><CTAButtons settings={s} /></div>
       </Section>
 

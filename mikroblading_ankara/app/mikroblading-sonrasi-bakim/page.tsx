@@ -4,6 +4,7 @@ import { getSettings, SETTINGS_FALLBACK } from "@/lib/content";
 import { LAST_UPDATED } from "@/lib/copy";
 import { buildMetadata } from "@/lib/seo";
 import { Section } from "@/components/Section";
+import { ImageSlot } from "@/components/ImageSlot";
 import { CTAButtons, CTABanner } from "@/components/CTA";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Faq } from "@/components/Faq";
@@ -128,6 +129,12 @@ export default async function MikrobladingSonrasiBakimPage() {
           İlk 10 gün kaşları su, ter, güneş ve makyajdan koruyun, kabukları koparmayın. Doğru bakım,
           pigmentin düzgün tutunmasını ve sonucun doğal görünmesini sağlar.
         </p>
+        <ImageSlot
+          src="/images/topics/mikroblading-sonrasi-bakim.png"
+          alt="Mikroblading sonrası bakım — iyileşme döneminde kaş koruma rutini"
+          ratio="aspect-[16/9]"
+          className="mt-8 max-w-[920px] rounded-[24px] border border-line bg-blush"
+        />
         <div className="mt-8"><CTAButtons settings={s} /></div>
       </Section>
 

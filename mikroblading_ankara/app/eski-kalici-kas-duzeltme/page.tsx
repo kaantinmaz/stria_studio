@@ -4,6 +4,7 @@ import { getSettings, SETTINGS_FALLBACK } from "@/lib/content";
 import { LAST_UPDATED } from "@/lib/copy";
 import { buildMetadata } from "@/lib/seo";
 import { Section } from "@/components/Section";
+import { ImageSlot } from "@/components/ImageSlot";
 import { CTAButtons, CTABanner } from "@/components/CTA";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Faq } from "@/components/Faq";
@@ -108,6 +109,12 @@ export default async function EskiKaliciKasDuzeltmePage() {
           üzerine çoğu zaman çalışılabilir; koyu ve doygun eski dövmelerde ise önce açma (lazer/removal)
           gerekebilir. Karar, fotoğraf ön değerlendirmesi ve yüz yüze görüşmeyle birlikte verilir.
         </p>
+        <ImageSlot
+          src="/images/topics/eski-kalici-kas-duzeltme.png"
+          alt="Eski kalıcı kaş düzeltme — pigment değerlendirmesi ve yeni tasarım"
+          ratio="aspect-[16/9]"
+          className="mt-8 max-w-[920px] rounded-[24px] border border-line bg-blush"
+        />
         <div className="mt-8"><CTAButtons settings={s} /></div>
       </Section>
 

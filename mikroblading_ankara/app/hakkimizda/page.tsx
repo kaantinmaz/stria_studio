@@ -3,6 +3,7 @@ import { getSettings, SETTINGS_FALLBACK } from "@/lib/content";
 import { about } from "@/lib/copy";
 import { buildMetadata } from "@/lib/seo";
 import { Section } from "@/components/Section";
+import { ImageSlot } from "@/components/ImageSlot";
 import { CTABanner } from "@/components/CTA";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { CheckIcon } from "@/components/Icons";
@@ -31,6 +32,13 @@ export default async function AboutPage() {
             Stüdyo yaklaşımımız ve kalıcı makyaj hizmetlerimiz hakkında daha fazla bilgi için <a href="https://striastudio.com.tr" target="_blank" rel="noopener" className="text-accent-dark hover:underline">Stria Studio</a> web sitesini ziyaret edebilirsiniz.
           </p>
         </div>
+
+        <ImageSlot
+          src="/images/topics/hakkimizda.png"
+          alt="Stria Studio mikroblading uzmanlığı — özenli kaş tasarımı yaklaşımı"
+          ratio="aspect-[16/9]"
+          className="mt-8 rounded-[24px] border border-line bg-blush"
+        />
 
         <h2 className="mt-12 text-[22px] text-ink">Neden bizi tercih etmelisiniz?</h2>
         <ul className="mt-5 grid gap-3 sm:grid-cols-2">

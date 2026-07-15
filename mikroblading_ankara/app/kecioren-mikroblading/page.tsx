@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getSettings, SETTINGS_FALLBACK } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
 import { Section } from "@/components/Section";
+import { ImageSlot } from "@/components/ImageSlot";
 import { StudioMap } from "@/components/StudioMap";
 import { CTAButtons, CTABanner } from "@/components/CTA";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
@@ -62,6 +63,12 @@ export default async function KeciorenMicrobladingPage() {
           öncesinde haritadan canlı güzergâhı açabilir, güncel adresi stüdyodan doğrudan
           doğrulayabilirsiniz.
         </p>
+        <ImageSlot
+          src="/images/topics/kecioren-mikroblading.png"
+          alt="Keçiören'den mikroblading randevusuna ulaşım — Çankaya stüdyo rotası"
+          ratio="aspect-[16/9]"
+          className="mt-8 max-w-[920px] rounded-[24px] border border-line bg-blush"
+        />
         <div className="mt-8"><CTAButtons settings={s} /></div>
       </Section>
 

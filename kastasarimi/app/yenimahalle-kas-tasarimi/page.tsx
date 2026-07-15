@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getSettings, SETTINGS_FALLBACK } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
 import { Section } from "@/components/Section";
+import { ImageSlot } from "@/components/ImageSlot";
 import { StudioMap } from "@/components/StudioMap";
 import { CTAButtons, CTABanner } from "@/components/CTA";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
@@ -62,6 +63,12 @@ export default async function Page() {
           uygular. Form, yüz simetriniz ve altın oran ölçümüne göre belirlenir; her kıl tek tek
           işlenir ve sonuç 12–18 ay kalıcıdır.
         </p>
+        <ImageSlot
+          src="/images/topics/yenimahalle-kas-tasarimi.png"
+          alt="Yenimahalle'den gelen danışana altın oran kaş tasarımı"
+          ratio="aspect-[16/9]"
+          className="mt-8 rounded-[2px] border border-line"
+        />
         <div className="mt-8">
           <CTAButtons settings={s} />
         </div>

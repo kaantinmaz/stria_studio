@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getSettings, SETTINGS_FALLBACK } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
 import { Section } from "@/components/Section";
+import { ImageSlot } from "@/components/ImageSlot";
 import { CTAButtons, CTABanner } from "@/components/CTA";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Faq } from "@/components/Faq";
@@ -57,6 +58,12 @@ export default async function Page() {
           maruziyet, cilt yenilenme hızı ve bakım alışkanlıkları kalıcılığı kısaltıp uzatabilir.
           Görünümü tazelemek için yılda bir yenileme seansı önerilir.
         </p>
+        <ImageSlot
+          src="/images/topics/kas-tasarimi-kalici-mi.png"
+          alt="Kıl tekniği kaş tasarımında zamanla doğal biçimde açılan pigment"
+          ratio="aspect-[16/9]"
+          className="mt-8 rounded-[2px] border border-line"
+        />
         <div className="mt-8">
           <CTAButtons settings={s} />
         </div>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getSettings, SETTINGS_FALLBACK } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
 import { Section } from "@/components/Section";
+import { ImageSlot } from "@/components/ImageSlot";
 import { CTAButtons, CTABanner } from "@/components/CTA";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Faq } from "@/components/Faq";
@@ -59,6 +60,12 @@ export default async function Page() {
           biçimde doldurulur. Ankara Çankaya&apos;daki Stria Studio&apos;da form mevcut kıllarınıza
           uyumlu çizilir; sonuç makyajsız da dolgun görünür ve kıl tekniğiyle 12–18 ay kalıcıdır.
         </p>
+        <ImageSlot
+          src="/images/topics/seyrek-kaslar-kas-tasarimi.png"
+          alt="Seyrek kaş boşluklarının doğal kıl çizgileriyle tamamlanması"
+          ratio="aspect-[16/9]"
+          className="mt-8 rounded-[2px] border border-line"
+        />
         <div className="mt-8">
           <CTAButtons settings={s} />
         </div>

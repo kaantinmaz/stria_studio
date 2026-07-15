@@ -4,6 +4,7 @@ import { getSettings, SETTINGS_FALLBACK } from "@/lib/content";
 import { LAST_UPDATED } from "@/lib/copy";
 import { buildMetadata } from "@/lib/seo";
 import { Section } from "@/components/Section";
+import { ImageSlot } from "@/components/ImageSlot";
 import { CTAButtons, CTABanner } from "@/components/CTA";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Faq } from "@/components/Faq";
@@ -117,6 +118,12 @@ export default async function MikrobladingOncesiHazirlikPage() {
           pigmentin daha iyi tutunmasını sağlar; kanamayı ve sızıntıyı azaltarak daha net bir sonuç
           elde etmenize yardımcı olur.
         </p>
+        <ImageSlot
+          src="/images/topics/mikroblading-oncesi-hazirlik.png"
+          alt="Mikroblading öncesi hazırlık — randevu öncesi bakım düzeni"
+          ratio="aspect-[16/9]"
+          className="mt-8 max-w-[920px] rounded-[24px] border border-line bg-blush"
+        />
         <div className="mt-8"><CTAButtons settings={s} /></div>
       </Section>
 

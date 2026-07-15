@@ -5,10 +5,10 @@ export const IMG = {
   hero: "/images/hero.png",
   // Hero slider slides — add/remove paths here to change the rotation.
   heroSlides: [
-    "/images/hero.png",
+    "/images/hero-brows.png",
     "/images/powder.png",
+    "/images/hero.png",
     "/images/eyeliner.png",
-    "/images/dipliner.png",
   ],
   micro: "/images/micro.png",
   powder: "/images/powder.png",
@@ -114,10 +114,10 @@ export const UI: Record<Lang, Dict> = {
     navFaq: "S.S.S.",
     navCta: "Randevu Al",
     callLabel: "Ara",
-    heroKicker: "Ankara · Kalıcı Makyaj & Güzellik Stüdyosu",
-    heroTitle: "Sen, en doğal\nhalinle güzelsin",
+    heroKicker: "Ankara · Kaş Tasarımı, Microblading & Kalıcı Makyaj",
+    heroTitle: "Kaşların, en doğal\nhaliyle güzel",
     heroText:
-      "Kaş, kirpik ve kalıcı makyajda özenli, doğal ve tamamen sana özel dokunuşlar. Ankara Çankaya'da.",
+      "Microblading, kaş pudralama ve kalıcı makyajda yüz hatlarına göre kişiye özel tasarım. Kaşın yüzüne göre çizilir — Ankara Çankaya'da.",
     heroCtaPrimary: "WhatsApp'tan Randevu",
     heroCtaSecondary: "Hemen Ara",
     heroFeatures: [
@@ -183,10 +183,10 @@ export const UI: Record<Lang, Dict> = {
     navFaq: "FAQ",
     navCta: "Book Now",
     callLabel: "Call",
-    heroKicker: "Ankara · Permanent Makeup & Beauty Studio",
-    heroTitle: "You, at your\nmost natural",
+    heroKicker: "Ankara · Brow Design, Microblading & Permanent Makeup",
+    heroTitle: "Your brows, beautiful\nat their most natural",
     heroText:
-      "Careful, natural and entirely bespoke touches for brows, lashes and permanent makeup. In Çankaya, Ankara.",
+      "Bespoke microblading, powder brows and permanent makeup, designed for your features. In Çankaya, Ankara.",
     heroCtaPrimary: "Book on WhatsApp",
     heroCtaSecondary: "Call Now",
     heroFeatures: [

@@ -3,6 +3,7 @@ import { getSettings, SETTINGS_FALLBACK } from "@/lib/content";
 import { pricing, LAST_UPDATED } from "@/lib/copy";
 import { buildMetadata } from "@/lib/seo";
 import { Container, Section } from "@/components/Section";
+import { ImageSlot } from "@/components/ImageSlot";
 import { PricingTable } from "@/components/PricingTable";
 import { CTAButtons, CTABanner } from "@/components/CTA";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
@@ -50,6 +51,12 @@ export default async function PricingPage() {
         <p className="mb-3 text-[11px] uppercase tracking-[0.18em] text-accent">Son güncelleme: {LAST_UPDATED}</p>
         <h1 className="max-w-[760px] text-[clamp(28px,4vw,42px)] leading-tight text-ink">{pricing.heading}</h1>
         <p className="mt-5 max-w-[680px] text-[18px] leading-relaxed text-muted2">{pricing.intro}</p>
+        <ImageSlot
+          src="/images/topics/mikroblading-fiyatlari.png"
+          alt="Mikroblading fiyatları — kaş tasarımı ve uygulama kapsamı"
+          ratio="aspect-[16/9]"
+          className="mt-8 max-w-[920px] rounded-[24px] border border-line bg-blush"
+        />
         <PricingTable rows={pricing.rows} />
         <p className="mt-4 text-[13px] text-muted">{pricing.note}</p>
         <div className="mt-8">

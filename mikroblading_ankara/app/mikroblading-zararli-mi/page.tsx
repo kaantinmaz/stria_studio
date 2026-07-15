@@ -4,6 +4,7 @@ import { getSettings, SETTINGS_FALLBACK } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
 import { LAST_UPDATED } from "@/lib/copy";
 import { Section } from "@/components/Section";
+import { ImageSlot } from "@/components/ImageSlot";
 import { CTAButtons, CTABanner } from "@/components/CTA";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Faq } from "@/components/Faq";
@@ -67,6 +68,12 @@ export default async function MikrobladingZararliMiPage() {
           deneyimiyle ilgilidir; doğru koşullar sağlandığında bu riskler önemli ölçüde azalır.
         </p>
         <p className="mt-4 text-[14px] text-muted2">Son güncelleme: {LAST_UPDATED}</p>
+        <ImageSlot
+          src="/images/topics/mikroblading-zararli-mi.png"
+          alt="Güvenli mikroblading uygulaması — steril ekipman ve hijyen hazırlığı"
+          ratio="aspect-[16/9]"
+          className="mt-8 max-w-[920px] rounded-[24px] border border-line bg-blush"
+        />
         <div className="mt-8"><CTAButtons settings={s} /></div>
       </Section>
 

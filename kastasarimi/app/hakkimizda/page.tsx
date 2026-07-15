@@ -3,6 +3,7 @@ import { getSettings, SETTINGS_FALLBACK } from "@/lib/content";
 import { about } from "@/lib/copy";
 import { buildMetadata } from "@/lib/seo";
 import { Section } from "@/components/Section";
+import { ImageSlot } from "@/components/ImageSlot";
 import { CTABanner } from "@/components/CTA";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { CheckIcon } from "@/components/Icons";
@@ -29,6 +30,13 @@ export default async function AboutPage() {
             </p>
           ))}
         </div>
+
+        <ImageSlot
+          src="/images/topics/hakkimizda.png"
+          alt="Stria Studio'nun sakin ve hijyenik kaş tasarımı çalışma alanı"
+          ratio="aspect-[16/9]"
+          className="mt-8 rounded-[2px] border border-line"
+        />
 
         <h2 className="mt-12 text-[22px] text-ink">Neden bizi tercih etmelisiniz?</h2>
         <ul className="mt-5 grid gap-3 sm:grid-cols-2">

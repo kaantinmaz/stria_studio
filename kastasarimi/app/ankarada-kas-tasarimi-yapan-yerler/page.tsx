@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getSettings, SETTINGS_FALLBACK } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
 import { Section } from "@/components/Section";
+import { ImageSlot } from "@/components/ImageSlot";
 import { CTAButtons, CTABanner } from "@/components/CTA";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Faq } from "@/components/Faq";
@@ -116,6 +117,12 @@ export default async function Page() {
           pigment bilgisi, altın oran ölçümü, onaylı ön çizim ve rötuş politikası birlikte
           değerlendirilmelidir. Stria Studio, Çankaya&apos;da bu ölçütlerle hizmet verir.
         </p>
+        <ImageSlot
+          src="/images/topics/ankarada-kas-tasarimi-yapan-yerler.png"
+          alt="Ankara'da kaş tasarımı stüdyosu seçerken hijyen ve portfolyo değerlendirmesi"
+          ratio="aspect-[16/9]"
+          className="mt-8 rounded-[2px] border border-line"
+        />
         <div className="mt-8">
           <CTAButtons settings={s} />
         </div>

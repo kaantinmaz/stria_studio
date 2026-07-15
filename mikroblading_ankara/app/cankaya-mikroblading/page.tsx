@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getSettings, SETTINGS_FALLBACK } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
 import { Section } from "@/components/Section";
+import { ImageSlot } from "@/components/ImageSlot";
 import { StudioMap } from "@/components/StudioMap";
 import { CTAButtons, CTABanner } from "@/components/CTA";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
@@ -63,6 +64,12 @@ export default async function CankayaMicrobladingPage() {
           kolaylaştırır. Güncel adres ile yol tarifi aşağıdadır; randevu öncesinde konumu yeniden
           doğrulamanız önerilir.
         </p>
+        <ImageSlot
+          src="/images/topics/cankaya-mikroblading.png"
+          alt="Çankaya'da mikroblading uygulaması — doğal kıl tekniği kaş tasarımı"
+          ratio="aspect-[16/9]"
+          className="mt-8 max-w-[920px] rounded-[24px] border border-line bg-blush"
+        />
         <div className="mt-8"><CTAButtons settings={s} /></div>
       </Section>
 
