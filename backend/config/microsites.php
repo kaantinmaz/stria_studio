@@ -8,7 +8,7 @@ return [
     'mikroblading-ankara' => [
         'name' => 'Mikroblading Ankara',
         'service' => 'microblading',
-        'url' => 'https://mikrobladingankara.com',
+        'url' => 'https://microbladingankara.com',
     ],
     'kas-tasarimi-ankara' => [
         'name' => 'Kaş Tasarımı Ankara',

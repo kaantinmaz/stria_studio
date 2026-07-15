@@ -54,7 +54,7 @@ export default async function HomePage() {
             </div>
           </div>
           <Image
-            src="/hero1.png"
+            src="/hero1.jpg"
             alt="Mikroblading Ankara — kıl tekniğiyle doğal kaş tasarımı, Stria Studio Çankaya"
             width={1126}
             height={1397}
@@ -133,6 +133,16 @@ export default async function HomePage() {
             <li><Link href="/seyrek-kaslar-mikroblading" className="hover:underline">Seyrek kaşlar</Link></li>
             <li><Link href="/cankaya-mikroblading" className="hover:underline">Çankaya mikroblading</Link></li>
             <li><Link href="/kizilay-mikroblading" className="hover:underline">Kızılay ulaşım rehberi</Link></li>
+            <li><Link href="/kalici-kas-ankara" className="hover:underline">Kalıcı kaş Ankara</Link></li>
+            <li><Link href="/kas-pudralama-ankara" className="hover:underline">Kaş pudralama (powder brows)</Link></li>
+            <li><Link href="/mikroblading-mi-kas-pudralama-mi" className="hover:underline">Mikroblading mi, pudralama mı?</Link></li>
+            <li><Link href="/mikroblading-sonrasi-bakim" className="hover:underline">Sonrası bakım rehberi</Link></li>
+            <li><Link href="/mikroblading-zararli-mi" className="hover:underline">Mikroblading zararlı mı?</Link></li>
+            <li><Link href="/kas-konturu-ankara" className="hover:underline">Kaş kontürü</Link></li>
+            <li><Link href="/kecioren-mikroblading" className="hover:underline">Keçiören'den ulaşım</Link></li>
+            <li><Link href="/cayyolu-mikroblading" className="hover:underline">Çayyolu & Ümitköy'den ulaşım</Link></li>
+            <li><Link href="/mikroblading-oncesi-hazirlik" className="hover:underline">Öncesi hazırlık</Link></li>
+            <li><Link href="/eski-kalici-kas-duzeltme" className="hover:underline">Eski kalıcı kaş düzeltme</Link></li>
           </ul>
         </div>
       </Section>

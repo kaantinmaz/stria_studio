@@ -34,7 +34,7 @@ export function beautySalonSchema(s: Settings) {
     })),
     sameAs: [
       s.instagram,
-      "https://mikrobladingankara.com",
+      "https://microbladingankara.com",
       "https://kastasarimiankara.com",
       site.gbpUrl,
     ].filter(Boolean),

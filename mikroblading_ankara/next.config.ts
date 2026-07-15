@@ -2,6 +2,14 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["127.0.0.1"],
+  // English-spelling entry URLs → canonical Turkish routes (301).
+  async redirects() {
+    return [
+      { source: "/microblading-ankara", destination: "/", permanent: true },
+      { source: "/microblading", destination: "/", permanent: true },
+      { source: "/microblading-fiyatlari", destination: "/mikroblading-fiyatlari", permanent: true },
+    ];
+  },
   images: {
     remotePatterns: [
       { protocol: "http", hostname: "127.0.0.1", port: "8002", pathname: "/storage/**" },

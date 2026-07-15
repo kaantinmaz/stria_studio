@@ -18,7 +18,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-// Public, read-only API for per-service SEO microsites (e.g. mikrobladingankara.com).
+// Public, read-only API for per-service SEO microsites (e.g. microbladingankara.com).
 // Content and settings are scoped by the `site` slug; each site has its own settings
 // row (NAP, campaign bar, code injection) via Setting::forSite($site).
 class MicrositeController extends Controller

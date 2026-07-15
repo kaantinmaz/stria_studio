@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 // Scopes content to a microsite. NULL = main Stria site (unchanged behavior).
-// A per-service SEO microsite (e.g. mikrobladingankara.com) reads only rows
+// A per-service SEO microsite (e.g. microbladingankara.com) reads only rows
 // carrying its own `site` slug; the main site reads only NULL rows.
 return new class extends Migration
 {

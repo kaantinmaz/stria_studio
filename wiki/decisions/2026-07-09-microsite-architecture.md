@@ -1,11 +1,11 @@
 # Decision: Per-service SEO microsites on the shared backend
 
 **Date:** 2026-07-09
-**Status:** Accepted. Instances built: `mikrobladingankara.com` (`mikroblading_ankara/`, port 3001), `kastasarimiankara.com` (`kastasarimi/`, port 3002). Seeder generalized to loop `database/seeders/data/*.json` (site = filename) and upsert the pinned service when the JSON provides one.
+**Status:** Accepted. Instances built: `microbladingankara.com` (`mikroblading_ankara/`, port 3001), `kastasarimiankara.com` (`kastasarimi/`, port 3002). Seeder generalized to loop `database/seeders/data/*.json` (site = filename) and upsert the pinned service when the JSON provides one.
 
 ## Context
 
-Beyond the main Stria Studio site, the owner is launching **one SEO microsite per service** on its own exact-match domain (first: `mikrobladingankara.com` for microblading / kıl tekniği kaş). Goal: rank in both classic Google search and AI answer engines (ChatGPT, Perplexity, AI Overviews) for a single, tightly-focused topic + locality.
+Beyond the main Stria Studio site, the owner is launching **one SEO microsite per service** on its own exact-match domain (first: `microbladingankara.com` for microblading / kıl tekniği kaş). Goal: rank in both classic Google search and AI answer engines (ChatGPT, Perplexity, AI Overviews) for a single, tightly-focused topic + locality.
 
 ## Decision
 

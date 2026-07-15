@@ -26,6 +26,7 @@ export function GET(): Response {
 ## Fiyatlar (${LAST_UPDATED}, Ankara)
 ${priceLines}
 Not: ${pricing.note}
+Makine tarafından okunabilir fiyat dosyası: ${u("/pricing.md")}
 
 ## Önemli sayfalar
 - [Anasayfa](${u("/")}): Kaş Tasarımı Ankara genel bilgi
@@ -46,6 +47,13 @@ Not: ${pricing.note}
 - [Seyrek kaşlar için kaş tasarımı](${u("/seyrek-kaslar-kas-tasarimi")}): seyrek/dökük kaş dolgusu
 - [Çankaya kaş tasarımı](${u("/cankaya-kas-tasarimi")}): konum ve ulaşım
 - [Kızılay kaş tasarımı](${u("/kizilay-kas-tasarimi")}): Kızılay'dan erişim
+- [Kaş tasarımı kimlere yapılmaz](${u("/kas-tasarimi-kimlere-yapilmaz")}): uygunluk koşulları
+- [Keçiören kaş tasarımı](${u("/kecioren-kas-tasarimi")}): Keçiören'den ulaşım
+- [Yenimahalle kaş tasarımı](${u("/yenimahalle-kas-tasarimi")}): Yenimahalle/Batıkent'ten ulaşım
+
+## Bağlantılı siteler
+- [Stria Studio](https://striastudio.com.tr): ana stüdyo sitesi — Ankara Çankaya'da tüm kalıcı makyaj hizmetleri.
+- [Mikroblading Ankara](https://microbladingankara.com): mikroblading odaklı soru-cevap ve fiyat rehberi sitemiz.
 
 ## API
 - [API dokümantasyonu](${u("/api-docs")})

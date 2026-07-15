@@ -6,6 +6,8 @@ import { ContactForm } from "@/components/ContactForm";
 import { StudioMap } from "@/components/StudioMap";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { WhatsAppIcon, PhoneIcon, InstagramIcon, MapPinIcon } from "@/components/Icons";
+import { JsonLd } from "@/components/JsonLd";
+import { webPageSchema } from "@/lib/schema";
 
 export const metadata: Metadata = buildMetadata({
   title: "İletişim & Randevu — Mikroblading Ankara | Stria Studio",
@@ -18,6 +20,7 @@ export default async function ContactPage() {
   const s = (await getSettings()) ?? SETTINGS_FALLBACK;
   return (
     <>
+      <JsonLd data={webPageSchema({ type: "ContactPage", name: "İletişim & Randevu — Mikroblading Ankara", path: "/iletisim" })} />
       <Breadcrumbs items={[{ name: "İletişim", path: "/iletisim" }]} />
       <Section as="h1" eyebrow="İletişim" heading="Randevu & iletişim"
         intro="Ücretsiz ön görüşme için formu doldurun ya da WhatsApp'tan yazın. En kısa sürede size dönüş yaparız.">

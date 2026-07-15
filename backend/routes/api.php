@@ -33,7 +33,7 @@ Route::prefix('admin')->middleware(App\Http\Middleware\EnsureAdminApiToken::clas
     Route::delete('/posts/{slug}', [AdminPostController::class, 'destroy']);
 });
 
-// Per-service SEO microsites (e.g. mikrobladingankara.com). Site-scoped, read-only + contact.
+// Per-service SEO microsites (e.g. microbladingankara.com). Site-scoped, read-only + contact.
 Route::prefix('microsites/{site}')->group(function () {
     Route::get('/service', [MicrositeController::class, 'service']);
     Route::get('/posts', [MicrositeController::class, 'posts']);

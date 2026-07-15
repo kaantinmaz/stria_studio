@@ -5,7 +5,7 @@
 
 ## What was audited
 
-Full SEO/GEO audit of `mikroblading_ankara/` (target: Google + AI answer engines), run as a **real local crawl**: MySQL(8889) + backend(8002) + `next build && next start`(3001), crawler over the sitemap capturing status, title/desc, canonical, robots meta, H1/H2, JSON-LD @types, img alt, internal-link 404s. Domain `mikrobladingankara.com` does **not** resolve yet → live SERP / AI-answer benchmarking is impossible pre-launch; the benchmark is the local crawl + per-query answer-readiness mapping.
+Full SEO/GEO audit of `mikroblading_ankara/` (target: Google + AI answer engines), run as a **real local crawl**: MySQL(8889) + backend(8002) + `next build && next start`(3001), crawler over the sitemap capturing status, title/desc, canonical, robots meta, H1/H2, JSON-LD @types, img alt, internal-link 404s. Domain `microbladingankara.com` does **not** resolve yet → live SERP / AI-answer benchmarking is impossible pre-launch; the benchmark is the local crawl + per-query answer-readiness mapping.
 
 Strong already: crawlability (robots allows AI bots, blocks CCBot), self-canonicals, unique in-range titles/descriptions, full JSON-LD (BeautySalon/Service/FAQPage/HowTo/Breadcrumb/BlogPosting), answer-first copy, internal linking (no orphans), llms.txt w/ machine-readable pricing, geo meta, `/og`. hreflang correctly absent (TR-only, see [[decisions/2026-07-08-seo-architecture]]).
 

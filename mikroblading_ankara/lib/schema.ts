@@ -1,6 +1,7 @@
 import { site } from "@/lib/site";
 import { absUrl } from "@/lib/seo";
 import { phoneHref, type Settings } from "@/lib/content";
+import { pricing } from "@/lib/copy";
 
 // LocalBusiness (BeautySalon) — microsite identity. @id is referenced by
 // per-page Service schema via `provider`. Same physical studio as the main brand.
@@ -34,9 +35,24 @@ export function beautySalonSchema(s: Settings) {
       opens: h.open,
       closes: h.close,
     })),
+    // Machine-readable service prices — mirrors /mikroblading-fiyatlari and /llms.txt.
+    hasOfferCatalog: {
+      "@type": "OfferCatalog",
+      name: "Mikroblading hizmet ve fiyat listesi",
+      itemListElement: pricing.rows.map((r) => ({
+        "@type": "Offer",
+        itemOffered: { "@type": "Service", name: r.name, description: r.detail },
+        priceSpecification: {
+          "@type": "PriceSpecification",
+          minPrice: r.min,
+          maxPrice: r.max,
+          priceCurrency: "TRY",
+        },
+      })),
+    },
     sameAs: [
       s.instagram || site.instagram,
-      "https://striastudio.com",
+      "https://striastudio.com.tr",
       "https://kastasarimiankara.com",
       site.gbpUrl,
     ].filter(Boolean),
@@ -119,5 +135,30 @@ export function blogPostingSchema(opts: {
       name: site.studio,
       logo: { "@type": "ImageObject", url: absUrl("/og") },
     },
+  };
+}
+
+// WebSite entity — helps Google/AI engines tie the domain to the business entity.
+export function websiteSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": absUrl("/#website"),
+    name: site.brand,
+    url: site.siteUrl,
+    inLanguage: "tr",
+    publisher: { "@id": absUrl("/#business") },
+  };
+}
+
+// AboutPage / ContactPage — ties utility pages to the business entity.
+export function webPageSchema(opts: { type: "AboutPage" | "ContactPage"; name: string; path: string }) {
+  return {
+    "@context": "https://schema.org",
+    "@type": opts.type,
+    name: opts.name,
+    url: absUrl(opts.path),
+    inLanguage: "tr",
+    mainEntity: { "@id": absUrl("/#business") },
   };
 }

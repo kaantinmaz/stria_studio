@@ -12,7 +12,7 @@ _(none yet)_
 - [stack-and-dev-servers](decisions/2026-07-07-stack-and-dev-servers.md) — monorepo, MySQL/MAMP, dev ports (8002/3001), added contact form, CORS. ("No admin UI" call superseded by filament-admin-resources below.)
 - [seo-architecture](decisions/2026-07-08-seo-architecture.md) — TR-first, per-service pages, JSON-LD, sitemap/robots, llms.txt.
 - [filament-admin-resources](decisions/2026-07-08-filament-admin-resources.md) — Filament v4.11 admin CRUD for Post/Category/Tag; v3→v4 namespace map (Schema, Schemas\Components\Tabs, Actions, recordActions/toolbarActions).
-- [microsite-architecture](decisions/2026-07-09-microsite-architecture.md) — per-service SEO microsites (mikrobladingankara.com) on shared backend; `site` column scoping, `/api/microsites/{site}/*`, Filament Site selector, isolation guard. (Item 7 "settings shared" superseded by per-site-settings below.)
+- [microsite-architecture](decisions/2026-07-09-microsite-architecture.md) — per-service SEO microsites (microbladingankara.com) on shared backend; `site` column scoping, `/api/microsites/{site}/*`, Filament Site selector, isolation guard. (Item 7 "settings shared" superseded by per-site-settings below.)
 - [per-site-settings](decisions/2026-07-12-per-site-settings.md) — settings now `site`-scoped (NULL=main); `Setting::forSite()`, Filament site switcher, per-site campaign bar + code injection on both microsites.
 - [model-routing](decisions/2026-07-12-model-routing.md) — Fable 5 = thinking/orchestration; coding & detail always delegated to Codex 5.6 (`gpt-5.6-sol`) or Opus 4.8 (`claude -p --model opus`). Codified in CLAUDE.md §5.
 

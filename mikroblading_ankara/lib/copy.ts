@@ -17,7 +17,7 @@ export const hero = {
 export const whatIs = {
   heading: "Mikroblading nedir?",
   answer:
-    "Mikroblading, ince bir kalem ucuyla cildin üst katmanına kıl kıl pigment işlenerek yapılan yarı kalıcı bir kaş işlemidir. Ankara Çankaya'daki Stria Studio'da her kıl tek tek çizilir; sonuç doğal, dolgun ve 12–18 ay kalıcıdır. Makyaja gerek kalmadan simetrik, bakımlı kaşlar sağlar.",
+    "Mikroblading (İngilizce: microblading), ince bir kalem ucuyla cildin üst katmanına kıl kıl pigment işlenerek yapılan yarı kalıcı bir kaş işlemidir. Ankara Çankaya'daki Stria Studio'da her kıl tek tek çizilir; sonuç doğal, dolgun ve 12–18 ay kalıcıdır. Makyaja gerek kalmadan simetrik, bakımlı kaşlar sağlar.",
 };
 
 export const benefits = {
@@ -75,10 +75,10 @@ export const pricing = {
     "Ankara'da mikroblading fiyatları uygulayıcının deneyimine ve kullanılan pigmente göre değişir. Stria Studio'da güncel fiyat aralıkları aşağıdadır; kesin fiyat ücretsiz ön görüşmede netleşir.",
   note: "Tüm paketlere yüz analizi, tasarım ve steril ekipman dahildir. Fiyatlar bilgilendirme amaçlıdır.",
   rows: [
-    { name: "Mikroblading (tek seans)", detail: "Kıl tekniği, tasarım dahil", price: "4.500 – 6.500 ₺" },
-    { name: "Mikroblading + Rötuş paketi", detail: "1. seans + 4–6 hafta rötuş", price: "6.000 – 8.500 ₺" },
-    { name: "Yıllık yenileme", detail: "Mevcut kaşın tazelenmesi", price: "2.500 – 4.000 ₺" },
-    { name: "Kaş pudralama (powder brows)", detail: "Yağlı ciltler için alternatif", price: "5.000 – 7.500 ₺" },
+    { name: "Mikroblading (tek seans)", detail: "Kıl tekniği, tasarım dahil", price: "4.500 – 6.500 ₺", min: 4500, max: 6500 },
+    { name: "Mikroblading + Rötuş paketi", detail: "1. seans + 4–6 hafta rötuş", price: "6.000 – 8.500 ₺", min: 6000, max: 8500 },
+    { name: "Yıllık yenileme", detail: "Mevcut kaşın tazelenmesi", price: "2.500 – 4.000 ₺", min: 2500, max: 4000 },
+    { name: "Kaş pudralama (powder brows)", detail: "Yağlı ciltler için alternatif", price: "5.000 – 7.500 ₺", min: 5000, max: 7500 },
   ],
 };
 

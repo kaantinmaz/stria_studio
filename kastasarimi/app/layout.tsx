@@ -5,7 +5,7 @@ import "./globals.css";
 import { site } from "@/lib/site";
 import { getSettings, SETTINGS_FALLBACK } from "@/lib/content";
 import { JsonLd } from "@/components/JsonLd";
-import { beautySalonSchema } from "@/lib/schema";
+import { beautySalonSchema, webSiteSchema } from "@/lib/schema";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { WhatsAppFab } from "@/components/WhatsAppFab";
@@ -65,6 +65,7 @@ export default async function RootLayout({
           <div dangerouslySetInnerHTML={{ __html: settings.header_code }} />
         )}
         <JsonLd data={beautySalonSchema(settings)} />
+        <JsonLd data={webSiteSchema()} />
         <Nav
           whatsapp={settings.whatsapp}
           campaignEnabled={settings.campaign_enabled}

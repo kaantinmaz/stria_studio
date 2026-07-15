@@ -22,7 +22,11 @@ export default async function AboutPage() {
       <Section as="h1" narrow eyebrow="Hakkımızda" heading={about.heading}>
         <div className="mt-6 space-y-4">
           {about.paragraphs.map((p, i) => (
-            <p key={i} className="text-[17px] leading-relaxed text-muted2">{p}</p>
+            <p key={i} className="text-[17px] leading-relaxed text-muted2">
+              {i === 0 ? (
+                <><a href="https://striastudio.com.tr" target="_blank" rel="noopener" className="hover:text-accent-dark">Stria Studio</a>{p.slice("Stria Studio".length)}</>
+              ) : p}
+            </p>
           ))}
         </div>
 

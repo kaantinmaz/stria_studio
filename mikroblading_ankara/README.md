@@ -1,6 +1,6 @@
 # Mikroblading Ankara — SEO Microsite
 
-TR-only, single-service SEO/AEO microsite for **mikrobladingankara.com** (microblading / kıl tekniği kaş, Ankara Çankaya). Part of the Stria Studio project: a standalone Next.js app that reads content from the **shared Laravel backend** (`../backend`), scoped by the `site` slug `mikroblading-ankara`.
+TR-only, single-service SEO/AEO microsite for **microbladingankara.com** (microblading / kıl tekniği kaş, Ankara Çankaya). Part of the Stria Studio project: a standalone Next.js app that reads content from the **shared Laravel backend** (`../backend`), scoped by the `site` slug `mikroblading-ankara`.
 
 ## Stack
 - Next.js 16 (App Router, Turbopack) · React 19 · Tailwind CSS 4 · TypeScript

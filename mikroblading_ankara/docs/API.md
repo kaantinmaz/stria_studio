@@ -1,7 +1,7 @@
 # Mikroblading Ankara — Microsite API
 
 Public, read-only content API served by the shared Stria Studio Laravel backend.
-All content is scoped by the `site` slug. Machine-readable spec: [`openapi.yaml`](../public/openapi.yaml) · rendered: [`/api-docs`](https://mikrobladingankara.com/api-docs).
+All content is scoped by the `site` slug. Machine-readable spec: [`openapi.yaml`](../public/openapi.yaml) · rendered: [`/api-docs`](https://microbladingankara.com/api-docs).
 
 **Base URL:** `{API_URL}/api/microsites/{site}` — e.g. `http://127.0.0.1:8002/api/microsites/mikroblading-ankara`
 Unknown `{site}` (not in `backend/config/microsites.php`) → `404`. All responses are JSON.

@@ -8,7 +8,7 @@ export const site = {
   slug: process.env.NEXT_PUBLIC_SITE ?? "mikroblading-ankara",
 
   // Public domain (canonical, sitemap, OpenGraph).
-  siteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? "https://mikrobladingankara.com",
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? "https://microbladingankara.com",
 
   brand: "Mikroblading Ankara",
   studio: "Stria Studio",
@@ -24,5 +24,8 @@ export const site = {
     "kalıcı kaş ankara",
     "çankaya mikroblading",
     "kaş tasarımı ankara",
+    "kaş kontürü ankara",
+    "kaş pudralama ankara",
+    "powder brows ankara",
   ],
 } as const;

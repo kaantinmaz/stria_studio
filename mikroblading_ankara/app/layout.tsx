@@ -4,7 +4,7 @@ import "./globals.css";
 import { site } from "@/lib/site";
 import { getSettings, SETTINGS_FALLBACK } from "@/lib/content";
 import { JsonLd } from "@/components/JsonLd";
-import { beautySalonSchema } from "@/lib/schema";
+import { beautySalonSchema, websiteSchema } from "@/lib/schema";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { WhatsAppFab } from "@/components/WhatsAppFab";
@@ -20,11 +20,11 @@ const jost = Jost({
 export const metadata: Metadata = {
   metadataBase: new URL(site.siteUrl),
   title: {
-    default: "Mikroblading Ankara | Kıl Tekniği Kaş Tasarımı · Stria Studio",
+    default: "Mikroblading Ankara | Kıl Tekniği Kaş · Stria Studio",
     template: "%s · Mikroblading Ankara",
   },
   description:
-    "Ankara Çankaya'da mikroblading (kıl tekniği kaş): doğal, kalıcı, yüze özel kaş tasarımı. Steril ekipman, uzman uygulama, 12–18 ay kalıcılık. WhatsApp'tan randevu.",
+    "Ankara Çankaya'da mikroblading (microblading / kıl tekniği kaş): doğal, kalıcı, yüze özel kaş tasarımı. Steril ekipman, 12–18 ay kalıcılık. WhatsApp'tan randevu.",
   keywords: [...site.keywords],
   alternates: { canonical: "/" },
   openGraph: {
@@ -56,6 +56,7 @@ export default async function RootLayout({
           <div dangerouslySetInnerHTML={{ __html: settings.header_code }} />
         )}
         <JsonLd data={beautySalonSchema(settings)} />
+        <JsonLd data={websiteSchema()} />
         <Nav
           whatsapp={settings.whatsapp}
           campaignEnabled={settings.campaign_enabled}

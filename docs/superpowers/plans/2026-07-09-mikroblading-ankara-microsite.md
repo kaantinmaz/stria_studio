@@ -2,7 +2,7 @@
 
 > **For agentic workers:** Use superpowers:executing-plans. Steps use `- [ ]` checkboxes.
 
-**Goal:** Ship `mikrobladingankara.com` — a TR-only, single-service SEO/AEO microsite fed by the shared Laravel backend, with blog, API docs, and full structured data.
+**Goal:** Ship `microbladingankara.com` — a TR-only, single-service SEO/AEO microsite fed by the shared Laravel backend, with blog, API docs, and full structured data.
 
 **Architecture:** Standalone Next.js 16 app in `mikroblading_ankara/` (SSG + ISR), reads site-scoped content from the shared Laravel backend. New `site` column scopes blog/FAQ/gallery/leads; existing main-site endpoints guarded to `site IS NULL`. API described by committed `openapi.yaml` → `/api-docs`.
 

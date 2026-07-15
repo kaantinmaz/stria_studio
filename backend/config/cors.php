@@ -13,7 +13,7 @@ return [
         'CORS_ALLOWED_ORIGINS',
         // Production default: every site that talks to this API.
         'https://striastudio.com.tr,https://www.striastudio.com.tr,'
-        .'https://mikrobladingankara.com,https://www.mikrobladingankara.com,'
+        .'https://microbladingankara.com,https://www.microbladingankara.com,'
         .'https://kastasarimiankara.com,https://www.kastasarimiankara.com'
     ))),
 

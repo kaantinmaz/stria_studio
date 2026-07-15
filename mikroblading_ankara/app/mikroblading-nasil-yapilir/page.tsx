@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getSettings, SETTINGS_FALLBACK } from "@/lib/content";
 import { process, whatIs, LAST_UPDATED } from "@/lib/copy";
 import { buildMetadata } from "@/lib/seo";
@@ -56,6 +57,10 @@ export default async function HowItWorksPage() {
 
       <Section>
         <ProcessSteps steps={steps} />
+        <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-[15px]">
+          <Link href="/mikroblading-oncesi-hazirlik" className="text-accent-dark hover:underline">Randevu öncesi hazırlık rehberi</Link>
+          <Link href="/mikroblading-sonrasi-bakim" className="text-accent-dark hover:underline">Sonrası bakım ve iyileşme (gün gün)</Link>
+        </div>
       </Section>
 
       <Section eyebrow="S.S.S." heading="İşlem ve iyileşme hakkında" narrow className="bg-blush/40">

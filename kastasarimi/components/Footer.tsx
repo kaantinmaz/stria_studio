@@ -27,6 +27,16 @@ export function Footer({ settings }: { settings: Settings }) {
               <PhoneIcon className="h-5 w-5" />
             </a>
           </div>
+          <p className="mt-3 text-xs text-muted">
+            Bir <a href="https://striastudio.com.tr" target="_blank" rel="noopener" className="hover:text-accent-dark">Stria Studio</a> markasıdır.
+          </p>
+          <div className="mt-8">
+            <p className="mb-3 text-[11px] uppercase tracking-[0.18em] text-muted">Stria Studio</p>
+            <ul className="space-y-2 text-sm text-muted2">
+              <li><a href="https://striastudio.com.tr" target="_blank" rel="noopener" className="hover:text-accent-dark">Stria Studio · Ankara Kalıcı Makyaj</a></li>
+              <li><a href="https://microbladingankara.com" target="_blank" rel="noopener" className="hover:text-accent-dark">Mikroblading Ankara</a></li>
+            </ul>
+          </div>
         </div>
 
         <div>
@@ -77,6 +87,9 @@ export function Footer({ settings }: { settings: Settings }) {
             <li><Link href="/seyrek-kaslar-kas-tasarimi" className="hover:text-accent-dark">Seyrek kaşlar</Link></li>
             <li><Link href="/cankaya-kas-tasarimi" className="hover:text-accent-dark">Çankaya</Link></li>
             <li><Link href="/kizilay-kas-tasarimi" className="hover:text-accent-dark">Kızılay</Link></li>
+            <li><Link href="/kecioren-kas-tasarimi" className="hover:text-accent-dark">Keçiören</Link></li>
+            <li><Link href="/yenimahalle-kas-tasarimi" className="hover:text-accent-dark">Yenimahalle</Link></li>
+            <li><Link href="/kas-tasarimi-kimlere-yapilmaz" className="hover:text-accent-dark">Kimlere yapılmaz?</Link></li>
           </ul>
         </div>
       </div>

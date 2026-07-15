@@ -8,6 +8,17 @@ import { CallLabel } from "@/components/CallLabel";
 import { useSettings } from "@/components/SettingsProvider";
 import { phoneHref, type ServiceFull, type ServiceListItem } from "@/lib/content";
 
+const SERVICE_GUIDES: Record<string, { href: string; label: string }> = {
+  microblading: {
+    href: "https://microbladingankara.com",
+    label: "Mikroblading Ankara",
+  },
+  "kas-tasarimi": {
+    href: "https://kastasarimiankara.com",
+    label: "Kaş Tasarımı Ankara",
+  },
+};
+
 // Client-rendered TR service page body (settings-driven contact links).
 export function ServicePage({
   svc,
@@ -18,6 +29,7 @@ export function ServicePage({
 }) {
   const settings = useSettings();
   const name = svc.name_tr;
+  const guide = SERVICE_GUIDES[svc.slug];
   // Work photos — owner fills svc.gallery; until then show 3 fillable placeholders.
   const shots = svc.gallery?.length ? svc.gallery : ["", "", ""];
   const related = svc.related
@@ -129,6 +141,23 @@ export function ServicePage({
 
       {/* FAQ */}
       <Faq title="Sıkça Sorulan Sorular" items={svc.faq_tr} />
+
+      {guide && (
+        <section className="mx-auto max-w-[820px] px-[clamp(18px,5vw,56px)] pb-[clamp(32px,5vw,64px)]">
+          <p className="text-center text-[14px] leading-[1.7] text-muted">
+            Bu hizmet hakkında soru-cevap, fiyat ve iyileşme rehberi için özel sitemiz:{" "}
+            <a
+              href={guide.href}
+              target="_blank"
+              rel="noopener"
+              className="font-medium text-ink underline decoration-line underline-offset-4 transition-colors hover:text-accent"
+            >
+              {guide.label}
+            </a>
+            .
+          </p>
+        </section>
+      )}
 
       {/* related */}
       {related.length > 0 && (

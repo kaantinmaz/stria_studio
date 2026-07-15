@@ -2,6 +2,20 @@ import { site } from "@/lib/site";
 import { absUrl } from "@/lib/seo";
 import { phoneHref, type Settings } from "@/lib/content";
 
+// WebSite — site-level entity for search/AI engines; publisher points at the
+// LocalBusiness node so the graph links up.
+export function webSiteSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": absUrl("/#website"),
+    name: site.brand,
+    url: site.siteUrl,
+    inLanguage: "tr-TR",
+    publisher: { "@id": absUrl("/#business") },
+  };
+}
+
 // LocalBusiness (BeautySalon) — microsite identity. @id is referenced by
 // per-page Service schema via `provider`. Same physical studio as the main brand.
 export function beautySalonSchema(s: Settings) {
@@ -37,8 +51,8 @@ export function beautySalonSchema(s: Settings) {
     sameAs: [
       s.instagram || site.instagram,
       site.gbpUrl,
-      "https://striastudio.com",
-      "https://mikrobladingankara.com",
+      "https://striastudio.com.tr",
+      "https://microbladingankara.com",
     ].filter(Boolean),
   };
 }

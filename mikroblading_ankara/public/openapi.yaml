@@ -3,12 +3,12 @@ info:
   title: Mikroblading Ankara — Microsite API
   version: "1.0.0"
   description: >
-    Public, read-only content API for the mikrobladingankara.com microsite,
+    Public, read-only content API for the microbladingankara.com microsite,
     served by the shared Stria Studio Laravel backend. All content is scoped by
     the `site` slug. Unknown site slugs return 404.
   contact:
     name: Stria Studio
-    url: https://mikrobladingankara.com/iletisim
+    url: https://microbladingankara.com/iletisim
 servers:
   - url: http://127.0.0.1:8002/api
     description: Local development (MAMP)

@@ -26,7 +26,7 @@
 | SSS hub | tüm "… mı/mi" soruları | `/sss` (hizmet SSS'leri + genel, FAQPage) | GAP |
 | GEO infra | — | dinamik `llms.txt` (blog+sss+fiyat rehberi), `/og`, AI-bot robots, geo meta | GAP |
 
-## mikrobladingankara.com (mikroblading_ankara/)
+## microbladingankara.com (mikroblading_ankara/)
 
 Covered: nedir, fiyat (sayfa+blog), nasıl yapılır (HowTo), pudralama karşılaştırma, bakım, kalıcılık, acı. Teknik temiz (12.07 denetimi).
 

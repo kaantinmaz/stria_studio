@@ -34,6 +34,10 @@ export async function GET(): Promise<Response> {
 - Fiyatlar seçilen hizmete, kişinin ihtiyacına ve uygulama planına göre değişir.
 - Kesin fiyat için ön görüşme ve kişiye özel değerlendirme gerekir.
 
+## Uzman rehber sitelerimiz
+- [Mikroblading Ankara](https://microbladingankara.com): mikroblading odaklı soru-cevap, fiyat ve iyileşme rehberi sitemiz.
+- [Kaş Tasarımı Ankara](https://kastasarimiankara.com): kişiye özel kaş tasarımı rehber sitemiz.
+
 ## İletişim
 - Konum: ${settings.address}, Türkiye
 - Telefon: ${settings.phone}

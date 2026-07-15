@@ -6,7 +6,7 @@
 
 ## 1. Goal
 
-Stand up `mikrobladingankara.com`: a **single-service, Turkish-only SEO microsite** for microblading / kaş tasarımı in Ankara. It must rank in both classic search (Google) and AI answer engines (ChatGPT, Perplexity, Google AI Overviews, Claude). It is the **first of many** per-service microsites; the backend design must scale to N sites without duplication.
+Stand up `microbladingankara.com`: a **single-service, Turkish-only SEO microsite** for microblading / kaş tasarımı in Ankara. It must rank in both classic search (Google) and AI answer engines (ChatGPT, Perplexity, Google AI Overviews, Claude). It is the **first of many** per-service microsites; the backend design must scale to N sites without duplication.
 
 Deliverables:
 1. Standalone Next.js app (SSG/ISR) with full page set.
@@ -18,7 +18,7 @@ Deliverables:
 ## 2. Architecture
 
 ```
-mikrobladingankara.com  (Next.js 16, App Router, Tailwind 4, TS)   <-- new app in mikroblading_ankara/
+microbladingankara.com  (Next.js 16, App Router, Tailwind 4, TS)   <-- new app in mikroblading_ankara/
         |  HTTP (build-time fetch + ISR revalidate)
         v
 shared Laravel backend (backend/)   <-- one CMS + admin for ALL microsites

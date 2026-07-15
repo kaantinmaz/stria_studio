@@ -27,6 +27,9 @@ export function Footer({ settings }: { settings: Settings }) {
               <PhoneIcon className="h-5 w-5" />
             </a>
           </div>
+          <p className="mt-3 text-xs text-muted">
+            Bir <a href="https://striastudio.com.tr" target="_blank" rel="noopener" className="hover:text-accent-dark">Stria Studio</a> markasıdır.
+          </p>
         </div>
 
         <div>
@@ -62,6 +65,12 @@ export function Footer({ settings }: { settings: Settings }) {
             <li><a href="/openapi.yaml" className="hover:text-accent-dark">openapi.yaml</a></li>
             <li><a href="/llms.txt" className="hover:text-accent-dark">llms.txt</a></li>
           </ul>
+
+          <p className="mb-3 mt-6 text-[11px] uppercase tracking-[0.16em] text-accent">Stria Studio</p>
+          <ul className="space-y-2 text-sm text-muted2">
+            <li><a href="https://striastudio.com.tr" target="_blank" rel="noopener" className="hover:text-accent-dark">Stria Studio · Ankara Kalıcı Makyaj</a></li>
+            <li><a href="https://kastasarimiankara.com" target="_blank" rel="noopener" className="hover:text-accent-dark">Kaş Tasarımı Ankara</a></li>
+          </ul>
         </div>
       </div>
 
@@ -75,6 +84,16 @@ export function Footer({ settings }: { settings: Settings }) {
             <li><Link href="/seyrek-kaslar-mikroblading" className="hover:text-accent-dark">Seyrek kaşlar</Link></li>
             <li><Link href="/cankaya-mikroblading" className="hover:text-accent-dark">Çankaya</Link></li>
             <li><Link href="/kizilay-mikroblading" className="hover:text-accent-dark">Kızılay</Link></li>
+            <li><Link href="/kecioren-mikroblading" className="hover:text-accent-dark">Keçiören</Link></li>
+            <li><Link href="/cayyolu-mikroblading" className="hover:text-accent-dark">Çayyolu & Ümitköy</Link></li>
+            <li><Link href="/kalici-kas-ankara" className="hover:text-accent-dark">Kalıcı kaş Ankara</Link></li>
+            <li><Link href="/kas-pudralama-ankara" className="hover:text-accent-dark">Kaş pudralama</Link></li>
+            <li><Link href="/kas-konturu-ankara" className="hover:text-accent-dark">Kaş kontürü</Link></li>
+            <li><Link href="/mikroblading-mi-kas-pudralama-mi" className="hover:text-accent-dark">Mikroblading mi pudralama mı?</Link></li>
+            <li><Link href="/mikroblading-sonrasi-bakim" className="hover:text-accent-dark">Sonrası bakım</Link></li>
+            <li><Link href="/mikroblading-oncesi-hazirlik" className="hover:text-accent-dark">Öncesi hazırlık</Link></li>
+            <li><Link href="/eski-kalici-kas-duzeltme" className="hover:text-accent-dark">Eski kaş düzeltme</Link></li>
+            <li><Link href="/mikroblading-zararli-mi" className="hover:text-accent-dark">Zararlı mı?</Link></li>
           </ul>
         </div>
       </div>

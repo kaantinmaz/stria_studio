@@ -6,6 +6,8 @@ import { Section } from "@/components/Section";
 import { CTABanner } from "@/components/CTA";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { CheckIcon } from "@/components/Icons";
+import { JsonLd } from "@/components/JsonLd";
+import { webPageSchema } from "@/lib/schema";
 
 export const metadata: Metadata = buildMetadata({
   title: "Hakkımızda — Ankara'da Güvenilir Mikroblading | Stria Studio",
@@ -18,12 +20,16 @@ export default async function AboutPage() {
   const s = (await getSettings()) ?? SETTINGS_FALLBACK;
   return (
     <>
+      <JsonLd data={webPageSchema({ type: "AboutPage", name: "Hakkımızda — Stria Studio", path: "/hakkimizda" })} />
       <Breadcrumbs items={[{ name: "Hakkımızda", path: "/hakkimizda" }]} />
       <Section as="h1" narrow eyebrow="Hakkımızda" heading={about.heading}>
         <div className="mt-6 space-y-4">
           {about.paragraphs.map((p, i) => (
             <p key={i} className="text-[17px] leading-relaxed text-muted2">{p}</p>
           ))}
+          <p className="text-[17px] leading-relaxed text-muted2">
+            Stüdyo yaklaşımımız ve kalıcı makyaj hizmetlerimiz hakkında daha fazla bilgi için <a href="https://striastudio.com.tr" target="_blank" rel="noopener" className="text-accent-dark hover:underline">Stria Studio</a> web sitesini ziyaret edebilirsiniz.
+          </p>
         </div>
 
         <h2 className="mt-12 text-[22px] text-ink">Neden bizi tercih etmelisiniz?</h2>
