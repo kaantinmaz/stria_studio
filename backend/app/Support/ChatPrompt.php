@@ -17,6 +17,7 @@ class ChatPrompt
             ? config('app.frontend_url')
             : config("microsites.$site.url");
         $serviceContext = $this->serviceContext($site);
+        $pageMap = $this->pageMap($site, $siteUrl);
         $today = now()->format('d.m.Y');
         $phone = $this->value($settings->phone);
         $whatsapp = $this->value($settings->whatsapp);
@@ -30,6 +31,9 @@ Sen {$brand} web sitesinin asistanısın.
 Hizmet bağlamı:
 {$serviceContext}
 
+Site sayfa haritası (link verirken bunları kullan):
+{$pageMap}
+
 İletişim bilgileri:
 - Telefon: {$phone}
 - WhatsApp linki: {$whatsapp}
@@ -42,6 +46,7 @@ SIKI KURALLAR:
 - Adres/telefon sorulursa YALNIZCA yukarıdaki kendi firma bilgilerini ver; başka firma/klinik önerme, isim verme.
 - Tıbbi teşhis/tedavi önerisi verme; sağlık durumu sorularında uzmana/hekime danışılmasını söyle (site yasal uyarısıyla uyumlu).
 - Kısa, samimi ve net Türkçe cevaplar (2-5 cümle). Emin olmadığında iletişim sayfasına yönlendir.
+- Kullanıcı ZATEN bu sitede geziniyor. Bir sayfaya yönlendirirken yukarıdaki sayfa haritasından İLGİLİ SAYFANIN TAM URL'sini ver; asla yalnızca ana sayfa linki verme. Örn. hizmetler sorulursa hizmetler sayfasının tam linkini ver.
 - Cevaplarını DÜZ METİN yaz: markdown başlığı, yıldızlı kalın/italik işareti veya madde imi KULLANMA. En fazla 1-2 emoji.
 
 Bugünün tarihi: {$today}
@@ -62,12 +67,12 @@ PROMPT;
     {
         if ($site === null) {
             $services = Service::active()
-                ->get(['name_tr', 'desc_tr', 'intro_tr'])
+                ->get(['slug', 'name_tr', 'desc_tr', 'intro_tr'])
                 ->map(function (Service $service): string {
                     $description = $this->shorten($service->desc_tr);
                     $introduction = $this->shorten($service->intro_tr);
 
-                    return "- {$service->name_tr}: {$description} Tanıtım: {$introduction}";
+                    return "- {$service->name_tr} ({$service->slug}): {$description} Tanıtım: {$introduction}";
                 });
 
             return $services->isEmpty()
@@ -91,6 +96,50 @@ PROMPT;
             : $posts->implode("\n");
 
         return "Hizmet özeti: {$summary}\nYayınlanmış site yazıları:\n{$postList}";
+    }
+    private function pageMap(?string $site, ?string $siteUrl): string
+    {
+        $base = rtrim((string) $siteUrl, '/');
+
+        if ($site === null) {
+            $lines = collect([
+                "- Tüm hizmetler: {$base}/hizmetler",
+                "- Galeri (öncesi/sonrası): {$base}/galeri",
+                "- Hakkımızda: {$base}/hakkimizda",
+                "- İletişim ve randevu: {$base}/iletisim",
+                "- Sık sorulan sorular: {$base}/sss",
+                "- Blog yazıları: {$base}/blog",
+                "- Ankara'da kalıcı makyaj rehberi: {$base}/ankara-kalici-makyaj-yapan-yerler",
+            ]);
+
+            $lines = $lines->merge(Service::active()->get(['slug', 'name_tr'])->map(
+                fn (Service $service): string => "- {$service->name_tr} detay sayfası: {$base}/hizmetler/{$service->slug}"
+            ));
+
+            return $lines->implode("\n");
+        }
+
+        $topic = $site === 'mikroblading-ankara'
+            ? [
+                "- Fiyat bilgisi sayfası: {$base}/mikroblading-fiyatlari",
+                "- Nasıl yapılır: {$base}/mikroblading-nasil-yapilir",
+                "- Öncesi hazırlık: {$base}/mikroblading-oncesi-hazirlik",
+                "- Sonrası bakım: {$base}/mikroblading-sonrasi-bakim",
+            ]
+            : [
+                "- Fiyat bilgisi sayfası: {$base}/kas-tasarimi-fiyatlari",
+                "- Nasıl yapılır: {$base}/kas-tasarimi-nasil-yapilir",
+                "- Bakım: {$base}/kas-tasarimi-bakimi",
+                "- Kaş tasarımı nedir: {$base}/kas-tasarimi-nedir",
+            ];
+
+        return collect($topic)->merge([
+            "- Galeri: {$base}/galeri",
+            "- Hakkımızda: {$base}/hakkimizda",
+            "- İletişim ve randevu: {$base}/iletisim",
+            "- Sık sorulan sorular: {$base}/sss",
+            "- Blog yazıları: {$base}/blog (tek yazı: {$base}/blog/<slug>)",
+        ])->implode("\n");
     }
 
     private function shorten(?string $text): string

@@ -3,6 +3,26 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { site } from "@/lib/site";
 
+
+const URL_RE = /(https?:\/\/[^\s<>()]+[^\s<>().,!?;:'"])/g;
+
+function Linkified({ text }: { text: string }) {
+  const parts = text.split(URL_RE);
+  return (
+    <>
+      {parts.map((part, i) =>
+        /^https?:\/\//.test(part) ? (
+          <a key={i} href={part} target="_blank" rel="noopener" className="underline underline-offset-2 break-all">
+            {part}
+          </a>
+        ) : (
+          part
+        )
+      )}
+    </>
+  );
+}
+
 const STORAGE_KEY = "stria-chat";
 const CHAT_ENDPOINT = `${site.apiUrl.replace(/\/$/, "")}/api/chat`;
 const WELCOME_MESSAGE =
@@ -196,7 +216,7 @@ export function ChatWidget({ whatsapp }: { whatsapp: string }) {
                     : "mr-auto border-line2 bg-blush text-ink"
                 }`}
               >
-                <p className="whitespace-pre-wrap break-words">{message.content}</p>
+                <p className="whitespace-pre-wrap break-words"><Linkified text={message.content} /></p>
                 {message.isFallback && (
                   <a
                     href={whatsapp}

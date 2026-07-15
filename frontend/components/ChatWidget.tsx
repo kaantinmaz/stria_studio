@@ -3,6 +3,26 @@
 import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import { site } from "@/lib/site";
 
+
+const URL_RE = /(https?:\/\/[^\s<>()]+[^\s<>().,!?;:'"])/g;
+
+function Linkified({ text }: { text: string }) {
+  const parts = text.split(URL_RE);
+  return (
+    <>
+      {parts.map((part, i) =>
+        /^https?:\/\//.test(part) ? (
+          <a key={i} href={part} target="_blank" rel="noopener" className="underline underline-offset-2 break-all">
+            {part}
+          </a>
+        ) : (
+          part
+        )
+      )}
+    </>
+  );
+}
+
 const STORAGE_KEY = "stria-chat";
 const WELCOME_MESSAGE =
   "Merhaba! Stria hakkında sorularınızı yanıtlayabilirim. Randevu ve fiyat için sizi WhatsApp'a yönlendirebilirim.";
@@ -203,7 +223,7 @@ export function ChatWidget({ whatsappUrl }: { whatsappUrl: string }) {
                       : "rounded-bl-md border border-line bg-white text-ink"
                   }`}
                 >
-                  {message.content}
+                  <Linkified text={message.content} />
                   {message.showWhatsAppLink && (
                     <a
                       href={whatsappUrl}

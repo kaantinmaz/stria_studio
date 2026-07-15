@@ -3,6 +3,26 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { site } from "@/lib/site";
 
+
+const URL_RE = /(https?:\/\/[^\s<>()]+[^\s<>().,!?;:'"])/g;
+
+function Linkified({ text }: { text: string }) {
+  const parts = text.split(URL_RE);
+  return (
+    <>
+      {parts.map((part, i) =>
+        /^https?:\/\//.test(part) ? (
+          <a key={i} href={part} target="_blank" rel="noopener" className="underline underline-offset-2 break-all">
+            {part}
+          </a>
+        ) : (
+          part
+        )
+      )}
+    </>
+  );
+}
+
 const STORAGE_KEY = "stria-chat";
 const GREETING =
   "Merhaba! Mikroblading Ankara hakkında sorularınızı yanıtlayabilirim. Randevu ve fiyat için sizi WhatsApp'a yönlendirebilirim.";
@@ -194,7 +214,7 @@ export function ChatWidget({ whatsapp }: { whatsapp: string }) {
                       : "rounded-bl-md border border-line bg-white text-ink"
                   }`}
                 >
-                  <p className="whitespace-pre-wrap">{message.content}</p>
+                  <p className="whitespace-pre-wrap"><Linkified text={message.content} /></p>
                   {message.kind === "error" && (
                     <a
                       href={whatsapp}
