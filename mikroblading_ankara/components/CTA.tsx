@@ -39,16 +39,25 @@ export function CTAButtons({
 }
 
 // Full-width dark CTA banner used near the bottom of pages.
-export function CTABanner({ settings }: { settings: Settings }) {
+export function CTABanner({
+  settings,
+  heading = "Ankara'da doğal kaşlar için ücretsiz ön görüşme",
+  description =
+    "Uygunluğunuzu değerlendirelim, kaş tasarımınızı birlikte planlayalım. Randevu ücretsizdir.",
+}: {
+  settings: Settings;
+  heading?: string;
+  description?: string;
+}) {
   return (
     <section className="py-4">
       <div className="mx-auto max-w-[1180px] px-5">
         <div className="rounded-[28px] bg-ink px-6 py-12 text-center sm:px-12">
           <h2 className="mx-auto max-w-[560px] text-[clamp(22px,3vw,32px)] leading-tight text-cream">
-            Ankara'da doğal kaşlar için ücretsiz ön görüşme
+            {heading}
           </h2>
           <p className="mx-auto mt-3 max-w-[520px] text-[15px] text-cream/70">
-            Uygunluğunuzu değerlendirelim, kaş tasarımınızı birlikte planlayalım. Randevu ücretsizdir.
+            {description}
           </p>
           <div className="mt-7 flex justify-center">
             <CTAButtons settings={settings} variant="dark" />

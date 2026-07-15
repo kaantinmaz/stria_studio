@@ -80,6 +80,7 @@ export function Footer({ settings }: { settings: Settings }) {
           <ul className="flex flex-wrap gap-x-5 gap-y-2 text-[13px] text-muted2">
             <li><Link href="/mikroblading-nasil-yapilir" className="hover:text-accent-dark">Mikroblading nasıl yapılır?</Link></li>
             <li><Link href="/mikroblading-fiyatlari" className="hover:text-accent-dark">Mikroblading fiyatları</Link></li>
+            <li><Link href="/ankarada-mikroblading-yapan-yerler" className="hover:text-accent-dark">Ankara'da yapan yerler</Link></li>
             <li><Link href="/erkek-mikroblading-ankara" className="hover:text-accent-dark">Erkek mikroblading</Link></li>
             <li><Link href="/seyrek-kaslar-mikroblading" className="hover:text-accent-dark">Seyrek kaşlar</Link></li>
             <li><Link href="/cankaya-mikroblading" className="hover:text-accent-dark">Çankaya</Link></li>

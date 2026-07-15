@@ -45,6 +45,7 @@ export function beautySalonSchema(s: Settings) {
 export function serviceSchema(
   svc: { slug: string; intro_tr: string | null; desc_tr: string },
   name: string,
+  path = `/hizmetler/${svc.slug}`,
 ) {
   return {
     "@context": "https://schema.org",
@@ -52,7 +53,7 @@ export function serviceSchema(
     name,
     serviceType: name,
     description: svc.intro_tr || svc.desc_tr,
-    url: absUrl(`/hizmetler/${svc.slug}`),
+    url: absUrl(path),
     provider: { "@id": absUrl("/#business") },
     areaServed: { "@type": "City", name: "Ankara" },
   };

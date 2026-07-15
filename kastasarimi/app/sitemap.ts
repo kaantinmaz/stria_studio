@@ -12,6 +12,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: absUrl("/"), lastModified: now, changeFrequency: "weekly", priority: 1 },
     { url: absUrl("/kas-tasarimi-fiyatlari"), lastModified: now, changeFrequency: "monthly", priority: 0.9 },
     { url: absUrl("/kas-tasarimi-nasil-yapilir"), lastModified: now, changeFrequency: "monthly", priority: 0.9 },
+    { url: absUrl("/ankarada-kas-tasarimi-yapan-yerler"), lastModified: now, changeFrequency: "monthly", priority: 0.9 },
     { url: absUrl("/kas-tasarimi-nedir"), lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: absUrl("/kas-tasarimi-kalici-mi"), lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: absUrl("/kas-tasarimi-iyilesme-sureci"), lastModified: now, changeFrequency: "monthly", priority: 0.8 },

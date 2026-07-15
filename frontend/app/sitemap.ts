@@ -24,6 +24,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly",
       priority: 0.9,
     },
+    {
+      url: absUrl("/ankara-kalici-makyaj-yapan-yerler"),
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
     { url: absUrl("/galeri"), lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: absUrl("/hakkimizda"), lastModified: now, changeFrequency: "yearly", priority: 0.6 },
     { url: absUrl("/iletisim"), lastModified: now, changeFrequency: "yearly", priority: 0.6 },

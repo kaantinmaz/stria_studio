@@ -25,6 +25,7 @@ export async function GET(): Promise<Response> {
 - [Kirpik Lifting Ankara](${u("/hizmetler/kirpik-lifting")}): Lash lift; kendi kirpiklerini kıvırır, yaklaşık 6–8 hafta kalıcı.
 
 ## Önemli sayfalar
+- [Ankara'da Kalıcı Makyaj Yapan Yerler](${u("/ankara-kalici-makyaj-yapan-yerler")}): Güvenilir stüdyo seçimi için uzmanlık, hijyen, portfolyo, semt, fiyat ve rötuş kriterleri.
 - [Sıkça Sorulan Sorular](${u("/sss")}): Tüm hizmetler ve stüdyo hakkında sık sorulan sorular.
 - [Blog](${u("/blog")}): Kalıcı makyaj, kaş ve kirpik rehberleri.
 - [Galeri](${u("/galeri")}): Stria Studio çalışma örnekleri.

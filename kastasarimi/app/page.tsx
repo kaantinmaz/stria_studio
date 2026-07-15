@@ -144,6 +144,7 @@ export default async function HomePage() {
             <li><Link href="/kas-tasarimi-bakimi" className="hover:underline">Bakım</Link></li>
             <li><Link href="/erkek-kas-tasarimi-ankara" className="hover:underline">Erkek kaş tasarımı</Link></li>
             <li><Link href="/seyrek-kaslar-kas-tasarimi" className="hover:underline">Seyrek kaşlar</Link></li>
+            <li><Link href="/ankarada-kas-tasarimi-yapan-yerler" className="hover:underline">Ankara'da yapan yerler</Link></li>
             <li><Link href="/cankaya-kas-tasarimi" className="hover:underline">Çankaya</Link></li>
             <li><Link href="/kizilay-kas-tasarimi" className="hover:underline">Kızılay</Link></li>
           </ul>

@@ -30,6 +30,7 @@ Not: ${pricing.note}
 ## Önemli sayfalar
 - [Anasayfa](${u("/")}): Mikroblading Ankara genel bilgi
 - [Mikroblading nedir & nasıl yapılır](${u("/mikroblading-nasil-yapilir")}): adım adım işlem ve iyileşme
+- [Ankara'da microblading yapan yerler](${u("/ankarada-mikroblading-yapan-yerler")}): stüdyo seçimi, 7 değerlendirme kriteri, kırmızı bayraklar ve semtler
 - [Fiyatlar](${u("/mikroblading-fiyatlari")}): güncel fiyat listesi
 - [Kalıcı kaş Ankara](${u("/kalici-kas-ankara")}): kalıcı kaş teknikleri, fiyatlar ve doğru teknik seçimi
 - [Kaş pudralama Ankara](${u("/kas-pudralama-ankara")}): powder brows, yağlı ciltler için alternatif, 1–3 yıl kalıcılık

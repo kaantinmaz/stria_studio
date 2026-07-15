@@ -131,6 +131,7 @@ export default async function HomePage() {
           <ul className="flex flex-wrap gap-x-5 gap-y-2 text-[14px] text-accent-dark">
             <li><Link href="/erkek-mikroblading-ankara" className="hover:underline">Erkek mikroblading</Link></li>
             <li><Link href="/seyrek-kaslar-mikroblading" className="hover:underline">Seyrek kaşlar</Link></li>
+            <li><Link href="/ankarada-mikroblading-yapan-yerler" className="hover:underline">Ankara'da microblading yapan yerler</Link></li>
             <li><Link href="/cankaya-mikroblading" className="hover:underline">Çankaya mikroblading</Link></li>
             <li><Link href="/kizilay-mikroblading" className="hover:underline">Kızılay ulaşım rehberi</Link></li>
             <li><Link href="/kalici-kas-ankara" className="hover:underline">Kalıcı kaş Ankara</Link></li>

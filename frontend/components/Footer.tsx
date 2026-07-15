@@ -23,6 +23,10 @@ export function Footer() {
     { href: "/iletisim", label: t.navContact },
     { href: "/blog", label: t.navBlog },
     { href: "/sss", label: t.navFaq },
+    {
+      href: "/ankara-kalici-makyaj-yapan-yerler",
+      label: lang === "tr" ? "Stüdyo Seçim Rehberi" : "Studio Selection Guide",
+    },
   ];
 
   return (

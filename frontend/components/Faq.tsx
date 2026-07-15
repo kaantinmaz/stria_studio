@@ -2,14 +2,21 @@
 // by the page via <JsonLd data={faqSchema(items)} />.
 export function Faq({
   title,
+  intro,
   items,
 }: {
   title: string;
+  intro?: string;
   items: { q: string; a: string }[];
 }) {
   return (
     <section className="mx-auto max-w-[820px] px-[clamp(18px,5vw,56px)] py-[clamp(32px,5vw,64px)]">
       <h2 className="mb-6 text-center text-[clamp(24px,3vw,38px)]">{title}</h2>
+      {intro && (
+        <p className="mx-auto mb-8 max-w-[720px] text-[15px] leading-[1.7] text-muted">
+          {intro}
+        </p>
+      )}
       <div className="flex flex-col gap-3">
         {items.map((f) => (
           <details

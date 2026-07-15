@@ -85,6 +85,7 @@ export function Footer({ settings }: { settings: Settings }) {
             <li><Link href="/kas-tasarimi-bakimi" className="hover:text-accent-dark">Bakım</Link></li>
             <li><Link href="/erkek-kas-tasarimi-ankara" className="hover:text-accent-dark">Erkek kaş tasarımı</Link></li>
             <li><Link href="/seyrek-kaslar-kas-tasarimi" className="hover:text-accent-dark">Seyrek kaşlar</Link></li>
+            <li><Link href="/ankarada-kas-tasarimi-yapan-yerler" className="hover:text-accent-dark">Ankara'da yapan yerler</Link></li>
             <li><Link href="/cankaya-kas-tasarimi" className="hover:text-accent-dark">Çankaya</Link></li>
             <li><Link href="/kizilay-kas-tasarimi" className="hover:text-accent-dark">Kızılay</Link></li>
             <li><Link href="/kecioren-kas-tasarimi" className="hover:text-accent-dark">Keçiören</Link></li>

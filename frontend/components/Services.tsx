@@ -67,6 +67,16 @@ export function Services() {
           );
         })}
       </div>
+      <div className="mx-auto mt-8 max-w-[1160px] text-center">
+        <Link
+          href="/ankara-kalici-makyaj-yapan-yerler"
+          className="text-[14px] font-medium text-ink underline decoration-line underline-offset-4 transition-colors hover:text-accent"
+        >
+          {lang === "tr"
+            ? "Ankara’da güvenilir kalıcı makyaj stüdyosu nasıl seçilir?"
+            : "How to choose a permanent makeup studio in Ankara"}
+        </Link>
+      </div>
     </section>
   );
 }

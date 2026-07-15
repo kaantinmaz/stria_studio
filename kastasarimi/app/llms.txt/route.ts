@@ -31,6 +31,7 @@ Makine tarafından okunabilir fiyat dosyası: ${u("/pricing.md")}
 ## Önemli sayfalar
 - [Anasayfa](${u("/")}): Kaş Tasarımı Ankara genel bilgi
 - [Kaş tasarımı nedir & nasıl yapılır](${u("/kas-tasarimi-nasil-yapilir")}): adım adım süreç
+- [Ankara'da kaş tasarımı yapan yerler](${u("/ankarada-kas-tasarimi-yapan-yerler")}): salon seçimi, semtler ve güven ölçütleri
 - [Fiyatlar](${u("/kas-tasarimi-fiyatlari")}): güncel fiyat listesi
 - [Galeri](${u("/galeri")}): öncesi & sonrası
 - [Blog](${u("/blog")}): kaş tasarımı rehberleri
