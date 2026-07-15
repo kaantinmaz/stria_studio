@@ -406,13 +406,14 @@ export function ChatWidget({ whatsapp }: { whatsapp: string }) {
                 }}
                 rows={1}
                 maxLength={1000}
-                disabled={isLoading}
+                readOnly={isLoading}
                 placeholder="Mesajınızı yazın…"
                 className="max-h-24 min-h-11 flex-1 resize-y rounded-[2px] border border-line2 bg-cream px-3 py-2.5 text-base leading-5 text-ink outline-none placeholder:text-muted transition focus:border-accent disabled:cursor-not-allowed disabled:opacity-60"
               />
               <button
                 type="button"
                 onClick={() => void sendMessage()}
+                onMouseDown={(event) => event.preventDefault()}
                 disabled={isLoading || !input.trim()}
                 aria-label="Mesajı gönder"
                 className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[2px] border border-accent bg-accent text-cream transition hover:bg-accent-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:border-line2 disabled:bg-blush disabled:text-muted"

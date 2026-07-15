@@ -401,13 +401,14 @@ export function ChatWidget({ whatsappUrl }: { whatsappUrl: string }) {
                 onKeyDown={onInputKeyDown}
                 maxLength={1000}
                 rows={1}
-                disabled={isSending}
+                readOnly={isSending}
                 placeholder="Mesajınızı yazın..."
                 className="max-h-24 min-h-10 flex-1 resize-none bg-transparent py-2 text-base sm:text-[13px] leading-5 text-ink outline-none placeholder:text-muted/70 disabled:opacity-60"
               />
               <button
                 type="submit"
                 aria-label="Mesajı gönder"
+                onMouseDown={(event) => event.preventDefault()}
                 disabled={isSending || !input.trim()}
                 className="flex h-10 w-10 flex-none cursor-pointer items-center justify-center rounded-full bg-rose text-white transition-colors hover:bg-accent-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-45"
               >

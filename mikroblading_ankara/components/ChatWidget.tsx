@@ -386,7 +386,7 @@ export function ChatWidget({ whatsapp }: { whatsapp: string }) {
                 }}
                 maxLength={1000}
                 rows={1}
-                disabled={loading}
+                readOnly={loading}
                 placeholder="Sorunuzu yazın…"
                 className="max-h-24 min-h-10 flex-1 resize-none bg-transparent px-2 py-2 text-base sm:text-sm leading-6 text-ink outline-none placeholder:text-muted disabled:opacity-60"
               />
@@ -394,6 +394,7 @@ export function ChatWidget({ whatsapp }: { whatsapp: string }) {
                 type="button"
                 aria-label="Mesajı gönder"
                 onClick={() => void sendMessage()}
+                onMouseDown={(event) => event.preventDefault()}
                 disabled={loading || !input.trim()}
                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-ink text-cream transition hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-dark"
               >
