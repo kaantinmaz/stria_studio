@@ -11,6 +11,7 @@ import { WhatsAppFab } from "@/components/WhatsAppFab";
 import { Analytics } from "@/components/Analytics";
 import { Popup } from "@/components/Popup";
 import { CookieConsent } from "@/components/CookieConsent";
+import { ChatWidget } from "@/components/ChatWidget";
 
 const jost = Jost({
   subsets: ["latin"],
@@ -68,6 +69,7 @@ export default async function RootLayout({
         <main>{children}</main>
         <Footer settings={settings} />
         <CookieConsent />
+        <ChatWidget whatsapp={settings.whatsapp} />
         <WhatsAppFab whatsapp={settings.whatsapp} />
         <Analytics />
         {settings.footer_code && (

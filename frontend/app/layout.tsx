@@ -5,6 +5,7 @@ import { LanguageProvider } from "@/components/LanguageProvider";
 import { ServicesProvider } from "@/components/ServicesProvider";
 import { SettingsProvider } from "@/components/SettingsProvider";
 import { WhatsAppFab } from "@/components/WhatsAppFab";
+import { ChatWidget } from "@/components/ChatWidget";
 import { Analytics } from "@/components/Analytics";
 import { Popup } from "@/components/Popup";
 import { CookieConsent } from "@/components/CookieConsent";
@@ -62,6 +63,7 @@ export default async function RootLayout({
             <ServicesProvider services={services}>{children}</ServicesProvider>
             <Popup settings={settings ?? SETTINGS_FALLBACK} />
             <CookieConsent />
+            <ChatWidget whatsappUrl={(settings ?? SETTINGS_FALLBACK).whatsapp} />
             <WhatsAppFab />
             <Analytics />
           </SettingsProvider>

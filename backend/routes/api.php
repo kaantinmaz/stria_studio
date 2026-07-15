@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminPostController;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\GalleryController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\TrackController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/contact', [ContactController::class, 'store']);
+Route::post('/chat', [ChatController::class, 'store'])->middleware('throttle:20,1');
 
 Route::get('/posts', [BlogController::class, 'index']);
 Route::get('/posts/{slug}', [BlogController::class, 'show']);

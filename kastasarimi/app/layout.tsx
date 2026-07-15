@@ -9,6 +9,7 @@ import { beautySalonSchema, webSiteSchema } from "@/lib/schema";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { WhatsAppFab } from "@/components/WhatsAppFab";
+import { ChatWidget } from "@/components/ChatWidget";
 import { Analytics } from "@/components/Analytics";
 import { Popup } from "@/components/Popup";
 import { CookieConsent } from "@/components/CookieConsent";
@@ -77,6 +78,7 @@ export default async function RootLayout({
         <Footer settings={settings} />
         <CookieConsent />
         <WhatsAppFab whatsapp={settings.whatsapp} />
+        <ChatWidget whatsapp={settings.whatsapp} />
         <Popup settings={settings} />
         <Analytics />
         {/* Third-party visitor analytics (site-wide) */}
