@@ -23,6 +23,8 @@ export function Footer() {
     { href: "/iletisim", label: t.navContact },
     { href: "/blog", label: t.navBlog },
     { href: "/sss", label: t.navFaq },
+    { href: "/kvkk", label: "KVKK Aydınlatma Metni" },
+    { href: "/cerez-politikasi", label: "Çerez Politikası" },
     {
       href: "/ankara-kalici-makyaj-yapan-yerler",
       label: lang === "tr" ? "Stüdyo Seçim Rehberi" : "Studio Selection Guide",
@@ -138,6 +140,14 @@ export function Footer() {
         <span>© 2026 Stria Studio · {t.footerRights}</span>
         <span>Çankaya, Ankara</span>
       </div>
+      <p className="mx-auto mt-5 max-w-[1160px] text-[10.5px] leading-[1.65] text-[#9a857e]">
+        Bu web sitesindeki tüm içerikler yalnızca bilgilendirme amaçlıdır; tıbbi
+        öneri niteliği taşımaz, teşhis ve tedavi amacıyla kullanılamaz. Bu site
+        sağlık hizmeti vermemektedir. Uzmana danışılmadan yapılan uygulamalardan
+        doğabilecek sonuçlardan Stria Studio sorumlu tutulamaz. Çerezleri veri
+        politikamızdaki amaçlarla sınırlı ve mevzuata uygun şekilde kullanıyoruz.
+        Bu siteyi ziyaret eden kişi bu uyarıları okumuş ve kabul etmiş sayılır.
+      </p>
     </footer>
   );
 }

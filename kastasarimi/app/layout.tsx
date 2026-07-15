@@ -11,6 +11,7 @@ import { Footer } from "@/components/Footer";
 import { WhatsAppFab } from "@/components/WhatsAppFab";
 import { Analytics } from "@/components/Analytics";
 import { Popup } from "@/components/Popup";
+import { CookieConsent } from "@/components/CookieConsent";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -74,6 +75,7 @@ export default async function RootLayout({
         />
         <main>{children}</main>
         <Footer settings={settings} />
+        <CookieConsent />
         <WhatsAppFab whatsapp={settings.whatsapp} />
         <Popup settings={settings} />
         <Analytics />

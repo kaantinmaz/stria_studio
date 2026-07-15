@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Services\Tables;
 
+use App\Models\Visit;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -11,6 +12,9 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Database\Query\Expression;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class ServicesTable
@@ -18,6 +22,7 @@ class ServicesTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn (Builder $query): Builder => self::withVisitCounts($query))
             ->columns([
                 // Cover first. Resolve to an absolute URL so both uploaded
                 // (storage/…) and seeded root-relative (/images/…) covers render.
@@ -39,6 +44,14 @@ class ServicesTable
                 IconColumn::make('is_active')
                     ->label('Aktif')
                     ->boolean(),
+                TextColumn::make('readers_count')
+                    ->label('Okuyan (tekil)')
+                    ->numeric()
+                    ->sortable(),
+                TextColumn::make('views_count')
+                    ->label('Görüntülenme')
+                    ->numeric()
+                    ->sortable(),
                 TextColumn::make('sort_order')
                     ->label('Sıra')
                     ->sortable(),
@@ -63,6 +76,30 @@ class ServicesTable
                     DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function withVisitCounts(Builder $query): Builder
+    {
+        $path = self::servicePathExpression();
+
+        return $query->addSelect([
+            'views_count' => Visit::query()
+                ->selectRaw('COUNT(*)')
+                ->whereColumn('visits.path', '=', $path)
+                ->whereNull('visits.site'),
+            'readers_count' => Visit::query()
+                ->selectRaw('COUNT(DISTINCT visits.visitor_id)')
+                ->whereColumn('visits.path', '=', $path)
+                ->whereNull('visits.site'),
+        ]);
+    }
+
+    private static function servicePathExpression(): Expression
+    {
+        return DB::raw(match (DB::connection()->getDriverName()) {
+            'mysql', 'mariadb' => "CONCAT('/hizmetler/', services.slug)",
+            default => "'/hizmetler/' || services.slug",
+        });
     }
 
     private static function imageUrl(?string $img): ?string

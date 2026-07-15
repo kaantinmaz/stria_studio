@@ -49,6 +49,11 @@ export function Footer({ settings }: { settings: Settings }) {
             <li><Link href="/sss" className="hover:text-accent-dark">Sıkça Sorulan Sorular</Link></li>
             <li><Link href="/hakkimizda" className="hover:text-accent-dark">Hakkımızda</Link></li>
           </ul>
+          <p className="mb-3 mt-8 text-[11px] uppercase tracking-[0.18em] text-muted">Yasal</p>
+          <ul className="space-y-2 text-sm text-muted2">
+            <li><Link href="/kvkk" className="hover:text-accent-dark">KVKK Aydınlatma Metni</Link></li>
+            <li><Link href="/cerez-politikasi" className="hover:text-accent-dark">Çerez Politikası</Link></li>
+          </ul>
         </div>
 
         <div>
@@ -95,8 +100,17 @@ export function Footer({ settings }: { settings: Settings }) {
         </div>
       </div>
 
-      <div className="border-t border-line px-5 py-5 text-center text-xs text-muted">
-        © {year} {site.studio} · Kaş Tasarımı Ankara · Tüm hakları saklıdır.
+      <div className="border-t border-line px-5 py-5 text-center text-xs leading-relaxed text-muted">
+        <p className="mx-auto max-w-[980px]">
+          Bu web sitesindeki tüm içerikler yalnızca bilgilendirme amaçlıdır; tıbbi öneri niteliği taşımaz,
+          teşhis ve tedavi amacıyla kullanılamaz. Bu site sağlık hizmeti vermemektedir. Uzmana danışılmadan
+          yapılan uygulamalardan doğabilecek sonuçlardan Stria Studio sorumlu tutulamaz. Çerezleri veri
+          politikamızdaki amaçlarla sınırlı ve mevzuata uygun şekilde kullanıyoruz. Bu siteyi ziyaret eden
+          kişi bu uyarıları okumuş ve kabul etmiş sayılır.
+        </p>
+        <p className="mt-4">
+          © {year} {site.studio} · Kaş Tasarımı Ankara · Tüm hakları saklıdır.
+        </p>
       </div>
     </footer>
   );

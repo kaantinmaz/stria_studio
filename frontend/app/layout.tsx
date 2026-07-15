@@ -7,6 +7,7 @@ import { SettingsProvider } from "@/components/SettingsProvider";
 import { WhatsAppFab } from "@/components/WhatsAppFab";
 import { Analytics } from "@/components/Analytics";
 import { Popup } from "@/components/Popup";
+import { CookieConsent } from "@/components/CookieConsent";
 import { JsonLd } from "@/components/JsonLd";
 import { beautySalonSchema } from "@/components/schema";
 import { site } from "@/lib/site";
@@ -60,6 +61,7 @@ export default async function RootLayout({
           <SettingsProvider settings={settings}>
             <ServicesProvider services={services}>{children}</ServicesProvider>
             <Popup settings={settings ?? SETTINGS_FALLBACK} />
+            <CookieConsent />
             <WhatsAppFab />
             <Analytics />
           </SettingsProvider>
