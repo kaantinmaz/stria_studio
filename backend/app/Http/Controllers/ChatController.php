@@ -78,8 +78,19 @@ class ChatController extends Controller
         }
 
         return response()->json([
-            'data' => ['reply' => trim($reply)],
+            'data' => ['reply' => $this->stripMarkdown(trim($reply))],
         ]);
+    }
+
+    // The prompt forbids markdown, but the model occasionally slips bold/headings
+    // into long answers; the widgets render plain text, so strip deterministically.
+    private function stripMarkdown(string $text): string
+    {
+        $text = preg_replace('/\*\*(.+?)\*\*/s', '$1', $text);
+        $text = preg_replace('/(?<!\w)\*(?!\s)(.+?)(?<!\s)\*(?!\w)/s', '$1', $text);
+        $text = preg_replace('/^#{1,6}\s+/m', '', $text);
+
+        return $text;
     }
 
     private function unavailable(): JsonResponse
