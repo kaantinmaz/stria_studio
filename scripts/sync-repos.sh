@@ -36,7 +36,7 @@ sync() {
   local sha
   sha=$(git subtree split --prefix="$prefix")   # progress on stderr, sha on stdout
   echo "→ pushing ${prefix}/ ($sha) to '${remote}' main …"
-  git push $push_flags "$remote" "${sha}:main"
+  git push $push_flags "$remote" "${sha}:refs/heads/main"
   echo "✓ ${remote} updated."
 }
 
