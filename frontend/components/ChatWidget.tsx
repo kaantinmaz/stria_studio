@@ -23,6 +23,7 @@ function Linkified({ text }: { text: string }) {
   );
 }
 
+const OPEN_KEY = "stria-chat-open";
 const STORAGE_KEY = "stria-chat";
 const WELCOME_MESSAGE =
   "Merhaba! Stria hakkında sorularınızı yanıtlayabilirim. Randevu ve fiyat için sizi WhatsApp'a yönlendirebilirim.";
@@ -117,6 +118,25 @@ export function ChatWidget({ whatsappUrl }: { whatsappUrl: string }) {
   const [expanded, setExpanded] = useState(false);
   const [vvHeight, setVvHeight] = useState<number | null>(null);
   const [vvTop, setVvTop] = useState(0);
+
+  // Keep the panel open across page navigations (session-scoped).
+  useEffect(() => {
+    try {
+      if (sessionStorage.getItem(OPEN_KEY) === "1") setIsOpen(true);
+    } catch {
+      // storage unavailable
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      if (isOpen) sessionStorage.setItem(OPEN_KEY, "1");
+      else sessionStorage.removeItem(OPEN_KEY);
+    } catch {
+      // storage unavailable
+    }
+  }, [isOpen]);
+
   const [messages, setMessages] = useState<ChatMessage[]>(loadStoredMessages);
   const [input, setInput] = useState("");
   const [isSending, setIsSending] = useState(false);

@@ -23,6 +23,7 @@ function Linkified({ text }: { text: string }) {
   );
 }
 
+const OPEN_KEY = "stria-chat-open";
 const STORAGE_KEY = "stria-chat";
 const CHAT_ENDPOINT = `${site.apiUrl.replace(/\/$/, "")}/api/chat`;
 const WELCOME_MESSAGE =
@@ -108,6 +109,25 @@ export function ChatWidget({ whatsapp }: { whatsapp: string }) {
   const [expanded, setExpanded] = useState(false);
   const [vvHeight, setVvHeight] = useState<number | null>(null);
   const [vvTop, setVvTop] = useState(0);
+
+  // Keep the panel open across page navigations (session-scoped).
+  useEffect(() => {
+    try {
+      if (sessionStorage.getItem(OPEN_KEY) === "1") setIsOpen(true);
+    } catch {
+      // storage unavailable
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      if (isOpen) sessionStorage.setItem(OPEN_KEY, "1");
+      else sessionStorage.removeItem(OPEN_KEY);
+    } catch {
+      // storage unavailable
+    }
+  }, [isOpen]);
+
   const [messages, setMessages] = useState<ChatMessage[]>(INITIAL_MESSAGES);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
