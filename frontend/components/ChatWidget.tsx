@@ -116,6 +116,7 @@ export function ChatWidget({ whatsappUrl }: { whatsappUrl: string }) {
   const [isOpen, setIsOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [vvHeight, setVvHeight] = useState<number | null>(null);
+  const [vvTop, setVvTop] = useState(0);
   const [messages, setMessages] = useState<ChatMessage[]>(loadStoredMessages);
   const [input, setInput] = useState("");
   const [isSending, setIsSending] = useState(false);
@@ -147,17 +148,27 @@ export function ChatWidget({ whatsappUrl }: { whatsappUrl: string }) {
   useEffect(() => {
     if (!expanded) {
       setVvHeight(null);
+      setVvTop(0);
       return;
     }
+    // Lock the page behind the fullscreen panel so the browser can't scroll it
+    // when the keyboard opens; track the visual viewport (height + offset) so the
+    // panel always covers exactly the visible area — header stays on screen.
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     const vv = window.visualViewport;
-    if (!vv) return;
-    const update = () => setVvHeight(Math.round(vv.height));
+    const update = () => {
+      if (!vv) return;
+      setVvHeight(Math.round(vv.height));
+      setVvTop(Math.round(vv.offsetTop));
+    };
     update();
-    vv.addEventListener("resize", update);
-    vv.addEventListener("scroll", update);
+    vv?.addEventListener("resize", update);
+    vv?.addEventListener("scroll", update);
     return () => {
-      vv.removeEventListener("resize", update);
-      vv.removeEventListener("scroll", update);
+      document.body.style.overflow = prevOverflow;
+      vv?.removeEventListener("resize", update);
+      vv?.removeEventListener("scroll", update);
     };
   }, [expanded]);
 
@@ -272,7 +283,7 @@ export function ChatWidget({ whatsappUrl }: { whatsappUrl: string }) {
               ? "fixed inset-x-0 top-0 z-[60] w-full"
               : "absolute bottom-[72px] right-0 max-h-[70vh] w-[min(360px,calc(100vw-32px))] rounded-[28px]"
           } sm:absolute sm:inset-auto sm:bottom-[72px] sm:right-0 sm:z-auto sm:h-auto sm:max-h-[70vh] sm:w-[min(360px,calc(100vw-32px))] sm:rounded-[28px]`}
-          style={expanded ? { height: vvHeight ? `${vvHeight}px` : "100dvh" } : undefined}
+          style={expanded ? { height: vvHeight ? `${vvHeight}px` : "100dvh", transform: `translateY(${vvTop}px)` } : undefined}
         >
           <header className="flex items-center justify-between border-b border-line bg-white/70 px-5 py-4">
             <div>

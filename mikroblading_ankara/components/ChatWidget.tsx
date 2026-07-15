@@ -94,6 +94,7 @@ export function ChatWidget({ whatsapp }: { whatsapp: string }) {
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [vvHeight, setVvHeight] = useState<number | null>(null);
+  const [vvTop, setVvTop] = useState(0);
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -120,17 +121,27 @@ export function ChatWidget({ whatsapp }: { whatsapp: string }) {
   useEffect(() => {
     if (!expanded) {
       setVvHeight(null);
+      setVvTop(0);
       return;
     }
+    // Lock the page behind the fullscreen panel so the browser can't scroll it
+    // when the keyboard opens; track the visual viewport (height + offset) so the
+    // panel always covers exactly the visible area — header stays on screen.
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     const vv = window.visualViewport;
-    if (!vv) return;
-    const update = () => setVvHeight(Math.round(vv.height));
+    const update = () => {
+      if (!vv) return;
+      setVvHeight(Math.round(vv.height));
+      setVvTop(Math.round(vv.offsetTop));
+    };
     update();
-    vv.addEventListener("resize", update);
-    vv.addEventListener("scroll", update);
+    vv?.addEventListener("resize", update);
+    vv?.addEventListener("scroll", update);
     return () => {
-      vv.removeEventListener("resize", update);
-      vv.removeEventListener("scroll", update);
+      document.body.style.overflow = prevOverflow;
+      vv?.removeEventListener("resize", update);
+      vv?.removeEventListener("scroll", update);
     };
   }, [expanded]);
 
@@ -261,7 +272,7 @@ export function ChatWidget({ whatsapp }: { whatsapp: string }) {
               ? "fixed inset-x-0 top-0 z-[55] w-full"
               : "fixed bottom-44 right-3 z-[55] h-[min(560px,70vh)] max-h-[70vh] w-[calc(100vw-1.5rem)] rounded-[24px]"
           } sm:inset-auto sm:bottom-44 sm:right-5 sm:h-[min(560px,70vh)] sm:max-h-[70vh] sm:w-[360px] sm:rounded-[24px]`}
-          style={expanded ? { height: vvHeight ? `${vvHeight}px` : "100dvh" } : undefined}
+          style={expanded ? { height: vvHeight ? `${vvHeight}px` : "100dvh", transform: `translateY(${vvTop}px)` } : undefined}
         >
           <header className="flex shrink-0 items-center justify-between gap-3 border-b border-line bg-blush px-5 py-4">
             <div>
@@ -290,7 +301,7 @@ export function ChatWidget({ whatsapp }: { whatsapp: string }) {
             ref={listRef}
             aria-live="polite"
             aria-busy={loading}
-            className="flex-1 space-y-3 overflow-y-auto px-4 py-5"
+            className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-5"
           >
             {messages.map((message, index) => (
               <div
