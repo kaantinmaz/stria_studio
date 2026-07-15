@@ -173,12 +173,12 @@ export function ChatWidget({ whatsappUrl }: { whatsappUrl: string }) {
   };
 
   return (
-    <div className="fixed bottom-24 right-5 z-50 sm:right-6">
+    <div className="fixed bottom-24 right-5 z-[70] sm:right-6">
       {isOpen && (
         <section
           role="dialog"
           aria-label="Stria Asistan"
-          className="absolute bottom-[72px] right-0 flex max-h-[70vh] w-[min(360px,calc(100vw-32px))] flex-col overflow-hidden rounded-[28px] border border-line bg-cream shadow-[0_28px_80px_-24px_rgba(66,48,46,0.55)]"
+          className="fixed inset-0 z-[60] flex h-[100dvh] w-full flex-col overflow-hidden border border-line bg-cream shadow-[0_28px_80px_-24px_rgba(66,48,46,0.55)] sm:absolute sm:inset-auto sm:bottom-[72px] sm:right-0 sm:z-auto sm:h-auto sm:max-h-[70vh] sm:w-[min(360px,calc(100vw-32px))] sm:rounded-[28px]"
         >
           <header className="flex items-center justify-between border-b border-line bg-white/70 px-5 py-4">
             <div>
@@ -269,7 +269,7 @@ export function ChatWidget({ whatsappUrl }: { whatsappUrl: string }) {
                 rows={1}
                 disabled={isSending}
                 placeholder="Mesajınızı yazın..."
-                className="max-h-24 min-h-10 flex-1 resize-none bg-transparent py-2 text-[13px] leading-5 text-ink outline-none placeholder:text-muted/70 disabled:opacity-60"
+                className="max-h-24 min-h-10 flex-1 resize-none bg-transparent py-2 text-base sm:text-[13px] leading-5 text-ink outline-none placeholder:text-muted/70 disabled:opacity-60"
               />
               <button
                 type="submit"

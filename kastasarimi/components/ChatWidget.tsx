@@ -174,13 +174,13 @@ export function ChatWidget({ whatsapp }: { whatsapp: string }) {
   }
 
   return (
-    <div className="fixed bottom-24 right-4 z-40 sm:right-6">
+    <div className="fixed bottom-24 right-4 z-[70] sm:right-6">
       {isOpen ? (
         <section
           id="stria-chat-dialog"
           role="dialog"
           aria-label="Kaş Tasarımı Ankara Asistan"
-          className="flex h-[min(560px,70vh)] w-[calc(100vw-2rem)] max-w-[360px] flex-col overflow-hidden rounded-[2px] border border-line2 bg-cream"
+          className="fixed inset-0 z-[60] flex h-[100dvh] w-full max-w-none flex-col overflow-hidden rounded-none border border-line2 bg-cream sm:static sm:z-auto sm:h-[min(560px,70vh)] sm:w-[calc(100vw-2rem)] sm:max-w-[360px] sm:rounded-[2px]"
         >
           <header className="flex items-center justify-between gap-3 border-b border-line2 px-4 py-3.5">
             <div className="min-w-0">

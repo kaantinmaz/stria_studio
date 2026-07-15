@@ -175,7 +175,7 @@ export function ChatWidget({ whatsapp }: { whatsapp: string }) {
         <section
           role="dialog"
           aria-label="Mikroblading Ankara Asistan"
-          className="fixed bottom-44 right-3 z-[55] flex h-[min(560px,70vh)] max-h-[70vh] w-[calc(100vw-1.5rem)] flex-col overflow-hidden rounded-[24px] border border-line bg-cream shadow-[0_20px_60px_rgba(66,48,46,0.22)] sm:right-5 sm:w-[360px]"
+          className="fixed inset-0 z-[55] flex h-[100dvh] w-full flex-col overflow-hidden border border-line bg-cream shadow-[0_20px_60px_rgba(66,48,46,0.22)] sm:inset-auto sm:bottom-44 sm:right-5 sm:h-[min(560px,70vh)] sm:max-h-[70vh] sm:w-[360px] sm:rounded-[24px]"
         >
           <header className="flex shrink-0 items-center justify-between gap-3 border-b border-line bg-blush px-5 py-4">
             <div>
@@ -264,7 +264,7 @@ export function ChatWidget({ whatsapp }: { whatsapp: string }) {
                 rows={1}
                 disabled={loading}
                 placeholder="Sorunuzu yazın…"
-                className="max-h-24 min-h-10 flex-1 resize-none bg-transparent px-2 py-2 text-base leading-6 text-ink outline-none placeholder:text-muted disabled:opacity-60"
+                className="max-h-24 min-h-10 flex-1 resize-none bg-transparent px-2 py-2 text-base sm:text-sm leading-6 text-ink outline-none placeholder:text-muted disabled:opacity-60"
               />
               <button
                 type="button"
