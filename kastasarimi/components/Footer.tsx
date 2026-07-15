@@ -111,6 +111,17 @@ export function Footer({ settings }: { settings: Settings }) {
         <p className="mt-4">
           © {year} {site.studio} · Kaş Tasarımı Ankara · Tüm hakları saklıdır.
         </p>
+        <p className="mt-1 text-[11px]">
+          Web Tasarım:{" "}
+          <a
+            href="https://crabdigital.com.tr"
+            target="_blank"
+            rel="noopener"
+            className="transition hover:text-accent-dark"
+          >
+            Crab Digital
+          </a>
+        </p>
       </div>
     </footer>
   );

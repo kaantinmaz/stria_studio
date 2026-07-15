@@ -27,6 +27,47 @@ const STORAGE_KEY = "stria-chat";
 const WELCOME_MESSAGE =
   "Merhaba! Stria hakkında sorularınızı yanıtlayabilirim. Randevu ve fiyat için sizi WhatsApp'a yönlendirebilirim.";
 const ERROR_MESSAGE = "Şu an yanıt veremiyorum. WhatsApp'tan yazabilirsiniz 👉";
+const WORD_COMPLETIONS = [
+  "merhaba",
+  "hizmetler",
+  "hizmetleriniz",
+  "randevu",
+  "randevu almak istiyorum",
+  "fiyat",
+  "fiyatlarınız",
+  "adres",
+  "adresiniz",
+  "telefon",
+  "çalışma saatleri",
+  "iyileşme",
+  "iyileşme süreci",
+  "bakım",
+  "kalıcılık",
+  "kalıcı",
+  "ne kadar",
+  "nerede",
+  "nasıl yapılır",
+  "ağrı",
+  "acır mı",
+  "whatsapp",
+  "iletişim",
+  "teşekkürler",
+  "öncesi",
+  "sonrası",
+  "uygun muyum",
+  "hamilelik",
+  "rötuş",
+  "microblading",
+  "kaş pudralama",
+  "kalıcı eyeliner",
+  "dipliner",
+  "dudak renklendirme",
+  "kaş laminasyonu",
+  "kirpik lifting",
+  "kaş tasarımı",
+  "kalıcı makyaj",
+  "galeri",
+];
 
 type ChatMessage = {
   role: "user" | "assistant";
@@ -73,11 +114,22 @@ function loadStoredMessages(): ChatMessage[] {
 
 export function ChatWidget({ whatsappUrl }: { whatsappUrl: string }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [vvHeight, setVvHeight] = useState<number | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>(loadStoredMessages);
   const [input, setInput] = useState("");
   const [isSending, setIsSending] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const lastWordMatch = input.match(/\S+$/u);
+  const lastWord = lastWordMatch?.[0] ?? "";
+  const normalizedLastWord = lastWord.toLocaleLowerCase("tr");
+  const completions =
+    normalizedLastWord.length >= 2
+      ? WORD_COMPLETIONS.filter((completion) =>
+          completion.toLocaleLowerCase("tr").startsWith(normalizedLastWord)
+        ).slice(0, 3)
+      : [];
 
   useEffect(() => {
     try {
@@ -86,6 +138,28 @@ export function ChatWidget({ whatsappUrl }: { whatsappUrl: string }) {
       // Chat remains usable when storage is unavailable or full.
     }
   }, [messages]);
+  // Compact panel expands to fullscreen when the input is focused on mobile;
+  // track the visual viewport so the keyboard never pushes the header off-screen.
+  useEffect(() => {
+    if (!isOpen) setExpanded(false);
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!expanded) {
+      setVvHeight(null);
+      return;
+    }
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const update = () => setVvHeight(Math.round(vv.height));
+    update();
+    vv.addEventListener("resize", update);
+    vv.addEventListener("scroll", update);
+    return () => {
+      vv.removeEventListener("resize", update);
+      vv.removeEventListener("scroll", update);
+    };
+  }, [expanded]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -95,7 +169,9 @@ export function ChatWidget({ whatsappUrl }: { whatsappUrl: string }) {
     };
 
     document.addEventListener("keydown", onKeyDown);
-    window.requestAnimationFrame(() => inputRef.current?.focus());
+    if (window.innerWidth >= 640) {
+      window.requestAnimationFrame(() => inputRef.current?.focus());
+    }
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [isOpen]);
 
@@ -165,7 +241,20 @@ export function ChatWidget({ whatsappUrl }: { whatsappUrl: string }) {
     void sendMessage();
   };
 
+  const applyCompletion = (completion: string) => {
+    if (!lastWordMatch || lastWordMatch.index === undefined) return;
+
+    setInput(`${input.slice(0, lastWordMatch.index)}${completion} `);
+    window.requestAnimationFrame(() => inputRef.current?.focus());
+  };
+
   const onInputKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === "Tab" && completions.length > 0) {
+      event.preventDefault();
+      applyCompletion(completions[0]);
+      return;
+    }
+
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
       void sendMessage();
@@ -178,11 +267,25 @@ export function ChatWidget({ whatsappUrl }: { whatsappUrl: string }) {
         <section
           role="dialog"
           aria-label="Stria Asistan"
-          className="fixed inset-0 z-[60] flex h-[100dvh] w-full flex-col overflow-hidden border border-line bg-cream shadow-[0_28px_80px_-24px_rgba(66,48,46,0.55)] sm:absolute sm:inset-auto sm:bottom-[72px] sm:right-0 sm:z-auto sm:h-auto sm:max-h-[70vh] sm:w-[min(360px,calc(100vw-32px))] sm:rounded-[28px]"
+          className={`flex flex-col overflow-hidden border border-line bg-cream shadow-[0_28px_80px_-24px_rgba(66,48,46,0.55)] ${
+            expanded
+              ? "fixed inset-x-0 top-0 z-[60] w-full"
+              : "absolute bottom-[72px] right-0 max-h-[70vh] w-[min(360px,calc(100vw-32px))] rounded-[28px]"
+          } sm:absolute sm:inset-auto sm:bottom-[72px] sm:right-0 sm:z-auto sm:h-auto sm:max-h-[70vh] sm:w-[min(360px,calc(100vw-32px))] sm:rounded-[28px]`}
+          style={expanded ? { height: vvHeight ? `${vvHeight}px` : "100dvh" } : undefined}
         >
           <header className="flex items-center justify-between border-b border-line bg-white/70 px-5 py-4">
             <div>
-              <h2 className="text-[18px] text-ink">Stria Asistan</h2>
+              <div className="flex items-center gap-2">
+                <h2 className="text-[18px] text-ink">Stria Asistan</h2>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-700">
+                  <span
+                    aria-hidden="true"
+                    className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500 motion-reduce:animate-none"
+                  />
+                  Canlı
+                </span>
+              </div>
               <p className="mt-0.5 text-[11px] text-muted">Size nasıl yardımcı olabilirim?</p>
             </div>
             <button
@@ -255,6 +358,23 @@ export function ChatWidget({ whatsappUrl }: { whatsappUrl: string }) {
           </div>
 
           <form onSubmit={onSubmit} className="border-t border-line bg-white/70 p-3">
+            {completions.length > 0 && (
+              <div
+                aria-label="Kelime önerileri"
+                className="mb-2 flex gap-2 overflow-x-auto px-1 pb-0.5"
+              >
+                {completions.map((completion) => (
+                  <button
+                    key={completion}
+                    type="button"
+                    onClick={() => applyCompletion(completion)}
+                    className="flex-none cursor-pointer whitespace-nowrap rounded-full border border-line2 bg-white px-3 py-1.5 text-[11px] text-ink transition-colors hover:border-accent hover:bg-blush focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                  >
+                    {completion}
+                  </button>
+                ))}
+              </div>
+            )}
             <label htmlFor="stria-chat-input" className="sr-only">
               Mesajınız
             </label>
@@ -262,6 +382,9 @@ export function ChatWidget({ whatsappUrl }: { whatsappUrl: string }) {
               <textarea
                 ref={inputRef}
                 id="stria-chat-input"
+                onFocus={() => {
+                  if (window.innerWidth < 640) setExpanded(true);
+                }}
                 value={input}
                 onChange={(event) => setInput(event.target.value)}
                 onKeyDown={onInputKeyDown}

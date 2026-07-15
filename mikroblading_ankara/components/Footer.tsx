@@ -113,7 +113,17 @@ export function Footer({ settings }: { settings: Settings }) {
           politikamızdaki amaçlarla sınırlı ve mevzuata uygun şekilde kullanıyoruz. Bu siteyi ziyaret eden
           kişi bu uyarıları okumuş ve kabul etmiş sayılır.
         </p>
-        <p className="mt-4">© {year} {site.studio} · Mikroblading Ankara · Tüm hakları saklıdır.</p>
+        <p className="mt-4">
+          © {year} {site.studio} · Mikroblading Ankara · Tüm hakları saklıdır. · Web Tasarım:{" "}
+          <a
+            href="https://crabdigital.com.tr"
+            target="_blank"
+            rel="noopener"
+            className="transition hover:text-accent-dark"
+          >
+            Crab Digital
+          </a>
+        </p>
       </div>
     </footer>
   );

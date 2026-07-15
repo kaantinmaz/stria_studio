@@ -28,6 +28,45 @@ const CHAT_ENDPOINT = `${site.apiUrl.replace(/\/$/, "")}/api/chat`;
 const WELCOME_MESSAGE =
   "Merhaba! Kaş Tasarımı Ankara hakkında sorularınızı yanıtlayabilirim. Randevu ve fiyat için sizi WhatsApp'a yönlendirebilirim.";
 const ERROR_MESSAGE = "Şu an yanıt veremiyorum. WhatsApp'tan yazabilirsiniz 👉";
+const SUGGESTION_WORDS = [
+  "merhaba",
+  "hizmetler",
+  "hizmetleriniz",
+  "randevu",
+  "randevu almak istiyorum",
+  "fiyat",
+  "fiyatlarınız",
+  "adres",
+  "adresiniz",
+  "telefon",
+  "çalışma saatleri",
+  "iyileşme",
+  "iyileşme süreci",
+  "bakım",
+  "kalıcılık",
+  "kalıcı",
+  "ne kadar",
+  "nerede",
+  "nasıl yapılır",
+  "ağrı",
+  "acır mı",
+  "whatsapp",
+  "iletişim",
+  "teşekkürler",
+  "öncesi",
+  "sonrası",
+  "uygun muyum",
+  "hamilelik",
+  "rötuş",
+  "kaş tasarımı",
+  "kaş",
+  "kaşlarım",
+  "kıl tekniği",
+  "altın oran",
+  "yüz şekli",
+  "pigment",
+  "seyrek kaş",
+];
 
 type ChatMessage = {
   role: "user" | "assistant";
@@ -66,6 +105,8 @@ function getStoredMessages(): ChatMessage[] | null {
 
 export function ChatWidget({ whatsapp }: { whatsapp: string }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [vvHeight, setVvHeight] = useState<number | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>(INITIAL_MESSAGES);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -73,6 +114,38 @@ export function ChatWidget({ whatsapp }: { whatsapp: string }) {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const openButtonRef = useRef<HTMLButtonElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const lastWordMatch = input.match(/\S+$/u);
+  const lastWord = lastWordMatch?.[0].toLocaleLowerCase("tr") ?? "";
+  const suggestions =
+    lastWord.length >= 2
+      ? SUGGESTION_WORDS.filter((word) =>
+          word.toLocaleLowerCase("tr").startsWith(lastWord),
+        ).slice(0, 3)
+      : [];
+
+
+  // Compact panel expands to fullscreen when the input is focused on mobile;
+  // track the visual viewport so the keyboard never pushes the header off-screen.
+  useEffect(() => {
+    if (!isOpen) setExpanded(false);
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!expanded) {
+      setVvHeight(null);
+      return;
+    }
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const update = () => setVvHeight(Math.round(vv.height));
+    update();
+    vv.addEventListener("resize", update);
+    vv.addEventListener("scroll", update);
+    return () => {
+      vv.removeEventListener("resize", update);
+      vv.removeEventListener("scroll", update);
+    };
+  }, [expanded]);
 
   useEffect(() => {
     const restoreTimer = window.setTimeout(() => {
@@ -102,7 +175,7 @@ export function ChatWidget({ whatsapp }: { whatsapp: string }) {
 
   useEffect(() => {
     if (!isOpen) return;
-    inputRef.current?.focus();
+    if (window.innerWidth >= 640) inputRef.current?.focus();
     messagesEndRef.current?.scrollIntoView({ block: "nearest" });
   }, [isOpen, isLoading, messages]);
 
@@ -119,6 +192,13 @@ export function ChatWidget({ whatsapp }: { whatsapp: string }) {
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [closeChat, isOpen]);
+
+  function applySuggestion(suggestion: string) {
+    if (!lastWordMatch || lastWordMatch.index === undefined) return;
+    const prefix = input.slice(0, lastWordMatch.index);
+    setInput(`${prefix}${suggestion} `.slice(0, 1000));
+    inputRef.current?.focus();
+  }
 
   async function sendMessage() {
     const content = input.trim();
@@ -180,16 +260,30 @@ export function ChatWidget({ whatsapp }: { whatsapp: string }) {
           id="stria-chat-dialog"
           role="dialog"
           aria-label="Kaş Tasarımı Ankara Asistan"
-          className="fixed inset-0 z-[60] flex h-[100dvh] w-full max-w-none flex-col overflow-hidden rounded-none border border-line2 bg-cream sm:static sm:z-auto sm:h-[min(560px,70vh)] sm:w-[calc(100vw-2rem)] sm:max-w-[360px] sm:rounded-[2px]"
+          className={`flex flex-col overflow-hidden border border-line2 bg-cream ${
+            expanded
+              ? "fixed inset-x-0 top-0 z-[60] w-full max-w-none rounded-none"
+              : "h-[min(560px,70vh)] w-[calc(100vw-2rem)] max-w-[360px] rounded-[2px]"
+          } sm:static sm:z-auto sm:h-[min(560px,70vh)] sm:w-[calc(100vw-2rem)] sm:max-w-[360px] sm:rounded-[2px]`}
+          style={expanded ? { height: vvHeight ? `${vvHeight}px` : "100dvh" } : undefined}
         >
           <header className="flex items-center justify-between gap-3 border-b border-line2 px-4 py-3.5">
             <div className="min-w-0">
               <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-accent-dark">
                 Stria Studio
               </p>
-              <h2 className="mt-1 truncate font-display text-[17px] leading-tight text-ink">
-                Kaş Tasarımı Ankara Asistan
-              </h2>
+              <div className="mt-1 flex min-w-0 items-center gap-2">
+                <h2 className="truncate font-display text-[17px] leading-tight text-ink">
+                  Kaş Tasarımı Ankara Asistan
+                </h2>
+                <span className="inline-flex shrink-0 items-center gap-1.5 text-[10px] font-medium text-green-700">
+                  <span
+                    aria-hidden="true"
+                    className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-500"
+                  />
+                  Canlı
+                </span>
+              </div>
             </div>
             <button
               type="button"
@@ -253,13 +347,43 @@ export function ChatWidget({ whatsapp }: { whatsapp: string }) {
             <label htmlFor="stria-chat-input" className="sr-only">
               Mesajınız
             </label>
+            {suggestions.length > 0 && (
+              <div
+                aria-label="Kelime önerileri"
+                className="mb-2 flex gap-2 overflow-x-auto"
+              >
+                {suggestions.map((suggestion) => (
+                  <button
+                    key={suggestion}
+                    type="button"
+                    onMouseDown={(event) => event.preventDefault()}
+                    onClick={() => applySuggestion(suggestion)}
+                    className="shrink-0 rounded-[2px] border border-line2 bg-blush px-2.5 py-1 text-[11px] leading-4 text-muted2 transition hover:border-accent hover:text-accent-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
+            )}
             <div className="flex items-end gap-2">
               <textarea
                 ref={inputRef}
                 id="stria-chat-input"
+                onFocus={() => {
+                  if (window.innerWidth < 640) setExpanded(true);
+                }}
                 value={input}
                 onChange={(event) => setInput(event.target.value)}
                 onKeyDown={(event) => {
+                  if (
+                    event.key === "Tab" &&
+                    suggestions.length > 0 &&
+                    !event.nativeEvent.isComposing
+                  ) {
+                    event.preventDefault();
+                    applySuggestion(suggestions[0]);
+                    return;
+                  }
                   if (
                     event.key === "Enter" &&
                     !event.shiftKey &&

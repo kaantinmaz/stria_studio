@@ -138,7 +138,20 @@ export function Footer() {
 
       <div className="mx-auto mt-12 flex max-w-[1160px] flex-col gap-2 border-t border-cream/[0.14] pt-6 text-[11px] tracking-[0.06em] text-[#9a857e] sm:flex-row sm:items-center sm:justify-between">
         <span>© 2026 Stria Studio · {t.footerRights}</span>
-        <span>Çankaya, Ankara</span>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          <span>Çankaya, Ankara</span>
+          <span>
+            Web Tasarım:{" "}
+            <a
+              href="https://crabdigital.com.tr"
+              target="_blank"
+              rel="noopener"
+              className="transition-colors hover:text-cream"
+            >
+              Crab Digital
+            </a>
+          </span>
+        </div>
       </div>
       <p className="mx-auto mt-5 max-w-[1160px] text-[10.5px] leading-[1.65] text-[#9a857e]">
         Bu web sitesindeki tüm içerikler yalnızca bilgilendirme amaçlıdır; tıbbi
