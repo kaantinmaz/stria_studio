@@ -16,6 +16,7 @@ class Setting extends Model
         'lat' => 'decimal:7',
         'lng' => 'decimal:7',
         'campaign_enabled' => 'boolean',
+        'popup_enabled' => 'boolean',
     ];
 
     // Settings row for a given site slug; NULL = the main site. Each microsite has

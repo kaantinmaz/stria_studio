@@ -106,6 +106,14 @@ class ServiceForm
                                     ->image()
                                     ->disk('public')
                                     ->directory('services'),
+                                FileUpload::make('hero_images')
+                                    ->image()
+                                    ->multiple()
+                                    ->reorderable()
+                                    ->disk('public')
+                                    ->directory('services')
+                                    ->maxFiles(8)
+                                    ->helperText('Hizmet detay sayfasının üst görsel alanı; birden fazla görsel otomatik kayan slayta dönüşür. Boşsa tekli görsel kullanılır.'),
                                 FileUpload::make('gallery')
                                     ->image()
                                     ->multiple()

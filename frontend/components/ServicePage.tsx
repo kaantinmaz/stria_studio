@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { HeroCarousel } from "@/components/HeroCarousel";
 import { ImageSlot } from "@/components/ImageSlot";
 import { Faq } from "@/components/Faq";
 import { WhatsAppIcon, PhoneIcon } from "@/components/Icons";
@@ -61,7 +62,7 @@ export function ServicePage({
               className="inline-flex items-center gap-[9px] rounded-[28px] bg-ink px-7 py-[15px] text-sm text-cream"
             >
               <WhatsAppIcon size={16} />
-              WhatsApp'tan Randevu
+              WhatsApp&apos;tan Randevu
             </a>
             <a
               href={phoneHref(settings.phone)}
@@ -73,11 +74,9 @@ export function ServicePage({
           </div>
         </div>
         <div className="relative h-[min(56vh,460px)] overflow-hidden rounded-[32px] shadow-[0_40px_90px_-50px_rgba(197,124,105,0.7)]">
-          <ImageSlot
-            src={svc.image ?? ""}
+          <HeroCarousel
+            images={svc.hero_images?.length ? svc.hero_images : (svc.image ? [svc.image] : [])}
             alt={`${name} — Stria Studio Ankara`}
-            placeholder={name}
-            sizes="(max-width: 768px) 100vw, 45vw"
           />
         </div>
       </header>

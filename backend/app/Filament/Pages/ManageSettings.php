@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Models\Setting;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -89,6 +90,32 @@ class ManageSettings extends Page
                                 TextInput::make('campaign_text_en')
                                     ->label('Kampanya metni (EN)')
                                     ->maxLength(255),
+                            ]),
+                        Tab::make('Pop-up')
+                            ->schema([
+                                Toggle::make('popup_enabled')
+                                    ->label('Pop-up göster'),
+                                TextInput::make('popup_title_tr')
+                                    ->label('Başlık (TR)'),
+                                TextInput::make('popup_title_en')
+                                    ->label('Başlık (EN)'),
+                                Textarea::make('popup_text_tr')
+                                    ->label('Metin (TR)')
+                                    ->rows(3),
+                                Textarea::make('popup_text_en')
+                                    ->label('Metin (EN)')
+                                    ->rows(3),
+                                FileUpload::make('popup_image')
+                                    ->label('Görsel')
+                                    ->image()
+                                    ->disk('public')
+                                    ->directory('popups'),
+                                TextInput::make('popup_cta_text_tr')
+                                    ->label('Buton metni (TR)'),
+                                TextInput::make('popup_cta_text_en')
+                                    ->label('Buton metni (EN)'),
+                                TextInput::make('popup_cta_url')
+                                    ->label('Buton bağlantısı'),
                             ]),
                         Tab::make('Adres/NAP')
                             ->schema([

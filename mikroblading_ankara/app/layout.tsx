@@ -9,6 +9,7 @@ import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { WhatsAppFab } from "@/components/WhatsAppFab";
 import { Analytics } from "@/components/Analytics";
+import { Popup } from "@/components/Popup";
 
 const jost = Jost({
   subsets: ["latin"],
@@ -62,6 +63,7 @@ export default async function RootLayout({
           campaignEnabled={settings.campaign_enabled}
           campaignText={settings.campaign_text_tr}
         />
+        <Popup settings={settings} />
         <main>{children}</main>
         <Footer settings={settings} />
         <WhatsAppFab whatsapp={settings.whatsapp} />

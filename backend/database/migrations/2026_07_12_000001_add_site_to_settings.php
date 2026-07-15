@@ -1,8 +1,8 @@
 <?php
 
-use App\Models\Setting;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 // Per-site settings. Until now `settings` held one shared row (Setting::current(),
@@ -19,19 +19,25 @@ return new class extends Migration
         // Existing row (id=1) becomes the main site (site = NULL, already the default).
         // Seed one row per microsite, copied from the main row so each site starts
         // identical to today's shared values; the owner then customizes per site.
-        $main = Setting::whereNull('site')->first();
-        $base = $main ? collect($main->attributesToArray())
-            ->except(['id', 'site', 'created_at', 'updated_at'])
-            ->all() : [];
+        // NOTE: uses the DB facade, not the Setting model — touching an Eloquent model
+        // mid-migration caches the table's column listing before later migrations add
+        // columns, silently discarding fills of those columns in the same process.
+        $main = (array) (DB::table('settings')->whereNull('site')->first() ?? []);
+        $base = collect($main)->except(['id', 'site', 'created_at', 'updated_at'])->all();
+        $now = now();
 
         foreach (array_keys(config('microsites', [])) as $slug) {
-            Setting::firstOrCreate(['site' => $slug], $base);
+            if (! DB::table('settings')->where('site', $slug)->exists()) {
+                DB::table('settings')->insert(
+                    $base + ['site' => $slug, 'created_at' => $now, 'updated_at' => $now]
+                );
+            }
         }
     }
 
     public function down(): void
     {
-        Setting::whereNotNull('site')->delete();
+        DB::table('settings')->whereNotNull('site')->delete();
 
         Schema::table('settings', function (Blueprint $table) {
             $table->dropUnique(['site']);

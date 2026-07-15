@@ -43,6 +43,35 @@ class ServiceApiTest extends TestCase
             ->assertJsonPath('data.image', asset('storage/services/x.png'));
     }
 
+    public function test_single_service_returns_absolute_hero_image_urls(): void
+    {
+        Service::factory()->create([
+            'slug' => 'hero',
+            'is_active' => true,
+            'hero_images' => ['services/hero-one.png', 'https://cdn.example.com/hero-two.png'],
+        ]);
+
+        $this->getJson('/api/services/hero')
+            ->assertOk()
+            ->assertJsonPath('data.hero_images', [
+                asset('storage/services/hero-one.png'),
+                'https://cdn.example.com/hero-two.png',
+            ]);
+    }
+
+    public function test_single_service_returns_empty_hero_images_when_column_is_null(): void
+    {
+        Service::factory()->create([
+            'slug' => 'no-hero',
+            'is_active' => true,
+            'hero_images' => null,
+        ]);
+
+        $this->getJson('/api/services/no-hero')
+            ->assertOk()
+            ->assertJsonPath('data.hero_images', []);
+    }
+
     public function test_inactive_service_is_404(): void
     {
         Service::factory()->create(['slug' => 'off', 'is_active' => false]);

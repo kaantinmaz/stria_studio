@@ -21,6 +21,15 @@ export type Settings = {
   hours: Hours[];
   campaign_enabled: boolean;
   campaign_text_tr: string;
+  popup_enabled: boolean;
+  popup_title_tr: string | null;
+  popup_title_en: string | null;
+  popup_text_tr: string | null;
+  popup_text_en: string | null;
+  popup_image: string | null;
+  popup_cta_text_tr: string | null;
+  popup_cta_text_en: string | null;
+  popup_cta_url: string | null;
   header_code: string | null;
   footer_code: string | null;
 };
@@ -50,6 +59,15 @@ export const SETTINGS_FALLBACK: Settings = {
   ],
   campaign_enabled: false,
   campaign_text_tr: "",
+  popup_enabled: false,
+  popup_title_tr: null,
+  popup_title_en: null,
+  popup_text_tr: null,
+  popup_text_en: null,
+  popup_image: null,
+  popup_cta_text_tr: null,
+  popup_cta_text_en: null,
+  popup_cta_url: null,
   header_code: null,
   footer_code: null,
 };

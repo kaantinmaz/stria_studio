@@ -27,4 +27,12 @@ class SettingModelTest extends TestCase
         $s->update(['hours' => [['days' => ['Monday'], 'open' => '10:00', 'close' => '19:00']]]);
         $this->assertSame('10:00', $s->fresh()->hours[0]['open']);
     }
+
+    public function test_popup_enabled_casts_to_boolean(): void
+    {
+        $s = Setting::current();
+        $s->update(['popup_enabled' => 1]);
+
+        $this->assertTrue($s->fresh()->popup_enabled);
+    }
 }

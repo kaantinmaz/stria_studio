@@ -26,9 +26,11 @@ class ServiceModelTest extends TestCase
         $s = Service::factory()->create([
             'benefits_tr' => ['x', 'y'],
             'faq_tr' => [['q' => 'q1', 'a' => 'a1']],
+            'hero_images' => ['services/one.png', 'services/two.png'],
         ]);
 
         $this->assertSame(['x', 'y'], $s->fresh()->benefits_tr);
         $this->assertSame('q1', $s->fresh()->faq_tr[0]['q']);
+        $this->assertSame(['services/one.png', 'services/two.png'], $s->fresh()->hero_images);
     }
 }
