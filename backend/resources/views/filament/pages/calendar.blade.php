@@ -135,6 +135,13 @@
 
         .stria-appointment-pill:hover { background: #dcecff; }
 
+        .stria-appointment-pill.is-unpaid {
+            color: #c81e1e;
+            background: #ffe5e5;
+        }
+
+        .stria-appointment-pill.is-unpaid:hover { background: #ffd6d6; }
+
         .stria-more {
             padding: 2px 6px;
             color: #6e6e73;
@@ -306,6 +313,86 @@
             cursor: pointer;
         }
 
+        .stria-photo-heading {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .stria-photo-heading .stria-label { margin-bottom: 0; }
+        .stria-photo-heading small { color: #8e8e93; font-size: 11px; }
+
+        .stria-photo-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .stria-photo-thumb {
+            position: relative;
+            width: 68px;
+            height: 68px;
+        }
+
+        .stria-photo-thumb img {
+            width: 100%;
+            height: 100%;
+            border: 1px solid rgba(60, 60, 67, .14);
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .stria-photo-remove {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            display: grid;
+            width: 19px;
+            height: 19px;
+            place-items: center;
+            border: 2px solid #fff;
+            border-radius: 999px;
+            padding: 0;
+            color: #fff;
+            background: #3a3a3c;
+            font-size: 12px;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .stria-photo-add {
+            display: inline-flex;
+            align-items: center;
+            min-height: 34px;
+            border: 1px solid #d1d1d6;
+            border-radius: 8px;
+            padding: 6px 10px;
+            color: #007aff;
+            background: #fff;
+            font-size: 12px;
+            font-weight: 650;
+            cursor: pointer;
+        }
+
+        .stria-photo-add:hover { background: #f2f2f7; }
+
+        .stria-photo-input {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .stria-photo-loading {
+            margin-left: 8px;
+            color: #8e8e93;
+            font-size: 11px;
+        }
+
         .stria-error { margin-top: 4px; color: #d70015; font-size: 11px; }
 
         .stria-modal-footer {
@@ -381,7 +468,7 @@
                                 @foreach (array_slice($day['appointments'], 0, 3) as $appointment)
                                     <button
                                         type="button"
-                                        class="stria-appointment-pill"
+                                        class="stria-appointment-pill {{ $appointment['is_paid'] ? '' : 'is-unpaid' }}"
                                         title="{{ $appointment['time'] }} {{ $appointment['customer'] }}"
                                         @click.stop="$wire.openEditModal({{ $appointment['id'] }})"
                                     >
@@ -477,17 +564,6 @@
                                     </button>
                                 </div>
 
-                                @if ($editingAppointmentId && $selectedCustomerEditUrl)
-                                    <a
-                                        class="stria-inline-action"
-                                        href="{{ $selectedCustomerEditUrl }}"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                    >
-                                        📷 Müşteri fotoğrafları
-                                    </a>
-                                @endif
-
                                 <button type="button" class="stria-inline-action" wire:click="useNewCustomer">
                                     + Yeni müşteri oluştur
                                 </button>
@@ -573,6 +649,43 @@
                             <textarea id="appointment-note" class="stria-input" wire:model="note"></textarea>
                             @error('note') <div class="stria-error">{{ $message }}</div> @enderror
                         </div>
+
+                        @if ($editingAppointmentId && $customerId)
+                            <div class="stria-field is-full">
+                                <div class="stria-photo-heading">
+                                    <span class="stria-label">Öncesi / Sonrası Fotoğrafları</span>
+                                    <small>sınırsız</small>
+                                </div>
+
+                                @if ($customerPhotos)
+                                    <div class="stria-photo-grid">
+                                        @foreach ($customerPhotos as $index => $path)
+                                            <div class="stria-photo-thumb" wire:key="customer-photo-{{ $index }}-{{ md5($path) }}">
+                                                <img src="{{ asset('storage/'.$path) }}" alt="Müşteri fotoğrafı">
+                                                <button
+                                                    type="button"
+                                                    class="stria-photo-remove"
+                                                    wire:click="removeCustomerPhoto({{ $index }})"
+                                                    aria-label="Fotoğrafı sil"
+                                                >×</button>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
+
+                                <input
+                                    id="customer-photo-upload"
+                                    type="file"
+                                    class="stria-photo-input"
+                                    multiple
+                                    accept="image/*"
+                                    wire:model="newPhotos"
+                                >
+                                <label class="stria-photo-add" for="customer-photo-upload">＋ Fotoğraf ekle</label>
+                                <span class="stria-photo-loading" wire:loading wire:target="newPhotos">Yükleniyor…</span>
+                                @error('newPhotos.*') <div class="stria-error">{{ $message }}</div> @enderror
+                            </div>
+                        @endif
                     </div>
 
                     <footer class="stria-modal-footer">

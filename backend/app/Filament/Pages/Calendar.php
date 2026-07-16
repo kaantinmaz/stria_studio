@@ -2,7 +2,6 @@
 
 namespace App\Filament\Pages;
 
-use App\Filament\Resources\Customers\CustomerResource;
 use App\Models\Appointment;
 use App\Models\Customer;
 use App\Models\Service;
@@ -14,10 +13,14 @@ use Filament\Pages\Page;
 use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Livewire\WithFileUploads;
 use Throwable;
 
 class Calendar extends Page
 {
+    use WithFileUploads;
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendarDays;
 
     protected static ?string $navigationLabel = 'Takvim';
@@ -60,6 +63,10 @@ class Calendar extends Page
 
     public string $note = '';
 
+    public array $newPhotos = [];
+
+    public array $customerPhotos = [];
+
     public function mount(): void
     {
         $this->month = now()->format('Y-m');
@@ -100,7 +107,7 @@ class Calendar extends Page
     {
         $appointment = Appointment::query()->findOrFail($appointmentId);
 
-        $this->resetValidation();
+        $this->resetAppointmentForm();
         $this->editingAppointmentId = $appointment->id;
         $this->customerId = $appointment->customer_id;
         $this->serviceId = $appointment->service_id;
@@ -114,13 +121,84 @@ class Calendar extends Page
         $this->creatingCustomer = false;
         $this->newCustomerName = '';
         $this->newCustomerPhone = '';
+        $this->customerPhotos = array_values($appointment->customer?->photos ?? []);
         $this->showAppointmentModal = true;
     }
 
     public function closeAppointmentModal(): void
     {
         $this->showAppointmentModal = false;
-        $this->resetValidation();
+        $this->resetAppointmentForm();
+    }
+
+    public function updatedCustomerId(): void
+    {
+        if (! $this->editingAppointmentId || ! $this->customerId) {
+            $this->customerPhotos = [];
+
+            return;
+        }
+
+        $this->customerPhotos = array_values(
+            Customer::query()->find($this->customerId)?->photos ?? [],
+        );
+    }
+
+    public function updatedNewPhotos(): void
+    {
+        $this->uploadCustomerPhotos();
+    }
+
+    public function uploadCustomerPhotos(): void
+    {
+        abort_unless($this->editingAppointmentId && $this->customerId, 404);
+
+        $this->validate([
+            'newPhotos.*' => ['image', 'max:10240'],
+        ]);
+
+        $customer = Customer::query()->findOrFail($this->customerId);
+        $photos = array_values($customer->photos ?? []);
+
+        foreach ($this->newPhotos as $photo) {
+            $photos[] = $photo->store('customers', 'public');
+        }
+
+        $customer->photos = $photos;
+        $customer->save();
+
+        $this->customerPhotos = array_values($customer->fresh()->photos ?? []);
+        $this->newPhotos = [];
+
+        Notification::make()
+            ->title('Fotoğraflar eklendi')
+            ->success()
+            ->send();
+    }
+
+    public function removeCustomerPhoto(int $index): void
+    {
+        abort_unless($this->editingAppointmentId && $this->customerId, 404);
+
+        $customer = Customer::query()->findOrFail($this->customerId);
+        $photos = array_values($customer->photos ?? []);
+
+        if (! array_key_exists($index, $photos)) {
+            return;
+        }
+
+        $path = $photos[$index];
+        unset($photos[$index]);
+        $photos = array_values($photos);
+
+        $customer->photos = $photos;
+        $customer->save();
+
+        if (is_string($path) && str_starts_with($path, 'customers/')) {
+            Storage::disk('public')->delete($path);
+        }
+
+        $this->customerPhotos = $photos;
     }
 
     public function useNewCustomer(): void
@@ -156,6 +234,7 @@ class Calendar extends Page
         });
 
         $this->showAppointmentModal = false;
+        $this->resetAppointmentForm();
 
         Notification::make()
             ->title('Randevu eklendi')
@@ -183,6 +262,7 @@ class Calendar extends Page
         });
 
         $this->showAppointmentModal = false;
+        $this->resetAppointmentForm();
 
         Notification::make()
             ->title('Randevu güncellendi')
@@ -196,6 +276,7 @@ class Calendar extends Page
 
         Appointment::query()->findOrFail($this->editingAppointmentId)->delete();
         $this->showAppointmentModal = false;
+        $this->resetAppointmentForm();
 
         Notification::make()
             ->title('Randevu silindi')
@@ -225,9 +306,6 @@ class Calendar extends Page
             'selectedCustomerName' => $this->customerId
                 ? Customer::query()->whereKey($this->customerId)->value('name') ?? ''
                 : '',
-            'selectedCustomerEditUrl' => $this->customerId
-                ? CustomerResource::getUrl('edit', ['record' => $this->customerId])
-                : null,
             'services' => Service::query()
                 ->where('is_active', true)
                 ->orderBy('sort_order')
@@ -261,6 +339,7 @@ class Calendar extends Page
                     'id' => $appointment->id,
                     'time' => $appointment->starts_at->format('H:i'),
                     'customer' => $this->shortCustomerName($appointment->customer?->name),
+                    'is_paid' => $appointment->is_paid,
                 ])
                 ->values()
                 ->all();
@@ -368,6 +447,8 @@ class Calendar extends Page
         $this->is_paid = false;
         $this->payment_method = null;
         $this->note = '';
+        $this->newPhotos = [];
+        $this->customerPhotos = [];
     }
 
     private function isValidDate(string $date): bool

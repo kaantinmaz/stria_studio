@@ -2,10 +2,16 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Pages\Calendar;
 use App\Models\Appointment;
 use App\Models\Customer;
+use App\Models\User;
+use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class CustomerAppointmentTest extends TestCase
@@ -85,5 +91,41 @@ class CustomerAppointmentTest extends TestCase
 
         $this->assertNull($customerWithoutPhotos->refresh()->photos);
         $this->assertCount(0, $customerWithoutPhotos->photos ?? []);
+    }
+
+    public function test_customer_photos_can_be_managed_from_the_appointment_edit_modal(): void
+    {
+        Storage::fake('public');
+        Storage::disk('public')->put('customers/before.jpg', 'before');
+
+        $customer = Customer::query()->create([
+            'name' => 'Takvim Fotoğraf Müşterisi',
+            'photos' => ['customers/before.jpg'],
+        ]);
+        $appointment = Appointment::query()->create([
+            'customer_id' => $customer->id,
+            'starts_at' => '2026-07-20 10:00:00',
+        ]);
+
+        $this->actingAs(User::factory()->create());
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+
+        $calendar = Livewire::test(Calendar::class)
+            ->call('openEditModal', $appointment->id)
+            ->assertSet('customerPhotos', ['customers/before.jpg']);
+
+        $calendar
+            ->call('removeCustomerPhoto', 0)
+            ->assertSet('customerPhotos', []);
+
+        $this->assertSame([], $customer->refresh()->photos);
+        Storage::disk('public')->assertMissing('customers/before.jpg');
+
+        $calendar
+            ->set('newPhotos', [UploadedFile::fake()->image('after.jpg')])
+            ->assertSet('newPhotos', []);
+
+        $this->assertCount(1, $customer->refresh()->photos);
+        Storage::disk('public')->assertExists($customer->photos[0]);
     }
 }
