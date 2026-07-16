@@ -72,6 +72,36 @@ class ServiceApiTest extends TestCase
             ->assertJsonPath('data.hero_images', []);
     }
 
+    public function test_single_service_returns_subservices(): void
+    {
+        $subservices = [
+            ['name' => 'Çatlak Gizleme', 'desc' => 'Çatlaklar cilt tonuna uygun pigmentlerle kamufle edilir.'],
+        ];
+
+        Service::factory()->create([
+            'slug' => 'camouflage',
+            'is_active' => true,
+            'subservices_tr' => $subservices,
+        ]);
+
+        $this->getJson('/api/services/camouflage')
+            ->assertOk()
+            ->assertJsonPath('data.subservices_tr', $subservices);
+    }
+
+    public function test_single_service_returns_empty_subservices_when_column_is_null(): void
+    {
+        Service::factory()->create([
+            'slug' => 'no-subservices',
+            'is_active' => true,
+            'subservices_tr' => null,
+        ]);
+
+        $this->getJson('/api/services/no-subservices')
+            ->assertOk()
+            ->assertJsonPath('data.subservices_tr', []);
+    }
+
     public function test_inactive_service_is_404(): void
     {
         Service::factory()->create(['slug' => 'off', 'is_active' => false]);

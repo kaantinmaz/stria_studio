@@ -22,6 +22,7 @@ class Service extends Model
         'process_en' => 'array',
         'faq_tr' => 'array',
         'faq_en' => 'array',
+        'subservices_tr' => 'array',
         'hero_images' => 'array',
         'gallery' => 'array',
         'related' => 'array',

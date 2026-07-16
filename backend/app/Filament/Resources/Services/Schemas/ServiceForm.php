@@ -55,6 +55,17 @@ class ServiceForm
                                             ->label('Cevap')
                                             ->rows(2),
                                     ]),
+                                Repeater::make('subservices_tr')
+                                    ->schema([
+                                        TextInput::make('name')
+                                            ->label('Alt hizmet adı'),
+                                        Textarea::make('desc')
+                                            ->label('Kısa açıklama')
+                                            ->rows(2),
+                                    ])
+                                    ->collapsible()
+                                    ->addActionLabel('Alt hizmet ekle')
+                                    ->helperText('Bu hizmetin altında listelenen alt uygulamalar (ör. Kamuflaj Makyaj → Çatlak Gizleme).'),
                             ]),
                         Tab::make('English')
                             ->schema([

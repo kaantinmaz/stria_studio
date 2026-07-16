@@ -91,6 +91,7 @@ export type ServiceFull = ServiceListItem & {
   benefits_en: string[];
   process_tr: string[];
   process_en: string[];
+  subservices_tr?: { name: string; desc: string }[];
   faq_tr: { q: string; a: string }[];
   faq_en: { q: string; a: string }[];
   gallery: string[];

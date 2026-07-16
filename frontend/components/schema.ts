@@ -43,7 +43,12 @@ export function beautySalonSchema(s: Settings) {
 }
 
 export function serviceSchema(
-  svc: { slug: string; intro_tr: string | null; desc_tr: string },
+  svc: {
+    slug: string;
+    intro_tr: string | null;
+    desc_tr: string;
+    subservices_tr?: { name: string; desc: string }[];
+  },
   name: string,
   path = `/hizmetler/${svc.slug}`,
 ) {
@@ -56,6 +61,22 @@ export function serviceSchema(
     url: absUrl(path),
     provider: { "@id": absUrl("/#business") },
     areaServed: { "@type": "City", name: "Ankara" },
+    ...(svc.subservices_tr?.length
+      ? {
+          hasOfferCatalog: {
+            "@type": "OfferCatalog",
+            name: `${name} Alt Uygulamaları`,
+            itemListElement: svc.subservices_tr.map((subservice) => ({
+              "@type": "Offer",
+              itemOffered: {
+                "@type": "Service",
+                name: subservice.name,
+                description: subservice.desc,
+              },
+            })),
+          },
+        }
+      : {}),
   };
 }
 

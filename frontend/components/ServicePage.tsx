@@ -18,6 +18,10 @@ const SERVICE_GUIDES: Record<string, { href: string; label: string }> = {
     href: "https://kastasarimiankara.com",
     label: "Kaş Tasarımı Ankara",
   },
+  "kamuflaj-makyaj": {
+    href: "https://catlakkamuflaj.com",
+    label: "Kamuflaj Makyajı",
+  },
 };
 
 // Client-rendered TR service page body (settings-driven contact links).
@@ -114,6 +118,28 @@ export function ServicePage({
           </div>
         </div>
       </section>
+
+      {svc.subservices_tr && svc.subservices_tr.length > 0 && (
+        <section className="mx-auto max-w-[1160px] px-[clamp(18px,5vw,56px)] py-[clamp(32px,5vw,64px)]">
+          <h2 className="mb-2 text-[clamp(22px,2.4vw,30px)]">Alt Uygulamalar</h2>
+          <p className="mb-7 max-w-[620px] text-[15px] leading-[1.6] text-muted">
+            {name} kapsamında sunduğumuz uygulamalar.
+          </p>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {svc.subservices_tr.map((subservice) => (
+              <article
+                key={subservice.name}
+                className="rounded-[22px] border border-line bg-blush px-6 py-5"
+              >
+                <h3 className="mb-2 text-[18px] leading-[1.35] text-ink">
+                  {subservice.name}
+                </h3>
+                <p className="text-[14px] leading-[1.7] text-muted2">{subservice.desc}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* work gallery — owner drops photos into ServiceFull.gallery */}
       <section className="mx-auto max-w-[1160px] px-[clamp(18px,5vw,56px)] py-[clamp(32px,5vw,64px)]">
