@@ -13,10 +13,13 @@ use Throwable;
 
 class ChatController extends Controller
 {
+    private const ENGAGE_SUFFIX = 'Bağlam: Bu konuşma sitedeki mini etkileşim panelinden geliyor. Kullanıcının ilk mesajı, ilgilendiği hizmetleri ve varsa endişesini özetler. Görevin: (1) Endişeyi empatiyle karşıla ve doğru bilgiyle OLUMLUYA çevir (korkutma, küçümseme yok; 2-4 cümle). (2) Cevabının sonunda kullanıcıyı tanımaya yönelik TEK kısa takip sorusu sor (örn. daha önce kalıcı makyaj deneyimi, istediği görünüm, ne zamandır düşündüğü). (3) Kullanıcı rahatladığında veya randevuya sıcak baktığında WhatsApp linkini paylaşarak nazikçe randevuya davet et. Fiyat yasağı ve diğer tüm kurallar aynen geçerli.';
+
     public function store(Request $request, ChatPrompt $prompt): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'site' => ['nullable', 'string'],
+            'intent' => ['nullable', Rule::in(['engage'])],
             'messages' => ['required', 'array', 'min:1', 'max:12'],
             'messages.*' => ['array:role,content'],
             'messages.*.role' => ['required', Rule::in(['user', 'assistant'])],
@@ -39,6 +42,8 @@ class ChatController extends Controller
 
         $validated = $validator->validate();
         $site = $validated['site'] ?? null;
+        $isEngage = ($validated['intent'] ?? null) === 'engage';
+        $engageSuffix = self::ENGAGE_SUFFIX;
 
         if ($site !== null && ! array_key_exists($site, config('microsites', []))) {
             abort(404);
@@ -53,7 +58,7 @@ class ChatController extends Controller
                 ->post('https://api.anthropic.com/v1/messages', [
                     'model' => config('services.anthropic.model'),
                     'max_tokens' => 400,
-                    'system' => $prompt->build($site),
+                    'system' => $prompt->build($site) . ($isEngage ? "\n\n" . $engageSuffix : ''),
                     'messages' => $validated['messages'],
                 ]);
         } catch (Throwable) {

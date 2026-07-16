@@ -8,6 +8,7 @@ import { WhatsAppFab } from "@/components/WhatsAppFab";
 import { ChatWidget } from "@/components/ChatWidget";
 import { Analytics } from "@/components/Analytics";
 import { Popup } from "@/components/Popup";
+import { EngageSurvey } from "@/components/EngageSurvey";
 import { CookieConsent } from "@/components/CookieConsent";
 import { JsonLd } from "@/components/JsonLd";
 import { beautySalonSchema } from "@/components/schema";
@@ -60,8 +61,13 @@ export default async function RootLayout({
         <JsonLd data={beautySalonSchema(settings ?? SETTINGS_FALLBACK)} />
         <LanguageProvider>
           <SettingsProvider settings={settings}>
-            <ServicesProvider services={services}>{children}</ServicesProvider>
-            <Popup settings={settings ?? SETTINGS_FALLBACK} />
+            <ServicesProvider services={services}>
+              {children}
+              <Popup settings={settings ?? SETTINGS_FALLBACK} />
+              <EngageSurvey
+                whatsappUrl={(settings ?? SETTINGS_FALLBACK).whatsapp}
+              />
+            </ServicesProvider>
             <CookieConsent />
             <ChatWidget whatsappUrl={(settings ?? SETTINGS_FALLBACK).whatsapp} />
             <WhatsAppFab />

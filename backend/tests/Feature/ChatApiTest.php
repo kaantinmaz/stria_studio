@@ -76,6 +76,40 @@ class ChatApiTest extends TestCase
         Http::assertNothingSent();
     }
 
+    public function test_engage_intent_is_accepted_and_other_values_are_rejected(): void
+    {
+        Http::fake([
+            'https://api.anthropic.com/v1/messages' => Http::response([
+                'content' => [
+                    ['type' => 'text', 'text' => 'Endişenizi anlıyorum.'],
+                ],
+            ]),
+        ]);
+
+        $messages = [
+            ['role' => 'user', 'content' => 'Kalıcı makyaj konusunda biraz endişeliyim.'],
+        ];
+
+        $this->postJson('/api/chat', [
+            'intent' => 'engage',
+            'messages' => $messages,
+        ])->assertOk();
+
+        Http::assertSent(fn (Request $request): bool => str_contains(
+            $request['system'],
+            'Bu konuşma sitedeki mini etkileşim panelinden geliyor.'
+        ));
+
+        $this->postJson('/api/chat', [
+            'intent' => 'other',
+            'messages' => $messages,
+        ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('intent');
+
+        Http::assertSentCount(1);
+    }
+
     public function test_last_message_must_be_from_user(): void
     {
         Http::fake();
