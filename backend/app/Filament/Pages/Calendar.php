@@ -51,6 +51,12 @@ class Calendar extends Page
 
     public int $durationMin = 60;
 
+    public ?string $price = null;
+
+    public bool $is_paid = false;
+
+    public ?string $payment_method = null;
+
     public string $note = '';
 
     public function mount(): void
@@ -100,6 +106,9 @@ class Calendar extends Page
         $this->selectedDate = $appointment->starts_at->format('Y-m-d');
         $this->appointmentTime = $appointment->starts_at->format('H:i');
         $this->durationMin = $appointment->duration_min;
+        $this->price = $appointment->price;
+        $this->is_paid = $appointment->is_paid;
+        $this->payment_method = $appointment->payment_method;
         $this->note = $appointment->note ?? '';
         $this->creatingCustomer = false;
         $this->newCustomerName = '';
@@ -138,6 +147,9 @@ class Calendar extends Page
                 'service_id' => $this->serviceId,
                 'starts_at' => $this->appointmentStartsAt(),
                 'duration_min' => $this->durationMin,
+                'price' => filled($this->price) ? $this->price : null,
+                'is_paid' => $this->is_paid,
+                'payment_method' => $this->payment_method,
                 'note' => filled($this->note) ? trim($this->note) : null,
             ]);
         });
@@ -162,6 +174,9 @@ class Calendar extends Page
                 'service_id' => $this->serviceId,
                 'starts_at' => $this->appointmentStartsAt(),
                 'duration_min' => $this->durationMin,
+                'price' => filled($this->price) ? $this->price : null,
+                'is_paid' => $this->is_paid,
+                'payment_method' => $this->payment_method,
                 'note' => filled($this->note) ? trim($this->note) : null,
             ]);
         });
@@ -280,6 +295,9 @@ class Calendar extends Page
             'appointmentTime' => ['required', 'date_format:H:i'],
             'durationMin' => ['required', 'integer', 'min:5', 'max:1440'],
             'serviceId' => ['nullable', 'integer', 'exists:services,id'],
+            'price' => ['nullable', 'numeric', 'min:0'],
+            'is_paid' => ['boolean'],
+            'payment_method' => ['nullable', 'in:nakit,kart,havale'],
             'note' => ['nullable', 'string'],
             'newCustomerPhone' => ['nullable', 'string', 'max:255'],
         ];
@@ -300,8 +318,15 @@ class Calendar extends Page
             'customerId' => 'müşteri',
             'newCustomerName' => 'yeni müşteri adı',
             'newCustomerPhone' => 'telefon',
+            'price' => 'fiyat',
+            'is_paid' => 'ödeme durumu',
+            'payment_method' => 'ödeme yöntemi',
             'note' => 'not',
         ]);
+
+        if (! $this->is_paid) {
+            $this->payment_method = null;
+        }
     }
 
     private function resolveCustomerId(): int
@@ -335,6 +360,9 @@ class Calendar extends Page
         $this->newCustomerPhone = '';
         $this->appointmentTime = '10:00';
         $this->durationMin = 60;
+        $this->price = null;
+        $this->is_paid = false;
+        $this->payment_method = null;
         $this->note = '';
     }
 

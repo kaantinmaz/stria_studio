@@ -28,6 +28,9 @@ class CustomerAppointmentTest extends TestCase
             'service_id',
             'starts_at',
             'duration_min',
+            'price',
+            'is_paid',
+            'payment_method',
             'note',
             'created_at',
             'updated_at',
@@ -40,12 +43,18 @@ class CustomerAppointmentTest extends TestCase
         $appointment = Appointment::query()->create([
             'customer_id' => $customer->id,
             'starts_at' => '2026-07-20 10:00:00',
+            'price' => '1250.50',
+            'is_paid' => true,
+            'payment_method' => 'kart',
         ]);
         $appointment->refresh();
 
         $this->assertTrue($appointment->customer->is($customer));
         $this->assertTrue($customer->appointments()->first()->is($appointment));
         $this->assertSame(60, $appointment->duration_min);
+        $this->assertSame('1250.50', $appointment->price);
+        $this->assertTrue($appointment->is_paid);
+        $this->assertSame('kart', $appointment->payment_method);
 
         $customer->delete();
 

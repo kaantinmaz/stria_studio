@@ -252,6 +252,19 @@
         textarea.stria-input { min-height: 82px; resize: vertical; }
         .stria-input:focus { border-color: #0a84ff; box-shadow: 0 0 0 3px rgba(10, 132, 255, .13); }
 
+        .stria-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            cursor: pointer;
+        }
+
+        .stria-checkbox input {
+            width: 16px;
+            height: 16px;
+            accent-color: #007aff;
+        }
+
         .stria-customer-results {
             position: absolute;
             z-index: 80;
@@ -418,7 +431,7 @@
                         <button type="button" class="stria-close" wire:click="closeAppointmentModal" aria-label="Kapat">×</button>
                     </header>
 
-                    <div class="stria-modal-body">
+                    <div class="stria-modal-body" x-data="{ isPaid: @js($is_paid) }">
                         @if (! $creatingCustomer)
                             <div
                                 class="stria-field is-full"
@@ -516,6 +529,32 @@
                             <label class="stria-label" for="appointment-duration">Süre (dk)</label>
                             <input id="appointment-duration" type="number" min="5" max="1440" step="5" class="stria-input" wire:model="durationMin" required>
                             @error('durationMin') <div class="stria-error">{{ $message }}</div> @enderror
+                        </div>
+
+                        <div class="stria-field">
+                            <label class="stria-label" for="appointment-price">Fiyat (₺)</label>
+                            <input id="appointment-price" type="number" min="0" step="0.01" class="stria-input" wire:model="price">
+                            @error('price') <div class="stria-error">{{ $message }}</div> @enderror
+                        </div>
+
+                        <div class="stria-field">
+                            <span class="stria-label">Ödeme</span>
+                            <label class="stria-input stria-checkbox" for="appointment-is-paid">
+                                <input id="appointment-is-paid" type="checkbox" wire:model="is_paid" x-model="isPaid">
+                                <span>Ödeme alındı</span>
+                            </label>
+                            @error('is_paid') <div class="stria-error">{{ $message }}</div> @enderror
+                        </div>
+
+                        <div class="stria-field" x-cloak x-show="isPaid">
+                            <label class="stria-label" for="appointment-payment-method">Ödeme yöntemi</label>
+                            <select id="appointment-payment-method" class="stria-input" wire:model="payment_method">
+                                <option value="">Yöntem seçilmedi</option>
+                                <option value="nakit">Nakit</option>
+                                <option value="kart">Kart</option>
+                                <option value="havale">Havale</option>
+                            </select>
+                            @error('payment_method') <div class="stria-error">{{ $message }}</div> @enderror
                         </div>
 
                         <div class="stria-field is-full">

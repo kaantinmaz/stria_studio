@@ -15,6 +15,9 @@ class Appointment extends Model
         'service_id',
         'starts_at',
         'duration_min',
+        'price',
+        'is_paid',
+        'payment_method',
         'note',
     ];
 
@@ -22,6 +25,8 @@ class Appointment extends Model
     {
         return [
             'starts_at' => 'datetime',
+            'price' => 'decimal:2',
+            'is_paid' => 'boolean',
         ];
     }
 
