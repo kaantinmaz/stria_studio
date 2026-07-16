@@ -75,6 +75,18 @@ export type ServiceListItem = {
   url: string;
 };
 
+export type SubService = {
+  slug?: string;
+  name: string;
+  desc: string;
+  gallery?: string[];
+  seo_title?: string;
+  seo_desc?: string;
+  intro?: string;
+  benefits?: string[];
+  faq?: { q: string; a: string }[];
+};
+
 export type ServiceFull = ServiceListItem & {
   hero_images: string[];
   seo_title_tr: string | null;
@@ -91,7 +103,7 @@ export type ServiceFull = ServiceListItem & {
   benefits_en: string[];
   process_tr: string[];
   process_en: string[];
-  subservices_tr?: { name: string; desc: string }[];
+  subservices_tr?: SubService[];
   faq_tr: { q: string; a: string }[];
   faq_en: { q: string; a: string }[];
   gallery: string[];

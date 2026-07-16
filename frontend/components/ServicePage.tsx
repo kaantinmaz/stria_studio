@@ -4,6 +4,7 @@ import Link from "next/link";
 import { HeroCarousel } from "@/components/HeroCarousel";
 import { ImageSlot } from "@/components/ImageSlot";
 import { Faq } from "@/components/Faq";
+import { WorkLightbox } from "@/components/WorkLightbox";
 import { WhatsAppIcon, PhoneIcon } from "@/components/Icons";
 import { CallLabel } from "@/components/CallLabel";
 import { useSettings } from "@/components/SettingsProvider";
@@ -127,15 +128,33 @@ export function ServicePage({
           </p>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {svc.subservices_tr.map((subservice) => (
-              <article
-                key={subservice.name}
-                className="rounded-[22px] border border-line bg-blush px-6 py-5"
-              >
-                <h3 className="mb-2 text-[18px] leading-[1.35] text-ink">
-                  {subservice.name}
-                </h3>
-                <p className="text-[14px] leading-[1.7] text-muted2">{subservice.desc}</p>
-              </article>
+              <div key={subservice.name} className="flex flex-col gap-3">
+                {subservice.slug ? (
+                  <Link
+                    href={`/hizmetler/${svc.slug}/${subservice.slug}`}
+                    className="rounded-[22px] border border-line bg-blush px-6 py-5 transition-colors hover:border-accent"
+                  >
+                    <h3 className="mb-2 text-[18px] leading-[1.35] text-ink">
+                      {subservice.name}
+                    </h3>
+                    <p className="text-[14px] leading-[1.7] text-muted2">{subservice.desc}</p>
+                    <p className="mt-4 text-[14px] text-accent">Detaylı bilgi →</p>
+                  </Link>
+                ) : (
+                  <article className="rounded-[22px] border border-line bg-blush px-6 py-5">
+                    <h3 className="mb-2 text-[18px] leading-[1.35] text-ink">
+                      {subservice.name}
+                    </h3>
+                    <p className="text-[14px] leading-[1.7] text-muted2">{subservice.desc}</p>
+                  </article>
+                )}
+                {subservice.gallery && subservice.gallery.length > 0 && (
+                  <WorkLightbox
+                    images={subservice.gallery.slice(0, 3)}
+                    altBase={subservice.name}
+                  />
+                )}
+              </div>
             ))}
           </div>
         </section>

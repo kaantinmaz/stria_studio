@@ -1,6 +1,11 @@
 import { site } from "@/lib/site";
 import { absUrl } from "@/lib/seo";
-import { phoneHref, type Settings } from "@/lib/content";
+import {
+  phoneHref,
+  type ServiceFull,
+  type Settings,
+  type SubService,
+} from "@/lib/content";
 
 // LocalBusiness (BeautySalon) — site-wide identity. @id is referenced by
 // per-service Service schema via `provider`.
@@ -42,12 +47,18 @@ export function beautySalonSchema(s: Settings) {
   };
 }
 
+// Colloquial synonyms searchers use for a service; emitted as schema.org
+// alternateName so search/AI engines map variant queries to the same page.
+const SERVICE_ALTERNATE_NAMES: Record<string, string[]> = {
+  microblading: ["Kıl Tekniği Kaş", "Kaş Microblading"],
+};
+
 export function serviceSchema(
   svc: {
     slug: string;
     intro_tr: string | null;
     desc_tr: string;
-    subservices_tr?: { name: string; desc: string }[];
+    subservices_tr?: SubService[];
   },
   name: string,
   path = `/hizmetler/${svc.slug}`,
@@ -57,6 +68,9 @@ export function serviceSchema(
     "@type": "Service",
     name,
     serviceType: name,
+    ...(SERVICE_ALTERNATE_NAMES[svc.slug]
+      ? { alternateName: SERVICE_ALTERNATE_NAMES[svc.slug] }
+      : {}),
     description: svc.intro_tr || svc.desc_tr,
     url: absUrl(path),
     provider: { "@id": absUrl("/#business") },
@@ -68,6 +82,9 @@ export function serviceSchema(
             name: `${name} Alt Uygulamaları`,
             itemListElement: svc.subservices_tr.map((subservice) => ({
               "@type": "Offer",
+              ...(subservice.slug
+                ? { url: absUrl(`/hizmetler/${svc.slug}/${subservice.slug}`) }
+                : {}),
               itemOffered: {
                 "@type": "Service",
                 name: subservice.name,
@@ -77,6 +94,22 @@ export function serviceSchema(
           },
         }
       : {}),
+  };
+}
+
+export function subServiceSchema(svc: ServiceFull, sub: SubService) {
+  const path = `/hizmetler/${svc.slug}/${sub.slug}`;
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: sub.name,
+    serviceType: sub.name,
+    description: sub.desc,
+    url: absUrl(path),
+    provider: { "@id": absUrl("/#business") },
+    areaServed: "Ankara",
+    category: svc.name_tr,
   };
 }
 

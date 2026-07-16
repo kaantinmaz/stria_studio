@@ -6,7 +6,7 @@ Catalog of all wiki pages, by category. Update on every ingest/query that adds o
 _(none yet)_
 
 ## Concepts
-_(none yet)_
+- [keyword-cannibalization](concepts/keyword-cannibalization.md) — tek niyet tek sayfa; varyant sorgular mevcut sayfaya (title/intro/SSS/alternateName); domainler arası sorgu bölüşümü kuralları.
 
 ## Decisions
 - [stack-and-dev-servers](decisions/2026-07-07-stack-and-dev-servers.md) — monorepo, MySQL/MAMP, dev ports (8002/3001), added contact form, CORS. ("No admin UI" call superseded by filament-admin-resources below.)
@@ -24,3 +24,4 @@ _(none yet)_
 
 ## Raw sources
 - [stria-studio-design](raw/stria-studio-design.md) — imported Minimal design: tokens, bilingual copy, services, image URLs.
+- [2026-07-16-kil-teknigi-cannibalization-note](raw/2026-07-16-kil-teknigi-cannibalization-note.md) — kıl tekniği kaş danışması, uygulanan on-page değişiklikler, cannibalization denetim bulguları.

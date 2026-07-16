@@ -8,12 +8,10 @@ use Tests\TestCase;
 class ExampleTest extends TestCase
 {
     /**
-     * A basic test example.
+     * The web root exists only for the admin subdomain; it forwards to the panel.
      */
-    public function test_the_application_returns_a_successful_response(): void
+    public function test_root_redirects_to_admin_panel(): void
     {
-        $response = $this->get('/');
-
-        $response->assertStatus(200);
+        $this->get('/')->assertRedirect('/admin');
     }
 }

@@ -57,11 +57,40 @@ class ServiceForm
                                     ]),
                                 Repeater::make('subservices_tr')
                                     ->schema([
+                                        TextInput::make('slug')
+                                            ->label('Slug (URL)')
+                                            ->helperText("Alt sayfa URL'i /hizmetler/<hizmet>/<slug>"),
                                         TextInput::make('name')
                                             ->label('Alt hizmet adı'),
                                         Textarea::make('desc')
                                             ->label('Kısa açıklama')
                                             ->rows(2),
+                                        TextInput::make('seo_title')
+                                            ->label('SEO başlık'),
+                                        Textarea::make('seo_desc')
+                                            ->label('SEO açıklama')
+                                            ->rows(2),
+                                        Textarea::make('intro')
+                                            ->label('Giriş metni')
+                                            ->rows(4),
+                                        FileUpload::make('gallery')
+                                            ->image()
+                                            ->multiple()
+                                            ->disk('public')
+                                            ->directory('subservices')
+                                            ->label('Çalışma fotoğrafları')
+                                            ->helperText('Alt uygulama sayfasında kare kare listelenir; tıklanınca büyür.'),
+                                        Repeater::make('benefits')
+                                            ->label('Faydalar')
+                                            ->simple(TextInput::make('value')),
+                                        Repeater::make('faq')
+                                            ->schema([
+                                                TextInput::make('q')
+                                                    ->label('Soru'),
+                                                Textarea::make('a')
+                                                    ->label('Cevap')
+                                                    ->rows(2),
+                                            ]),
                                     ])
                                     ->collapsible()
                                     ->addActionLabel('Alt hizmet ekle')

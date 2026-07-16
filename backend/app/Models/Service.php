@@ -25,8 +25,29 @@ class Service extends Model
         'subservices_tr' => 'array',
         'hero_images' => 'array',
         'gallery' => 'array',
+        'gallery_updated_at' => 'datetime',
         'related' => 'array',
     ];
+
+    protected static function booted(): void
+    {
+        static::saving(function (Service $service): void {
+            $oldSubserviceGalleries = collect($service->getOriginal('subservices_tr') ?? [])
+                ->pluck('gallery')
+                ->filter()
+                ->values()
+                ->all();
+            $newSubserviceGalleries = collect($service->subservices_tr ?? [])
+                ->pluck('gallery')
+                ->filter()
+                ->values()
+                ->all();
+
+            if ($service->isDirty('gallery') || $oldSubserviceGalleries !== $newSubserviceGalleries) {
+                $service->gallery_updated_at = now();
+            }
+        });
+    }
 
     public function scopeActive(Builder $query): Builder
     {

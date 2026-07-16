@@ -75,7 +75,27 @@ class ServiceApiTest extends TestCase
     public function test_single_service_returns_subservices(): void
     {
         $subservices = [
-            ['name' => 'Çatlak Gizleme', 'desc' => 'Çatlaklar cilt tonuna uygun pigmentlerle kamufle edilir.'],
+            [
+                'slug' => 'catlak-gizleme',
+                'name' => 'Çatlak Gizleme',
+                'desc' => 'Çatlaklar cilt tonuna uygun pigmentlerle kamufle edilir.',
+                'seo_title' => 'Çatlak Gizleme Ankara | Doğal Cilt Tonu',
+                'seo_desc' => "Ankara'da çatlak gizleme uygulamasıyla renk farkını cilt tonunuza özel pigmentlerle kamufle edin. Stria Studio'da ön görüşme için hemen iletişime geçin.",
+                'intro' => "Çatlak gizleme, ciltteki açık renkli çatlak çizgileri ile çevre doku arasındaki ton farkını azaltmayı amaçlayan bir kamuflaj uygulamasıdır. Özellikle rengi oturmuş, hipopigmente çatlakların daha bütünlüklü ve doğal görünmesine yardımcı olur.\n\nStria Studio'da önce çatlağın dokusu ve cildin alt tonu incelenir. Kişiye özel hazırlanan medikal pigment, steril ve tek kullanımlık ekipmanla kontrollü katmanlar hâlinde uygulanır; iyileşme sonrasında renk uyumu yeniden değerlendirilir.",
+                'gallery' => [],
+                'benefits' => [
+                    'Açık renkli çatlaklarla çevre cilt arasındaki kontrastı azaltır',
+                    'Karın, kalça, basen ve bacak bölgelerine uyarlanabilir',
+                    'Cildin alt tonuna göre kişisel pigment karışımı hazırlanır',
+                    'Makyajla günlük kapatma ihtiyacını azaltmaya yardımcı olur',
+                ],
+                'faq' => [
+                    ['q' => 'Çatlak gizleme kaç seans sürer?', 'a' => 'Çatlağın genişliği, rengi ve cildin pigmenti tutma biçimine göre genellikle birden fazla seans planlanabilir; net plan ön görüşmede oluşturulur.'],
+                    ['q' => 'Yeni ve kırmızı çatlaklara uygulanır mı?', 'a' => 'Kamuflaj için çoğunlukla rengi oturmuş, açık tonlu çatlaklar tercih edilir. Yeni veya aktif görünümlü çatlakların önce olgunlaşması beklenebilir.'],
+                    ['q' => 'İyileşirken renk nasıl görünür?', 'a' => 'İlk günlerde pigment daha koyu veya sıcak görünebilir. Kabuklanma azaldıkça ton yumuşar ve nihai uyum birkaç hafta içinde değerlendirilir.'],
+                    ['q' => 'Sonuç doğal görünür mü?', 'a' => 'Amaç çatlağın dokusunu yok etmek değil, renk farkını azaltmaktır. Doğallık; doğru alt ton seçimi ve kontrollü pigment katmanlarıyla desteklenir.'],
+                ],
+            ],
         ];
 
         Service::factory()->create([
@@ -100,6 +120,31 @@ class ServiceApiTest extends TestCase
         $this->getJson('/api/services/no-subservices')
             ->assertOk()
             ->assertJsonPath('data.subservices_tr', []);
+    }
+
+    public function test_subservice_gallery_paths_are_mapped_to_public_urls(): void
+    {
+        Service::factory()->create([
+            'slug' => 'subservice-gallery',
+            'is_active' => true,
+            'subservices_tr' => [
+                [
+                    'slug' => 'catlak-gizleme',
+                    'gallery' => ['subservices/x.png', '/images/works/catlak-gizleme-1.png'],
+                ],
+                [
+                    'slug' => 'empty-gallery',
+                ],
+            ],
+        ]);
+
+        $this->getJson('/api/services/subservice-gallery')
+            ->assertOk()
+            ->assertJsonPath('data.subservices_tr.0.gallery', [
+                asset('storage/subservices/x.png'),
+                '/images/works/catlak-gizleme-1.png',
+            ])
+            ->assertJsonPath('data.subservices_tr.1.gallery', []);
     }
 
     public function test_inactive_service_is_404(): void

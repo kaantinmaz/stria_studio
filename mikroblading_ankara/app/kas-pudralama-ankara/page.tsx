@@ -13,9 +13,9 @@ import { serviceSchema, faqSchema } from "@/lib/schema";
 import { ArrowIcon } from "@/components/Icons";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Kaş Pudralama Ankara (Powder Brows) | Stria Studio",
+  title: "Kaş Pudralama Nedir? Powder Brows Tekniği ve Farkları",
   description:
-    "Kaş pudralama (powder brows) Ankara: pudralı, makyajlı gölge efekti veren kalıcı kaş tekniği. Özellikle yağlı ciltler için ideal, 1–3 yıl kalıcılık, 5.000–7.500 ₺.",
+    "Kaş pudralama (powder brows) nedir, cihazla noktasal pigmentle nasıl uygulanır, mikrobladingden farkı ne? Yağlı ciltteki avantajı, kalıcılık ve iyileşme rehberi.",
   path: "/kas-pudralama-ankara",
 });
 
@@ -48,19 +48,19 @@ export default async function KasPudralamaAnkaraPage() {
     <>
       <JsonLd
         data={serviceSchema({
-          name: "Kaş Pudralama (Powder Brows) Ankara",
+          name: "Kaş Pudralama (Powder Brows)",
           description:
-            "Ankara Çankaya'daki Stria Studio'da cihazla pigment uygulanan, pudralı gölge efekti veren kalıcı kaş pudralama (powder brows) hizmeti. Özellikle yağlı ciltler için uygundur.",
+            "Cihazla noktasal pigment uygulanan, pudralı gölge efekti veren kalıcı kaş tekniği rehberi: kimlere uygundur, mikrobladingden farkı, kalıcılık ve iyileşme.",
           path: "/kas-pudralama-ankara",
         })}
       />
       <JsonLd data={faqSchema(faqs)} />
-      <Breadcrumbs items={[{ name: "Kaş Pudralama Ankara", path: "/kas-pudralama-ankara" }]} />
+      <Breadcrumbs items={[{ name: "Kaş Pudralama Nedir", path: "/kas-pudralama-ankara" }]} />
 
       <Section>
         <p className="mb-3 text-[11px] uppercase tracking-[0.18em] text-accent">Son güncelleme: {LAST_UPDATED}</p>
         <h1 className="max-w-[820px] text-[clamp(28px,4vw,46px)] leading-tight text-ink">
-          Kaş pudralama Ankara — powder brows tekniği
+          Kaş pudralama nedir? Powder brows tekniği rehberi
         </h1>
         <p className="mt-5 max-w-[720px] text-[19px] leading-relaxed text-muted2">
           Kaş pudralama (powder brows), cihazla cildin üst katmanına noktasal pigment işlenerek
@@ -103,7 +103,9 @@ export default async function KasPudralamaAnkaraPage() {
           <Link href="/mikroblading-mi-kas-pudralama-mi" className="text-accent-dark hover:underline">mikroblading mi kaş pudralama mı</Link>{" "}
           karşılaştırmasını inceleyebilir; uzun ömürlü kaş seçenekleri için{" "}
           <Link href="/kalici-kas-ankara" className="text-accent-dark hover:underline">kalıcı kaş Ankara</Link>{" "}
-          sayfasına bakabilirsiniz.
+          sayfasına bakabilirsiniz. Ankara&apos;da randevu ve hizmet detayları için{" "}
+          <a href="https://striastudio.com.tr/hizmetler/kas-pudralama" className="text-accent-dark hover:underline" rel="noopener">Stria Studio kaş pudralama</a>{" "}
+          sayfasını ziyaret edin.
         </p>
       </Section>
 

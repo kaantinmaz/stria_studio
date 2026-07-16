@@ -35,12 +35,20 @@ class ServicesTable
                 TextColumn::make('tag_tr')
                     ->label('Etiket')
                     ->badge(),
-                // How many gallery images are uploaded for this service.
+                // How many service and subservice gallery images are uploaded.
                 TextColumn::make('gallery')
                     ->label('Galeri')
                     ->badge()
                     ->color('gray')
-                    ->getStateUsing(fn ($record) => count($record->gallery ?? []).' görsel'),
+                    ->getStateUsing(fn ($record) => (
+                        count($record->gallery ?? [])
+                        + collect($record->subservices_tr ?? [])->sum(fn (array $item): int => count($item['gallery'] ?? []))
+                    ).' görsel'),
+                TextColumn::make('gallery_updated_at')
+                    ->label('Son çalışma')
+                    ->since()
+                    ->placeholder('—')
+                    ->sortable(),
                 IconColumn::make('is_active')
                     ->label('Aktif')
                     ->boolean(),

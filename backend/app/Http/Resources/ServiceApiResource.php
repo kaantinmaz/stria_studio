@@ -25,7 +25,10 @@ class ServiceApiResource extends ServiceListResource
             'process_en' => $this->process_en ?? [],
             'faq_tr' => $this->faq_tr ?? [],
             'faq_en' => $this->faq_en ?? [],
-            'subservices_tr' => $this->subservices_tr ?? [],
+            'subservices_tr' => collect($this->subservices_tr ?? [])->map(fn (array $item): array => [
+                ...$item,
+                'gallery' => collect($item['gallery'] ?? [])->map(fn ($p) => $this->imageUrl($p))->values()->all(),
+            ])->values()->all(),
             'hero_images' => collect($this->hero_images ?? [])->map(fn ($p) => $this->imageUrl($p))->values()->all(),
             'gallery' => collect($this->gallery ?? [])->map(fn ($p) => $this->imageUrl($p))->values()->all(),
             'related' => $this->related ?? [],
