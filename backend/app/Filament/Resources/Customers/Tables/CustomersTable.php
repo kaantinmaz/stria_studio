@@ -28,6 +28,15 @@ class CustomersTable
                     ->label('Randevu Sayısı')
                     ->counts('appointments')
                     ->sortable(),
+                TextColumn::make('photos')
+                    ->label('Fotoğraflar')
+                    ->badge()
+                    ->color('gray')
+                    ->getStateUsing(function ($record): string {
+                        $count = count($record->photos ?? []);
+
+                        return $count > 0 ? $count.' fotoğraf' : '—';
+                    }),
                 TextColumn::make('created_at')
                     ->label('Kayıt Tarihi')
                     ->since()

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Resources\Customers\CustomerResource;
 use App\Models\Appointment;
 use App\Models\Customer;
 use App\Models\Service;
@@ -224,6 +225,9 @@ class Calendar extends Page
             'selectedCustomerName' => $this->customerId
                 ? Customer::query()->whereKey($this->customerId)->value('name') ?? ''
                 : '',
+            'selectedCustomerEditUrl' => $this->customerId
+                ? CustomerResource::getUrl('edit', ['record' => $this->customerId])
+                : null,
             'services' => Service::query()
                 ->where('is_active', true)
                 ->orderBy('sort_order')

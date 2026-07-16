@@ -20,6 +20,7 @@ class CustomerAppointmentTest extends TestCase
             'email',
             'instagram',
             'notes',
+            'photos',
             'created_at',
             'updated_at',
         ]));
@@ -60,5 +61,29 @@ class CustomerAppointmentTest extends TestCase
 
         $this->assertNull($appointment->refresh()->customer_id);
         $this->assertNull($appointment->customer);
+    }
+
+    public function test_customer_photos_are_persisted_as_an_array_and_nullable(): void
+    {
+        $photos = [
+            'customers/before-1.jpg',
+            'customers/after-1.jpg',
+            'customers/after-2.jpg',
+        ];
+
+        $customer = Customer::query()->create([
+            'name' => 'Fotoğraflı Müşteri',
+            'photos' => $photos,
+        ]);
+
+        $this->assertSame($photos, $customer->refresh()->photos);
+
+        $customerWithoutPhotos = Customer::query()->create([
+            'name' => 'Fotoğrafsız Müşteri',
+            'photos' => null,
+        ]);
+
+        $this->assertNull($customerWithoutPhotos->refresh()->photos);
+        $this->assertCount(0, $customerWithoutPhotos->photos ?? []);
     }
 }

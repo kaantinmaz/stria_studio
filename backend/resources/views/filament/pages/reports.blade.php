@@ -85,6 +85,12 @@
             gap: 14px;
         }
 
+        .stria-kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 14px;
+        }
+
         .stria-summary-card { padding: 20px 22px; }
 
         .stria-summary-label,
@@ -111,6 +117,10 @@
         .stria-summary-card.net-negative { border-top: 3px solid #ff3b30; }
         .stria-summary-card.net-positive .stria-summary-value { color: #248a3d; }
         .stria-summary-card.net-negative .stria-summary-value { color: #d70015; }
+        .stria-kpi-card:nth-child(1) { border-top: 3px solid #007aff; }
+        .stria-kpi-card:nth-child(2) { border-top: 3px solid #5856d6; }
+        .stria-kpi-card:nth-child(3) { border-top: 3px solid #34c759; }
+        .stria-kpi-card:nth-child(4) { border-top: 3px solid #af52de; }
 
         .stria-pending {
             display: flex;
@@ -157,6 +167,69 @@
         .stria-breakdown-fill { height: 100%; border-radius: inherit; background: #007aff; }
         .stria-expenses .stria-breakdown-fill { background: #ff9500; }
 
+        .stria-service-card .stria-breakdown-fill { background: #af52de; }
+
+        .stria-service-head,
+        .stria-service-row {
+            display: grid;
+            grid-template-columns: minmax(140px, 1.4fr) 70px 120px 120px;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .stria-service-head {
+            margin-top: 16px;
+            padding: 0 0 9px;
+            color: #8e8e93;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+        }
+
+        .stria-service-head span:not(:first-child),
+        .stria-service-row > span { text-align: right; }
+
+        .stria-service-row {
+            border-top: 1px solid rgba(60, 60, 67, .1);
+            padding: 11px 0;
+            color: #3a3a3c;
+            font-size: 13px;
+        }
+
+        .stria-service-row strong { color: #1d1d1f; }
+        .stria-service-row .stria-breakdown-track { grid-column: 1 / -1; }
+
+        .stria-insight-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .stria-section-heading {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .stria-section-highlight {
+            color: #007aff;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .stria-empty-state {
+            margin-top: 14px;
+            border-top: 1px solid rgba(60, 60, 67, .1);
+            padding: 16px 0 2px;
+            color: #8e8e93;
+            font-size: 13px;
+        }
+
+        .stria-compact-table { min-width: 420px; }
+
         .stria-table-card { overflow: hidden; }
         .stria-table-header { padding: 20px 22px 15px; }
         .stria-table-scroll { overflow-x: auto; }
@@ -199,7 +272,9 @@
 
         @media (max-width: 800px) {
             .stria-summary-grid { grid-template-columns: 1fr; }
+            .stria-kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
             .stria-breakdown-grid { grid-template-columns: 1fr; }
+            .stria-insight-grid { grid-template-columns: 1fr; }
         }
 
         @media (max-width: 640px) {
@@ -207,11 +282,24 @@
             .stria-reports-period { align-items: stretch; flex-direction: column; width: 100%; }
             .stria-reports-segment { grid-template-columns: 38px 1fr 38px; }
             .stria-reports-current { width: 100%; }
+            .stria-service-head { display: none; }
+            .stria-service-row { grid-template-columns: 1fr auto; }
+            .stria-service-row > span::before {
+                content: attr(data-label) ': ';
+                color: #8e8e93;
+                font-size: 10px;
+                font-weight: 700;
+                letter-spacing: .04em;
+                text-transform: uppercase;
+            }
+            .stria-service-row > span:nth-of-type(2),
+            .stria-service-row > span:nth-of-type(3) { grid-column: 1 / -1; }
         }
     </style>
 
     @php
         $formatMoney = static fn (float|int|string $value): string => number_format((float) $value, 2, ',', '.') . ' ₺';
+        $formatNumber = static fn (float|int|string $value): string => number_format((float) $value, 0, ',', '.');
     @endphp
 
     <div class="stria-reports">
@@ -242,6 +330,30 @@
             <article class="stria-report-card stria-summary-card {{ $summary['net'] >= 0 ? 'net-positive' : 'net-negative' }}">
                 <div class="stria-summary-label">Net</div>
                 <div class="stria-summary-value">{{ $formatMoney($summary['net']) }}</div>
+            </article>
+        </section>
+
+        <section class="stria-kpi-grid" aria-label="İşletme performansı">
+            <article class="stria-report-card stria-summary-card stria-kpi-card">
+                <div class="stria-summary-label">Randevu</div>
+                <div class="stria-summary-value">{{ $formatNumber($kpis['appointments']) }}</div>
+            </article>
+
+            <article class="stria-report-card stria-summary-card stria-kpi-card">
+                <div class="stria-summary-label">Ortalama Fiş</div>
+                <div class="stria-summary-value">
+                    {{ $kpis['average_ticket'] === null ? '—' : $formatMoney($kpis['average_ticket']) }}
+                </div>
+            </article>
+
+            <article class="stria-report-card stria-summary-card stria-kpi-card">
+                <div class="stria-summary-label">Yeni Müşteri</div>
+                <div class="stria-summary-value">{{ $formatNumber($kpis['new_customers']) }}</div>
+            </article>
+
+            <article class="stria-report-card stria-summary-card stria-kpi-card">
+                <div class="stria-summary-label">Tekrar Oranı</div>
+                <div class="stria-summary-value">%{{ $formatNumber($kpis['repeat_rate']) }}</div>
             </article>
         </section>
 
@@ -284,6 +396,98 @@
                                 ></div>
                             </div>
                             <strong>{{ $formatMoney($amount) }}</strong>
+                        </div>
+                    @endforeach
+                </div>
+            </article>
+        </section>
+
+        <section class="stria-report-card stria-breakdown-card stria-service-card" aria-label="Hizmet analizi">
+            <div class="stria-section-eyebrow">Seçili ay</div>
+            <h2 class="stria-section-title">Hizmet Analizi</h2>
+
+            @if ($serviceBreakdown === [])
+                <div class="stria-empty-state">Bu ay randevu yok</div>
+            @else
+                <div class="stria-service-head" aria-hidden="true">
+                    <span>Hizmet</span>
+                    <span>Adet</span>
+                    <span>Gelir</span>
+                    <span>Ort. fiyat</span>
+                </div>
+
+                @php($topServiceCount = $serviceBreakdown[0]['count'])
+                @foreach ($serviceBreakdown as $service)
+                    <div class="stria-service-row">
+                        <strong>{{ $service['service'] }}</strong>
+                        <span data-label="Adet">{{ $formatNumber($service['count']) }}</span>
+                        <span data-label="Gelir">{{ $formatMoney($service['revenue']) }}</span>
+                        <span data-label="Ort. fiyat">
+                            {{ $service['average_price'] === null ? '—' : $formatMoney($service['average_price']) }}
+                        </span>
+                        <div class="stria-breakdown-track" aria-hidden="true">
+                            <div
+                                class="stria-breakdown-fill"
+                                style="width: {{ $topServiceCount > 0 ? ($service['count'] / $topServiceCount) * 100 : 0 }}%"
+                            ></div>
+                        </div>
+                    </div>
+                @endforeach
+            @endif
+        </section>
+
+        <section class="stria-insight-grid">
+            <article class="stria-report-card stria-table-card" aria-label="En iyi müşteriler">
+                <header class="stria-table-header">
+                    <div class="stria-section-eyebrow">Tüm zamanlar</div>
+                    <h2 class="stria-section-title">En İyi Müşteriler</h2>
+                </header>
+
+                @if ($topCustomers === [])
+                    <div class="stria-empty-state" style="margin: 0 22px 18px;">Henüz müşteri randevusu yok</div>
+                @else
+                    <div class="stria-table-scroll">
+                        <table class="stria-report-table stria-compact-table">
+                            <thead>
+                                <tr>
+                                    <th>Müşteri</th>
+                                    <th>Randevu</th>
+                                    <th>Ödenen</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($topCustomers as $customer)
+                                    <tr>
+                                        <td>{{ $customer['customer'] }}</td>
+                                        <td>{{ $formatNumber($customer['appointments']) }}</td>
+                                        <td>{{ $formatMoney($customer['paid_total']) }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
+            </article>
+
+            <article class="stria-report-card stria-breakdown-card" aria-label="Haftalık yoğunluk">
+                <div class="stria-section-heading">
+                    <div>
+                        <div class="stria-section-eyebrow">Seçili ay</div>
+                        <h2 class="stria-section-title">Haftalık Yoğunluk</h2>
+                    </div>
+                    <span class="stria-section-highlight">
+                        {{ $busiestWeekday ? 'En yoğun: ' . $busiestWeekday : 'Randevu yok' }}
+                    </span>
+                </div>
+
+                <div class="stria-breakdown-list">
+                    @foreach ($weekdayLoad as $weekday)
+                        <div class="stria-breakdown-row">
+                            <span>{{ $weekday['day'] }}</span>
+                            <div class="stria-breakdown-track" aria-hidden="true">
+                                <div class="stria-breakdown-fill" style="width: {{ $weekday['percentage'] }}%"></div>
+                            </div>
+                            <strong>{{ $formatNumber($weekday['count']) }}</strong>
                         </div>
                     @endforeach
                 </div>

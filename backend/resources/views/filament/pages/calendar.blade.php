@@ -477,6 +477,17 @@
                                     </button>
                                 </div>
 
+                                @if ($editingAppointmentId && $selectedCustomerEditUrl)
+                                    <a
+                                        class="stria-inline-action"
+                                        href="{{ $selectedCustomerEditUrl }}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        📷 Müşteri fotoğrafları
+                                    </a>
+                                @endif
+
                                 <button type="button" class="stria-inline-action" wire:click="useNewCustomer">
                                     + Yeni müşteri oluştur
                                 </button>

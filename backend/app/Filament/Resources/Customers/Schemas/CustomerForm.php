@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Customers\Schemas;
 
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
@@ -30,6 +31,17 @@ class CustomerForm
                 Textarea::make('notes')
                     ->label('Notlar')
                     ->rows(5)
+                    ->columnSpanFull(),
+                FileUpload::make('photos')
+                    ->image()
+                    ->multiple()
+                    ->reorderable()
+                    ->disk('public')
+                    ->directory('customers')
+                    ->label('Öncesi / Sonrası Fotoğrafları')
+                    ->helperText('Sınırsız fotoğraf ekleyebilirsiniz.')
+                    ->panelLayout('grid')
+                    ->imagePreviewHeight('120')
                     ->columnSpanFull(),
             ]);
     }

@@ -16,7 +16,15 @@ class Customer extends Model
         'email',
         'instagram',
         'notes',
+        'photos',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'photos' => 'array',
+        ];
+    }
 
     public function appointments(): HasMany
     {

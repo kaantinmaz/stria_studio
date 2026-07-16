@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Models\Appointment;
+use App\Models\Customer;
 use App\Models\Expense;
 use BackedEnum;
 use Carbon\CarbonImmutable;
@@ -84,18 +85,180 @@ class Reports extends Page
     }
 
     /**
+     * @return array{appointments: int, average_ticket: float|null, new_customers: int, repeat_rate: int}
+     */
+    public function calculateKpis(string $month): array
+    {
+        $date = $this->parseMonth($month);
+        $range = [$date->startOfMonth(), $date->endOfMonth()];
+        $appointments = Appointment::query()
+            ->whereBetween('starts_at', $range)
+            ->get(['customer_id', 'price', 'is_paid']);
+        $paidAppointments = $appointments
+            ->where('is_paid', true)
+            ->whereNotNull('price');
+        $customerIds = $appointments
+            ->pluck('customer_id')
+            ->filter()
+            ->unique()
+            ->values();
+        $repeatCustomerCount = $customerIds->isEmpty()
+            ? 0
+            : Appointment::query()
+                ->whereIn('customer_id', $customerIds)
+                ->where('starts_at', '<', $date->startOfMonth())
+                ->distinct()
+                ->count('customer_id');
+
+        return [
+            'appointments' => $appointments->count(),
+            'average_ticket' => $paidAppointments->isEmpty()
+                ? null
+                : (float) $paidAppointments->sum('price') / $paidAppointments->count(),
+            'new_customers' => Customer::query()
+                ->whereBetween('created_at', $range)
+                ->count(),
+            'repeat_rate' => $customerIds->isEmpty()
+                ? 0
+                : (int) round(($repeatCustomerCount / $customerIds->count()) * 100),
+        ];
+    }
+
+    /**
+     * @return array<int, array{service: string, count: int, revenue: float, average_price: float|null}>
+     */
+    public function serviceBreakdown(string $month): array
+    {
+        $date = $this->parseMonth($month);
+        $appointments = Appointment::query()
+            ->with('service:id,name_tr')
+            ->whereBetween('starts_at', [$date->startOfMonth(), $date->endOfMonth()])
+            ->get(['service_id', 'price', 'is_paid'])
+            ->groupBy(fn (Appointment $appointment): string => $appointment->service_id === null
+                ? 'none'
+                : (string) $appointment->service_id)
+            ->map(function ($items): array {
+                $paidAppointments = $items
+                    ->where('is_paid', true)
+                    ->whereNotNull('price');
+                $revenue = (float) $paidAppointments->sum('price');
+
+                return [
+                    'service' => $items->first()->service?->name_tr ?? 'Hizmet seçilmedi',
+                    'count' => $items->count(),
+                    'revenue' => $revenue,
+                    'average_price' => $paidAppointments->isEmpty()
+                        ? null
+                        : $revenue / $paidAppointments->count(),
+                ];
+            })
+            ->values()
+            ->all();
+
+        usort($appointments, fn (array $left, array $right): int =>
+            $right['count'] <=> $left['count']
+            ?: $right['revenue'] <=> $left['revenue']
+            ?: strcmp($left['service'], $right['service']));
+
+        return $appointments;
+    }
+
+    /**
+     * @return array<int, array{customer: string, appointments: int, paid_total: float}>
+     */
+    public function topCustomers(int $limit = 5): array
+    {
+        if ($limit < 1) {
+            return [];
+        }
+
+        $customers = Appointment::query()
+            ->with('customer:id,name')
+            ->whereNotNull('customer_id')
+            ->get(['customer_id', 'price', 'is_paid'])
+            ->groupBy('customer_id')
+            ->map(function ($appointments): array {
+                $paidTotal = $appointments
+                    ->where('is_paid', true)
+                    ->whereNotNull('price')
+                    ->sum('price');
+
+                return [
+                    'customer' => $appointments->first()->customer?->name ?? 'Silinmiş müşteri',
+                    'appointments' => $appointments->count(),
+                    'paid_total' => (float) $paidTotal,
+                ];
+            })
+            ->values()
+            ->all();
+
+        usort($customers, fn (array $left, array $right): int =>
+            $right['paid_total'] <=> $left['paid_total']
+            ?: $right['appointments'] <=> $left['appointments']
+            ?: strcmp($left['customer'], $right['customer']));
+
+        return array_slice($customers, 0, $limit);
+    }
+
+    /**
+     * @return array<int, array{day: string, name: string, count: int, percentage: float}>
+     */
+    public function weekdayLoad(string $month): array
+    {
+        $date = $this->parseMonth($month);
+        $counts = array_fill(1, 7, 0);
+
+        Appointment::query()
+            ->whereBetween('starts_at', [$date->startOfMonth(), $date->endOfMonth()])
+            ->get(['starts_at'])
+            ->each(function (Appointment $appointment) use (&$counts): void {
+                $counts[$appointment->starts_at->dayOfWeekIso]++;
+            });
+
+        $days = [
+            1 => ['Pzt', 'Pazartesi'],
+            2 => ['Sal', 'Salı'],
+            3 => ['Çar', 'Çarşamba'],
+            4 => ['Per', 'Perşembe'],
+            5 => ['Cum', 'Cuma'],
+            6 => ['Cmt', 'Cumartesi'],
+            7 => ['Paz', 'Pazar'],
+        ];
+        $maximum = max($counts);
+
+        return collect($days)
+            ->map(fn (array $labels, int $day): array => [
+                'day' => $labels[0],
+                'name' => $labels[1],
+                'count' => $counts[$day],
+                'percentage' => $maximum > 0 ? ($counts[$day] / $maximum) * 100 : 0,
+            ])
+            ->values()
+            ->all();
+    }
+
+    /**
      * @return array<string, mixed>
      */
     protected function getViewData(): array
     {
         $month = $this->monthDate();
+        $weekdayLoad = $this->weekdayLoad($month->format('Y-m'));
+        $busiestWeekday = collect($weekdayLoad)->sortByDesc('count')->first();
 
         return [
             'monthName' => $this->turkishMonthName($month->month),
             'monthYear' => $month->year,
             'summary' => $this->calculateMonthSummary($month->format('Y-m')),
+            'kpis' => $this->calculateKpis($month->format('Y-m')),
             'paymentBreakdown' => $this->paymentBreakdown($month),
             'expenseBreakdown' => $this->expenseBreakdown($month),
+            'serviceBreakdown' => $this->serviceBreakdown($month->format('Y-m')),
+            'topCustomers' => $this->topCustomers(),
+            'weekdayLoad' => $weekdayLoad,
+            'busiestWeekday' => ($busiestWeekday['count'] ?? 0) > 0
+                ? $busiestWeekday['name']
+                : null,
             'monthlyReports' => $this->monthlyReports($month),
         ];
     }
