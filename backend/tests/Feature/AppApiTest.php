@@ -206,30 +206,113 @@ class AppApiTest extends TestCase
             ->assertJsonValidationErrors('time');
     }
 
-    public function test_campaigns_lists_only_active_campaigns(): void
+    public function test_campaigns_lists_only_active_and_in_window_campaigns_with_promo_first(): void
     {
+        CarbonImmutable::setTestNow('2026-07-17 09:00:00');
+
         Campaign::query()->create([
             'title' => '5. İşleme %40',
+            'kind' => 'loyalty',
             'nth' => 5,
             'discount_percent' => 40,
             'is_active' => true,
         ]);
         Campaign::query()->create([
             'title' => 'Pasif kampanya',
+            'kind' => 'loyalty',
             'nth' => 3,
             'discount_percent' => 20,
             'is_active' => false,
         ]);
+        $promo = Campaign::query()->create([
+            'title' => 'Haftaya Özel',
+            'kind' => 'promo',
+            'description' => 'Bu haftaya özel indirim',
+            'image' => 'campaigns/promo.jpg',
+            'old_price' => 1000,
+            'new_price' => 750,
+            'starts_at' => '2026-07-13',
+            'ends_at' => '2026-07-20',
+            'is_active' => true,
+        ]);
+        Campaign::query()->create([
+            'title' => 'Geçmiş kampanya',
+            'kind' => 'promo',
+            'description' => 'Süresi doldu',
+            'starts_at' => '2026-07-01',
+            'ends_at' => '2026-07-10',
+            'is_active' => true,
+        ]);
 
-        $this->actingAsAppUser()->getJson('/api/app/campaigns')
+        $response = $this->actingAsAppUser()->getJson('/api/app/campaigns')
             ->assertOk()
-            ->assertExactJson([
-                'data' => [[
-                    'title' => '5. İşleme %40',
-                    'nth' => 5,
-                    'discount_percent' => 40,
-                ]],
+            ->assertJsonCount(2, 'data');
+
+        // Promo first, then loyalty.
+        $response
+            ->assertJsonPath('data.0.id', $promo->id)
+            ->assertJsonPath('data.0.kind', 'promo')
+            ->assertJsonPath('data.0.title', 'Haftaya Özel')
+            ->assertJsonPath('data.0.description', 'Bu haftaya özel indirim')
+            ->assertJsonPath('data.0.old_price', '1000.00')
+            ->assertJsonPath('data.0.new_price', '750.00')
+            ->assertJsonPath('data.0.starts_at', '2026-07-13')
+            ->assertJsonPath('data.0.ends_at', '2026-07-20')
+            ->assertJsonPath('data.0.nth', null)
+            ->assertJsonPath('data.0.discount_percent', null)
+            ->assertJsonPath('data.1.kind', 'loyalty')
+            ->assertJsonPath('data.1.title', '5. İşleme %40')
+            ->assertJsonPath('data.1.nth', 5)
+            ->assertJsonPath('data.1.discount_percent', 40)
+            ->assertJsonPath('data.1.old_price', null)
+            ->assertJsonPath('data.1.new_price', null)
+            ->assertJsonPath('data.1.starts_at', null)
+            ->assertJsonPath('data.1.ends_at', null);
+
+        $this->assertStringContainsString('storage/campaigns/promo.jpg', $response->json('data.0.image'));
+        $this->assertNull($response->json('data.1.image'));
+    }
+
+    public function test_loyalty_ignores_promo_campaign_even_with_smaller_id(): void
+    {
+        CarbonImmutable::setTestNow('2026-07-17 09:00:00');
+        $user = $this->appUser();
+        $customer = Customer::query()->create([
+            'name' => 'Sadakat Müşterisi',
+            'app_user_id' => $user->id,
+        ]);
+
+        // Promo has the smaller id but must never be selected for loyalty.
+        Campaign::query()->create([
+            'title' => 'Promosyon',
+            'kind' => 'promo',
+            'old_price' => 500,
+            'new_price' => 400,
+            'is_active' => true,
+        ]);
+        Campaign::query()->create([
+            'title' => '5. İşleme %40',
+            'kind' => 'loyalty',
+            'nth' => 5,
+            'discount_percent' => 40,
+            'is_active' => true,
+        ]);
+
+        foreach (range(1, 4) as $day) {
+            Appointment::query()->create([
+                'customer_id' => $customer->id,
+                'starts_at' => "2026-07-0{$day} 10:00:00",
+                'status' => 'confirmed',
             ]);
+        }
+
+        $this->actingAsAppUser($user)->getJson('/api/app/me')
+            ->assertOk()
+            ->assertJsonPath('data.loyalty.campaign_title', '5. İşleme %40')
+            ->assertJsonPath('data.loyalty.nth', 5)
+            ->assertJsonPath('data.loyalty.discount_percent', 40)
+            ->assertJsonPath('data.loyalty.completed_count', 4)
+            ->assertJsonPath('data.loyalty.reward_next', true);
     }
 
     public function test_loyalty_math_marks_the_next_appointment_as_reward(): void

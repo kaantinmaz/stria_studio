@@ -39,9 +39,17 @@ export type Appointment = {
 };
 
 export type Campaign = {
+  id: number;
+  kind: 'loyalty' | 'promo';
   title: string;
-  nth: number;
-  discount_percent: number;
+  description: string | null;
+  image: string | null;
+  nth: number | null;
+  discount_percent: number | null;
+  old_price: string | null;
+  new_price: string | null;
+  starts_at: string | null;
+  ends_at: string | null;
 };
 
 export type Service = {

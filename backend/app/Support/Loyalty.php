@@ -14,11 +14,12 @@ class Loyalty
     {
         $campaign = Campaign::query()
             ->where('is_active', true)
+            ->where('kind', 'loyalty')
             ->orderBy('id')
             ->first();
         $customer = $user->customer()->first();
 
-        if (! $campaign || ! $customer || $campaign->nth < 1) {
+        if (! $campaign || ! $customer || (int) $campaign->nth < 1) {
             return null;
         }
 

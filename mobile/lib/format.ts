@@ -22,3 +22,13 @@ export function shortDay(date: Date) {
 export function monthName(date: Date) {
   return new Intl.DateTimeFormat('tr-TR', { month: 'long', year: 'numeric' }).format(date);
 }
+
+export function formatPrice(price: string) {
+  const value = Number(price);
+  if (!Number.isFinite(value)) return price;
+  return new Intl.NumberFormat('tr-TR', {
+    style: 'currency',
+    currency: 'TRY',
+    maximumFractionDigits: Number.isInteger(value) ? 0 : 2,
+  }).format(value);
+}

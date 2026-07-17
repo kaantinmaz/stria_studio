@@ -74,7 +74,26 @@ Kullanıcının randevusunu iptal eder (kapsam GET /appointments ile aynı: bağ
 ## Kampanyalar
 
 ### GET /campaigns  (auth)
-`200` → `{ "data": [ { "title": "5. İşleme %40", "nth": 5, "discount_percent": 40 } ] }` — yalnız aktif olanlar.
+`200` → `{ "data": [ Campaign, ... ] }` — yalnız `is_active=true` VE tarih penceresi bugünü kapsayan (`starts_at` null|≤bugün, `ends_at` null|≥bugün) kampanyalar. Sıralama: önce `promo`, sonra `id`.
+
+```jsonc
+Campaign {
+  "id": 12,
+  "kind": "promo",              // "loyalty" | "promo"
+  "title": "Haftaya Özel",
+  "description": "Bu haftaya özel indirim",  // null olabilir
+  "image": "https://.../storage/campaigns/promo.jpg",  // mutlak URL veya null
+  "nth": null,                  // loyalty'de int, promo'da null
+  "discount_percent": null,     // loyalty'de int, promo'da null
+  "old_price": "1000.00",       // promo'da string, yoksa null
+  "new_price": "750.00",        // promo'da string, yoksa null
+  "starts_at": "2026-07-13",    // "YYYY-MM-DD" veya null (süresiz)
+  "ends_at": "2026-07-20"       // "YYYY-MM-DD" veya null (süresiz)
+}
+```
+
+- `loyalty` kampanyaları damga kartı / sadakat mantığında kullanılır (`GET /me` → `loyalty`). Sadakat hesabı yalnız `kind='loyalty'` kampanyaları dikkate alır.
+- `promo` kampanyaları app ana sayfasındaki görselli kampanya slider'ında gösterilir.
 
 ## Hizmet listesi
 Mevcut public `GET /api/services` kullanılır (auth yok) — `name_tr/name_en`, `slug`, `image`.
@@ -83,4 +102,4 @@ Mevcut public `GET /api/services` kullanılır (auth yok) — `name_tr/name_en`,
 - Müşteri kartında "Uygulama kullanıcısı" bağlama alanı (code/e-posta ile arama). `customers.app_user_id` unique.
 - Takvimde ve müşteri listesinde 📱 rozeti (bağlı app kullanıcısı varsa).
 - "Randevu Talepleri": `status=requested` kayıtları onayla (→confirmed) / reddet (→cancelled).
-- Kampanyalar CRUD: `title, nth, discount_percent, is_active`.
+- Kampanyalar CRUD: `kind` (loyalty/promo), `title`, `is_active`; loyalty → `nth`, `discount_percent`; promo → `description`, `image`, `starts_at`, `ends_at`, `old_price`, `new_price`.

@@ -11,9 +11,16 @@ class Campaign extends Model
 
     protected $fillable = [
         'title',
+        'kind',
+        'description',
+        'image',
         'nth',
         'discount_percent',
         'is_active',
+        'starts_at',
+        'ends_at',
+        'old_price',
+        'new_price',
     ];
 
     protected function casts(): array
@@ -22,6 +29,10 @@ class Campaign extends Model
             'nth' => 'integer',
             'discount_percent' => 'integer',
             'is_active' => 'boolean',
+            'starts_at' => 'date',
+            'ends_at' => 'date',
+            'old_price' => 'decimal:2',
+            'new_price' => 'decimal:2',
         ];
     }
 }
