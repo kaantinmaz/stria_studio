@@ -1,7 +1,23 @@
-import { Redirect, Tabs } from 'expo-router';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import type {
+  MaterialTopTabNavigationEventMap,
+  MaterialTopTabNavigationOptions,
+} from 'expo-router/js-top-tabs';
+import { createMaterialTopTabNavigator } from 'expo-router/js-top-tabs';
+import type { ParamListBase, TabNavigationState } from 'expo-router/react-navigation';
+import { Redirect, withLayoutContext } from 'expo-router';
+import { ActivityIndicator, StyleSheet, Text, View, type ColorValue } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '@/lib/auth-context';
 import { colors, fonts } from '@/lib/theme';
+
+// Material Top Tabs (pager tabanlı) — sayfalar arası swipe için; bar altta durur.
+const { Navigator } = createMaterialTopTabNavigator();
+const MaterialTopTabs = withLayoutContext<
+  MaterialTopTabNavigationOptions,
+  typeof Navigator,
+  TabNavigationState<ParamListBase>,
+  MaterialTopTabNavigationEventMap
+>(Navigator);
 
 const icons: Record<string, string> = {
   index: '⌂',
@@ -12,6 +28,7 @@ const icons: Record<string, string> = {
 
 export default function TabLayout() {
   const { isReady, isAuthenticated } = useAuth();
+  const insets = useSafeAreaInsets();
 
   if (!isReady) {
     return (
@@ -23,22 +40,28 @@ export default function TabLayout() {
   if (!isAuthenticated) return <Redirect href="/giris" />;
 
   return (
-    <Tabs
-      screenOptions={({ route }) => ({
-        headerShown: false,
+    <MaterialTopTabs
+      tabBarPosition="bottom"
+      screenOptions={({ route }: { route: { name: string } }): MaterialTopTabNavigationOptions => ({
         sceneStyle: { backgroundColor: colors.cream },
+        swipeEnabled: true,
         tabBarActiveTintColor: colors.accentDark,
         tabBarInactiveTintColor: colors.muted,
-        tabBarStyle: styles.tabBar,
+        tabBarStyle: [styles.tabBar, { paddingBottom: insets.bottom }],
+        tabBarItemStyle: styles.tabItem,
         tabBarLabelStyle: styles.tabLabel,
-        tabBarIcon: ({ color }) => <Text style={[styles.icon, { color }]}>{icons[route.name]}</Text>,
+        tabBarIndicatorStyle: styles.indicator,
+        tabBarShowIcon: true,
+        tabBarIcon: ({ color }: { focused: boolean; color: ColorValue }) => (
+          <Text style={[styles.icon, { color }]}>{icons[route.name]}</Text>
+        ),
       })}
     >
-      <Tabs.Screen name="index" options={{ title: 'Ana Sayfa' }} />
-      <Tabs.Screen name="randevular" options={{ title: 'Randevular' }} />
-      <Tabs.Screen name="randevu-al" options={{ title: 'Randevu Al' }} />
-      <Tabs.Screen name="profil" options={{ title: 'Profil' }} />
-    </Tabs>
+      <MaterialTopTabs.Screen name="index" options={{ title: 'Ana Sayfa' }} />
+      <MaterialTopTabs.Screen name="randevular" options={{ title: 'Randevular' }} />
+      <MaterialTopTabs.Screen name="randevu-al" options={{ title: 'Randevu Al' }} />
+      <MaterialTopTabs.Screen name="profil" options={{ title: 'Profil' }} />
+    </MaterialTopTabs>
   );
 }
 
@@ -47,10 +70,12 @@ const styles = StyleSheet.create({
   tabBar: {
     backgroundColor: colors.white,
     borderTopColor: colors.line,
-    height: 72,
-    paddingTop: 8,
-    paddingBottom: 8,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    elevation: 0,
+    shadowOpacity: 0,
   },
-  tabLabel: { fontFamily: fonts.medium, fontSize: 11 },
+  tabItem: { height: 64, paddingTop: 8, paddingBottom: 8 },
+  tabLabel: { fontFamily: fonts.medium, fontSize: 11, textTransform: 'none', marginTop: 2 },
+  indicator: { top: 0, height: 2, backgroundColor: colors.accentDark },
   icon: { fontFamily: fonts.semibold, fontSize: 23, lineHeight: 25 },
 });
