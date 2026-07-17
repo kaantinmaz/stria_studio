@@ -3,9 +3,9 @@ import { router } from 'expo-router';
 import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Button, Card, ErrorState, Field, LoadingState, PageHeader } from '@/components/ui';
 import { ApiError, api, fieldError, friendlyError } from '@/lib/api';
-import { monthName, shortDay, toDateKey } from '@/lib/format';
+import { formatPrice, monthName, shortDay, toDateKey } from '@/lib/format';
 import { colors, fonts, radius, spacing, typography } from '@/lib/theme';
-import type { Service } from '@/lib/types';
+import type { Campaign, Service } from '@/lib/types';
 
 const nextThirtyDays = Array.from({ length: 30 }, (_, index) => {
   const date = new Date();
@@ -20,6 +20,8 @@ export default function BookingScreen() {
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [services, setServices] = useState<Service[] | null>(null);
   const [selectedService, setSelectedService] = useState<string | null>(null);
+  const [campaigns, setCampaigns] = useState<Campaign[] | null>(null);
+  const [selectedCampaignId, setSelectedCampaignId] = useState<number | null>(null);
   const [note, setNote] = useState('');
   const [slotError, setSlotError] = useState<unknown>(null);
   const [slotReloadKey, setSlotReloadKey] = useState(0);
@@ -42,6 +44,39 @@ export default function BookingScreen() {
   useEffect(() => {
     void loadServices();
   }, [loadServices]);
+
+  useEffect(() => {
+    let active = true;
+    api.campaigns()
+      .then((data) => {
+        if (active) setCampaigns(data);
+      })
+      .catch(() => {
+        if (active) setCampaigns([]);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const matchedCampaign = useMemo(() => {
+    if (!campaigns || !selectedService) return null;
+    const now = Date.now();
+    return (
+      campaigns.find((campaign) => {
+        if (campaign.kind !== 'promo') return false;
+        if (campaign.starts_at && new Date(campaign.starts_at).getTime() > now) return false;
+        if (campaign.ends_at && new Date(campaign.ends_at).getTime() < now) return false;
+        return campaign.service_slugs === null || campaign.service_slugs.includes(selectedService);
+      }) ?? null
+    );
+  }, [campaigns, selectedService]);
+
+  useEffect(() => {
+    if (selectedCampaignId !== null && matchedCampaign?.id !== selectedCampaignId) {
+      setSelectedCampaignId(null);
+    }
+  }, [matchedCampaign, selectedCampaignId]);
 
   useEffect(() => {
     let active = true;
@@ -70,6 +105,7 @@ export default function BookingScreen() {
         date: dateKey,
         time: selectedTime,
         ...(note.trim() ? { note: note.trim() } : {}),
+        ...(selectedCampaignId ? { campaign_id: selectedCampaignId } : {}),
       });
       setSuccess(true);
     } catch (caught) {
@@ -97,6 +133,7 @@ export default function BookingScreen() {
               setSelectedTime(null);
               setSelectedService(null);
               setNote('');
+              setSelectedCampaignId(null);
             }}
           />
         </Card>
@@ -187,6 +224,39 @@ export default function BookingScreen() {
               </Pressable>
             );
           })}
+          {matchedCampaign ? (
+            <View style={styles.campaignCard}>
+              <Text style={styles.campaignTitle}>🏷 {matchedCampaign.title}</Text>
+              {matchedCampaign.new_price ? (
+                <View style={styles.campaignPriceRow}>
+                  {matchedCampaign.old_price ? (
+                    <Text style={styles.campaignOldPrice}>{formatPrice(matchedCampaign.old_price)}</Text>
+                  ) : null}
+                  <Text style={styles.campaignNewPrice}>{formatPrice(matchedCampaign.new_price)}</Text>
+                </View>
+              ) : null}
+              <Pressable
+                accessibilityRole="button"
+                accessibilityState={{ selected: selectedCampaignId === matchedCampaign.id }}
+                onPress={() =>
+                  setSelectedCampaignId((current) => (current === matchedCampaign.id ? null : matchedCampaign.id))
+                }
+                style={[styles.campaignToggle, selectedCampaignId === matchedCampaign.id && styles.campaignToggleActive]}
+              >
+                <Text
+                  style={[
+                    styles.campaignToggleText,
+                    selectedCampaignId === matchedCampaign.id && styles.campaignToggleTextActive,
+                  ]}
+                >
+                  {selectedCampaignId === matchedCampaign.id ? '✓ Kampanya uygulanıyor' : 'Kampanyadan yararlan'}
+                </Text>
+              </Pressable>
+              <Text style={styles.campaignNote}>
+                Bugün oluşturduğun için, randevu tarihi kampanya bitişinden sonra olsa bile kampanya fiyatı geçerli olur.
+              </Text>
+            </View>
+          ) : null}
           {fieldError(submitError, 'service_slug') ? <Text style={styles.validationText}>{fieldError(submitError, 'service_slug')}</Text> : null}
         </View>
 
@@ -254,6 +324,16 @@ const styles = StyleSheet.create({
   radioDot: { width: 11, height: 11, borderRadius: 6, backgroundColor: colors.accentDark },
   serviceName: { flex: 1, fontFamily: fonts.medium, fontSize: 17, color: colors.ink },
   serviceNameSelected: { color: colors.accentDark },
+  campaignCard: { borderWidth: 1, borderColor: colors.accent, backgroundColor: colors.blush, borderRadius: radius.md, padding: spacing.md, gap: spacing.sm },
+  campaignTitle: { fontFamily: fonts.semibold, fontSize: 16, color: colors.accentDark },
+  campaignPriceRow: { flexDirection: 'row', alignItems: 'baseline', gap: spacing.sm },
+  campaignOldPrice: { fontFamily: fonts.regular, fontSize: 15, color: colors.muted, textDecorationLine: 'line-through' },
+  campaignNewPrice: { fontFamily: fonts.semibold, fontSize: 18, color: colors.accent },
+  campaignToggle: { alignSelf: 'flex-start', paddingHorizontal: spacing.md, paddingVertical: 10, borderRadius: radius.pill, borderWidth: 1, borderColor: colors.accent, backgroundColor: colors.white },
+  campaignToggleActive: { backgroundColor: colors.accent, borderColor: colors.accent },
+  campaignToggleText: { fontFamily: fonts.semibold, fontSize: 14, color: colors.accentDark },
+  campaignToggleTextActive: { color: colors.white },
+  campaignNote: { ...typography.caption, fontSize: 13 },
   submitError: { backgroundColor: colors.dangerBg, shadowOpacity: 0 },
   disclaimer: { ...typography.caption, textAlign: 'center', paddingHorizontal: spacing.md },
   successScreen: { flex: 1, backgroundColor: colors.cream, alignItems: 'center', justifyContent: 'center', padding: spacing.lg },

@@ -555,6 +555,17 @@
                     </header>
 
                     <div class="stria-modal-body" x-data="{ isPaid: @js($is_paid) }">
+                        @if ($appointmentCampaign)
+                            <div class="stria-field is-full">
+                                <div class="stria-campaign-note">
+                                    🏷 {{ $appointmentCampaign['title'] }}
+                                    @if (! empty($appointmentCampaign['new_price']))
+                                        — kampanya fiyatı ₺{{ $appointmentCampaign['new_price'] }}
+                                    @endif
+                                </div>
+                            </div>
+                        @endif
+
                         @if (! $creatingCustomer)
                             <div
                                 class="stria-field is-full"

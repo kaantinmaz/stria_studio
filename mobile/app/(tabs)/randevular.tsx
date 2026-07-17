@@ -4,7 +4,7 @@ import { Alert, FlatList, Image, Pressable, RefreshControl, ScrollView, StyleShe
 import { Button, Card, EmptyState, ErrorState, LoadingState, PageHeader } from '@/components/ui';
 import { PhotoViewer } from '@/components/photo-viewer';
 import { api, friendlyError } from '@/lib/api';
-import { appointmentDate } from '@/lib/format';
+import { appointmentDate, formatPrice } from '@/lib/format';
 import { colors, fonts, radius, spacing, typography } from '@/lib/theme';
 import { countUpcoming, setUpcomingCount } from '@/lib/upcoming-store';
 import type { Appointment, AppointmentStatus } from '@/lib/types';
@@ -135,6 +135,12 @@ function AppointmentCard({ appointment, onCancelled }: { appointment: Appointmen
           <Text style={styles.cancelText}>{cancelling ? 'İptal ediliyor…' : 'Gelemeyeceğim'}</Text>
         </Pressable>
       ) : null}
+      {appointment.campaign ? (
+        <Text style={styles.campaignRow}>
+          🏷 {appointment.campaign.title}
+          {appointment.campaign.new_price ? ` — ${formatPrice(appointment.campaign.new_price)}` : ''}
+        </Text>
+      ) : null}
     </Card>
   );
 }
@@ -163,5 +169,6 @@ const styles = StyleSheet.create({
   thumbStrip: { gap: spacing.sm, paddingTop: spacing.xs },
   thumb: { width: 72, height: 72, borderRadius: radius.md, backgroundColor: colors.line },
   cancelButton: { alignSelf: 'flex-start', paddingVertical: spacing.xs },
+  campaignRow: { fontFamily: fonts.medium, fontSize: 13, lineHeight: 18, color: colors.accent },
   cancelText: { fontFamily: fonts.semibold, fontSize: 14, color: colors.danger },
 });

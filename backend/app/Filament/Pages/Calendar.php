@@ -59,6 +59,9 @@ class Calendar extends Page
 
     public ?string $price = null;
 
+    /** @var array{title: string, new_price: ?string}|null */
+    public ?array $appointmentCampaign = null;
+
     public bool $is_paid = false;
 
     public ?string $payment_method = null;
@@ -111,7 +114,7 @@ class Calendar extends Page
 
     public function openEditModal(int $appointmentId): void
     {
-        $appointment = Appointment::query()->findOrFail($appointmentId);
+        $appointment = Appointment::query()->with('campaign:id,title,new_price')->findOrFail($appointmentId);
 
         $this->resetAppointmentForm();
         $this->editingAppointmentId = $appointment->id;
@@ -122,6 +125,18 @@ class Calendar extends Page
         $this->appointmentTime = $appointment->starts_at->format('H:i');
         $this->durationMin = $appointment->duration_min;
         $this->price = $appointment->price;
+        if ($appointment->campaign !== null) {
+            $newPrice = $appointment->campaign->new_price !== null
+                ? (string) $appointment->campaign->new_price
+                : null;
+            $this->appointmentCampaign = [
+                'title' => $appointment->campaign->title,
+                'new_price' => $newPrice,
+            ];
+            if (blank($this->price) && filled($newPrice)) {
+                $this->price = $newPrice;
+            }
+        }
         $this->is_paid = $appointment->is_paid;
         $this->payment_method = $appointment->payment_method;
         $this->note = $appointment->note ?? '';
@@ -506,6 +521,7 @@ class Calendar extends Page
         $this->appointmentTime = '10:00';
         $this->durationMin = 60;
         $this->price = null;
+        $this->appointmentCampaign = null;
         $this->is_paid = false;
         $this->payment_method = null;
         $this->note = '';

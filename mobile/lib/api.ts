@@ -122,7 +122,7 @@ export const api = {
     return response.data;
   },
 
-  async createAppointment(payload: { service_slug: string; date: string; time: string; note?: string }) {
+  async createAppointment(payload: { service_slug: string; date: string; time: string; note?: string; campaign_id?: number }) {
     const response = await request<{ data: { id: number; status: 'requested' } }>(`${APP_API_URL}/appointments`, {
       method: 'POST',
       body: payload,

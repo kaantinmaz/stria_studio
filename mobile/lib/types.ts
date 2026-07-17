@@ -36,6 +36,7 @@ export type Appointment = {
   duration_min: number;
   status: AppointmentStatus;
   photos: string[];
+  campaign: { title: string; new_price: string | null } | null;
 };
 
 export type Campaign = {
@@ -50,6 +51,7 @@ export type Campaign = {
   new_price: string | null;
   starts_at: string | null;
   ends_at: string | null;
+  service_slugs: string[] | null;
 };
 
 export type Announcement = {

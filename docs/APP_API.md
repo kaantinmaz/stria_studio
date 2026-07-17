@@ -52,17 +52,20 @@ Gövde: `{ "email", "password" }`
 ## Randevular
 
 ### GET /appointments  (auth)
-`200` → `{ "data": [ { "id", "service_name": string|null, "starts_at": ISO8601, "duration_min": int, "status": "requested"|"confirmed"|"cancelled"|"no_show", "photos": string[] (mutlak URL listesi, boşsa []) } ] }`
-Kapsam: bağlı müşteri kartının TÜM randevuları + kullanıcının uygulamadan açtığı talepler (`appointments.app_user_id`). `starts_at` azalan.
+`200` → `{ "data": [ { "id", "service_name": string|null, "starts_at": ISO8601, "duration_min": int, "status": "requested"|"confirmed"|"cancelled"|"no_show", "photos": string[] (mutlak URL listesi, boşsa []), "campaign": { "title": string, "new_price": string|null }|null } ] }`
+Kapsam: bağlı müşteri kartının TÜM randevuları + kullanıcının uygulamadan açtığı talepler (`appointments.app_user_id`). `starts_at` azalan. `campaign` yalnız randevu bir promo kampanyaya kilitlendiyse dolu, aksi halde null.
 
 ### GET /slots?date=YYYY-MM-DD  (auth)
 `200` → `{ "data": { "date": "2026-07-20", "slots": ["10:00","11:00","12:00"] } }`
 Kaynak: `settings.hours` çalışma saatleri (ana site), 60 dk ızgara; o güne çakışan `confirmed` randevular düşülür. Kapalı gün → boş liste. Geçmiş tarih → `422`.
 
 ### POST /appointments  (auth)
-Gövde: `{ "service_slug": string (aktif hizmet), "date": "YYYY-MM-DD", "time": "HH:MM", "note": string≤500 (ops.) }`
+Gövde: `{ "service_slug": string (aktif hizmet), "date": "YYYY-MM-DD", "time": "HH:MM", "note": string≤500 (ops.), "campaign_id": int (ops.) }`
 `201` → `{ "data": { "id", "status": "requested" } }`
 Kayıt: `status=requested`, `app_user_id`=kullanıcı, `customer_id`=bağlıysa müşteri kartı yoksa null. Dolu slota talep → `422`.
+`campaign_id` verilirse kampanya randevuya kilitlenir. Doğrulama randevu OLUŞTURMA GÜNÜNE göre yapılır (randevu tarihine göre değil): kampanya var + `is_active` + `kind='promo'` + BUGÜN tarih penceresi içinde (`starts_at` null|≤bugün, `ends_at` null|≥bugün) + hizmet kapsamda (`service_ids` null/boş → her hizmet kapsamda). İhlal → `422`:
+- Kampanya yok/pasif/promo değil/pencere dışı → `campaign_id`: "Kampanya artık geçerli değil."
+- Hizmet kapsam dışı → `campaign_id`: "Kampanya bu hizmet için geçerli değil."
 
 ### POST /appointments/{id}/cancel  (auth)
 Kullanıcının randevusunu iptal eder (kapsam GET /appointments ile aynı: bağlı müşteri kartı VEYA `app_user_id`).
@@ -88,7 +91,8 @@ Campaign {
   "old_price": "1000.00",       // promo'da string, yoksa null
   "new_price": "750.00",        // promo'da string, yoksa null
   "starts_at": "2026-07-13",    // "YYYY-MM-DD" veya null (süresiz)
-  "ends_at": "2026-07-20"       // "YYYY-MM-DD" veya null (süresiz)
+  "ends_at": "2026-07-20",      // "YYYY-MM-DD" veya null (süresiz)
+  "service_slugs": ["microblading"]  // kapsamdaki hizmet slug'ları; null → tüm hizmetler kapsamda
 }
 ```
 
@@ -130,5 +134,5 @@ Mevcut public `GET /api/services` kullanılır (auth yok) — `name_tr/name_en`,
 - Müşteri kartında "Uygulama kullanıcısı" bağlama alanı (code/e-posta ile arama). `customers.app_user_id` unique.
 - Takvimde ve müşteri listesinde 📱 rozeti (bağlı app kullanıcısı varsa).
 - "Randevu Talepleri": `status=requested` kayıtları onayla (→confirmed) / reddet (→cancelled).
-- Kampanyalar CRUD: `kind` (loyalty/promo), `title`, `is_active`; loyalty → `nth`, `discount_percent`; promo → `description`, `image`, `starts_at`, `ends_at`, `old_price`, `new_price`.
+- Kampanyalar CRUD: `kind` (loyalty/promo), `title`, `is_active`; loyalty → `nth`, `discount_percent`; promo → `description`, `image`, `starts_at`, `ends_at`, `old_price`, `new_price`, `service_ids` (Kapsam Hizmetler — boş bırakılırsa tüm hizmetlerde geçerli).
 - Duyurular CRUD: `title`, `body`, `is_active`, `starts_at`, `ends_at` (Duyurular navigasyonu, kampanyaların hemen ardından).

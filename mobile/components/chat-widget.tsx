@@ -10,7 +10,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { api } from '@/lib/api';
 import { colors, fonts, radius, spacing, typography } from '@/lib/theme';
 import type { ChatMessage } from '@/lib/types';
@@ -72,12 +72,14 @@ export function ChatWidget() {
       </Pressable>
 
       <Modal visible={visible} animationType="slide" onRequestClose={() => setVisible(false)}>
-        <SafeAreaView style={styles.screen} edges={['top', 'bottom']}>
+        {/* Modal içinde SafeAreaView inset almayabiliyor (RN Modal gotcha'sı) — insets'i dışarıdan uygula. */}
+        <View style={[styles.screen, { paddingTop: insets.top + spacing.sm, paddingBottom: insets.bottom }]}>
           <View style={styles.header}>
             <Text style={styles.headerTitle}>Sohbet</Text>
             <Pressable
               style={styles.closeButton}
               onPress={() => setVisible(false)}
+              hitSlop={12}
               accessibilityLabel="Sohbeti kapat"
             >
               <Text style={styles.closeIcon}>✕</Text>
@@ -116,7 +118,7 @@ export function ChatWidget() {
               </Pressable>
             </View>
           </KeyboardAvoidingView>
-        </SafeAreaView>
+        </View>
       </Modal>
     </>
   );

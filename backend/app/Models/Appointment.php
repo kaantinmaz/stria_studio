@@ -14,6 +14,7 @@ class Appointment extends Model
         'customer_id',
         'app_user_id',
         'service_id',
+        'campaign_id',
         'starts_at',
         'duration_min',
         'price',
@@ -42,6 +43,11 @@ class Appointment extends Model
     public function service(): BelongsTo
     {
         return $this->belongsTo(Service::class);
+    }
+
+    public function campaign(): BelongsTo
+    {
+        return $this->belongsTo(Campaign::class);
     }
 
     public function appUser(): BelongsTo

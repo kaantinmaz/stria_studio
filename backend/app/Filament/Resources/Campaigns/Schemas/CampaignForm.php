@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Campaigns\Schemas;
 
+use App\Models\Service;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
@@ -75,6 +76,14 @@ class CampaignForm
                     ->label('Kampanya Fiyatı')
                     ->numeric()
                     ->minValue(0)
+                    ->visible(fn (Get $get): bool => $get('kind') === 'promo'),
+                Select::make('service_ids')
+                    ->label('Kapsam Hizmetler')
+                    ->helperText('Boş bırakılırsa tüm hizmetlerde geçerli')
+                    ->multiple()
+                    ->options(fn (): array => Service::query()->pluck('name_tr', 'id')->all())
+                    ->native(false)
+                    ->columnSpanFull()
                     ->visible(fn (Get $get): bool => $get('kind') === 'promo'),
                 Toggle::make('is_active')
                     ->label('Aktif')

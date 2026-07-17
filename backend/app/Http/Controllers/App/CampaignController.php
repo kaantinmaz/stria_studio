@@ -4,6 +4,7 @@ namespace App\Http\Controllers\App;
 
 use App\Http\Controllers\Controller;
 use App\Models\Campaign;
+use App\Models\Service;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
 
@@ -36,6 +37,7 @@ class CampaignController extends Controller
                 'new_price' => $campaign->new_price !== null ? (string) $campaign->new_price : null,
                 'starts_at' => $campaign->starts_at?->toDateString(),
                 'ends_at' => $campaign->ends_at?->toDateString(),
+                'service_slugs' => self::serviceSlugs($campaign->service_ids),
             ]);
 
         return response()->json(['data' => $campaigns]);
@@ -50,5 +52,24 @@ class CampaignController extends Controller
         return Str::startsWith($path, ['http://', 'https://', '/'])
             ? $path
             : asset('storage/'.$path);
+    }
+
+    /**
+     * @param  array<int, int>|null  $serviceIds
+     * @return array<int, string>|null
+     */
+    private static function serviceSlugs(?array $serviceIds): ?array
+    {
+        if (empty($serviceIds)) {
+            return null;
+        }
+
+        $slugs = Service::query()
+            ->whereIn('id', $serviceIds)
+            ->pluck('slug')
+            ->values()
+            ->all();
+
+        return $slugs === [] ? null : $slugs;
     }
 }

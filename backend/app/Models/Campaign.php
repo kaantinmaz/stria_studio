@@ -21,6 +21,7 @@ class Campaign extends Model
         'ends_at',
         'old_price',
         'new_price',
+        'service_ids',
     ];
 
     protected function casts(): array
@@ -33,6 +34,7 @@ class Campaign extends Model
             'ends_at' => 'date',
             'old_price' => 'decimal:2',
             'new_price' => 'decimal:2',
+            'service_ids' => 'array',
         ];
     }
 }
