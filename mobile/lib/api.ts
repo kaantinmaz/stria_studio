@@ -14,6 +14,7 @@ import type {
 const rawBaseUrl = process.env.EXPO_PUBLIC_API_URL ?? 'https://admin.striastudio.com.tr';
 export const API_URL = rawBaseUrl.replace(/\/$/, '');
 const APP_API_URL = `${API_URL}/api/app`;
+const SITE_URL = process.env.EXPO_PUBLIC_SITE_URL ?? 'https://striastudio.com.tr';
 
 type LaravelError = {
   message?: string;
@@ -139,6 +140,10 @@ export const api = {
 
   async gallery() {
     const response = await request<{ data: GalleryImage[] }>(`${API_URL}/api/gallery`, { auth: false });
-    return response.data;
+    // Kök-göreli yollar (/images/...) ana sitenin public dosyalarıdır — mutlak URL'ye çevir.
+    return response.data.map((image) => ({
+      ...image,
+      image: image.image?.startsWith('/') ? `${SITE_URL}${image.image}` : image.image,
+    }));
   },
 };
