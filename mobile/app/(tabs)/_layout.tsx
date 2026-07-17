@@ -5,10 +5,12 @@ import type {
 import { createMaterialTopTabNavigator } from 'expo-router/js-top-tabs';
 import type { ParamListBase, TabNavigationState } from 'expo-router/react-navigation';
 import { Redirect, withLayoutContext } from 'expo-router';
-import { ActivityIndicator, StyleSheet, Text, View, type ColorValue } from 'react-native';
+import { ActivityIndicator, Image, StyleSheet, Text, View, type ColorValue } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ChatWidget } from '@/components/chat-widget';
 import { useAuth } from '@/lib/auth-context';
 import { colors, fonts } from '@/lib/theme';
+import { useUpcomingCount } from '@/lib/upcoming-store';
 
 // Material Top Tabs (pager tabanlı) — sayfalar arası swipe için; bar altta durur.
 const { Navigator } = createMaterialTopTabNavigator();
@@ -20,11 +22,20 @@ const MaterialTopTabs = withLayoutContext<
 >(Navigator);
 
 const icons: Record<string, string> = {
-  index: '⌂',
   randevular: '◷',
   'randevu-al': '+',
-  profil: '♡',
+  profil: '♀',
 };
+
+function UpcomingBadge() {
+  const count = useUpcomingCount();
+  if (count <= 0) return null;
+  return (
+    <View style={styles.badge}>
+      <Text style={styles.badgeText}>{count}</Text>
+    </View>
+  );
+}
 
 export default function TabLayout() {
   const { isReady, isAuthenticated } = useAuth();
@@ -40,32 +51,46 @@ export default function TabLayout() {
   if (!isAuthenticated) return <Redirect href="/giris" />;
 
   return (
-    <MaterialTopTabs
-      tabBarPosition="bottom"
-      screenOptions={({ route }: { route: { name: string } }): MaterialTopTabNavigationOptions => ({
-        sceneStyle: { backgroundColor: colors.cream },
-        swipeEnabled: true,
-        tabBarActiveTintColor: colors.accentDark,
-        tabBarInactiveTintColor: colors.muted,
-        tabBarStyle: [styles.tabBar, { paddingBottom: insets.bottom }],
-        tabBarItemStyle: styles.tabItem,
-        tabBarLabelStyle: styles.tabLabel,
-        tabBarIndicatorStyle: styles.indicator,
-        tabBarShowIcon: true,
-        tabBarIcon: ({ color }: { focused: boolean; color: ColorValue }) => (
-          <Text style={[styles.icon, { color }]}>{icons[route.name]}</Text>
-        ),
-      })}
-    >
-      <MaterialTopTabs.Screen name="index" options={{ title: 'Ana Sayfa' }} />
-      <MaterialTopTabs.Screen name="randevular" options={{ title: 'Randevular' }} />
-      <MaterialTopTabs.Screen name="randevu-al" options={{ title: 'Randevu Al' }} />
-      <MaterialTopTabs.Screen name="profil" options={{ title: 'Profil' }} />
-    </MaterialTopTabs>
+    <View style={styles.flex}>
+      <MaterialTopTabs
+        tabBarPosition="bottom"
+        screenOptions={({ route }: { route: { name: string } }): MaterialTopTabNavigationOptions => ({
+          sceneStyle: { backgroundColor: colors.cream },
+          swipeEnabled: true,
+          tabBarActiveTintColor: colors.accentDark,
+          tabBarInactiveTintColor: colors.muted,
+          tabBarStyle: [styles.tabBar, { paddingBottom: insets.bottom }],
+          tabBarItemStyle: styles.tabItem,
+          tabBarLabelStyle: styles.tabLabel,
+          tabBarIndicatorStyle: styles.indicator,
+          tabBarShowIcon: true,
+          tabBarIcon: ({ color }: { focused: boolean; color: ColorValue }) =>
+            route.name === 'index' ? (
+              <Image
+                source={require('../../assets/logo.png')}
+                style={[styles.logo, { tintColor: color }]}
+                resizeMode="contain"
+              />
+            ) : (
+              <Text style={[styles.icon, { color }]}>{icons[route.name]}</Text>
+            ),
+        })}
+      >
+        <MaterialTopTabs.Screen name="index" options={{ title: 'Ana Sayfa' }} />
+        <MaterialTopTabs.Screen
+          name="randevular"
+          options={{ title: 'Randevular', tabBarBadge: () => <UpcomingBadge /> }}
+        />
+        <MaterialTopTabs.Screen name="randevu-al" options={{ title: 'Randevu Al' }} />
+        <MaterialTopTabs.Screen name="profil" options={{ title: 'Profil' }} />
+      </MaterialTopTabs>
+      <ChatWidget />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  flex: { flex: 1 },
   loading: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.cream },
   tabBar: {
     backgroundColor: colors.white,
@@ -78,4 +103,17 @@ const styles = StyleSheet.create({
   tabLabel: { fontFamily: fonts.medium, fontSize: 11, textTransform: 'none', marginTop: 2 },
   indicator: { top: 0, height: 2, backgroundColor: colors.accentDark },
   icon: { fontFamily: fonts.semibold, fontSize: 23, lineHeight: 25 },
+  logo: { width: 52, height: 24 },
+  badge: {
+    minWidth: 18,
+    height: 18,
+    paddingHorizontal: 5,
+    borderRadius: 9,
+    backgroundColor: colors.accent,
+    alignItems: 'center',
+    justifyContent: 'center',
+    top: -2,
+    right: -10,
+  },
+  badgeText: { fontFamily: fonts.semibold, fontSize: 11, lineHeight: 13, color: colors.white },
 });

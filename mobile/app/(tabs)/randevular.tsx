@@ -6,6 +6,7 @@ import { PhotoViewer } from '@/components/photo-viewer';
 import { api, friendlyError } from '@/lib/api';
 import { appointmentDate } from '@/lib/format';
 import { colors, fonts, radius, spacing, typography } from '@/lib/theme';
+import { countUpcoming, setUpcomingCount } from '@/lib/upcoming-store';
 import type { Appointment, AppointmentStatus } from '@/lib/types';
 
 const statusLabels: Record<AppointmentStatus, string> = {
@@ -24,7 +25,9 @@ export default function AppointmentsScreen() {
     if (asRefresh) setRefreshing(true);
     setError(null);
     try {
-      setAppointments(await api.appointments());
+      const data = await api.appointments();
+      setAppointments(data);
+      setUpcomingCount(countUpcoming(data));
     } catch (caught) {
       setError(caught);
     } finally {

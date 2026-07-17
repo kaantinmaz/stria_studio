@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Customers\Schemas;
 
 use App\Models\AppUser;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -49,6 +50,15 @@ class CustomerForm
                     ->label('E-posta')
                     ->email()
                     ->maxLength(255),
+                Placeholder::make('completed_appointments')
+                    ->label('Tamamlanan İşlem')
+                    ->content(fn ($record): string => $record
+                        ? $record->appointments()
+                            ->where('status', 'confirmed')
+                            ->where('starts_at', '<', now())
+                            ->count().' işlem'
+                        : '—')
+                    ->hiddenOn('create'),
                 TextInput::make('instagram')
                     ->label('Instagram')
                     ->maxLength(255),

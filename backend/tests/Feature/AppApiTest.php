@@ -24,7 +24,7 @@ class AppApiTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_register_returns_token_and_me_returns_unlinked_user_without_loyalty(): void
+    public function test_register_creates_linked_customer_and_returns_token(): void
     {
         $response = $this->postJson('/api/app/register', [
             'name' => 'Ayşe Yılmaz',
@@ -37,14 +37,21 @@ class AppApiTest extends TestCase
             ->assertCreated()
             ->assertJsonPath('data.user.name', 'Ayşe Yılmaz')
             ->assertJsonPath('data.user.email', 'ayse@example.com')
-            ->assertJsonPath('data.user.customer_linked', false);
+            ->assertJsonPath('data.user.customer_linked', true);
         $this->assertMatchesRegularExpression('/^S-1\d{3}$/', $response->json('data.user.code'));
+
+        $userId = AppUser::query()->where('email', 'ayse@example.com')->value('id');
+        $this->assertDatabaseHas('customers', [
+            'app_user_id' => $userId,
+            'name' => 'Ayşe Yılmaz',
+            'phone' => '0555 111 22 33',
+        ]);
 
         $this->withToken($response->json('data.token'))
             ->getJson('/api/app/me')
             ->assertOk()
             ->assertJsonPath('data.user.code', $response->json('data.user.code'))
-            ->assertJsonPath('data.user.customer_linked', false)
+            ->assertJsonPath('data.user.customer_linked', true)
             ->assertJsonPath('data.loyalty', null);
     }
 

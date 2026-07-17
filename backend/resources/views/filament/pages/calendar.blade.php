@@ -411,6 +411,26 @@
 
         .stria-error { margin-top: 4px; color: #d70015; font-size: 11px; }
 
+        .stria-customer-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .stria-customer-stats .stria-stat {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 9px;
+            border-radius: 999px;
+            background: #f2f2f7;
+            color: #6e6e73;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .stria-customer-stats .stria-stat.is-first { color: #92400e; background: #fef3c7; }
+
         .stria-modal-footer {
             display: flex;
             align-items: center;
@@ -584,6 +604,18 @@
                                     + Yeni müşteri oluştur
                                 </button>
                                 @error('customerId') <div class="stria-error">{{ $message }}</div> @enderror
+                                @if ($customerId)
+                                    <div class="stria-customer-stats">
+                                        @if ($customerDoneCount === 0)
+                                            <span class="stria-stat is-first">İlk işlemi 🌟</span>
+                                        @else
+                                            <span class="stria-stat">Toplam {{ $customerDoneCount }} tamamlanmış işlem</span>
+                                        @endif
+                                        @if ($appointmentSequence)
+                                            <span class="stria-stat">Bu randevu {{ $appointmentSequence }}. işlemi</span>
+                                        @endif
+                                    </div>
+                                @endif
                             </div>
                         @else
                             <div class="stria-field">

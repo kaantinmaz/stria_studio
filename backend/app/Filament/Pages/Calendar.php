@@ -69,6 +69,10 @@ class Calendar extends Page
 
     public array $appointmentPhotos = [];
 
+    public ?int $customerDoneCount = null;
+
+    public ?int $appointmentSequence = null;
+
     public function mount(): void
     {
         $this->month = now()->format('Y-m');
@@ -125,6 +129,7 @@ class Calendar extends Page
         $this->newCustomerName = '';
         $this->newCustomerPhone = '';
         $this->appointmentPhotos = array_values($appointment->photos ?? []);
+        $this->loadCustomerStats($appointment->customer_id, $appointment->starts_at);
         $this->showAppointmentModal = true;
     }
 
@@ -506,6 +511,32 @@ class Calendar extends Page
         $this->note = '';
         $this->newPhotos = [];
         $this->appointmentPhotos = [];
+        $this->customerDoneCount = null;
+        $this->appointmentSequence = null;
+    }
+
+    private function loadCustomerStats(?int $customerId, ?CarbonInterface $startsAt): void
+    {
+        if (! $customerId) {
+            $this->customerDoneCount = null;
+            $this->appointmentSequence = null;
+
+            return;
+        }
+
+        $this->customerDoneCount = Appointment::query()
+            ->where('customer_id', $customerId)
+            ->where('status', 'confirmed')
+            ->where('starts_at', '<', now())
+            ->count();
+
+        $this->appointmentSequence = $startsAt
+            ? Appointment::query()
+                ->where('customer_id', $customerId)
+                ->where('status', 'confirmed')
+                ->where('starts_at', '<', $startsAt)
+                ->count() + 1
+            : null;
     }
 
     private function isValidDate(string $date): bool

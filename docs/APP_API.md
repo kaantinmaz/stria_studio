@@ -113,6 +113,16 @@ Announcement {
 
 - Stüdyo bilgilendirmeleri (tatil, kapalı gün, çalışma saati değişikliği vb.) için kullanılır; kampanyalardan ayrı bir Duyurular alanında gösterilir.
 
+## Sohbet (Asistan)
+
+### POST /chat  (auth, throttle 20/dk)
+Gövde: `{ "messages": [ { "role": "user"|"assistant", "content": string(1-1000) } ] }` — en fazla 12 mesaj, son mesajın rolü `user` olmalı.
+`200` → `{ "data": { "reply": string } }`
+`502` → `{ "message": "assistant_unavailable" }` (yapay zekâ sağlayıcısına ulaşılamadı).
+Doğrulama hatası `422`, yetkisiz `401`.
+
+Asistan sunucu tarafında Anthropic'e proxy'lenir (API anahtarı istemciye asla gönderilmez). Sistem promptuna, sitedeki asistanın ortak kuralları + oturum sahibinin KENDİ bağlamı eklenir: adı ve müşteri kodu, son 10 randevusu (bağlı müşteri kartı VEYA `app_user_id` kapsamı), sadakat özeti, aktif kampanyalar ve aktif duyurular. Kişisel veriler yalnız oturum sahibine aittir; asistan başka kullanıcı/müşteri hakkında bilgi vermez.
+
 ## Hizmet listesi
 Mevcut public `GET /api/services` kullanılır (auth yok) — `name_tr/name_en`, `slug`, `image`.
 

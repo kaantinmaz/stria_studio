@@ -5,6 +5,7 @@ use App\Http\Controllers\App\AnnouncementController as AppAnnouncementController
 use App\Http\Controllers\App\AppointmentController as AppAppointmentController;
 use App\Http\Controllers\App\AuthController as AppAuthController;
 use App\Http\Controllers\App\CampaignController as AppCampaignController;
+use App\Http\Controllers\App\ChatController as AppChatController;
 use App\Http\Controllers\App\MeController as AppMeController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ChatController;
@@ -50,6 +51,7 @@ Route::prefix('app')->group(function () {
         Route::post('/appointments/{id}/cancel', [AppAppointmentController::class, 'cancel']);
         Route::get('/campaigns', [AppCampaignController::class, 'index']);
         Route::get('/announcements', [AppAnnouncementController::class, 'index']);
+        Route::post('/chat', [AppChatController::class, 'store'])->middleware('throttle:20,1');
     });
 });
 

@@ -81,3 +81,5 @@ export type SlotData = {
 };
 
 export type ValidationErrors = Record<string, string[]>;
+
+export type ChatMessage = { role: 'user' | 'assistant'; content: string };

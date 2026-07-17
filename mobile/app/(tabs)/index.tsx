@@ -20,6 +20,7 @@ import { LoyaltyCard } from '@/components/loyalty-card';
 import { Card, ErrorState, LoadingState, PageHeader } from '@/components/ui';
 import { PhotoViewer } from '@/components/photo-viewer';
 import { api, friendlyError } from '@/lib/api';
+import { countUpcoming, setUpcomingCount } from '@/lib/upcoming-store';
 import { useAuth } from '@/lib/auth-context';
 import { colors, fonts, radius, shadows, spacing, typography } from '@/lib/theme';
 import type { Announcement, Appointment, Campaign, GalleryImage } from '@/lib/types';
@@ -91,7 +92,10 @@ export default function HomeScreen() {
   const loadExtras = useCallback(() => {
     api
       .appointments()
-      .then((data) => setUpcoming(findUpcoming(data)))
+      .then((data) => {
+        setUpcoming(findUpcoming(data));
+        setUpcomingCount(countUpcoming(data));
+      })
       .catch(() => {});
     api
       .announcements()

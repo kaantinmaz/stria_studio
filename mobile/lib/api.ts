@@ -5,6 +5,7 @@ import type {
   Appointment,
   AuthData,
   Campaign,
+  ChatMessage,
   GalleryImage,
   MeData,
   Service,
@@ -142,6 +143,14 @@ export const api = {
   async announcements() {
     const response = await request<{ data: Announcement[] }>(`${APP_API_URL}/announcements`);
     return response.data;
+  },
+
+  async chat(messages: ChatMessage[]) {
+    const response = await request<{ data: { reply: string } }>(`${APP_API_URL}/chat`, {
+      method: 'POST',
+      body: { messages },
+    });
+    return response.data.reply;
   },
 
   async services() {
