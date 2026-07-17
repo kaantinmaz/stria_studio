@@ -41,6 +41,8 @@ class Calendar extends Page
 
     public ?int $editingAppointmentId = null;
 
+    public string $appointmentStatus = 'confirmed';
+
     public ?int $customerId = null;
 
     public ?int $serviceId = null;
@@ -109,6 +111,7 @@ class Calendar extends Page
 
         $this->resetAppointmentForm();
         $this->editingAppointmentId = $appointment->id;
+        $this->appointmentStatus = $appointment->status;
         $this->customerId = $appointment->customer_id;
         $this->serviceId = $appointment->service_id;
         $this->selectedDate = $appointment->starts_at->format('Y-m-d');
@@ -284,6 +287,38 @@ class Calendar extends Page
             ->send();
     }
 
+    public function approveRequest(): void
+    {
+        abort_unless($this->editingAppointmentId && $this->appointmentStatus === 'requested', 404);
+
+        Appointment::query()->findOrFail($this->editingAppointmentId)->update([
+            'status' => 'confirmed',
+        ]);
+        $this->showAppointmentModal = false;
+        $this->resetAppointmentForm();
+
+        Notification::make()
+            ->title('Randevu talebi onaylandı')
+            ->success()
+            ->send();
+    }
+
+    public function rejectRequest(): void
+    {
+        abort_unless($this->editingAppointmentId && $this->appointmentStatus === 'requested', 404);
+
+        Appointment::query()->findOrFail($this->editingAppointmentId)->update([
+            'status' => 'cancelled',
+        ]);
+        $this->showAppointmentModal = false;
+        $this->resetAppointmentForm();
+
+        Notification::make()
+            ->title('Randevu talebi reddedildi')
+            ->success()
+            ->send();
+    }
+
     /**
      * @return array<string, mixed>
      */
@@ -324,7 +359,7 @@ class Calendar extends Page
         $gridStart = $month->startOfWeek(CarbonInterface::MONDAY);
         $gridEnd = $month->endOfMonth()->endOfWeek(CarbonInterface::SUNDAY);
         $appointments = Appointment::query()
-            ->with(['customer:id,name'])
+            ->with(['customer:id,name,app_user_id'])
             ->whereBetween('starts_at', [$gridStart->startOfDay(), $gridEnd->endOfDay()])
             ->orderBy('starts_at')
             ->get()
@@ -340,6 +375,8 @@ class Calendar extends Page
                     'time' => $appointment->starts_at->format('H:i'),
                     'customer' => $this->shortCustomerName($appointment->customer?->name),
                     'is_paid' => $appointment->is_paid,
+                    'status' => $appointment->status,
+                    'has_app_user' => filled($appointment->customer?->app_user_id),
                 ])
                 ->values()
                 ->all();
@@ -436,6 +473,7 @@ class Calendar extends Page
     {
         $this->resetValidation();
         $this->editingAppointmentId = null;
+        $this->appointmentStatus = 'confirmed';
         $this->customerId = null;
         $this->serviceId = null;
         $this->creatingCustomer = false;

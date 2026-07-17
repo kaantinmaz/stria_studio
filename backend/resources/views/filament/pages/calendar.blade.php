@@ -142,6 +142,14 @@
 
         .stria-appointment-pill.is-unpaid:hover { background: #ffd6d6; }
 
+        .stria-appointment-pill.is-requested {
+            border: 1px dashed #d97706;
+            color: #92400e;
+            background: #fef3c7;
+        }
+
+        .stria-appointment-pill.is-requested:hover { background: #fde68a; }
+
         .stria-more {
             padding: 2px 6px;
             color: #6e6e73;
@@ -468,11 +476,11 @@
                                 @foreach (array_slice($day['appointments'], 0, 3) as $appointment)
                                     <button
                                         type="button"
-                                        class="stria-appointment-pill {{ $appointment['is_paid'] ? '' : 'is-unpaid' }}"
+                                        class="stria-appointment-pill {{ $appointment['is_paid'] ? '' : 'is-unpaid' }} {{ $appointment['status'] === 'requested' ? 'is-requested' : '' }}"
                                         title="{{ $appointment['time'] }} {{ $appointment['customer'] }}"
                                         @click.stop="$wire.openEditModal({{ $appointment['id'] }})"
                                     >
-                                        {{ $appointment['time'] }} {{ $appointment['customer'] }}
+                                        {{ $appointment['has_app_user'] ? '📱' : '' }} {{ $appointment['time'] }} {{ $appointment['customer'] }}
                                     </button>
                                 @endforeach
 
@@ -689,6 +697,20 @@
                     </div>
 
                     <footer class="stria-modal-footer">
+                        @if ($editingAppointmentId && $appointmentStatus === 'requested')
+                            <button
+                                type="button"
+                                class="stria-button danger"
+                                wire:click="rejectRequest"
+                                wire:confirm="Bu randevu talebini reddetmek istediğinize emin misiniz?"
+                            >
+                                Reddet
+                            </button>
+                            <button type="button" class="stria-button primary" wire:click="approveRequest">
+                                Onayla
+                            </button>
+                        @endif
+
                         @if ($editingAppointmentId)
                             <button
                                 type="button"

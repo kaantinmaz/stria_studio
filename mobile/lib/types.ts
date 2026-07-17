@@ -1,0 +1,58 @@
+export type User = {
+  id: number;
+  code: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  customer_linked: boolean;
+};
+
+export type Loyalty = {
+  campaign_title: string;
+  nth: number;
+  discount_percent: number;
+  completed_count: number;
+  progress: number;
+  remaining: number;
+  reward_next: boolean;
+};
+
+export type MeData = {
+  user: User;
+  loyalty: Loyalty | null;
+};
+
+export type AuthData = {
+  token: string;
+  user: User;
+};
+
+export type AppointmentStatus = 'requested' | 'confirmed' | 'cancelled';
+
+export type Appointment = {
+  id: number;
+  service_name: string | null;
+  starts_at: string;
+  duration_min: number;
+  status: AppointmentStatus;
+};
+
+export type Campaign = {
+  title: string;
+  nth: number;
+  discount_percent: number;
+};
+
+export type Service = {
+  name_tr: string;
+  name_en: string;
+  slug: string;
+  image: string | null;
+};
+
+export type SlotData = {
+  date: string;
+  slots: string[];
+};
+
+export type ValidationErrors = Record<string, string[]>;

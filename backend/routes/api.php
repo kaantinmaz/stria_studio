@@ -1,6 +1,10 @@
 <?php
 
 use App\Http\Controllers\AdminPostController;
+use App\Http\Controllers\App\AppointmentController as AppAppointmentController;
+use App\Http\Controllers\App\AuthController as AppAuthController;
+use App\Http\Controllers\App\CampaignController as AppCampaignController;
+use App\Http\Controllers\App\MeController as AppMeController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ContactController;
@@ -29,6 +33,22 @@ Route::get('/gallery', [GalleryController::class, 'index']);
 Route::get('/faqs', [FaqController::class, 'index']);
 
 Route::post('/track', [TrackController::class, 'store'])->middleware('throttle:120,1');
+
+Route::prefix('app')->group(function () {
+    Route::middleware('throttle:10,1')->group(function () {
+        Route::post('/register', [AppAuthController::class, 'register']);
+        Route::post('/login', [AppAuthController::class, 'login']);
+    });
+
+    Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
+        Route::post('/logout', [AppAuthController::class, 'logout']);
+        Route::get('/me', AppMeController::class);
+        Route::get('/appointments', [AppAppointmentController::class, 'index']);
+        Route::get('/slots', [AppAppointmentController::class, 'slots']);
+        Route::post('/appointments', [AppAppointmentController::class, 'store']);
+        Route::get('/campaigns', [AppCampaignController::class, 'index']);
+    });
+});
 
 Route::prefix('admin')->middleware(App\Http\Middleware\EnsureAdminApiToken::class)->group(function () {
     Route::post('/posts', [AdminPostController::class, 'store']);

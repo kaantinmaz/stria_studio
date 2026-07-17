@@ -12,6 +12,7 @@ class Appointment extends Model
 
     protected $fillable = [
         'customer_id',
+        'app_user_id',
         'service_id',
         'starts_at',
         'duration_min',
@@ -19,6 +20,7 @@ class Appointment extends Model
         'is_paid',
         'payment_method',
         'note',
+        'status',
     ];
 
     protected function casts(): array
@@ -38,5 +40,10 @@ class Appointment extends Model
     public function service(): BelongsTo
     {
         return $this->belongsTo(Service::class);
+    }
+
+    public function appUser(): BelongsTo
+    {
+        return $this->belongsTo(AppUser::class);
     }
 }
