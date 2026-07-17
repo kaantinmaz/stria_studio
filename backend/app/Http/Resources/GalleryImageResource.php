@@ -11,6 +11,7 @@ class GalleryImageResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'id' => $this->id,
             'image' => $this->image && ! Str::startsWith($this->image, ['http://', 'https://', '/'])
                 ? asset('storage/'.$this->image)
                 : $this->image,

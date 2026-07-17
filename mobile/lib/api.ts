@@ -4,6 +4,7 @@ import type {
   Appointment,
   AuthData,
   Campaign,
+  GalleryImage,
   MeData,
   Service,
   SlotData,
@@ -134,5 +135,10 @@ export const api = {
   async services() {
     const response = await request<{ data: Service[] } | Service[]>(`${API_URL}/api/services`, { auth: false });
     return Array.isArray(response) ? response : response.data;
+  },
+
+  async gallery() {
+    const response = await request<{ data: GalleryImage[] }>(`${API_URL}/api/gallery`, { auth: false });
+    return response.data;
   },
 };

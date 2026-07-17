@@ -36,6 +36,7 @@ class AppointmentController extends Controller
                 'starts_at' => $appointment->starts_at->toIso8601String(),
                 'duration_min' => $appointment->duration_min,
                 'status' => $appointment->status,
+                'photos' => collect($appointment->photos ?? [])->map(fn ($p) => str_starts_with($p, 'http') || str_starts_with($p, '/') ? $p : asset('storage/'.$p))->values()->all(),
             ])
             ->values();
 

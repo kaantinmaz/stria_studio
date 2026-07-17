@@ -658,22 +658,22 @@
                             @error('note') <div class="stria-error">{{ $message }}</div> @enderror
                         </div>
 
-                        @if ($editingAppointmentId && $customerId)
+                        @if ($editingAppointmentId)
                             <div class="stria-field is-full">
                                 <div class="stria-photo-heading">
                                     <span class="stria-label">Öncesi / Sonrası Fotoğrafları</span>
                                     <small>sınırsız</small>
                                 </div>
 
-                                @if ($customerPhotos)
+                                @if ($appointmentPhotos)
                                     <div class="stria-photo-grid">
-                                        @foreach ($customerPhotos as $index => $path)
-                                            <div class="stria-photo-thumb" wire:key="customer-photo-{{ $index }}-{{ md5($path) }}">
-                                                <img src="{{ asset('storage/'.$path) }}" alt="Müşteri fotoğrafı">
+                                        @foreach ($appointmentPhotos as $index => $path)
+                                            <div class="stria-photo-thumb" wire:key="appointment-photo-{{ $index }}-{{ md5($path) }}">
+                                                <img src="{{ asset('storage/'.$path) }}" alt="Randevu fotoğrafı">
                                                 <button
                                                     type="button"
                                                     class="stria-photo-remove"
-                                                    wire:click="removeCustomerPhoto({{ $index }})"
+                                                    wire:click="removeAppointmentPhoto({{ $index }})"
                                                     aria-label="Fotoğrafı sil"
                                                 >×</button>
                                             </div>
@@ -682,14 +682,14 @@
                                 @endif
 
                                 <input
-                                    id="customer-photo-upload"
+                                    id="appointment-photo-upload"
                                     type="file"
                                     class="stria-photo-input"
                                     multiple
                                     accept="image/*"
                                     wire:model="newPhotos"
                                 >
-                                <label class="stria-photo-add" for="customer-photo-upload">＋ Fotoğraf ekle</label>
+                                <label class="stria-photo-add" for="appointment-photo-upload">＋ Fotoğraf ekle</label>
                                 <span class="stria-photo-loading" wire:loading wire:target="newPhotos">Yükleniyor…</span>
                                 @error('newPhotos.*') <div class="stria-error">{{ $message }}</div> @enderror
                             </div>

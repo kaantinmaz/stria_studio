@@ -1,19 +1,22 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useFocusEffect } from 'expo-router';
-import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { CodeCard } from '@/components/code-card';
 import { LoyaltyCard } from '@/components/loyalty-card';
 import { Card, ErrorState, LoadingState, PageHeader } from '@/components/ui';
+import { PhotoViewer } from '@/components/photo-viewer';
 import { api, friendlyError } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import { colors, fonts, spacing, typography } from '@/lib/theme';
-import type { Campaign } from '@/lib/types';
+import { colors, fonts, radius, spacing, typography } from '@/lib/theme';
+import type { Campaign, GalleryImage } from '@/lib/types';
 
 export default function HomeScreen() {
   const { user, loyalty, refreshMe } = useAuth();
   const [campaigns, setCampaigns] = useState<Campaign[] | null>(null);
   const [error, setError] = useState<unknown>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [gallery, setGallery] = useState<GalleryImage[]>([]);
+  const [viewerIndex, setViewerIndex] = useState<number | null>(null);
 
   const load = useCallback(async (asRefresh = false) => {
     if (asRefresh) setRefreshing(true);
@@ -34,7 +37,30 @@ export default function HomeScreen() {
     }, [load]),
   );
 
+  useEffect(() => {
+    let active = true;
+    api
+      .gallery()
+      .then((images) => {
+        if (!active) return;
+        setGallery(
+          images
+            .filter((image) => image.image !== null)
+            .sort((a, b) => b.id - a.id)
+            .slice(0, 10),
+        );
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, []);
+
   if (!campaigns && !error) return <LoadingState label="Güzelliklerini hazırlıyoruz…" />;
+
+  const galleryPhotos = gallery
+    .map((image) => image.image)
+    .filter((uri): uri is string => uri !== null);
 
   return (
     <ScrollView
@@ -87,6 +113,20 @@ export default function HomeScreen() {
                 </Card>
               )}
             </View>
+
+            {galleryPhotos.length ? (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Son Çalışmalar</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.galleryStrip}>
+                  {galleryPhotos.map((uri, index) => (
+                    <Pressable key={`${uri}-${index}`} accessibilityLabel="Galeri fotoğrafı" onPress={() => setViewerIndex(index)}>
+                      <Image source={{ uri }} style={styles.galleryThumb} resizeMode="cover" />
+                    </Pressable>
+                  ))}
+                </ScrollView>
+                <PhotoViewer photos={galleryPhotos} index={viewerIndex} onClose={() => setViewerIndex(null)} />
+              </View>
+            ) : null}
           </>
         ) : null}
       </View>
@@ -112,4 +152,6 @@ const styles = StyleSheet.create({
   campaignBadge: { width: 64, height: 64, borderRadius: 32, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.pink },
   campaignPercent: { fontFamily: fonts.semibold, fontSize: 18, color: colors.accentDark },
   emptyCampaign: { backgroundColor: colors.blush },
+  galleryStrip: { gap: spacing.sm, paddingTop: spacing.xs },
+  galleryThumb: { width: 140, height: 140, borderRadius: radius.md, backgroundColor: colors.line },
 });

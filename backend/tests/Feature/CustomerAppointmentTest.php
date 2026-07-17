@@ -93,18 +93,18 @@ class CustomerAppointmentTest extends TestCase
         $this->assertCount(0, $customerWithoutPhotos->photos ?? []);
     }
 
-    public function test_customer_photos_can_be_managed_from_the_appointment_edit_modal(): void
+    public function test_photos_can_be_managed_from_the_appointment_edit_modal(): void
     {
         Storage::fake('public');
-        Storage::disk('public')->put('customers/before.jpg', 'before');
+        Storage::disk('public')->put('appointments/before.jpg', 'before');
 
         $customer = Customer::query()->create([
             'name' => 'Takvim Fotoğraf Müşterisi',
-            'photos' => ['customers/before.jpg'],
         ]);
         $appointment = Appointment::query()->create([
             'customer_id' => $customer->id,
             'starts_at' => '2026-07-20 10:00:00',
+            'photos' => ['appointments/before.jpg'],
         ]);
 
         $this->actingAs(User::factory()->create());
@@ -112,20 +112,20 @@ class CustomerAppointmentTest extends TestCase
 
         $calendar = Livewire::test(Calendar::class)
             ->call('openEditModal', $appointment->id)
-            ->assertSet('customerPhotos', ['customers/before.jpg']);
+            ->assertSet('appointmentPhotos', ['appointments/before.jpg']);
 
         $calendar
-            ->call('removeCustomerPhoto', 0)
-            ->assertSet('customerPhotos', []);
+            ->call('removeAppointmentPhoto', 0)
+            ->assertSet('appointmentPhotos', []);
 
-        $this->assertSame([], $customer->refresh()->photos);
-        Storage::disk('public')->assertMissing('customers/before.jpg');
+        $this->assertSame([], $appointment->refresh()->photos);
+        Storage::disk('public')->assertMissing('appointments/before.jpg');
 
         $calendar
             ->set('newPhotos', [UploadedFile::fake()->image('after.jpg')])
             ->assertSet('newPhotos', []);
 
-        $this->assertCount(1, $customer->refresh()->photos);
-        Storage::disk('public')->assertExists($customer->photos[0]);
+        $this->assertCount(1, $appointment->refresh()->photos);
+        Storage::disk('public')->assertExists($appointment->photos[0]);
     }
 }

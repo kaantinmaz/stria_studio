@@ -52,7 +52,7 @@ Gövde: `{ "email", "password" }`
 ## Randevular
 
 ### GET /appointments  (auth)
-`200` → `{ "data": [ { "id", "service_name": string|null, "starts_at": ISO8601, "duration_min": int, "status": "requested"|"confirmed"|"cancelled" } ] }`
+`200` → `{ "data": [ { "id", "service_name": string|null, "starts_at": ISO8601, "duration_min": int, "status": "requested"|"confirmed"|"cancelled", "photos": string[] (mutlak URL listesi, boşsa []) } ] }`
 Kapsam: bağlı müşteri kartının TÜM randevuları + kullanıcının uygulamadan açtığı talepler (`appointments.app_user_id`). `starts_at` azalan.
 
 ### GET /slots?date=YYYY-MM-DD  (auth)

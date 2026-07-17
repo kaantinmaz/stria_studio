@@ -67,7 +67,7 @@ class Calendar extends Page
 
     public array $newPhotos = [];
 
-    public array $customerPhotos = [];
+    public array $appointmentPhotos = [];
 
     public function mount(): void
     {
@@ -124,7 +124,7 @@ class Calendar extends Page
         $this->creatingCustomer = false;
         $this->newCustomerName = '';
         $this->newCustomerPhone = '';
-        $this->customerPhotos = array_values($appointment->customer?->photos ?? []);
+        $this->appointmentPhotos = array_values($appointment->photos ?? []);
         $this->showAppointmentModal = true;
     }
 
@@ -134,43 +134,30 @@ class Calendar extends Page
         $this->resetAppointmentForm();
     }
 
-    public function updatedCustomerId(): void
-    {
-        if (! $this->editingAppointmentId || ! $this->customerId) {
-            $this->customerPhotos = [];
-
-            return;
-        }
-
-        $this->customerPhotos = array_values(
-            Customer::query()->find($this->customerId)?->photos ?? [],
-        );
-    }
-
     public function updatedNewPhotos(): void
     {
-        $this->uploadCustomerPhotos();
+        $this->uploadAppointmentPhotos();
     }
 
-    public function uploadCustomerPhotos(): void
+    public function uploadAppointmentPhotos(): void
     {
-        abort_unless($this->editingAppointmentId && $this->customerId, 404);
+        abort_unless($this->editingAppointmentId, 404);
 
         $this->validate([
             'newPhotos.*' => ['image', 'max:10240'],
         ]);
 
-        $customer = Customer::query()->findOrFail($this->customerId);
-        $photos = array_values($customer->photos ?? []);
+        $appointment = Appointment::query()->findOrFail($this->editingAppointmentId);
+        $photos = array_values($appointment->photos ?? []);
 
         foreach ($this->newPhotos as $photo) {
-            $photos[] = $photo->store('customers', 'public');
+            $photos[] = $photo->store('appointments', 'public');
         }
 
-        $customer->photos = $photos;
-        $customer->save();
+        $appointment->photos = $photos;
+        $appointment->save();
 
-        $this->customerPhotos = array_values($customer->fresh()->photos ?? []);
+        $this->appointmentPhotos = array_values($appointment->fresh()->photos ?? []);
         $this->newPhotos = [];
 
         Notification::make()
@@ -179,12 +166,12 @@ class Calendar extends Page
             ->send();
     }
 
-    public function removeCustomerPhoto(int $index): void
+    public function removeAppointmentPhoto(int $index): void
     {
-        abort_unless($this->editingAppointmentId && $this->customerId, 404);
+        abort_unless($this->editingAppointmentId, 404);
 
-        $customer = Customer::query()->findOrFail($this->customerId);
-        $photos = array_values($customer->photos ?? []);
+        $appointment = Appointment::query()->findOrFail($this->editingAppointmentId);
+        $photos = array_values($appointment->photos ?? []);
 
         if (! array_key_exists($index, $photos)) {
             return;
@@ -194,14 +181,14 @@ class Calendar extends Page
         unset($photos[$index]);
         $photos = array_values($photos);
 
-        $customer->photos = $photos;
-        $customer->save();
+        $appointment->photos = $photos;
+        $appointment->save();
 
-        if (is_string($path) && str_starts_with($path, 'customers/')) {
+        if (is_string($path) && str_starts_with($path, 'appointments/')) {
             Storage::disk('public')->delete($path);
         }
 
-        $this->customerPhotos = $photos;
+        $this->appointmentPhotos = $photos;
     }
 
     public function useNewCustomer(): void
@@ -486,7 +473,7 @@ class Calendar extends Page
         $this->payment_method = null;
         $this->note = '';
         $this->newPhotos = [];
-        $this->customerPhotos = [];
+        $this->appointmentPhotos = [];
     }
 
     private function isValidDate(string $date): bool

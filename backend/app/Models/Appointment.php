@@ -21,6 +21,7 @@ class Appointment extends Model
         'payment_method',
         'note',
         'status',
+        'photos',
     ];
 
     protected function casts(): array
@@ -29,6 +30,7 @@ class Appointment extends Model
             'starts_at' => 'datetime',
             'price' => 'decimal:2',
             'is_paid' => 'boolean',
+            'photos' => 'array',
         ];
     }
 

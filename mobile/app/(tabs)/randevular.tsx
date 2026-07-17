@@ -1,7 +1,8 @@
 import { useCallback, useState } from 'react';
 import { router, useFocusEffect } from 'expo-router';
-import { FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Image, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Button, Card, EmptyState, ErrorState, LoadingState, PageHeader } from '@/components/ui';
+import { PhotoViewer } from '@/components/photo-viewer';
 import { api, friendlyError } from '@/lib/api';
 import { appointmentDate } from '@/lib/format';
 import { colors, fonts, radius, spacing, typography } from '@/lib/theme';
@@ -68,6 +69,9 @@ export default function AppointmentsScreen() {
 }
 
 function AppointmentCard({ appointment }: { appointment: Appointment }) {
+  const [viewerIndex, setViewerIndex] = useState<number | null>(null);
+  const hasPhotos = appointment.photos.length > 0;
+
   return (
     <Card style={styles.card}>
       <View style={styles.cardTop}>
@@ -80,6 +84,26 @@ function AppointmentCard({ appointment }: { appointment: Appointment }) {
         </View>
       </View>
       <Text style={styles.duration}>{appointment.duration_min} dakika</Text>
+      {hasPhotos ? (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.thumbStrip}>
+          {appointment.photos.map((photo, index) => (
+            <Pressable
+              key={`${photo}-${index}`}
+              accessibilityLabel="Randevu fotoğrafı"
+              onPress={() => setViewerIndex(index)}
+            >
+              <Image source={{ uri: photo }} style={styles.thumb} resizeMode="cover" />
+            </Pressable>
+          ))}
+        </ScrollView>
+      ) : null}
+      {hasPhotos ? (
+        <PhotoViewer
+          photos={appointment.photos}
+          index={viewerIndex}
+          onClose={() => setViewerIndex(null)}
+        />
+      ) : null}
     </Card>
   );
 }
@@ -103,4 +127,6 @@ const styles = StyleSheet.create({
   confirmedText: { color: colors.green },
   cancelledPill: { backgroundColor: colors.grayBg },
   cancelledText: { color: colors.gray },
+  thumbStrip: { gap: spacing.sm, paddingTop: spacing.xs },
+  thumb: { width: 72, height: 72, borderRadius: radius.md, backgroundColor: colors.line },
 });

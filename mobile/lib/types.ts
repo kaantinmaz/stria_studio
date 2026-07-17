@@ -35,6 +35,7 @@ export type Appointment = {
   starts_at: string;
   duration_min: number;
   status: AppointmentStatus;
+  photos: string[];
 };
 
 export type Campaign = {
@@ -48,6 +49,13 @@ export type Service = {
   name_en: string;
   slug: string;
   image: string | null;
+};
+
+export type GalleryImage = {
+  id: number;
+  image: string | null;
+  alt_tr: string | null;
+  alt_en: string | null;
 };
 
 export type SlotData = {
