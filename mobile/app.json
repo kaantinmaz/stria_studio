@@ -6,6 +6,13 @@
     "orientation": "portrait",
     "scheme": "striastudio",
     "userInterfaceStyle": "light",
+    "ios": {
+      "bundleIdentifier": "com.striastudio.app",
+      "supportsTablet": false
+    },
+    "android": {
+      "package": "com.striastudio.app"
+    },
     "plugins": ["expo-router", "expo-secure-store"],
     "experiments": {
       "typedRoutes": true
