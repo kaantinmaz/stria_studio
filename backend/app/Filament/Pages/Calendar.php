@@ -306,6 +306,38 @@ class Calendar extends Page
             ->send();
     }
 
+    public function markNoShow(): void
+    {
+        abort_unless($this->editingAppointmentId && $this->appointmentStatus === 'confirmed', 404);
+
+        Appointment::query()->findOrFail($this->editingAppointmentId)->update([
+            'status' => 'no_show',
+        ]);
+        $this->showAppointmentModal = false;
+        $this->resetAppointmentForm();
+
+        Notification::make()
+            ->title('Gelmedi olarak işaretlendi')
+            ->success()
+            ->send();
+    }
+
+    public function markAttended(): void
+    {
+        abort_unless($this->editingAppointmentId && $this->appointmentStatus === 'no_show', 404);
+
+        Appointment::query()->findOrFail($this->editingAppointmentId)->update([
+            'status' => 'confirmed',
+        ]);
+        $this->showAppointmentModal = false;
+        $this->resetAppointmentForm();
+
+        Notification::make()
+            ->title('Geldi olarak işaretlendi')
+            ->success()
+            ->send();
+    }
+
     /**
      * @return array<string, mixed>
      */

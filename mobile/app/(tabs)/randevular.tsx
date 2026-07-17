@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { router, useFocusEffect } from 'expo-router';
-import { FlatList, Image, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, FlatList, Image, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Button, Card, EmptyState, ErrorState, LoadingState, PageHeader } from '@/components/ui';
 import { PhotoViewer } from '@/components/photo-viewer';
 import { api, friendlyError } from '@/lib/api';
@@ -12,6 +12,7 @@ const statusLabels: Record<AppointmentStatus, string> = {
   requested: 'Talep Edildi',
   confirmed: 'Onaylandı',
   cancelled: 'İptal',
+  no_show: 'Gelmedi',
 };
 
 export default function AppointmentsScreen() {
@@ -62,15 +63,37 @@ export default function AppointmentsScreen() {
           action={<Button title="Randevu Al" onPress={() => router.push('/(tabs)/randevu-al')} />}
         />
       }
-      renderItem={({ item }: { item: Appointment }) => <AppointmentCard appointment={item} />}
+      renderItem={({ item }: { item: Appointment }) => <AppointmentCard appointment={item} onCancelled={() => void load()} />}
       ItemSeparatorComponent={() => <View style={styles.separator} />}
     />
   );
 }
 
-function AppointmentCard({ appointment }: { appointment: Appointment }) {
+function AppointmentCard({ appointment, onCancelled }: { appointment: Appointment; onCancelled: () => void }) {
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
+  const [cancelling, setCancelling] = useState(false);
   const hasPhotos = appointment.photos.length > 0;
+  const canCancel =
+    (appointment.status === 'requested' || appointment.status === 'confirmed') &&
+    new Date(appointment.starts_at).getTime() - Date.now() > 12 * 3600 * 1000;
+
+  const confirmCancel = () => {
+    Alert.alert('Randevu iptal edilecek. Emin misin?', undefined, [
+      { text: 'Vazgeç', style: 'cancel' },
+      {
+        text: 'İptal',
+        style: 'destructive',
+        onPress: () => {
+          setCancelling(true);
+          api
+            .cancelAppointment(appointment.id)
+            .then(() => onCancelled())
+            .catch((caught) => Alert.alert('Hata', friendlyError(caught)))
+            .finally(() => setCancelling(false));
+        },
+      },
+    ]);
+  };
 
   return (
     <Card style={styles.card}>
@@ -104,6 +127,11 @@ function AppointmentCard({ appointment }: { appointment: Appointment }) {
           onClose={() => setViewerIndex(null)}
         />
       ) : null}
+      {canCancel ? (
+        <Pressable onPress={confirmCancel} disabled={cancelling} accessibilityRole="button" style={styles.cancelButton}>
+          <Text style={styles.cancelText}>{cancelling ? 'İptal ediliyor…' : 'Gelemeyeceğim'}</Text>
+        </Pressable>
+      ) : null}
     </Card>
   );
 }
@@ -127,6 +155,10 @@ const styles = StyleSheet.create({
   confirmedText: { color: colors.green },
   cancelledPill: { backgroundColor: colors.grayBg },
   cancelledText: { color: colors.gray },
+  no_showPill: { backgroundColor: colors.dangerBg },
+  no_showText: { color: colors.danger },
   thumbStrip: { gap: spacing.sm, paddingTop: spacing.xs },
   thumb: { width: 72, height: 72, borderRadius: radius.md, backgroundColor: colors.line },
+  cancelButton: { alignSelf: 'flex-start', paddingVertical: spacing.xs },
+  cancelText: { fontFamily: fonts.semibold, fontSize: 14, color: colors.danger },
 });

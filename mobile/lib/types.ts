@@ -27,7 +27,7 @@ export type AuthData = {
   user: User;
 };
 
-export type AppointmentStatus = 'requested' | 'confirmed' | 'cancelled';
+export type AppointmentStatus = 'requested' | 'confirmed' | 'cancelled' | 'no_show';
 
 export type Appointment = {
   id: number;

@@ -86,6 +86,45 @@ class AppointmentController extends Controller
         ], 201);
     }
 
+    public function cancel(Request $request, int $id): JsonResponse
+    {
+        $user = $request->user();
+        $customerId = $user->customer()->value('id');
+        $appointment = Appointment::query()
+            ->where('id', $id)
+            ->where(function (Builder $query) use ($customerId, $user): void {
+                $query->where('app_user_id', $user->id);
+
+                if ($customerId) {
+                    $query->orWhere('customer_id', $customerId);
+                }
+            })
+            ->first();
+
+        abort_if($appointment === null, 404);
+
+        if (! in_array($appointment->status, ['requested', 'confirmed'], true)) {
+            throw ValidationException::withMessages([
+                'status' => ['Bu randevu iptal edilemez.'],
+            ]);
+        }
+
+        if ($appointment->starts_at->lessThanOrEqualTo(CarbonImmutable::now()->addHours(12))) {
+            throw ValidationException::withMessages([
+                'starts_at' => ['Randevu başlangıcına 12 saatten az kaldığı için uygulamadan iptal edilemiyor. Lütfen bizi arayın.'],
+            ]);
+        }
+
+        $appointment->update(['status' => 'cancelled']);
+
+        return response()->json([
+            'data' => [
+                'id' => $appointment->id,
+                'status' => $appointment->status,
+            ],
+        ]);
+    }
+
     public function slots(Request $request, AppointmentSlots $appointmentSlots): JsonResponse
     {
         $validated = $request->validate([

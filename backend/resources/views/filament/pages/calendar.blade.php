@@ -150,6 +150,14 @@
 
         .stria-appointment-pill.is-requested:hover { background: #fde68a; }
 
+        .stria-appointment-pill.is-noshow {
+            color: #6b7280;
+            background: #e5e7eb;
+            text-decoration: line-through;
+        }
+
+        .stria-appointment-pill.is-noshow:hover { background: #d1d5db; }
+
         .stria-more {
             padding: 2px 6px;
             color: #6e6e73;
@@ -476,7 +484,7 @@
                                 @foreach (array_slice($day['appointments'], 0, 3) as $appointment)
                                     <button
                                         type="button"
-                                        class="stria-appointment-pill {{ $appointment['is_paid'] ? '' : 'is-unpaid' }} {{ $appointment['status'] === 'requested' ? 'is-requested' : '' }}"
+                                        class="stria-appointment-pill {{ $appointment['is_paid'] ? '' : 'is-unpaid' }} {{ $appointment['status'] === 'requested' ? 'is-requested' : '' }} {{ $appointment['status'] === 'no_show' ? 'is-noshow' : '' }}"
                                         title="{{ $appointment['time'] }} {{ $appointment['customer'] }}"
                                         @click.stop="$wire.openEditModal({{ $appointment['id'] }})"
                                     >
@@ -708,6 +716,23 @@
                             </button>
                             <button type="button" class="stria-button primary" wire:click="approveRequest">
                                 Onayla
+                            </button>
+                        @endif
+
+                        @if ($editingAppointmentId && $appointmentStatus === 'confirmed')
+                            <button
+                                type="button"
+                                class="stria-button danger"
+                                wire:click="markNoShow"
+                                wire:confirm="Randevu gelmedi olarak işaretlenecek. Emin misin?"
+                            >
+                                Gelmedi
+                            </button>
+                        @endif
+
+                        @if ($editingAppointmentId && $appointmentStatus === 'no_show')
+                            <button type="button" class="stria-button primary" wire:click="markAttended">
+                                Geldi olarak işaretle
                             </button>
                         @endif
 

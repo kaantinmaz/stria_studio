@@ -8,6 +8,7 @@ use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Filament\Support\Icons\Heroicon;
 
 class CustomersTable
@@ -33,6 +34,15 @@ class CustomersTable
                 TextColumn::make('appointments_count')
                     ->label('Randevu Sayısı')
                     ->counts('appointments')
+                    ->sortable(),
+                TextColumn::make('no_show_appointments_count')
+                    ->label('Gelmedi')
+                    ->counts([
+                        'appointments as no_show_appointments_count' => fn (Builder $query) => $query->where('status', 'no_show'),
+                    ])
+                    ->badge()
+                    ->color(fn (int $state): string => $state > 0 ? 'danger' : 'gray')
+                    ->formatStateUsing(fn (int $state): string => $state > 0 ? (string) $state : '—')
                     ->sortable(),
                 TextColumn::make('photos')
                     ->label('Fotoğraflar')

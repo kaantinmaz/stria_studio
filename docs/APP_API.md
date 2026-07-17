@@ -52,7 +52,7 @@ Gövde: `{ "email", "password" }`
 ## Randevular
 
 ### GET /appointments  (auth)
-`200` → `{ "data": [ { "id", "service_name": string|null, "starts_at": ISO8601, "duration_min": int, "status": "requested"|"confirmed"|"cancelled", "photos": string[] (mutlak URL listesi, boşsa []) } ] }`
+`200` → `{ "data": [ { "id", "service_name": string|null, "starts_at": ISO8601, "duration_min": int, "status": "requested"|"confirmed"|"cancelled"|"no_show", "photos": string[] (mutlak URL listesi, boşsa []) } ] }`
 Kapsam: bağlı müşteri kartının TÜM randevuları + kullanıcının uygulamadan açtığı talepler (`appointments.app_user_id`). `starts_at` azalan.
 
 ### GET /slots?date=YYYY-MM-DD  (auth)
@@ -63,6 +63,13 @@ Kaynak: `settings.hours` çalışma saatleri (ana site), 60 dk ızgara; o güne 
 Gövde: `{ "service_slug": string (aktif hizmet), "date": "YYYY-MM-DD", "time": "HH:MM", "note": string≤500 (ops.) }`
 `201` → `{ "data": { "id", "status": "requested" } }`
 Kayıt: `status=requested`, `app_user_id`=kullanıcı, `customer_id`=bağlıysa müşteri kartı yoksa null. Dolu slota talep → `422`.
+
+### POST /appointments/{id}/cancel  (auth)
+Kullanıcının randevusunu iptal eder (kapsam GET /appointments ile aynı: bağlı müşteri kartı VEYA `app_user_id`).
+`200` → `{ "data": { "id", "status": "cancelled" } }`
+- Randevu kullanıcıya ait değilse → `404`.
+- `status` `requested` veya `confirmed` değilse → `422` (`status`: "Bu randevu iptal edilemez.").
+- Başlangıcına 12 saatten az kaldıysa (`starts_at <= now()+12h`) → `422` (`starts_at`: "Randevu başlangıcına 12 saatten az kaldığı için uygulamadan iptal edilemiyor. Lütfen bizi arayın.").
 
 ## Kampanyalar
 

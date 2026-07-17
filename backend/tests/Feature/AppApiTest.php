@@ -277,6 +277,76 @@ class AppApiTest extends TestCase
             ->assertJsonPath('data.loyalty.reward_next', true);
     }
 
+    public function test_cancel_rejects_appointment_not_owned_by_user(): void
+    {
+        CarbonImmutable::setTestNow('2026-07-17 09:00:00');
+        $appointment = Appointment::query()->create([
+            'starts_at' => '2026-07-25 10:00:00',
+            'status' => 'confirmed',
+        ]);
+
+        $this->actingAsAppUser()->postJson("/api/app/appointments/{$appointment->id}/cancel")
+            ->assertNotFound();
+        $this->assertDatabaseHas('appointments', [
+            'id' => $appointment->id,
+            'status' => 'confirmed',
+        ]);
+    }
+
+    public function test_cancel_rejects_appointment_starting_within_twelve_hours(): void
+    {
+        CarbonImmutable::setTestNow('2026-07-17 09:00:00');
+        $user = $this->appUser();
+        $appointment = Appointment::query()->create([
+            'app_user_id' => $user->id,
+            'starts_at' => '2026-07-17 15:00:00',
+            'status' => 'confirmed',
+        ]);
+
+        $this->actingAsAppUser($user)->postJson("/api/app/appointments/{$appointment->id}/cancel")
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('starts_at');
+        $this->assertDatabaseHas('appointments', [
+            'id' => $appointment->id,
+            'status' => 'confirmed',
+        ]);
+    }
+
+    public function test_cancel_succeeds_for_owned_appointment_more_than_twelve_hours_away(): void
+    {
+        CarbonImmutable::setTestNow('2026-07-17 09:00:00');
+        $user = $this->appUser();
+        $appointment = Appointment::query()->create([
+            'app_user_id' => $user->id,
+            'starts_at' => '2026-07-25 10:00:00',
+            'status' => 'confirmed',
+        ]);
+
+        $this->actingAsAppUser($user)->postJson("/api/app/appointments/{$appointment->id}/cancel")
+            ->assertOk()
+            ->assertJsonPath('data.id', $appointment->id)
+            ->assertJsonPath('data.status', 'cancelled');
+        $this->assertDatabaseHas('appointments', [
+            'id' => $appointment->id,
+            'status' => 'cancelled',
+        ]);
+    }
+
+    public function test_cancel_rejects_already_cancelled_appointment(): void
+    {
+        CarbonImmutable::setTestNow('2026-07-17 09:00:00');
+        $user = $this->appUser();
+        $appointment = Appointment::query()->create([
+            'app_user_id' => $user->id,
+            'starts_at' => '2026-07-25 10:00:00',
+            'status' => 'cancelled',
+        ]);
+
+        $this->actingAsAppUser($user)->postJson("/api/app/appointments/{$appointment->id}/cancel")
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('status');
+    }
+
     private function appUser(): AppUser
     {
         return AppUser::query()->create([

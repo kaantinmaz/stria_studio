@@ -128,6 +128,11 @@ export const api = {
     return response.data;
   },
 
+  cancelAppointment: (id: number) =>
+    request<{ data: { id: number; status: 'cancelled' } }>(`${APP_API_URL}/appointments/${id}/cancel`, {
+      method: 'POST',
+    }),
+
   async campaigns() {
     const response = await request<{ data: Campaign[] }>(`${APP_API_URL}/campaigns`);
     return response.data;

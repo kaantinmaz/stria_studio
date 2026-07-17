@@ -46,6 +46,7 @@ Route::prefix('app')->group(function () {
         Route::get('/appointments', [AppAppointmentController::class, 'index']);
         Route::get('/slots', [AppAppointmentController::class, 'slots']);
         Route::post('/appointments', [AppAppointmentController::class, 'store']);
+        Route::post('/appointments/{id}/cancel', [AppAppointmentController::class, 'cancel']);
         Route::get('/campaigns', [AppCampaignController::class, 'index']);
     });
 });
