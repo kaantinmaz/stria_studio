@@ -20,7 +20,7 @@ export function Card({ children, style }: PropsWithChildren<{ style?: ViewStyle 
 type ButtonProps = PressableProps & {
   title: string;
   loading?: boolean;
-  variant?: 'primary' | 'secondary' | 'ghost';
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
   fullWidth?: boolean;
 };
 
@@ -29,11 +29,13 @@ export function Button({ title, loading, variant = 'primary', fullWidth = true, 
     primary: styles.primaryButton,
     secondary: styles.secondaryButton,
     ghost: styles.ghostButton,
+    danger: styles.dangerButton,
   };
   const textVariants = {
     primary: styles.primaryButtonText,
     secondary: styles.secondaryButtonText,
     ghost: styles.ghostButtonText,
+    danger: styles.dangerButtonText,
   };
 
   return (
@@ -145,6 +147,8 @@ const styles = StyleSheet.create({
   primaryButtonText: { color: colors.white },
   secondaryButtonText: { color: colors.accentDark },
   ghostButtonText: { color: colors.accentDark },
+  dangerButton: { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.danger },
+  dangerButtonText: { color: colors.danger },
   pressed: { opacity: 0.82, transform: [{ scale: 0.99 }] },
   disabled: { opacity: 0.48 },
   fieldWrap: { gap: spacing.xs },

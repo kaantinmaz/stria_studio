@@ -44,6 +44,7 @@ Route::prefix('app')->group(function () {
 
     Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
         Route::post('/logout', [AppAuthController::class, 'logout']);
+        Route::delete('/account', [AppAuthController::class, 'destroy']);
         Route::get('/me', AppMeController::class);
         Route::get('/appointments', [AppAppointmentController::class, 'index']);
         Route::get('/slots', [AppAppointmentController::class, 'slots']);

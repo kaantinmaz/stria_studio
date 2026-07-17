@@ -16,7 +16,7 @@ import { colors, fonts, radius, spacing, typography } from '@/lib/theme';
 import type { ChatMessage } from '@/lib/types';
 
 const GREETING =
-  'Merhaba! Randevuların, kampanyalar ve hizmetlerimiz hakkında bana sorabilirsin. ✨';
+  'Merhaba! Randevuların, kampanyalar ve hizmetlerimiz hakkında bana sorabilirsin. ✨ Yanıtlar yapay zekâ tarafından oluşturulur.';
 const ERROR_REPLY = 'Şu an yanıt veremiyorum, birazdan tekrar dener misin?';
 
 type Bubble = ChatMessage | { role: 'typing'; content: '' };

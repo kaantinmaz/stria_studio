@@ -85,4 +85,16 @@ class AuthController extends Controller
 
         return response()->noContent();
     }
+
+    public function destroy(Request $request): Response
+    {
+        $user = $request->user();
+
+        DB::transaction(function () use ($user): void {
+            $user->tokens()->delete();
+            $user->delete();
+        });
+
+        return response()->noContent();
+    }
 }

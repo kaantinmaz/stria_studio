@@ -18,6 +18,10 @@ Gövde: `{ "email", "password" }`
 ### POST /logout  (auth)
 `204`. Aktif token iptal edilir.
 
+### DELETE /account  (auth)
+`204`. Oturum sahibinin uygulama hesabını **kalıcı** siler: kullanıcının tüm token'ları ve `app_users` kaydı silinir. **Geri döndürülemez** — Apple 5.1.1(v) gereği uygulama içi hesap silme.
+İşletme kayıtları (randevu geçmişi, müşteri kartı) yasal saklama yükümlülüğü gereği korunur; ilişkili `customers.app_user_id` ve `appointments.app_user_id` FK'ları `nullOnDelete` ile otomatik `NULL`'a çekilerek kayıtlar kişisel hesaptan koparılıp **anonimleştirilir**. Yeni token gerektirmez; silinmiş token'la sonraki istekler `401` döner.
+
 ## User nesnesi
 ```json
 {

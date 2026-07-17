@@ -1,17 +1,25 @@
 import { useCallback, useState } from 'react';
 import { router, useFocusEffect } from 'expo-router';
-import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Linking, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { CodeCard } from '@/components/code-card';
 import { Button, Card, ErrorState, LoadingState, PageHeader } from '@/components/ui';
-import { friendlyError } from '@/lib/api';
+import { api, friendlyError } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { colors, fonts, radius, spacing, typography } from '@/lib/theme';
+
+const LEGAL_LINKS = [
+  { label: 'Gizlilik Politikası', url: 'https://striastudio.com.tr/gizlilik-politikasi' },
+  { label: 'KVKK Aydınlatma Metni', url: 'https://striastudio.com.tr/kvkk' },
+  { label: 'Çerez Politikası', url: 'https://striastudio.com.tr/cerez-politikasi' },
+  { label: 'İletişim', url: 'https://striastudio.com.tr/iletisim' },
+];
 
 export default function ProfileScreen() {
   const { user, refreshMe, signOut } = useAuth();
   const [error, setError] = useState<unknown>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const load = useCallback(async (asRefresh = false) => {
     if (asRefresh) setRefreshing(true);
@@ -39,6 +47,47 @@ export default function ProfileScreen() {
     } finally {
       setLoggingOut(false);
     }
+  }
+
+  function confirmDelete() {
+    Alert.alert(
+      'Hesabını sil',
+      'Hesabın kalıcı olarak silinecek. Randevu geçmişin stüdyo kayıtlarında anonim olarak saklanır. Devam edilsin mi?',
+      [
+        { text: 'Vazgeç', style: 'cancel' },
+        { text: 'Devam', onPress: confirmDeleteFinal },
+      ],
+    );
+  }
+
+  function confirmDeleteFinal() {
+    Alert.alert(
+      'Emin misin?',
+      'Bu işlem GERİ ALINAMAZ. Hesabını silmek istediğine emin misin?',
+      [
+        { text: 'Vazgeç', style: 'cancel' },
+        { text: 'Hesabımı Sil', style: 'destructive', onPress: () => void deleteAccount() },
+      ],
+    );
+  }
+
+  async function deleteAccount() {
+    setDeleting(true);
+    try {
+      await api.deleteAccount();
+    } catch (caught) {
+      Alert.alert('Bir sorun oluştu', friendlyError(caught));
+      setDeleting(false);
+      return;
+    }
+    // Hesap ve token'lar sunucuda silindi; oturum temizliğinde logout 401'i yut.
+    try {
+      await signOut();
+    } catch {
+      // yok sayılır
+    }
+    router.replace('/giris');
+    setDeleting(false);
   }
 
   if (!user) return <LoadingState label="Profilin yükleniyor…" />;
@@ -79,7 +128,25 @@ export default function ProfileScreen() {
           </View>
         </Card>
 
+        <Card style={styles.detailsCard}>
+          <Text style={styles.sectionTitle}>Yasal</Text>
+          {LEGAL_LINKS.map((item, index) => (
+            <View key={item.url}>
+              {index > 0 ? <View style={styles.line} /> : null}
+              <LegalRow label={item.label} url={item.url} />
+            </View>
+          ))}
+        </Card>
+
         <Button title="Çıkış Yap" variant="secondary" loading={loggingOut} onPress={logout} />
+        <Button
+          title="Hesabımı Sil"
+          variant="danger"
+          loading={deleting}
+          disabled={deleting}
+          onPress={confirmDelete}
+        />
+        <Text style={styles.version}>v1.0.0</Text>
       </View>
     </ScrollView>
   );
@@ -91,6 +158,15 @@ function ProfileRow({ label, value }: { label: string; value: string }) {
       <Text style={styles.rowLabel}>{label}</Text>
       <Text selectable style={styles.rowValue}>{value}</Text>
     </View>
+  );
+}
+
+function LegalRow({ label, url }: { label: string; url: string }) {
+  return (
+    <Pressable style={styles.legalRow} onPress={() => void Linking.openURL(url)}>
+      <Text style={styles.legalLabel}>{label}</Text>
+      <Text style={styles.legalArrow}>↗</Text>
+    </Pressable>
   );
 }
 
@@ -107,6 +183,11 @@ const styles = StyleSheet.create({
   rowLabel: { fontFamily: fonts.medium, fontSize: 13, color: colors.muted },
   rowValue: { fontFamily: fonts.medium, fontSize: 17, color: colors.ink },
   line: { height: 1, backgroundColor: colors.line },
+  sectionTitle: { fontFamily: fonts.semibold, fontSize: 17, color: colors.ink, marginBottom: spacing.xs },
+  legalRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: spacing.xs },
+  legalLabel: { fontFamily: fonts.medium, fontSize: 16, color: colors.ink },
+  legalArrow: { fontFamily: fonts.medium, fontSize: 16, color: colors.accent },
+  version: { fontFamily: fonts.regular, fontSize: 13, color: colors.muted, textAlign: 'center', marginTop: spacing.xs },
   linkCard: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md, shadowOpacity: 0 },
   linkedCard: { backgroundColor: colors.greenBg, borderColor: '#c9e2d3' },
   unlinkedCard: { backgroundColor: colors.blush },

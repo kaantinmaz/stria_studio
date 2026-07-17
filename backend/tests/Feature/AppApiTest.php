@@ -83,6 +83,51 @@ class AppApiTest extends TestCase
             ->assertUnauthorized();
     }
 
+    public function test_delete_account_removes_user_and_token_but_keeps_business_records(): void
+    {
+        $user = $this->appUser();
+        $token = $user->createToken('test-device')->plainTextToken;
+        $customer = Customer::query()->create([
+            'name' => 'Mobil Müşteri',
+            'app_user_id' => $user->id,
+        ]);
+        $service = Service::factory()->create(['name_tr' => 'Kaş Tasarımı']);
+        $appointment = Appointment::query()->create([
+            'app_user_id' => $user->id,
+            'customer_id' => $customer->id,
+            'service_id' => $service->id,
+            'starts_at' => '2026-07-21 11:00:00',
+            'status' => 'requested',
+        ]);
+
+        $this->withToken($token)
+            ->deleteJson('/api/app/account')
+            ->assertNoContent();
+
+        $this->assertDatabaseMissing('app_users', ['id' => $user->id]);
+        $this->assertDatabaseCount('personal_access_tokens', 0);
+
+        $this->assertDatabaseHas('customers', [
+            'id' => $customer->id,
+            'app_user_id' => null,
+        ]);
+        $this->assertDatabaseHas('appointments', [
+            'id' => $appointment->id,
+            'app_user_id' => null,
+            'customer_id' => $customer->id,
+        ]);
+
+        $this->app['auth']->forgetGuards();
+        $this->withToken($token)
+            ->getJson('/api/app/me')
+            ->assertUnauthorized();
+    }
+
+    public function test_delete_account_requires_authentication(): void
+    {
+        $this->deleteJson('/api/app/account')->assertUnauthorized();
+    }
+
     public function test_linked_customer_sees_customer_and_app_created_appointment_history(): void
     {
         $user = $this->appUser();

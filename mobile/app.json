@@ -9,12 +9,24 @@
     "userInterfaceStyle": "light",
     "ios": {
       "bundleIdentifier": "com.striastudio.app",
-      "supportsTablet": false
+      "supportsTablet": false,
+      "buildNumber": "1"
     },
     "android": {
       "package": "com.striastudio.app"
     },
-    "plugins": ["expo-router", "expo-secure-store"],
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash.png",
+          "imageWidth": 220,
+          "backgroundColor": "#fbf4f1"
+        }
+      ]
+    ],
     "experiments": {
       "typedRoutes": true
     },

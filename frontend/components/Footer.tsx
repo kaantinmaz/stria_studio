@@ -23,6 +23,7 @@ export function Footer() {
     { href: "/iletisim", label: t.navContact },
     { href: "/blog", label: t.navBlog },
     { href: "/sss", label: t.navFaq },
+    { href: "/gizlilik-politikasi", label: "Gizlilik Politikası" },
     { href: "/kvkk", label: "KVKK Aydınlatma Metni" },
     { href: "/cerez-politikasi", label: "Çerez Politikası" },
     {

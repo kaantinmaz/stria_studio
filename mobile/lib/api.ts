@@ -107,6 +107,8 @@ export const api = {
 
   logout: () => request<void>(`${APP_API_URL}/logout`, { method: 'POST' }),
 
+  deleteAccount: () => request<void>(`${APP_API_URL}/account`, { method: 'DELETE' }),
+
   async me() {
     const response = await request<{ data: MeData }>(`${APP_API_URL}/me`);
     return response.data;
