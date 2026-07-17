@@ -11,13 +11,13 @@ npm install
 npx expo start
 ```
 
-Varsayılan API adresi `http://127.0.0.1:8002`'dir. Farklı bir backend için public ortam değişkenini ayarlayın:
+Varsayılan API adresi `https://admin.striastudio.com.tr`'dir (production). Yerel backend'e karşı geliştirmek için public ortam değişkenini ayarlayın:
 
 ```bash
-EXPO_PUBLIC_API_URL=https://admin.striastudio.com.tr npx expo start
+EXPO_PUBLIC_API_URL=http://192.168.1.X:8002 npx expo start
 ```
 
-API adresine `/api/app` eklemeyin; uygulama sözleşme yollarını kendisi ekler. Fiziksel cihazda geliştirme yaparken `127.0.0.1` yerine bilgisayarınızın yerel ağ adresini kullanın.
+API adresine `/api/app` eklemeyin; uygulama sözleşme yollarını kendisi ekler.
 
 ## Kontroller
 

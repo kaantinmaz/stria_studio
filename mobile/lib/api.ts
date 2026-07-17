@@ -10,7 +10,7 @@ import type {
   ValidationErrors,
 } from './types';
 
-const rawBaseUrl = process.env.EXPO_PUBLIC_API_URL ?? 'http://127.0.0.1:8002';
+const rawBaseUrl = process.env.EXPO_PUBLIC_API_URL ?? 'https://admin.striastudio.com.tr';
 export const API_URL = rawBaseUrl.replace(/\/$/, '');
 const APP_API_URL = `${API_URL}/api/app`;
 
