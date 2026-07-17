@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import {
   Dimensions,
   FlatList,
@@ -15,14 +15,14 @@ import {
   type NativeSyntheticEvent,
 } from 'react-native';
 import { CodeCard } from '@/components/code-card';
-import { formatPrice } from '@/lib/format';
+import { appointmentDate, formatPrice } from '@/lib/format';
 import { LoyaltyCard } from '@/components/loyalty-card';
 import { Card, ErrorState, LoadingState, PageHeader } from '@/components/ui';
 import { PhotoViewer } from '@/components/photo-viewer';
 import { api, friendlyError } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
-import { colors, fonts, radius, spacing, typography } from '@/lib/theme';
-import type { Campaign, GalleryImage } from '@/lib/types';
+import { colors, fonts, radius, shadows, spacing, typography } from '@/lib/theme';
+import type { Announcement, Appointment, Campaign, GalleryImage } from '@/lib/types';
 
 const TR_MONTHS_SHORT = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'];
 const SLIDE_HEIGHT = 180;
@@ -43,14 +43,25 @@ function fmtShort(iso: string): string {
   return `${Number(day)} ${monthLabel}`;
 }
 
-function validityLabel(campaign: Campaign): string | null {
+function validityLabel(item: { starts_at: string | null; ends_at: string | null }): string | null {
   const today = todayIso();
-  const { starts_at, ends_at } = campaign;
+  const { starts_at, ends_at } = item;
   if (starts_at && ends_at && starts_at === today && ends_at === today) return 'Bugüne özel';
   if (ends_at === today) return 'Son gün';
   if (starts_at && ends_at) return `${fmtShort(starts_at)} – ${fmtShort(ends_at)} arası`;
   if (ends_at) return `${fmtShort(ends_at)}'a kadar`;
   return null;
+}
+
+function findUpcoming(appointments: Appointment[]): Appointment | null {
+  const now = Date.now();
+  return appointments
+    .filter(
+      (appointment) =>
+        (appointment.status === 'requested' || appointment.status === 'confirmed') &&
+        new Date(appointment.starts_at).getTime() > now,
+    )
+    .sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime())[0] ?? null;
 }
 
 export default function HomeScreen() {
@@ -62,6 +73,8 @@ export default function HomeScreen() {
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
   const [detail, setDetail] = useState<Campaign | null>(null);
   const [activeSlide, setActiveSlide] = useState(0);
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [upcoming, setUpcoming] = useState<Appointment | null>(null);
 
   const sliderRef = useRef<FlatList<Campaign>>(null);
   const activeSlideRef = useRef(0);
@@ -75,9 +88,21 @@ export default function HomeScreen() {
     (campaign) => campaign.kind === 'loyalty' || (campaign.kind === 'promo' && !campaign.image),
   );
 
+  const loadExtras = useCallback(() => {
+    api
+      .appointments()
+      .then((data) => setUpcoming(findUpcoming(data)))
+      .catch(() => {});
+    api
+      .announcements()
+      .then(setAnnouncements)
+      .catch(() => {});
+  }, []);
+
   const load = useCallback(async (asRefresh = false) => {
     if (asRefresh) setRefreshing(true);
     setError(null);
+    loadExtras();
     try {
       const [, campaignData] = await Promise.all([refreshMe(), api.campaigns()]);
       setCampaigns(campaignData);
@@ -86,7 +111,7 @@ export default function HomeScreen() {
     } finally {
       setRefreshing(false);
     }
-  }, [refreshMe]);
+  }, [refreshMe, loadExtras]);
 
   useFocusEffect(
     useCallback(() => {
@@ -150,6 +175,29 @@ export default function HomeScreen() {
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => void load(true)} tintColor={colors.accent} />}
     >
       <View style={styles.inner}>
+        {upcoming ? (
+          <Pressable
+            style={styles.upcomingCard}
+            accessibilityLabel="Yaklaşan randevun"
+            onPress={() => router.push('/randevular')}
+          >
+            <View style={styles.upcomingBar} />
+            <Text style={styles.upcomingIcon}>◷</Text>
+            <View style={styles.flex}>
+              <Text style={styles.upcomingLabel}>Yaklaşan randevun</Text>
+              <Text style={styles.upcomingDate}>{appointmentDate(upcoming.starts_at)}</Text>
+              {upcoming.service_name ? (
+                <Text style={styles.upcomingService}>{upcoming.service_name}</Text>
+              ) : null}
+            </View>
+            <View style={upcoming.status === 'confirmed' ? styles.statusConfirmed : styles.statusPending}>
+              <Text style={upcoming.status === 'confirmed' ? styles.statusConfirmedText : styles.statusPendingText}>
+                {upcoming.status === 'confirmed' ? 'Onaylandı' : 'Onay bekliyor'}
+              </Text>
+            </View>
+          </Pressable>
+        ) : null}
+
         {sliderPromos.length ? (
           <View style={styles.slider}>
             <FlatList
@@ -216,6 +264,22 @@ export default function HomeScreen() {
                 </Text>
                 <CodeCard code={user.code} />
               </Card>
+            ) : null}
+
+            {announcements.length ? (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Duyurular</Text>
+                {announcements.map((announcement) => {
+                  const validity = validityLabel(announcement);
+                  return (
+                    <Card key={`announcement-${announcement.id}`} style={styles.announcementCard}>
+                      <Text style={styles.cardTitle}>{announcement.title}</Text>
+                      <Text style={styles.cardBody}>{announcement.body}</Text>
+                      {validity ? <Text style={styles.validity}>{validity}</Text> : null}
+                    </Card>
+                  );
+                })}
+              </View>
             ) : null}
 
             {listCampaigns.length ? (
@@ -341,6 +405,17 @@ const styles = StyleSheet.create({
   cardNewPrice: { fontFamily: fonts.semibold, fontSize: 20, color: colors.accentDark },
   validity: { ...typography.caption, marginTop: spacing.xs, color: colors.accentDark },
   emptyCampaign: { backgroundColor: colors.blush },
+  upcomingCard: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, backgroundColor: colors.white, borderRadius: radius.md, paddingVertical: spacing.md, paddingHorizontal: spacing.md, overflow: 'hidden', ...shadows.soft },
+  upcomingBar: { position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, backgroundColor: colors.accent },
+  upcomingIcon: { fontFamily: fonts.regular, fontSize: 26, color: colors.accent, marginLeft: spacing.xs },
+  upcomingLabel: { fontFamily: fonts.semibold, fontSize: 12, letterSpacing: 1.1, color: colors.accentDark },
+  upcomingDate: { fontFamily: fonts.semibold, fontSize: 16, color: colors.ink, marginTop: 2 },
+  upcomingService: { ...typography.caption, marginTop: 2 },
+  statusPending: { paddingHorizontal: spacing.sm, paddingVertical: spacing.xs, borderRadius: radius.pill, backgroundColor: colors.amberBg },
+  statusPendingText: { fontFamily: fonts.semibold, fontSize: 12, color: colors.amber },
+  statusConfirmed: { paddingHorizontal: spacing.sm, paddingVertical: spacing.xs, borderRadius: radius.pill, backgroundColor: colors.greenBg },
+  statusConfirmedText: { fontFamily: fonts.semibold, fontSize: 12, color: colors.green },
+  announcementCard: { gap: spacing.xs, backgroundColor: colors.blush },
   galleryStrip: { gap: spacing.sm, paddingTop: spacing.xs },
   galleryThumb: { width: 140, height: 140, borderRadius: radius.md, backgroundColor: colors.line },
   modalBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', justifyContent: 'center', paddingHorizontal: spacing.lg },

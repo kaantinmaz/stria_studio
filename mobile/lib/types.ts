@@ -52,6 +52,15 @@ export type Campaign = {
   ends_at: string | null;
 };
 
+export type Announcement = {
+  id: number;
+  title: string;
+  body: string;
+  starts_at: string | null;
+  ends_at: string | null;
+  created_at: string;
+};
+
 export type Service = {
   name_tr: string;
   name_en: string;

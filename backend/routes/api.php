@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminPostController;
+use App\Http\Controllers\App\AnnouncementController as AppAnnouncementController;
 use App\Http\Controllers\App\AppointmentController as AppAppointmentController;
 use App\Http\Controllers\App\AuthController as AppAuthController;
 use App\Http\Controllers\App\CampaignController as AppCampaignController;
@@ -48,6 +49,7 @@ Route::prefix('app')->group(function () {
         Route::post('/appointments', [AppAppointmentController::class, 'store']);
         Route::post('/appointments/{id}/cancel', [AppAppointmentController::class, 'cancel']);
         Route::get('/campaigns', [AppCampaignController::class, 'index']);
+        Route::get('/announcements', [AppAnnouncementController::class, 'index']);
     });
 });
 

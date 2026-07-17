@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { clearToken, getToken } from './storage';
 import type {
+  Announcement,
   Appointment,
   AuthData,
   Campaign,
@@ -135,6 +136,11 @@ export const api = {
 
   async campaigns() {
     const response = await request<{ data: Campaign[] }>(`${APP_API_URL}/campaigns`);
+    return response.data;
+  },
+
+  async announcements() {
+    const response = await request<{ data: Announcement[] }>(`${APP_API_URL}/announcements`);
     return response.data;
   },
 

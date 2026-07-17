@@ -24,7 +24,7 @@
 		22DC06AF2D1DBCD309709172 /* Pods-StriaStudio.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StriaStudio.debug.xcconfig"; path = "Target Support Files/Pods-StriaStudio/Pods-StriaStudio.debug.xcconfig"; sourceTree = "<group>"; };
 		67CBA630F6ED1DC350755F34 /* libPods-StriaStudio.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-StriaStudio.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9088DBF1B1E67C96E7381096 /* Pods-StriaStudio.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StriaStudio.release.xcconfig"; path = "Target Support Files/Pods-StriaStudio/Pods-StriaStudio.release.xcconfig"; sourceTree = "<group>"; };
-		A67AD89DE4ED06BAB2B96B12 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = StriaStudio/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		A67AD89DE4ED06BAB2B96B12 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = StriaStudio/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = StriaStudio/SplashScreen.storyboard; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
@@ -64,7 +64,6 @@
 				22DC06AF2D1DBCD309709172 /* Pods-StriaStudio.debug.xcconfig */,
 				9088DBF1B1E67C96E7381096 /* Pods-StriaStudio.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -349,6 +348,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = StriaStudio/StriaStudio.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = NYD2BQLQN5;
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
@@ -386,6 +386,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = StriaStudio/StriaStudio.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = NYD2BQLQN5;
 				INFOPLIST_FILE = StriaStudio/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				LD_RUNPATH_SEARCH_PATHS = (

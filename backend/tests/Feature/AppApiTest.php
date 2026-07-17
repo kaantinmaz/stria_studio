@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Announcement;
 use App\Models\Appointment;
 use App\Models\AppUser;
 use App\Models\Campaign;
@@ -428,6 +429,60 @@ class AppApiTest extends TestCase
         $this->actingAsAppUser($user)->postJson("/api/app/appointments/{$appointment->id}/cancel")
             ->assertUnprocessable()
             ->assertJsonValidationErrors('status');
+    }
+
+    public function test_announcements_lists_only_active_and_in_window_records_newest_first(): void
+    {
+        CarbonImmutable::setTestNow('2026-07-17 09:00:00');
+
+        $open = Announcement::query()->create([
+            'title' => 'Bayram Tatili',
+            'body' => '20 Temmuz kapalıyız.',
+            'starts_at' => '2026-07-13',
+            'ends_at' => '2026-07-20',
+            'is_active' => true,
+        ]);
+        $evergreen = Announcement::query()->create([
+            'title' => 'Yeni Çalışma Saatleri',
+            'body' => 'Artık 10:00-19:00 açığız.',
+            'is_active' => true,
+        ]);
+        Announcement::query()->create([
+            'title' => 'Geçmiş Duyuru',
+            'body' => 'Süresi doldu.',
+            'starts_at' => '2026-07-01',
+            'ends_at' => '2026-07-10',
+            'is_active' => true,
+        ]);
+        Announcement::query()->create([
+            'title' => 'Pasif Duyuru',
+            'body' => 'Gösterilmemeli.',
+            'is_active' => false,
+        ]);
+
+        $response = $this->actingAsAppUser()->getJson('/api/app/announcements')
+            ->assertOk()
+            ->assertJsonCount(2, 'data');
+
+        // Newest first (id desc): evergreen created after open.
+        $response
+            ->assertJsonPath('data.0.id', $evergreen->id)
+            ->assertJsonPath('data.0.title', 'Yeni Çalışma Saatleri')
+            ->assertJsonPath('data.0.body', 'Artık 10:00-19:00 açığız.')
+            ->assertJsonPath('data.0.starts_at', null)
+            ->assertJsonPath('data.0.ends_at', null)
+            ->assertJsonPath('data.1.id', $open->id)
+            ->assertJsonPath('data.1.title', 'Bayram Tatili')
+            ->assertJsonPath('data.1.body', '20 Temmuz kapalıyız.')
+            ->assertJsonPath('data.1.starts_at', '2026-07-13')
+            ->assertJsonPath('data.1.ends_at', '2026-07-20');
+
+        $this->assertNotNull($response->json('data.0.created_at'));
+    }
+
+    public function test_announcements_requires_authentication(): void
+    {
+        $this->getJson('/api/app/announcements')->assertUnauthorized();
     }
 
     private function appUser(): AppUser

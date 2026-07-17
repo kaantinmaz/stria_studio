@@ -95,6 +95,24 @@ Campaign {
 - `loyalty` kampanyaları damga kartı / sadakat mantığında kullanılır (`GET /me` → `loyalty`). Sadakat hesabı yalnız `kind='loyalty'` kampanyaları dikkate alır.
 - `promo` kampanyaları app ana sayfasındaki görselli kampanya slider'ında gösterilir.
 
+## Duyurular
+
+### GET /announcements  (auth)
+`200` → `{ "data": [ Announcement, ... ] }` — yalnız `is_active=true` VE tarih penceresi bugünü kapsayan (`starts_at` null|≤bugün, `ends_at` null|≥bugün) duyurular. Sıralama: en yeni önce (`id` azalan).
+
+```jsonc
+Announcement {
+  "id": 12,
+  "title": "Bayram Tatili",
+  "body": "20 Temmuz kapalıyız.",
+  "starts_at": "2026-07-13",    // "YYYY-MM-DD" veya null (süresiz)
+  "ends_at": "2026-07-20",      // "YYYY-MM-DD" veya null (süresiz)
+  "created_at": "2026-07-17T09:00:00+00:00"  // ISO8601
+}
+```
+
+- Stüdyo bilgilendirmeleri (tatil, kapalı gün, çalışma saati değişikliği vb.) için kullanılır; kampanyalardan ayrı bir Duyurular alanında gösterilir.
+
 ## Hizmet listesi
 Mevcut public `GET /api/services` kullanılır (auth yok) — `name_tr/name_en`, `slug`, `image`.
 
@@ -103,3 +121,4 @@ Mevcut public `GET /api/services` kullanılır (auth yok) — `name_tr/name_en`,
 - Takvimde ve müşteri listesinde 📱 rozeti (bağlı app kullanıcısı varsa).
 - "Randevu Talepleri": `status=requested` kayıtları onayla (→confirmed) / reddet (→cancelled).
 - Kampanyalar CRUD: `kind` (loyalty/promo), `title`, `is_active`; loyalty → `nth`, `discount_percent`; promo → `description`, `image`, `starts_at`, `ends_at`, `old_price`, `new_price`.
+- Duyurular CRUD: `title`, `body`, `is_active`, `starts_at`, `ends_at` (Duyurular navigasyonu, kampanyaların hemen ardından).
