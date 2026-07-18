@@ -1,6 +1,7 @@
 import { Nav } from "@/components/Nav";
 import { About } from "@/components/About";
 import { AboutStory } from "@/components/AboutStory";
+import { Founder } from "@/components/Founder";
 import { Footer } from "@/components/Footer";
 import { JsonLd } from "@/components/JsonLd";
 import { breadcrumbSchema } from "@/components/schema";
@@ -25,6 +26,7 @@ export default function HakkimizdaPage() {
       />
       <main className="pt-[132px]">
         <About headingAs="h1" />
+        <Founder />
         <AboutStory />
       </main>
       <Footer />

@@ -4,12 +4,7 @@ export type LS = { tr: string; en: string };
 export const IMG = {
   hero: "/images/hero.png",
   // Hero slider slides — add/remove paths here to change the rotation.
-  heroSlides: [
-    "/images/hero-brows.png",
-    "/images/powder.png",
-    "/images/hero.png",
-    "/images/eyeliner.png",
-  ],
+  heroSlides: ["/images/eyeliner.png"],
   micro: "/images/micro.png",
   powder: "/images/powder.png",
   eyeliner: "/images/eyeliner.png",
@@ -77,6 +72,10 @@ export type Dict = {
   aboutTitle: string;
   aboutText: string;
   aboutStoryLong: string;
+  founderKicker: string;
+  founderName: string;
+  founderRole: string;
+  founderText: string;
   contactKicker: string;
   contactTitle: string;
   contactText: string;
@@ -143,6 +142,11 @@ export const UI: Record<Lang, Dict> = {
       "Her uygulamaya yüz analizi ve simetri ölçümüyle başlıyoruz. Steril ortam, kaliteli pigmentler ve doğallıktan ödün vermeyen bir anlayış — Stria'da güzellik abartısız ve sana ait kalıyor.",
     aboutStoryLong:
       "Stria Studio, Ankara Çankaya'da kalıcı makyaj ve güzellik alanında; doğallığı, sterilizasyonu ve kişiye özel tasarımı merkezine alan bir stüdyodur. Her uygulamaya ücretsiz ön görüşme, yüz analizi ve simetri ölçümüyle başlıyor; kaliteli pigmentler ve tek kullanımlık ekipmanla, abartısız ve size ait bir sonuç hedefliyoruz.",
+    founderKicker: "Kurucu",
+    founderName: "Nilsu Kamişli",
+    founderRole: "Kurucu & Kalıcı Makyaj Uzmanı",
+    founderText:
+      "Stria Studio'nun kurucusu Nilsu Kamişli; kaş tasarımı, microblading ve kalıcı makyaj alanında her müşterisine yüz hatlarına özel, doğal ve abartısız sonuçlar sunar. Hijyen ve güveni merkezine alan yaklaşımıyla her uygulamayı ücretsiz ön görüşme ve yüz analiziyle kişiselleştirir.",
     contactKicker: "İletişim",
     contactTitle: "Hadi randevunu oluşturalım",
     contactText:
@@ -212,6 +216,11 @@ export const UI: Record<Lang, Dict> = {
       "Every treatment begins with facial analysis and symmetry mapping. A sterile space, premium pigments and an approach that never oversteps — at Stria, beauty stays understated and unmistakably yours.",
     aboutStoryLong:
       "Stria Studio is a permanent-makeup and beauty studio in Çankaya, Ankara, built around natural results, strict sterilisation and per-face design. Every treatment starts with a free consultation, face analysis and symmetry measurement; with quality pigments and single-use tools we aim for an understated result that stays truly yours.",
+    founderKicker: "Founder",
+    founderName: "Nilsu Kamişli",
+    founderRole: "Founder & Permanent Makeup Specialist",
+    founderText:
+      "Nilsu Kamişli, founder of Stria Studio, delivers natural, understated results in brow design, microblading and permanent makeup — each mapped to the client's own features. With hygiene and trust at the core, every treatment starts with a free consultation and facial analysis.",
     contactKicker: "Contact",
     contactTitle: "Let's book your appointment",
     contactText:
