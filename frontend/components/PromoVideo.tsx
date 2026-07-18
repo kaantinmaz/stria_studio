@@ -7,7 +7,7 @@ import { useLang } from "@/components/LanguageProvider";
 //  - Self-host: put the file in public/videos/ and set "/videos/promo.mp4"
 //  - Empty string -> a styled placeholder (nothing to show yet).
 // ponytail: single const swap point; move to a CMS setting later if it changes often.
-const VIDEO_URL = "";
+const VIDEO_URL = "/videos/promo.mp4";
 
 function youtubeEmbed(url: string): string | null {
   const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
