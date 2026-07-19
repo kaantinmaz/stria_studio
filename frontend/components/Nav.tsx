@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { useLang } from "@/components/LanguageProvider";
 import { useSettings } from "@/components/SettingsProvider";
 import { phoneHref, formatHours, pickLang } from "@/lib/content";
-import { PhoneIcon, PinIcon, WhatsAppIcon } from "@/components/Icons";
+import { InstagramIcon, PhoneIcon, PinIcon, WhatsAppIcon } from "@/components/Icons";
 import { NavServices } from "@/components/NavServices";
 
 export function Nav() {
@@ -99,8 +99,9 @@ export function Nav() {
           href={settings.instagram}
           target="_blank"
           rel="noreferrer"
-          className="hidden text-[#e7d3cc] sm:inline"
+          className="inline-flex items-center gap-[7px] text-[#e7d3cc]"
         >
+          <InstagramIcon size={13} />
           Instagram
         </a>
         <span className="hidden opacity-40 sm:inline">·</span>
@@ -166,6 +167,15 @@ export function Nav() {
 
         {/* mobile cluster */}
         <div className="flex items-center gap-2 md:hidden">
+          <a
+            href={settings.instagram}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Instagram"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-line2 bg-white text-ink"
+          >
+            <InstagramIcon size={17} />
+          </a>
           <a
             href={settings.whatsapp}
             target="_blank"
