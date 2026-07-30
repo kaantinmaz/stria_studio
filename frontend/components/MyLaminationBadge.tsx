@@ -1,9 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ML_BRAND } from "@/lib/mylamination";
+import { ML_BRAND, ML_EXPERT } from "@/lib/mylamination";
 
 // "My Lamination uzmanı" rozeti. Kaş laminasyonu ve kirpik lifting sayfalarının
 // en üstünde, başlığın hemen üzerinde görünür; ürün rehberine bağlantı verir.
+// Sertifika kişiye ait olduğu için uzmanlık Nilsu Kamişli adına yazılır.
 export function MyLaminationBadge({
   scope,
   className = "",
@@ -13,8 +14,8 @@ export function MyLaminationBadge({
 }) {
   const label =
     scope === "kas"
-      ? "Kaş laminasyonunda My Lamination uzmanıyız"
-      : "Kirpik liftingde My Lamination uzmanıyız";
+      ? `${ML_EXPERT.name}, kaş laminasyonunda My Lamination uzmanıdır`
+      : `${ML_EXPERT.name}, kirpik liftingde My Lamination uzmanıdır`;
 
   return (
     <div
@@ -30,15 +31,16 @@ export function MyLaminationBadge({
       <div className="min-w-[220px] flex-1">
         <p className="text-[14px] font-medium leading-[1.45] text-ink">{label}</p>
         <p className="mt-1 text-[13px] leading-[1.6] text-muted">
-          Uygulamalarımızda İtalyan teknolojisiyle üretilen, T.C. Sağlık
-          Bakanlığı’na kayıtlı{" "}
+          Stria Studio’nun kurucusu Nilsu Kamişli, My Lamination workshopunu
+          tamamlamış sertifikalı uygulayıcıdır. Seansta İtalyan teknolojisiyle
+          üretilen, T.C. Sağlık Bakanlığı’na kayıtlı{" "}
           <Link
             href="/mylamination"
             className="underline decoration-line underline-offset-2 transition-colors hover:text-accent"
           >
-            My Lamination ürünlerini
+            My Lamination ürünleri
           </Link>{" "}
-          kullanıyoruz.
+          kullanılır.
         </p>
       </div>
     </div>

@@ -11,6 +11,7 @@ import {
   ML_BRAND,
   ML_CATEGORIES,
   ML_CATEGORY_ORDER,
+  ML_EXPERT,
   ML_PRODUCTS,
 } from "@/lib/mylamination";
 
@@ -44,8 +45,12 @@ const faqs = [
     a: "Marka, İtalya’daki Padua Üniversitesi araştırma ve geliştirme laboratuvarlarında ESEM elektron mikroskobuyla yapılan bir klinik çalışmaya dayanır. Çalışmada işlem öncesi 68,18 µm olan kirpik çapı işlemden hemen sonra 86,14 µm, bir ay ev serumu kullanımından sonra 129,32 µm ölçülmüştür.",
   },
   {
-    q: "Stria Studio hangi My Lamination ürünlerini kullanıyor?",
-    a: "Kaş laminasyonu ve kirpik lifting seanslarında Lifting Cream, Neutralising Cream ve Hydrating Serum üçlüsünü, bakım için Vitamin ve Mineral Lashbrow kürlerini, renklendirmede PPD içermeyen kaş-kirpik boyasını Color Developer ile birlikte kullanıyoruz. Kalıp ve fırçalarda Lamitta serisini tercih ediyoruz.",
+    q: "Ankara’da My Lamination uzmanı kimdir?",
+    a: "Stria Studio’nun kurucusu Nilsu Kamişli, My Lamination workshopunu tamamlamış sertifikalı bir My Lamination uzmanıdır. Sertifika kuruma değil uygulayıcıya verilir; kaş laminasyonu ve kirpik lifting seanslarını Ankara Çankaya’daki stüdyoda kendisi uygular.",
+  },
+  {
+    q: "Nilsu Kamişli hangi My Lamination ürünlerini kullanıyor?",
+    a: "Kaş laminasyonu ve kirpik lifting seanslarında Lifting Cream, Neutralising Cream ve Hydrating Serum üçlüsünü, bakım için Vitamin ve Mineral Lashbrow kürlerini, renklendirmede PPD içermeyen kaş-kirpik boyasını Color Developer ile birlikte kullanır. Kalıp ve fırçalarda Lamitta serisini tercih eder.",
   },
   {
     q: "Kaş laminasyonu ürünleri kaşa zarar verir mi?",
@@ -98,11 +103,35 @@ const brandSchema = {
   ],
 };
 
+// Uzmanlık kişiye ait: My Lamination sertifikası workshopu tamamlayan
+// uygulayıcı adına düzenlenir. Person şeması bu atfı makine tarafında da kurar.
+const expertSchema = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "@id": absUrl("/mylamination#uzman"),
+  name: ML_EXPERT.name,
+  jobTitle: ML_EXPERT.role,
+  worksFor: { "@id": absUrl("/#business") },
+  knowsAbout: [
+    "Kaş laminasyonu",
+    "Kirpik lifting",
+    "My Lamination ürünleri",
+    "Kalıcı makyaj",
+  ],
+  hasCredential: {
+    "@type": "EducationalOccupationalCredential",
+    credentialCategory: "certificate",
+    name: "My Lamination sertifikalı uygulayıcı",
+    recognizedBy: { "@id": absUrl("/mylamination#brand") },
+  },
+};
+
 export default function MyLaminationPage() {
   return (
     <>
       <Nav />
       <JsonLd data={brandSchema} />
+      <JsonLd data={expertSchema} />
       <JsonLd data={catalogSchema} />
       <JsonLd data={faqSchema(faqs)} />
       <JsonLd data={breadcrumbSchema(crumbs)} />
@@ -119,18 +148,20 @@ export default function MyLaminationPage() {
               className="h-16 w-auto"
             />
             <div className="text-xs uppercase tracking-[0.14em] text-accent">
-              Stria Studio · My Lamination Uzmanı
+              {ML_EXPERT.name} · My Lamination Uzmanı
             </div>
           </div>
           <h1 className="mb-5 max-w-[880px] text-[clamp(30px,4.4vw,54px)] leading-[1.06]">
             My Lamination Ürünleri: Kaş Laminasyonu ve Kirpik Lifting Rehberi
           </h1>
           <p className="max-w-[820px] text-[clamp(16px,1.5vw,19px)] leading-[1.75] text-muted">
-            Stria Studio, Ankara Çankaya’da kaş laminasyonu ve kirpik lifting
-            uygulamalarında My Lamination ürünlerini kullanır. Bu sayfa markanın{" "}
-            {ML_PRODUCTS.length} ürününü tek tek anlatır: hangi adımda hangi
-            solüsyon kullanılır, silikon kalıp boyu sonucu nasıl değiştirir, evde
-            hangi serum ne işe yarar. Her ürünün kendi detay sayfası vardır.
+            Stria Studio’nun kurucusu {ML_EXPERT.name}, My Lamination workshopunu
+            tamamlamış sertifikalı bir uzmandır ve Ankara Çankaya’daki kaş
+            laminasyonu ile kirpik lifting seanslarında bu ürünleri kullanır. Bu
+            sayfa markanın {ML_PRODUCTS.length} ürününü tek tek anlatır: hangi
+            adımda hangi solüsyon kullanılır, silikon kalıp boyu sonucu nasıl
+            değiştirir, evde hangi serum ne işe yarar. Her ürünün kendi detay
+            sayfası vardır.
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
             <Link
@@ -316,10 +347,11 @@ export default function MyLaminationPage() {
           <p className={answerClass}>
             My Lamination ürünleri serbest satışta olmadığı için uygulama, markanın
             workshopunu tamamlamış sertifikalı uygulayıcılar tarafından yapılır.
-            Stria Studio Ankara Çankaya’da kaş laminasyonu ve kirpik lifting
-            uygulamalarını bu ürünlerle yapar; seans öncesi kıl analizinde hangi
-            solüsyonu hangi sürede kullanacağımızı ve evde hangi bakımı
-            önerdiğimizi birlikte konuşuruz.
+            Stria Studio’nun kurucusu {ML_EXPERT.name} bu sertifikaya sahiptir ve
+            kaş laminasyonu ile kirpik lifting seanslarını Ankara Çankaya’daki
+            stüdyoda kendisi uygular; seans öncesi kıl analizinde hangi solüsyonun
+            hangi sürede kullanılacağını ve evde hangi bakımın önerildiğini
+            birlikte konuşursunuz.
           </p>
           <p className="mt-6 text-[15px] leading-[1.7] text-muted">
             Markanın kendi ürün kataloğuna{" "}

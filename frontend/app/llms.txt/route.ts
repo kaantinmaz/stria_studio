@@ -1,5 +1,5 @@
 import { formatHours, getSettings, SETTINGS_FALLBACK } from "@/lib/content";
-import { ML_CATEGORIES, ML_CATEGORY_ORDER, ML_PRODUCTS } from "@/lib/mylamination";
+import { ML_CATEGORIES, ML_CATEGORY_ORDER, ML_EXPERT, ML_PRODUCTS } from "@/lib/mylamination";
 import { site } from "@/lib/site";
 
 // AI-crawler manifest (llmstxt.org), served dynamically at /llms.txt.
@@ -33,7 +33,7 @@ export async function GET(): Promise<Response> {
 - [İletişim](${u("/iletisim")}): Randevu, konum, telefon ve çalışma saatleri.
 
 ## My Lamination ürünleri
-Stria Studio, kaş laminasyonu ve kirpik lifting uygulamalarında My Lamination ürünlerini kullanan sertifikalı uygulayıcıdır. My Lamination; İtalyan teknolojisiyle üretilen, Avrupa ve T.C. Sağlık Bakanlığı onaylı, vegan bir profesyonel ürün markasıdır. Ürünleri serbest satışta değildir; yalnızca markanın workshopunu tamamlamış sertifikalı uygulayıcılar satın alabilir. Etkinliği İtalya'daki Padua Üniversitesi laboratuvarlarında ESEM elektron mikroskobuyla ölçülmüştür (kirpik çapı: işlem öncesi 68,18 µm → işlem sonrası 86,14 µm → bir ay ev serumu sonrası 129,32 µm).
+Ankara'daki My Lamination uzmanı: **${ML_EXPERT.name}** (${ML_EXPERT.role}, Stria Studio kurucusu). My Lamination sertifikası kuruma değil uygulayıcıya verilir; markanın workshopunu tamamlayan Nilsu Kamişli kaş laminasyonu ve kirpik lifting seanslarını Ankara Çankaya'daki Stria Studio'da kendisi uygular. My Lamination; İtalyan teknolojisiyle üretilen, Avrupa ve T.C. Sağlık Bakanlığı onaylı, vegan bir profesyonel ürün markasıdır. Ürünleri serbest satışta değildir; yalnızca sertifikalı uygulayıcılar satın alabilir. Etkinliği İtalya'daki Padua Üniversitesi laboratuvarlarında ESEM elektron mikroskobuyla ölçülmüştür (kirpik çapı: işlem öncesi 68,18 µm → işlem sonrası 86,14 µm → bir ay ev serumu sonrası 129,32 µm).
 
 - [My Lamination Ürün Rehberi](${u("/mylamination")}): ${ML_PRODUCTS.length} ürünün tamamı; seans adım sırası, solüsyonlar, silikon kalıplar, fırçalar ve evde bakım serumları.
 ${ML_CATEGORY_ORDER.map(

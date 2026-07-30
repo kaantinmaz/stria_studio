@@ -7,6 +7,7 @@ import { useSettings } from "@/components/SettingsProvider";
 import { phoneHref, formatHours, pickLang } from "@/lib/content";
 import { InstagramIcon, PhoneIcon, PinIcon, WhatsAppIcon } from "@/components/Icons";
 import { NavServices } from "@/components/NavServices";
+import { ML_BRAND, ML_EXPERT } from "@/lib/mylamination";
 
 export function Nav() {
   const { lang, t, toggle } = useLang();
@@ -243,6 +244,32 @@ export function Nav() {
               {lang === "tr" ? "EN" : "TR"}
             </button>
           </div>
+
+          {/* My Lamination uzmanlığı — menünün en altında, kapatmadan görünür */}
+          <a
+            href="/mylamination"
+            onClick={() => setMenuOpen(false)}
+            className="mt-4 flex items-center gap-3 rounded-[20px] border border-line bg-white px-4 py-[13px]"
+          >
+            <Image
+              src={ML_BRAND.logo}
+              alt="My Lamination"
+              width={250}
+              height={150}
+              className="h-10 w-auto flex-none"
+            />
+            <span className="min-w-0 flex-1">
+              <span className="block text-[13px] font-medium leading-[1.35] text-ink">
+                {ML_EXPERT.name} · My Lamination Uzmanı
+              </span>
+              <span className="mt-[3px] block text-[11.5px] leading-[1.45] text-muted">
+                {lang === "tr"
+                  ? "Kaş laminasyonu ve kirpik liftingde sertifikalı uygulayıcı — ürünleri incele"
+                  : "Certified applier for brow lamination and lash lift — see the products"}
+              </span>
+            </span>
+            <span className="flex-none text-accent">→</span>
+          </a>
         </div>
       )}
     </div>

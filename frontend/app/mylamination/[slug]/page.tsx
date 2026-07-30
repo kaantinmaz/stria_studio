@@ -14,6 +14,7 @@ import { absUrl, buildMetadata } from "@/lib/seo";
 import {
   ML_BRAND,
   ML_CATEGORIES,
+  ML_EXPERT,
   ML_PRODUCTS,
   ML_SCOPE_LABEL,
 } from "@/lib/mylamination";
@@ -154,8 +155,8 @@ export default async function MyLaminationProductPage({ params }: Params) {
                 className="h-8 w-auto flex-none"
               />
               <p className="min-w-[200px] flex-1 text-[13px] leading-[1.6] text-muted2">
-                Stria Studio bu ürünü Ankara Çankaya’daki uygulamalarında kullanan
-                sertifikalı My Lamination uzmanıdır.
+                Sertifikalı My Lamination uzmanı {ML_EXPERT.name}, bu ürünü Ankara
+                Çankaya’daki Stria Studio uygulamalarında kullanır.
               </p>
             </div>
           </div>

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ML_PRODUCTS, type MlProduct } from "@/lib/mylamination";
+import { ML_EXPERT, ML_PRODUCTS, type MlProduct } from "@/lib/mylamination";
 
 // Hizmet sayfasında "seansta kullandığımız ürünler" bölümü. Uygulama ve ekipman
 // ürünlerini kısa kartlarla listeler, detay için ürün rehberine bağlar.
@@ -23,9 +23,10 @@ export function MyLaminationServiceSection({
         {serviceName} seansında kullandığımız My Lamination ürünleri
       </h2>
       <p className="mb-8 max-w-[720px] text-[15px] leading-[1.7] text-muted">
-        Seansın her adımında hangi ürünü kullandığımızı açıkça paylaşırız.
-        Aşağıdaki solüsyon ve bakım ürünleri My Lamination’a aittir; İtalyan
-        teknolojisiyle üretilir ve T.C. Sağlık Bakanlığı’na kayıtlıdır.{" "}
+        Seansı sertifikalı My Lamination uzmanı {ML_EXPERT.name} uygular ve her
+        adımda hangi ürünün kullanıldığını açıkça paylaşır. Aşağıdaki solüsyon ve
+        bakım ürünleri My Lamination’a aittir; İtalyan teknolojisiyle üretilir ve
+        T.C. Sağlık Bakanlığı’na kayıtlıdır.{" "}
         <Link
           href="/mylamination"
           className="font-medium text-ink underline decoration-line underline-offset-4 transition-colors hover:text-accent"

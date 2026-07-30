@@ -75,6 +75,14 @@ export const ML_BRAND = {
   logoItaly: "/mylamination/logo-italy.png",
 } as const;
 
+// My Lamination sertifikası kuruma değil kişiye verilir: workshopu tamamlayan
+// uygulayıcı adına düzenlenir. Uzmanlık iddiası bu yüzden stüdyoya değil
+// Nilsu Kamişli'ye atfedilir.
+export const ML_EXPERT = {
+  name: "Nilsu Kamişli",
+  role: "Kurucu & Kalıcı Makyaj Uzmanı",
+} as const;
+
 // My Lamination ürünleriyle yaptığımız hizmetler. Rozet, ürün bölümü ve kart
 // işaretleri bu eşlemeye bakar — yeni bir hizmet eklenirse tek yerden açılır.
 export const ML_SERVICE_SCOPE: Record<string, "kas" | "kirpik"> = {
