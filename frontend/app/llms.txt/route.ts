@@ -1,5 +1,10 @@
 import { formatHours, getSettings, SETTINGS_FALLBACK } from "@/lib/content";
-import { ML_CATEGORIES, ML_CATEGORY_ORDER, ML_EXPERT, ML_PRODUCTS } from "@/lib/mylamination";
+import {
+  ML_CATEGORIES,
+  ML_EXPERT,
+  ML_VISIBLE_CATEGORIES,
+  ML_VISIBLE_PRODUCTS,
+} from "@/lib/mylamination";
 import { site } from "@/lib/site";
 
 // AI-crawler manifest (llmstxt.org), served dynamically at /llms.txt.
@@ -35,16 +40,16 @@ export async function GET(): Promise<Response> {
 ## My Lamination ürünleri
 Ankara'daki My Lamination uzmanı: **${ML_EXPERT.name}** (${ML_EXPERT.role}, Stria Studio kurucusu). My Lamination sertifikası kuruma değil uygulayıcıya verilir; markanın workshopunu tamamlayan Nilsu Kamişli kaş laminasyonu ve kirpik lifting seanslarını Ankara Çankaya'daki Stria Studio'da kendisi uygular. My Lamination; İtalyan teknolojisiyle üretilen, Avrupa ve T.C. Sağlık Bakanlığı onaylı, vegan bir profesyonel ürün markasıdır. Ürünleri serbest satışta değildir; yalnızca sertifikalı uygulayıcılar satın alabilir. Etkinliği İtalya'daki Padua Üniversitesi laboratuvarlarında ESEM elektron mikroskobuyla ölçülmüştür (kirpik çapı: işlem öncesi 68,18 µm → işlem sonrası 86,14 µm → bir ay ev serumu sonrası 129,32 µm).
 
-- [My Lamination Ürün Rehberi](${u("/mylamination")}): ${ML_PRODUCTS.length} ürünün tamamı; seans adım sırası, solüsyonlar, silikon kalıplar, fırçalar ve evde bakım serumları.
-${ML_CATEGORY_ORDER.map(
+- [My Lamination Ürün Rehberi](${u("/mylamination")}): seansın adım sırası ve yayında olan ${ML_VISIBLE_PRODUCTS.length} ürünün tek tek anlatımı.
+${ML_VISIBLE_CATEGORIES.map(
   (category) =>
-    `- ${ML_CATEGORIES[category].label}: ${ML_PRODUCTS.filter((p) => p.category === category)
+    `- ${ML_CATEGORIES[category].label}: ${ML_VISIBLE_PRODUCTS.filter((p) => p.category === category)
       .map((p) => p.name)
       .join(", ")}.`,
 ).join("\n")}
 
 Her ürünün ayrı detay sayfası vardır:
-${ML_PRODUCTS.map((p) => `- [${p.name}](${u(`/mylamination/${p.slug}`)}): ${p.summary}`).join("\n")}
+${ML_VISIBLE_PRODUCTS.map((p) => `- [${p.name}](${u(`/mylamination/${p.slug}`)}): ${p.summary}`).join("\n")}
 
 ## Fiyatlandırma rehberi
 - Fiyatlar seçilen hizmete, kişinin ihtiyacına ve uygulama planına göre değişir.

@@ -10,9 +10,9 @@ import { absUrl, buildMetadata } from "@/lib/seo";
 import {
   ML_BRAND,
   ML_CATEGORIES,
-  ML_CATEGORY_ORDER,
   ML_EXPERT,
-  ML_PRODUCTS,
+  ML_VISIBLE_CATEGORIES,
+  ML_VISIBLE_PRODUCTS,
 } from "@/lib/mylamination";
 
 export const revalidate = 3600;
@@ -22,7 +22,7 @@ const path = "/mylamination";
 export const metadata = buildMetadata({
   title: "My Lamination Ürünleri: Kaş Laminasyonu ve Kirpik Lifting Rehberi",
   description:
-    "My Lamination kaş laminasyonu ve kirpik lifting ürünlerinin tamamı: solüsyonlar, silikon kalıplar, fırçalar ve evde bakım serumları. Hangisi ne işe yarar, nasıl kullanılır?",
+    "My Lamination kaş laminasyonu ve kirpik lifting ürünleri: hangisi ne işe yarar, nasıl kullanılır, evde hangi serum ne yapar? Sertifikalı uzman anlatımı.",
   path,
 });
 
@@ -77,8 +77,8 @@ const catalogSchema = {
   description:
     "Stria Studio’nun kaş laminasyonu ve kirpik lifting uygulamalarında kullandığı My Lamination ürünleri.",
   url: absUrl(path),
-  numberOfItems: ML_PRODUCTS.length,
-  itemListElement: ML_PRODUCTS.map((product, index) => ({
+  numberOfItems: ML_VISIBLE_PRODUCTS.length,
+  itemListElement: ML_VISIBLE_PRODUCTS.map((product, index) => ({
     "@type": "ListItem",
     position: index + 1,
     url: absUrl(`/mylamination/${product.slug}`),
@@ -158,10 +158,10 @@ export default function MyLaminationPage() {
             Stria Studio’nun kurucusu {ML_EXPERT.name}, My Lamination workshopunu
             tamamlamış sertifikalı bir uzmandır ve Ankara Çankaya’daki kaş
             laminasyonu ile kirpik lifting seanslarında bu ürünleri kullanır. Bu
-            sayfa markanın {ML_PRODUCTS.length} ürününü tek tek anlatır: hangi
-            adımda hangi solüsyon kullanılır, silikon kalıp boyu sonucu nasıl
-            değiştirir, evde hangi serum ne işe yarar. Her ürünün kendi detay
-            sayfası vardır.
+            sayfa seansın adım sırasını ve yayında olan{" "}
+            {ML_VISIBLE_PRODUCTS.length} ürünü tek tek anlatır: hangisi ne işe
+            yarar, nasıl kullanılır, içinde ne var. Her ürünün kendi detay sayfası
+            vardır.
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
             <Link
@@ -291,9 +291,15 @@ export default function MyLaminationPage() {
                 <div>
                   <h3 className="text-[17px] leading-[1.4] text-ink">{step.title}</h3>
                   <p className="mt-1 text-[13px] text-accent">
-                    <Link href={`/mylamination/${step.slug}`} className="hover:underline">
-                      {step.product}
-                    </Link>
+                    {/* Yayında olmayan ürüne link verilmez — 404 olur. Adımın
+                        kendisi süreci anlattığı için ürün adı düz metin kalır. */}
+                    {ML_VISIBLE_PRODUCTS.some((p) => p.slug === step.slug) ? (
+                      <Link href={`/mylamination/${step.slug}`} className="hover:underline">
+                        {step.product}
+                      </Link>
+                    ) : (
+                      step.product
+                    )}
                   </p>
                   <p className="mt-2 text-[14px] leading-[1.7] text-muted">{step.text}</p>
                 </div>
@@ -302,8 +308,8 @@ export default function MyLaminationPage() {
           </ol>
         </section>
 
-        {ML_CATEGORY_ORDER.map((category) => {
-          const products = ML_PRODUCTS.filter((p) => p.category === category);
+        {ML_VISIBLE_CATEGORIES.map((category) => {
+          const products = ML_VISIBLE_PRODUCTS.filter((p) => p.category === category);
           const meta = ML_CATEGORIES[category];
 
           return (

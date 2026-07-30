@@ -15,8 +15,8 @@ import {
   ML_BRAND,
   ML_CATEGORIES,
   ML_EXPERT,
-  ML_PRODUCTS,
   ML_SCOPE_LABEL,
+  ML_VISIBLE_PRODUCTS,
 } from "@/lib/mylamination";
 
 type Params = { params: Promise<{ slug: string }> };
@@ -24,12 +24,12 @@ type Params = { params: Promise<{ slug: string }> };
 export const revalidate = 3600;
 
 export function generateStaticParams() {
-  return ML_PRODUCTS.map((product) => ({ slug: product.slug }));
+  return ML_VISIBLE_PRODUCTS.map((product) => ({ slug: product.slug }));
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
-  const product = ML_PRODUCTS.find((p) => p.slug === slug);
+  const product = ML_VISIBLE_PRODUCTS.find((p) => p.slug === slug);
   if (!product) return {};
 
   return buildMetadata({
@@ -45,7 +45,9 @@ const headingClass = "mb-5 text-[clamp(21px,2.4vw,30px)] leading-tight";
 
 export default async function MyLaminationProductPage({ params }: Params) {
   const { slug } = await params;
-  const product = ML_PRODUCTS.find((p) => p.slug === slug);
+  // Yayından kaldırılan kategoriler 404 verir; veri dosyasında duruyor olması
+  // sayfayı erişilebilir kılmaz.
+  const product = ML_VISIBLE_PRODUCTS.find((p) => p.slug === slug);
   if (!product) notFound();
 
   const settings = (await getSettings()) ?? SETTINGS_FALLBACK;
@@ -55,7 +57,7 @@ export default async function MyLaminationProductPage({ params }: Params) {
       ? "/hizmetler/kas-laminasyon"
       : "/hizmetler/kirpik-lifting";
 
-  const related = ML_PRODUCTS.filter(
+  const related = ML_VISIBLE_PRODUCTS.filter(
     (p) => p.category === product.category && p.slug !== product.slug,
   ).slice(0, 6);
 

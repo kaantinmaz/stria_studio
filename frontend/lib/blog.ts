@@ -73,14 +73,24 @@ export async function getTags(): Promise<Tag[]> {
   return out?.data ?? [];
 }
 
-export async function getAllPostSlugs(): Promise<string[]> {
-  const slugs: string[] = [];
+/**
+ * Tüm yazılar, sayfalama gezilerek. API sayfa başına 9 döner; blog listesi ve
+ * sitemap tam listeye ihtiyaç duyar. Kategori filtresi istemci tarafında
+ * çalıştığı için eksik liste, filtreyi de yanlış gösterir.
+ */
+export async function getAllPosts(): Promise<PostList[]> {
+  const posts: PostList[] = [];
   let page = 1;
   for (;;) {
     const res = await getPosts({ page });
-    slugs.push(...res.data.map((p) => p.slug));
+    posts.push(...res.data);
     if (page >= res.meta.last_page || res.data.length === 0) break;
     page++;
   }
-  return slugs;
+  return posts;
+}
+
+export async function getAllPostSlugs(): Promise<string[]> {
+  const posts = await getAllPosts();
+  return posts.map((p) => p.slug);
 }

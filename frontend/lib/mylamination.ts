@@ -1561,6 +1561,13 @@ export const ML_PRODUCTS: MlProduct[] = [
   },
 ];
 
+/**
+ * Yayında olan kategoriler. Owner kararı (2026-07-30): şimdilik yalnızca evde
+ * bakım ürünleri yayında; uygulama, ekipman ve cilt ürünleri gizli. İçerik
+ * SİLİNMEDİ — tekrar yayına almak için ilgili kategoriyi bu diziye geri ekle.
+ */
+export const ML_PUBLISHED_CATEGORIES: MlCategory[] = ["evde-bakim"];
+
 /** Kategori sırası — hub sayfası ve sitemap bu sırayı kullanır. */
 export const ML_CATEGORY_ORDER: MlCategory[] = [
   "uygulama",
@@ -1568,6 +1575,19 @@ export const ML_CATEGORY_ORDER: MlCategory[] = [
   "evde-bakim",
   "cilt",
 ];
+
+/**
+ * Sitede gösterilen ürünler. Rota, sitemap, şema ve llms.txt bunu kullanır —
+ * ML_PRODUCTS'ı doğrudan kullanmak gizli ürünü yayına sızdırır.
+ */
+export const ML_VISIBLE_PRODUCTS: MlProduct[] = ML_PRODUCTS.filter((p) =>
+  ML_PUBLISHED_CATEGORIES.includes(p.category),
+);
+
+/** Yayında olan kategoriler, hub'daki gösterim sırasıyla. */
+export const ML_VISIBLE_CATEGORIES: MlCategory[] = ML_CATEGORY_ORDER.filter(
+  (category) => ML_PUBLISHED_CATEGORIES.includes(category),
+);
 
 export const ML_SCOPE_LABEL: Record<MlScope, string> = {
   kas: "Kaş laminasyonu",

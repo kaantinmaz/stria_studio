@@ -4,7 +4,7 @@ import { BlogList } from "@/components/BlogList";
 import { JsonLd } from "@/components/JsonLd";
 import { breadcrumbSchema } from "@/components/schema";
 import { buildMetadata } from "@/lib/seo";
-import { getPosts, getCategories } from "@/lib/blog";
+import { getAllPosts, getCategories } from "@/lib/blog";
 
 export const revalidate = 300;
 
@@ -16,7 +16,7 @@ export const metadata = buildMetadata({
 });
 
 export default async function BlogPage() {
-  const [posts, categories] = await Promise.all([getPosts(), getCategories()]);
+  const [posts, categories] = await Promise.all([getAllPosts(), getCategories()]);
 
   return (
     <>
@@ -33,7 +33,7 @@ export default async function BlogPage() {
             <h1 className="text-[clamp(32px,4.6vw,58px)] leading-[1.05]">Blog</h1>
           </div>
         </header>
-        <BlogList initial={posts.data} categories={categories} />
+        <BlogList initial={posts} categories={categories} />
       </main>
       <Footer />
     </>

@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { absUrl } from "@/lib/seo";
 import { getService, getServiceSlugs } from "@/lib/content";
 import { getAllPostSlugs } from "@/lib/blog";
-import { ML_PRODUCTS } from "@/lib/mylamination";
+import { ML_VISIBLE_PRODUCTS } from "@/lib/mylamination";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
@@ -54,7 +54,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly",
       priority: 0.9,
     },
-    ...ML_PRODUCTS.map((product) => ({
+    ...ML_VISIBLE_PRODUCTS.map((product) => ({
       url: absUrl(`/mylamination/${product.slug}`),
       lastModified: now,
       changeFrequency: "monthly" as const,
