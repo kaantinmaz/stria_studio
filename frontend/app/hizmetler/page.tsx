@@ -3,6 +3,8 @@ import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ImageSlot } from "@/components/ImageSlot";
+import { MyLaminationChip } from "@/components/MyLaminationBadge";
+import { ML_SERVICE_SCOPE } from "@/lib/mylamination";
 import { JsonLd } from "@/components/JsonLd";
 import { breadcrumbSchema } from "@/components/schema";
 import { buildMetadata } from "@/lib/seo";
@@ -62,6 +64,9 @@ export default async function HizmetlerHub() {
                 <span className="absolute left-3 top-3 rounded-[16px] bg-cream/[0.92] px-[11px] py-[6px] text-[10px] uppercase tracking-[0.12em] text-accent backdrop-blur-[4px]">
                   {s.tag_tr}
                 </span>
+                {ML_SERVICE_SCOPE[s.slug] && (
+                  <MyLaminationChip className="absolute right-3 top-3" />
+                )}
               </div>
               <div className="flex flex-1 flex-col gap-2 px-[26px] pb-[22px] pt-6">
                 <h2 className="text-[22px] leading-[1.15]">{s.name_tr}</h2>

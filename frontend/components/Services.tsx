@@ -5,6 +5,8 @@ import { useLang } from "@/components/LanguageProvider";
 import { useServices } from "@/components/ServicesProvider";
 import { pickLang } from "@/lib/content";
 import { ImageSlot } from "@/components/ImageSlot";
+import { MyLaminationChip } from "@/components/MyLaminationBadge";
+import { ML_SERVICE_SCOPE } from "@/lib/mylamination";
 
 export function Services() {
   const { lang, t } = useLang();
@@ -40,6 +42,9 @@ export function Services() {
                 <span className="absolute left-3 top-3 rounded-[16px] bg-cream/[0.92] px-[11px] py-[6px] text-[10px] uppercase tracking-[0.12em] text-accent backdrop-blur-[4px]">
                   {pickLang(s.tag_tr, s.tag_en, lang)}
                 </span>
+                {ML_SERVICE_SCOPE[s.slug] && (
+                  <MyLaminationChip className="absolute right-3 top-3" />
+                )}
               </div>
               <div className="flex flex-1 flex-col gap-[11px] px-[26px] pb-[22px] pt-6">
                 <h3 className="text-[22px] leading-[1.15]">

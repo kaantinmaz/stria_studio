@@ -10,6 +10,7 @@ import { CallLabel } from "@/components/CallLabel";
 import { useSettings } from "@/components/SettingsProvider";
 import { MyLaminationBadge } from "@/components/MyLaminationBadge";
 import { MyLaminationServiceSection } from "@/components/MyLaminationServiceSection";
+import { ML_SERVICE_SCOPE } from "@/lib/mylamination";
 import { phoneHref, type ServiceFull, type ServiceListItem } from "@/lib/content";
 
 const SERVICE_GUIDES: Record<string, { href: string; label: string }> = {
@@ -25,13 +26,6 @@ const SERVICE_GUIDES: Record<string, { href: string; label: string }> = {
     href: "https://catlakkamuflaj.com",
     label: "Kamuflaj Makyajı",
   },
-};
-
-// Kaş laminasyonu ve kirpik lifting seanslarında My Lamination ürünleri
-// kullanılır; bu iki sayfada başlığın üzerinde uzmanlık rozeti gösterilir.
-const ML_SERVICE_SCOPE: Record<string, "kas" | "kirpik"> = {
-  "kas-laminasyon": "kas",
-  "kirpik-lifting": "kirpik",
 };
 
 // Client-rendered TR service page body (settings-driven contact links).

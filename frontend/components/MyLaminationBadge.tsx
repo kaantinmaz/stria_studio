@@ -44,3 +44,27 @@ export function MyLaminationBadge({
     </div>
   );
 }
+
+// Kompakt marka işareti — hizmet kartlarının görseli üzerinde, kategori
+// çipinin karşı köşesinde durur. Kart zaten bir link olduğu için kendisi
+// link değildir; yalnızca "bu uygulamada My Lamination kullanıyoruz" der.
+export function MyLaminationChip({ className = "" }: { className?: string }) {
+  return (
+    <span
+      title="My Lamination ürünleriyle uygulanır"
+      className={`inline-flex items-center gap-[6px] rounded-[16px] bg-cream/[0.92] py-[5px] pl-[7px] pr-[10px] backdrop-blur-[4px] ${className}`}
+    >
+      <Image
+        src={ML_BRAND.logoMark}
+        alt=""
+        aria-hidden
+        width={270}
+        height={270}
+        className="h-[15px] w-[15px] flex-none"
+      />
+      <span className="text-[9.5px] font-medium uppercase tracking-[0.08em] text-ink">
+        My Lamination
+      </span>
+    </span>
+  );
+}

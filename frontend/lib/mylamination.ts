@@ -71,8 +71,16 @@ export const ML_BRAND = {
   siteUrl: "https://www.mylamination.com.tr",
   productsUrl: "https://www.mylamination.com.tr/urunler/",
   logo: "/mylamination/logo.png",
+  logoMark: "/mylamination/logo-mark.png",
   logoItaly: "/mylamination/logo-italy.png",
 } as const;
+
+// My Lamination ürünleriyle yaptığımız hizmetler. Rozet, ürün bölümü ve kart
+// işaretleri bu eşlemeye bakar — yeni bir hizmet eklenirse tek yerden açılır.
+export const ML_SERVICE_SCOPE: Record<string, "kas" | "kirpik"> = {
+  "kas-laminasyon": "kas",
+  "kirpik-lifting": "kirpik",
+};
 
 export const ML_PRODUCTS: MlProduct[] = [
   // ---------------------------------------------------------------- uygulama
