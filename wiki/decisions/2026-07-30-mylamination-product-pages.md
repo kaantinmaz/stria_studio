@@ -46,3 +46,16 @@ Stria Studio uses **My Lamination** products (mylamination.com.tr — Türkiye e
 - Ayrım korundu: *stüdyo* ürünleri **kullanır**, *kişi* sertifikayı **taşır**. "Stria Studio'da … kullanılır" ifadeleri doğru olduğu için bırakıldı.
 
 Ayrıca owner isteğiyle **mobil menünün en altına** My Lamination logosu + uzmanlık notu (`/mylamination`'a link) eklendi; ana sayfa ve `/hizmetler` kartlarında `MyLaminationChip` duruyor.
+
+## Yayın filtresi (aynı gün): yalnız evde bakım yayında
+
+Owner kararı: **"Evde Bakım Ürünleri haricinde diğer ürünleri şimdilik yayından kaldıralım. Tamamen silme, şimdilik kaldıracağız."**
+
+- Uygulama: `ML_PUBLISHED_CATEGORIES: MlCategory[] = ["evde-bakim"]` + türetilmiş `ML_VISIBLE_PRODUCTS` / `ML_VISIBLE_CATEGORIES`. Ürün başına `published` alanı **eklenmedi** — istek kategori düzeyinde, 33 kayda bayrak dağıtmak geri almayı da zorlaştırırdı. Geri açmak: diziye kategoriyi ekle, başka dokunuş yok.
+- **`ML_PRODUCTS` artık doğrudan tüketilmez.** Rota, hub, hizmet bölümü, sitemap ve `llms.txt` yalnız `ML_VISIBLE_*` okur; ham diziyi kullanmak gizli ürünü yayına sızdırır.
+- Gizli slug'lar `notFound()` → **404**. Geçici kaldırma olduğu için 410 kullanılmadı (410 "kalıcı olarak gitti" der).
+- Hub'daki **adım sırası bölümü korundu**: gizli ürünler adıyla anlatılmaya devam ediyor (protokol anlatımı sayfanın değerli kısmı), ama gizli ürün adı **link değil düz metin** — aksi hâlde 404 link olurdu.
+- `MyLaminationServiceSection` grup listesine dönüştürüldü: boş grup render edilmez, hepsi gizliyse bölüm `null`. Kaş/kirpik sayfalarında şu an yalnız "… sonrası evde önerdiğimiz My Lamination ürünleri" bölümü çıkıyor.
+- Sayıya bağlı metinler (`hub` intro, `llms.txt`) `ML_VISIBLE_PRODUCTS.length`'ten türetiliyor; hub `metadata.description`'ından gizli kategorilerin enumerasyonu ("silikon kalıplar, fırçalar") çıkarıldı ki iki durumda da doğru kalsın.
+
+Sonuç: yayında 7 ürün (hub + 7 = 8 sitemap URL'i), 26 ürün gizli ve veri dosyasında bekliyor.
