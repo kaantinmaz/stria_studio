@@ -34,3 +34,15 @@ Stria Studio uses **My Lamination** products (mylamination.com.tr — Türkiye e
 
 ## Sources
 `frontend/lib/mylamination.ts` · `frontend/components/MyLaminationBadge.tsx` · `frontend/components/MyLaminationServiceSection.tsx` · `frontend/app/mylamination/` · `backend/database/seeders/ServiceSeeder.php` · [[seo-architecture]]
+
+## Düzeltme (aynı gün): uzmanlık kişiye ait
+
+İlk sürümde iddia **"Stria Studio bir My Lamination uzmanıdır"** biçiminde kurumaydı — yanlış. My Lamination sertifikası workshopu tamamlayan **uygulayıcı adına** düzenlenir, kuruma verilmez. Owner düzeltmesiyle tüm uzmanlık atfı **Nilsu Kamişli**'ye (Kurucu & Kalıcı Makyaj Uzmanı) taşındı.
+
+- `ML_EXPERT` sabiti `lib/mylamination.ts`'te — ad ve unvan tek yerde; rozet, hub, ürün detay, hizmet bölümü ve `llms.txt` buradan okur.
+- Rozet artık "Nilsu Kamişli, kaş laminasyonunda My Lamination uzmanıdır" der; gövde metni sertifikanın kişiye ait olduğunu açıklar.
+- Hub'a **`Person`** şeması eklendi: `jobTitle`, `worksFor` → `/#business`, `knowsAbout`, ve `hasCredential` (`EducationalOccupationalCredential`, `recognizedBy` → `/mylamination#brand`). Uzmanlık atfı artık makine tarafında da kurulu — E-E-A-T sinyali kuruma değil kişiye bağlanıyor.
+- İki hizmete "**Kim uyguluyor?**" SSS'i ve "Sertifikalı My Lamination uzmanı Nilsu Kamişli uygular" fayda maddesi eklendi (seeder; SSS 5→6).
+- Ayrım korundu: *stüdyo* ürünleri **kullanır**, *kişi* sertifikayı **taşır**. "Stria Studio'da … kullanılır" ifadeleri doğru olduğu için bırakıldı.
+
+Ayrıca owner isteğiyle **mobil menünün en altına** My Lamination logosu + uzmanlık notu (`/mylamination`'a link) eklendi; ana sayfa ve `/hizmetler` kartlarında `MyLaminationChip` duruyor.
