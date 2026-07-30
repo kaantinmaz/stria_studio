@@ -115,9 +115,19 @@ export function NavServices() {
                 </Link>
               ))}
               <Link
+                href="/mylamination"
+                onClick={() => setOpen(false)}
+                className="col-span-full mt-1 flex items-center justify-between gap-2 rounded-[14px] bg-white/70 px-3 py-[10px] text-[13px] text-ink hover:bg-white"
+              >
+                My Lamination Ürünleri
+                <span className="text-[10px] uppercase tracking-[0.1em] text-accent">
+                  Kaş &amp; Kirpik
+                </span>
+              </Link>
+              <Link
                 href="/hizmetler"
                 onClick={() => setOpen(false)}
-                className="col-span-full mt-1 rounded-[14px] px-3 py-[10px] text-[13px] font-medium text-accent hover:bg-white"
+                className="col-span-full rounded-[14px] px-3 py-[10px] text-[13px] font-medium text-accent hover:bg-white"
               >
                 Tüm hizmetler →
               </Link>

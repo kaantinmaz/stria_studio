@@ -56,6 +56,7 @@ export function Nav() {
 
   const links = [
     { href: "/hizmetler", label: t.navServices },
+    { href: "/mylamination", label: "My Lamination Ürünleri" },
     { href: "/galeri", label: t.navGallery },
     { href: "/hakkimizda", label: t.navAbout },
     { href: "/iletisim", label: t.navContact },

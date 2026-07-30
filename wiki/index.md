@@ -15,6 +15,7 @@ _(none yet)_
 - [microsite-architecture](decisions/2026-07-09-microsite-architecture.md) — per-service SEO microsites (microbladingankara.com) on shared backend; `site` column scoping, `/api/microsites/{site}/*`, Filament Site selector, isolation guard. (Item 7 "settings shared" superseded by per-site-settings below.)
 - [per-site-settings](decisions/2026-07-12-per-site-settings.md) — settings now `site`-scoped (NULL=main); `Setting::forSite()`, Filament site switcher, per-site campaign bar + code injection on both microsites.
 - [model-routing](decisions/2026-07-12-model-routing.md) — Fable 5 = thinking/orchestration; coding & detail always delegated to Codex 5.6 (`gpt-5.6-sol`) or Opus 4.8 (`claude -p --model opus`). Codified in CLAUDE.md §5.
+- [mylamination-product-pages](decisions/2026-07-30-mylamination-product-pages.md) — My Lamination marka/ürün sayfaları: `/mylamination` hub + 33 ürün detayı, statik `lib/mylamination.ts`, hizmet sayfalarında uzmanlık rozeti, Brand/ItemList/Product JSON-LD, offers yok (satış yapmıyoruz).
 
 ## Issues
 - [mikroblading-seo-geo-audit](issues/2026-07-12-mikroblading-seo-geo-audit.md) — 2026-07-12 audit: fixed missing H1 (Section `as="h1"`) + api-docs noindex; open owner blockers (gallery photos, real NAP, reviews→AggregateRating, launch/GSC).

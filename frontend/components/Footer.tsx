@@ -30,6 +30,10 @@ export function Footer() {
       href: "/ankara-kalici-makyaj-yapan-yerler",
       label: lang === "tr" ? "Stüdyo Seçim Rehberi" : "Studio Selection Guide",
     },
+    {
+      href: "/mylamination",
+      label: lang === "tr" ? "My Lamination Ürünleri" : "My Lamination Products",
+    },
   ];
 
   return (

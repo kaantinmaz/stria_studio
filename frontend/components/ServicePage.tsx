@@ -8,6 +8,8 @@ import { WorkLightbox } from "@/components/WorkLightbox";
 import { WhatsAppIcon, PhoneIcon } from "@/components/Icons";
 import { CallLabel } from "@/components/CallLabel";
 import { useSettings } from "@/components/SettingsProvider";
+import { MyLaminationBadge } from "@/components/MyLaminationBadge";
+import { MyLaminationServiceSection } from "@/components/MyLaminationServiceSection";
 import { phoneHref, type ServiceFull, type ServiceListItem } from "@/lib/content";
 
 const SERVICE_GUIDES: Record<string, { href: string; label: string }> = {
@@ -25,6 +27,13 @@ const SERVICE_GUIDES: Record<string, { href: string; label: string }> = {
   },
 };
 
+// Kaş laminasyonu ve kirpik lifting seanslarında My Lamination ürünleri
+// kullanılır; bu iki sayfada başlığın üzerinde uzmanlık rozeti gösterilir.
+const ML_SERVICE_SCOPE: Record<string, "kas" | "kirpik"> = {
+  "kas-laminasyon": "kas",
+  "kirpik-lifting": "kirpik",
+};
+
 // Client-rendered TR service page body (settings-driven contact links).
 export function ServicePage({
   svc,
@@ -36,6 +45,7 @@ export function ServicePage({
   const settings = useSettings();
   const name = svc.name_tr;
   const guide = SERVICE_GUIDES[svc.slug];
+  const mlScope = ML_SERVICE_SCOPE[svc.slug];
   // Work photos — owner fills svc.gallery; until then show 3 fillable placeholders.
   const shots = svc.gallery?.length ? svc.gallery : ["", "", ""];
   const related = svc.related
@@ -50,6 +60,7 @@ export function ServicePage({
       {/* header */}
       <header className="mx-auto grid max-w-[1160px] grid-cols-1 items-center gap-[clamp(28px,4.5vw,64px)] px-[clamp(18px,5vw,56px)] pb-12 pt-8 md:grid-cols-[1.05fr_0.95fr]">
         <div>
+          {mlScope && <MyLaminationBadge scope={mlScope} className="mb-5" />}
           <div className="mb-4 inline-flex items-center gap-2 rounded-[22px] bg-pink px-4 py-2 text-[11px] uppercase tracking-[0.14em] text-accent">
             {svc.tag_tr} · Ankara
           </div>
@@ -119,6 +130,8 @@ export function ServicePage({
           </div>
         </div>
       </section>
+
+      {mlScope && <MyLaminationServiceSection scope={mlScope} serviceName={name} />}
 
       {svc.subservices_tr && svc.subservices_tr.length > 0 && (
         <section className="mx-auto max-w-[1160px] px-[clamp(18px,5vw,56px)] py-[clamp(32px,5vw,64px)]">
