@@ -296,7 +296,12 @@ class ServiceSeeder extends Seeder
                     ['q' => 'Kirpik lifting ile kirpik laminasyonu aynı şey mi?', 'a' => 'Pratikte aynı uygulamayı anlatır. Lifting kirpiği kıvırma işini, laminasyon ise bu işe eklenen vitamin ve mineral bakımını öne çıkarır. My Lamination protokolünde ikisi tek seansta birlikte yapılır.'],
                 ],
                 'related' => ['dipliner', 'eyeliner'],
-                'gallery' => [],
+                'gallery' => [
+                    '/images/works/kirpik-lifting-oncesi-1.jpg',
+                    '/images/works/kirpik-lifting-sonrasi-1.jpg',
+                    '/images/works/kirpik-lifting-sonrasi-2.jpg',
+                    '/images/works/kirpik-lifting-sonrasi-3.jpg',
+                ],
             ],
             [
                 'slug' => 'kamuflaj-makyaj',

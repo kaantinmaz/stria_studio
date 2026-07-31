@@ -28,6 +28,13 @@ const SERVICE_GUIDES: Record<string, { href: string; label: string }> = {
   },
 };
 
+// Work photos are labelled from the file name: "…-oncesi-1.jpg" / "…-sonrasi-2.jpg".
+function workLabel(src: string): string | null {
+  if (src.includes("-oncesi")) return "Öncesi";
+  if (src.includes("-sonrasi")) return "Sonrası";
+  return null;
+}
+
 // Client-rendered TR service page body (settings-driven contact links).
 export function ServicePage({
   svc,
@@ -174,19 +181,35 @@ export function ServicePage({
           {name} uygulamalarımızdan örnek görüntüler.
         </p>
         <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,220px),1fr))] gap-4">
-          {shots.map((src, i) => (
-            <div
-              key={i}
-              className="relative aspect-[4/5] overflow-hidden rounded-[22px] border border-line bg-white"
-            >
-              <ImageSlot
-                src={src}
-                placeholder={`${name} · görsel ${i + 1}`}
-                alt={`${name} çalışma örneği ${i + 1} — Stria Studio Ankara`}
-                sizes="(max-width: 768px) 50vw, 280px"
-              />
-            </div>
-          ))}
+          {shots.map((src, i) => {
+            const label = workLabel(src);
+            // Number repeated labels ("sonrası 1/2/3") so each alt stays unique.
+            const sameLabel = label ? shots.filter((s) => workLabel(s) === label) : [];
+            const suffix =
+              sameLabel.length > 1 ? ` ${sameLabel.indexOf(src) + 1}` : "";
+            return (
+              <div
+                key={i}
+                className="relative aspect-[4/5] overflow-hidden rounded-[22px] border border-line bg-white"
+              >
+                <ImageSlot
+                  src={src}
+                  placeholder={`${name} · görsel ${i + 1}`}
+                  alt={
+                    label
+                      ? `${name} ${label.toLocaleLowerCase("tr")}${suffix} — Stria Studio Ankara`
+                      : `${name} çalışma örneği ${i + 1} — Stria Studio Ankara`
+                  }
+                  sizes="(max-width: 768px) 50vw, 280px"
+                />
+                {label && (
+                  <span className="absolute left-3 top-3 rounded-[14px] bg-cream/90 px-3 py-1 text-[11px] uppercase tracking-[0.12em] text-ink backdrop-blur">
+                    {label}
+                  </span>
+                )}
+              </div>
+            );
+          })}
         </div>
       </section>
 

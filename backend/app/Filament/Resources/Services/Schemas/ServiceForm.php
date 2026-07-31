@@ -157,8 +157,12 @@ class ServiceForm
                                 FileUpload::make('gallery')
                                     ->image()
                                     ->multiple()
+                                    ->reorderable()
                                     ->disk('public')
-                                    ->directory('services'),
+                                    ->directory('services')
+                                    // Öncesi/Sonrası rozeti dosya adından okunur → ad korunmalı.
+                                    ->preserveFilenames()
+                                    ->helperText('Çalışma fotoğrafları. Öncesi/sonrası rozeti DOSYA ADINDAN okunur: yüklemeden önce adı "kirpik-lifting-oncesi-1.jpg" / "kirpik-lifting-sonrasi-1.jpg" biçiminde verin (Türkçe karakter kullanmayın). Ad eşleşmezse görsel rozetsiz görünür.'),
                                 TagsInput::make('related'),
                                 TextInput::make('sort_order')
                                     ->numeric()
