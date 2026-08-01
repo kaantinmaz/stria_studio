@@ -52,12 +52,11 @@ export default async function RootLayout({
   const settings = (await getSettings()) ?? SETTINGS_FALLBACK;
   return (
     <html lang="tr" className={jost.variable}>
+      {/* Admin-managed raw code (analytics/GTM/pixel/doğrulama etiketi). Rendered
+          inside <head> so vendor snippets land where they are expected; Next's own
+          metadata is hoisted into the same <head>. Unescaped — admin-only, per-site. */}
+      <head dangerouslySetInnerHTML={{ __html: settings.header_code ?? "" }} />
       <body>
-        {/* Admin-managed raw code (analytics/GTM/pixel). Server-rendered so injected
-            <script> tags run; intentionally unescaped — admin-only, per-site. */}
-        {settings.header_code && (
-          <div dangerouslySetInnerHTML={{ __html: settings.header_code }} />
-        )}
         <JsonLd data={beautySalonSchema(settings)} />
         <JsonLd data={websiteSchema()} />
         <Nav

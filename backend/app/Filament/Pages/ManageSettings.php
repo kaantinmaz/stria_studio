@@ -135,8 +135,8 @@ class ManageSettings extends Page
                         Tab::make('Kod Enjeksiyonu')
                             ->schema([
                                 Textarea::make('header_code')
-                                    ->label('Header kodu (<body> başı)')
-                                    ->helperText('Analytics, GTM, pixel, özel CSS. Ham olarak eklenir — dikkatli kullan.')
+                                    ->label('Header kodu (<head> içi)')
+                                    ->helperText('Analytics, GTM, pixel, doğrulama etiketi, özel CSS. Ham olarak eklenir — dikkatli kullan. Script adresleri mutlaka tam ve https:// ile başlamalı; localhost adresleri ziyaretçide çalışmaz.')
                                     ->rows(8)
                                     ->extraInputAttributes(['style' => 'font-family: monospace;']),
                                 Textarea::make('footer_code')

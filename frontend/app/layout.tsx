@@ -52,12 +52,12 @@ export default async function RootLayout({
   const [services, settings] = await Promise.all([getServices(), getSettings()]);
   return (
     <html lang="tr" className={jost.variable}>
+      {/* Admin-managed raw code, rendered inside <head> so verification meta
+          tags and vendor snippets land where they are expected. Next's own
+          metadata tags are hoisted into this same <head> by React.
+          Intentionally unescaped — admin-only. */}
+      <head dangerouslySetInnerHTML={{ __html: settings?.header_code ?? "" }} />
       <body>
-        {/* Admin-managed raw code. Server-rendered so injected <script> tags run
-            (innerHTML scripts wouldn't). Intentionally unescaped — admin-only. */}
-        {settings?.header_code && (
-          <div dangerouslySetInnerHTML={{ __html: settings.header_code }} />
-        )}
         <JsonLd data={beautySalonSchema(settings ?? SETTINGS_FALLBACK)} />
         <LanguageProvider>
           <SettingsProvider settings={settings}>
