@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useLang } from "@/components/LanguageProvider";
 import { fmtDate } from "@/lib/date";
 import type { PostFull } from "@/lib/blog";
@@ -22,6 +23,12 @@ export function PostBody({ post }: { post: PostFull }) {
         )}
         <h1 className="mb-3 mt-2 text-[clamp(30px,4vw,52px)] leading-[1.08]">{title}</h1>
         <div className="flex flex-wrap gap-x-4 gap-y-1 text-[13px] text-muted2">
+          <span>
+            {lang === "tr" ? "Yazan: " : "By "}
+            <Link href="/hakkimizda" className="text-accent">
+              Nilsu Kamişli
+            </Link>
+          </span>
           <time>{fmtDate(post.published_at, lang)}</time>
           {showUpdated && (
             <time dateTime={post.updated_at ?? undefined}>

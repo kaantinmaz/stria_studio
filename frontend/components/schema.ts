@@ -37,13 +37,44 @@ export function beautySalonSchema(s: Settings) {
       opens: h.open,
       closes: h.close,
     })),
-    sameAs: [
-      s.instagram,
-      "https://microbladingankara.com",
-      "https://kastasarimiankara.com",
-      site.gbpUrl,
-    ].filter(Boolean),
+    // Kardeş domainler (microbladingankara.com, kastasarimiankara.com) ana
+    // domaine 301 yönlendiriliyor; redirect'e işaret eden sameAs yanlış otorite
+    // sinyali olur — bu yüzden listeden çıkarıldı.
+    sameAs: [s.instagram, site.gbpUrl].filter(Boolean),
+    founder: { "@id": absUrl("/hakkimizda#nilsu-kamisli") },
     priceRange: "₺₺",
+  };
+}
+
+// Person (yazar/uygulayıcı entity) — E-E-A-T sinyali. @id, BlogPosting.author ve
+// BeautySalon.founder tarafından referanslanır; /hakkimizda sayfasındaki
+// id="nilsu-kamisli" çıpasında çözülür. My Lamination sertifikası kuruma değil
+// kişiye ait olduğu için hasCredential burada tutulur.
+export function personSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "@id": absUrl("/hakkimizda#nilsu-kamisli"),
+    name: "Nilsu Kamişli",
+    jobTitle: "Kalıcı makyaj uzmanı, stüdyo kurucusu",
+    worksFor: { "@id": absUrl("/#business") },
+    url: absUrl("/hakkimizda"),
+    image: absUrl("/images/nilsu-kamisli.jpg"),
+    knowsAbout: [
+      "Microblading",
+      "Kaş pudralama",
+      "Kalıcı eyeliner",
+      "Dudak renklendirme",
+      "Kaş laminasyonu",
+      "Kirpik lifting",
+      "Kamuflaj makyaj",
+    ],
+    hasCredential: {
+      "@type": "EducationalOccupationalCredential",
+      credentialCategory: "certificate",
+      name: "My Lamination Workshop Sertifikası",
+      recognizedBy: { "@type": "Organization", name: "My Lamination" },
+    },
   };
 }
 

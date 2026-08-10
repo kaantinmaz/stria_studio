@@ -49,7 +49,7 @@ export default async function PostPage({
     datePublished: post.published_at,
     dateModified: post.updated_at ?? post.published_at,
     image: post.cover_url ?? absUrl("/og"),
-    author: { "@type": "Organization", name: "Stria Studio" },
+    author: { "@id": absUrl("/hakkimizda#nilsu-kamisli") },
     publisher: {
       "@type": "Organization",
       name: "Stria Studio",

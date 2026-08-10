@@ -191,10 +191,9 @@ export default async function AnkaraKaliciMakyajYapanYerlerPage() {
               <h3 className="mb-2 text-[19px]">Çankaya ve Tunalı</h3>
               <p className="text-[14px] leading-[1.7] text-muted">
                 Merkezi konum ve farklı ulaşım seçenekleri nedeniyle geniş bir stüdyo seçkisi
-                bulunur. Stria Studio Çankaya’dadır; kaş odaklı ulaşım ayrıntıları için uzman
-                sitemizdeki{" "}
-                <Link href="https://microbladingankara.com/cankaya-mikroblading" className={linkClass}>
-                  Çankaya microblading rehberine
+                bulunur. Stria Studio Çankaya’dadır; kaş odaklı teknik ayrıntılar için{" "}
+                <Link href="/hizmetler/microblading" className={linkClass}>
+                  microblading hizmet sayfamıza
                 </Link>{" "}
                 bakabilirsiniz.
               </p>
@@ -203,9 +202,9 @@ export default async function AnkaraKaliciMakyajYapanYerlerPage() {
               <h3 className="mb-2 text-[19px]">Kızılay</h3>
               <p className="text-[14px] leading-[1.7] text-muted">
                 Metro ve otobüs bağlantıları, işlem ve sonraki kontrol ziyaretlerini planlamayı
-                kolaylaştırabilir. Microblading için yol ve randevu planını{" "}
-                <Link href="https://microbladingankara.com/kizilay-mikroblading" className={linkClass}>
-                  Kızılay ulaşım rehberinde
+                kolaylaştırabilir. Randevu öncesi hazırlığı{" "}
+                <Link href="/blog/kalici-makyaj-oncesi-hazirlik" className={linkClass}>
+                  hazırlık rehberimizde
                 </Link>{" "}
                 ayrıca anlattık.
               </p>
@@ -214,9 +213,9 @@ export default async function AnkaraKaliciMakyajYapanYerlerPage() {
               <h3 className="mb-2 text-[19px]">Çayyolu ve Ümitköy</h3>
               <p className="text-[14px] leading-[1.7] text-muted">
                 Batı koridorunda yaşayanlar stüdyo seçerken ilk seans kadar kontrol ve rötuş
-                ulaşımını da hesaba katmalıdır. M2 hattı ve araç rotası için{" "}
-                <Link href="https://microbladingankara.com/cayyolu-mikroblading" className={linkClass}>
-                  Çayyolu–Ümitköy microblading rehberini
+                ulaşımını da hesaba katmalıdır. Rötuşun ne zaman gerektiğini{" "}
+                <Link href="/blog/kalici-makyaj-renk-solmasi-rotus-zamani" className={linkClass}>
+                  renk solması ve rötuş zamanı yazımızda
                 </Link>{" "}
                 inceleyebilirsiniz.
               </p>
@@ -226,8 +225,8 @@ export default async function AnkaraKaliciMakyajYapanYerlerPage() {
               <p className="text-[14px] leading-[1.7] text-muted">
                 Kuzey Ankara’dan seçim yaparken trafik süresiyle birlikte iyileşme sonrası olası
                 ikinci ziyareti planlamak yararlıdır. Kaş uygulamasına özel seçenekleri{" "}
-                <Link href="https://kastasarimiankara.com/kecioren-kas-tasarimi" className={linkClass}>
-                  Keçiören kaş tasarımı rehberinde
+                <Link href="/hizmetler/kas-tasarimi" className={linkClass}>
+                  kaş tasarımı sayfamızda
                 </Link>{" "}
                 bulabilirsiniz.
               </p>
@@ -277,14 +276,14 @@ export default async function AnkaraKaliciMakyajYapanYerlerPage() {
           </div>
           <p className="mt-6 text-[15px] leading-[1.7] text-muted">
             Teknik ayrıntıya inmek isterseniz{" "}
-            <Link href="https://microbladingankara.com" className={linkClass}>
-              Microblading Ankara
+            <Link href="/hizmetler/microblading" className={linkClass}>
+              microblading
             </Link>{" "}
             ve{" "}
-            <Link href="https://kastasarimiankara.com" className={linkClass}>
-              Kaş Tasarımı Ankara
+            <Link href="/hizmetler/kas-tasarimi" className={linkClass}>
+              kaş tasarımı
             </Link>{" "}
-            uzman rehberlerimizi; genel seçenekler için{" "}
+            sayfalarımızı; genel seçenekler için{" "}
             <Link href="/hizmetler" className={linkClass}>
               tüm hizmetlerimizi
             </Link>{" "}

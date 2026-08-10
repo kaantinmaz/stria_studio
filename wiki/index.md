@@ -16,9 +16,11 @@ _(none yet)_
 - [per-site-settings](decisions/2026-07-12-per-site-settings.md) — settings now `site`-scoped (NULL=main); `Setting::forSite()`, Filament site switcher, per-site campaign bar + code injection on both microsites.
 - [model-routing](decisions/2026-07-12-model-routing.md) — Fable 5 = thinking/orchestration; coding & detail always delegated to Codex 5.6 (`gpt-5.6-sol`) or Opus 4.8 (`claude -p --model opus`). Codified in CLAUDE.md §5.
 - [mylamination-product-pages](decisions/2026-07-30-mylamination-product-pages.md) — My Lamination marka/ürün sayfaları: `/mylamination` hub + 33 ürün detayı, statik `lib/mylamination.ts`, hizmet sayfalarında uzmanlık rozeti, Brand/ItemList/Product JSON-LD, offers yok (satış yapmıyoruz).
+- [domain-konsolidasyonu](decisions/2026-08-10-domain-konsolidasyonu.md) — 2026-08-10: iki mikrosite (microbladingankara, kastasarimiankara) ana domaine 301 ile konsolide; 59 URL haritası + catch-all, kapsam boşlukları için 3 yeni yazı, redirect'e giden iç/dış linkler temizlendi, Person yazar entity'si. Mikrosite-SEO açısından [[decisions/2026-07-09-microsite-architecture]] geçersiz.
 
 ## Issues
 - [mikroblading-seo-geo-audit](issues/2026-07-12-mikroblading-seo-geo-audit.md) — 2026-07-12 audit: fixed missing H1 (Section `as="h1"`) + api-docs noindex; open owner blockers (gallery photos, real NAP, reviews→AggregateRating, launch/GSC).
+- [striastudio-organik-gorunurluk-teshisi](issues/2026-08-10-striastudio-organik-gorunurluk-teshisi.md) — 2026-08-10 canlı crawl: teknik/on-page temiz, indekste 0 sonuç; bloklayıcılar = `header_code`'daki kırık `http://localhost:3001/v.js` + GA4/GSC yok, placeholder NAP (AI cevabında güvenilmezlik uyarısı), 3 domain kanibalizasyonu, ince gövdeler + yazar entity yok. Shipped: sitemap gerçek `lastmod`.
 
 ## Syntheses
 - [seo-geo-topic-strategy](syntheses/2026-07-12-seo-geo-topic-strategy.md) — 2026-07-12: query universe → page map for all 3 sites; gaps → lanes (kastasarimi tech fixes, mikroblading topical expansion, main-site GEO infra + 6 blog posts).

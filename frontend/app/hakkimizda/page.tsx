@@ -4,7 +4,7 @@ import { AboutStory } from "@/components/AboutStory";
 import { Founder } from "@/components/Founder";
 import { Footer } from "@/components/Footer";
 import { JsonLd } from "@/components/JsonLd";
-import { breadcrumbSchema } from "@/components/schema";
+import { breadcrumbSchema, personSchema } from "@/components/schema";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata = buildMetadata({
@@ -18,6 +18,7 @@ export default function HakkimizdaPage() {
   return (
     <>
       <Nav />
+      <JsonLd data={personSchema()} />
       <JsonLd
         data={breadcrumbSchema([
           { name: "Ana Sayfa", path: "/" },
@@ -26,7 +27,10 @@ export default function HakkimizdaPage() {
       />
       <main className="pt-[132px]">
         <About headingAs="h1" />
-        <Founder />
+        {/* Person @id="/hakkimizda#nilsu-kamisli" bu çıpada çözülür. */}
+        <div id="nilsu-kamisli">
+          <Founder />
+        </div>
         <AboutStory />
       </main>
       <Footer />

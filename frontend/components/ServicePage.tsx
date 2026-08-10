@@ -13,15 +13,10 @@ import { MyLaminationServiceSection } from "@/components/MyLaminationServiceSect
 import { ML_SERVICE_SCOPE } from "@/lib/mylamination";
 import { phoneHref, type ServiceFull, type ServiceListItem } from "@/lib/content";
 
+// Ayrı domainde duran uzman rehber sitesi olan hizmetler. microbladingankara.com
+// ve kastasarimiankara.com ana domaine 301 ile konsolide edildiği için burada
+// yer almaz — redirect'e link vermek iç link değerini boşa harcar.
 const SERVICE_GUIDES: Record<string, { href: string; label: string }> = {
-  microblading: {
-    href: "https://microbladingankara.com",
-    label: "Mikroblading Ankara",
-  },
-  "kas-tasarimi": {
-    href: "https://kastasarimiankara.com",
-    label: "Kaş Tasarımı Ankara",
-  },
   "kamuflaj-makyaj": {
     href: "https://catlakkamuflaj.com",
     label: "Kamuflaj Makyajı",

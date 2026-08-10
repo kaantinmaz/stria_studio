@@ -1,12 +1,12 @@
 import type { MetadataRoute } from "next";
 import { absUrl } from "@/lib/seo";
 import { getService, getServiceSlugs } from "@/lib/content";
-import { getAllPostSlugs } from "@/lib/blog";
+import { getAllPosts } from "@/lib/blog";
 import { ML_VISIBLE_PRODUCTS } from "@/lib/mylamination";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
-  const slugs = await getAllPostSlugs();
+  const posts = await getAllPosts();
   const serviceSlugs = await getServiceSlugs();
   const services = await Promise.all(serviceSlugs.map((slug) => getService(slug)));
   const subservices = services.flatMap((svc) => {
@@ -27,9 +27,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   });
   const blog = [
     { url: absUrl("/blog"), lastModified: now, changeFrequency: "weekly" as const, priority: 0.8 },
-    ...slugs.map((s) => ({
-      url: absUrl(`/blog/${s}`),
-      lastModified: now,
+    ...posts.map((p) => ({
+      url: absUrl(`/blog/${p.slug}`),
+      // gerçek içerik tarihi: uydurma lastmod (build zamanı) Google'ın lastmod
+      // sinyalini tamamen yok saymasına yol açar.
+      lastModified: new Date(p.updated_at ?? p.published_at ?? now),
       changeFrequency: "monthly" as const,
       priority: 0.7,
     })),
