@@ -298,7 +298,7 @@ export function ChatWidget({ whatsappUrl }: { whatsappUrl: string }) {
         <section
           role="dialog"
           aria-label="Stria Asistan"
-          className={`flex flex-col overflow-hidden border border-line bg-cream shadow-[0_28px_80px_-24px_rgba(66,48,46,0.55)] ${
+          className={`flex flex-col overflow-hidden border border-line bg-cream shadow-[0_28px_80px_-24px_rgba(76,19,19,0.55)] ${
             expanded
               ? "fixed inset-x-0 top-0 z-[60] w-full"
               : "absolute bottom-[72px] right-0 max-h-[70vh] w-[min(360px,calc(100vw-32px))] rounded-[28px]"
@@ -457,7 +457,7 @@ export function ChatWidget({ whatsappUrl }: { whatsappUrl: string }) {
         aria-label={isOpen ? "Stria Asistan'ı kapat" : "Stria Asistan'ı aç"}
         aria-expanded={isOpen}
         onClick={() => setIsOpen((open) => !open)}
-        className="flex h-14 w-14 cursor-pointer items-center justify-center rounded-full bg-ink text-cream shadow-[0_14px_34px_-10px_rgba(66,48,46,0.65)] transition-transform duration-200 hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        className="flex h-14 w-14 cursor-pointer items-center justify-center rounded-full bg-ink text-cream shadow-[0_14px_34px_-10px_rgba(76,19,19,0.65)] transition-transform duration-200 hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
       >
         {isOpen ? (
           <svg

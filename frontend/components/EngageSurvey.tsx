@@ -357,7 +357,7 @@ export function EngageSurvey({ whatsappUrl }: { whatsappUrl: string }) {
     <section
       role="dialog"
       aria-label={lang === "tr" ? "Hizmet anketi" : "Service survey"}
-      className={`fixed inset-x-0 bottom-0 z-[65] flex max-h-[70vh] w-full flex-col overflow-hidden rounded-t-[28px] border border-b-0 border-line bg-cream shadow-[0_28px_80px_-24px_rgba(66,48,46,0.55)] transition-transform duration-500 motion-reduce:transition-none sm:inset-x-auto sm:bottom-auto sm:right-0 sm:top-1/2 sm:max-h-[max(340px,calc(100vh-340px))] sm:w-[min(340px,calc(100vw-24px))] sm:-translate-y-1/2 sm:rounded-l-[28px] sm:rounded-r-none sm:border-b sm:border-r-0 ${
+      className={`fixed inset-x-0 bottom-0 z-[65] flex max-h-[70vh] w-full flex-col overflow-hidden rounded-t-[28px] border border-b-0 border-line bg-cream shadow-[0_28px_80px_-24px_rgba(76,19,19,0.55)] transition-transform duration-500 motion-reduce:transition-none sm:inset-x-auto sm:bottom-auto sm:right-0 sm:top-1/2 sm:max-h-[max(340px,calc(100vh-340px))] sm:w-[min(340px,calc(100vw-24px))] sm:-translate-y-1/2 sm:rounded-l-[28px] sm:rounded-r-none sm:border-b sm:border-r-0 ${
         visible ? "translate-x-0" : "translate-x-full"
       }`}
     >

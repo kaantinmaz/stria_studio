@@ -75,7 +75,7 @@ export function Hero() {
       </div>
 
       <div className="reveal in relative">
-        <div className="relative h-[min(72vh,600px)] overflow-hidden rounded-[200px_200px_32px_32px] shadow-[0_40px_90px_-50px_rgba(197,124,105,0.7)]">
+        <div className="relative h-[min(72vh,600px)] overflow-hidden rounded-[200px_200px_32px_32px] shadow-[0_40px_90px_-50px_rgba(229,135,146,0.7)]">
           {slides.map((src, i) => (
             <div
               key={src}
@@ -113,7 +113,7 @@ export function Hero() {
         {/* featured service card */}
         <a
           href="#services"
-          className="absolute bottom-[26px] left-2 flex items-center gap-[13px] rounded-[20px] bg-cream/[0.92] p-3 pl-3 pr-4 text-ink shadow-[0_20px_40px_-18px_rgba(66,48,46,0.4)] backdrop-blur-[10px] sm:left-[-14px]"
+          className="absolute bottom-[26px] left-2 flex items-center gap-[13px] rounded-[20px] bg-cream/[0.92] p-3 pl-3 pr-4 text-ink shadow-[0_20px_40px_-18px_rgba(76,19,19,0.4)] backdrop-blur-[10px] sm:left-[-14px]"
         >
           <div className="relative h-14 w-14 flex-none overflow-hidden rounded-[14px]">
             <ImageSlot src={IMG.micro} alt={t.featuredName} sizes="56px" />
@@ -135,7 +135,7 @@ export function Hero() {
         </a>
 
         {/* rating chip */}
-        <div className="absolute right-2 top-6 rounded-[18px] bg-ink px-4 py-3 text-center text-cream shadow-[0_20px_40px_-18px_rgba(66,48,46,0.5)] sm:right-[-8px]">
+        <div className="absolute right-2 top-6 rounded-[18px] bg-ink px-4 py-3 text-center text-cream shadow-[0_20px_40px_-18px_rgba(76,19,19,0.5)] sm:right-[-8px]">
           <div className="text-[22px] font-medium leading-none tracking-[-0.02em]">
             5.0
           </div>

@@ -104,7 +104,7 @@ export function Popup({ settings }: { settings: PopupSettings }) {
         aria-labelledby={title ? titleId : undefined}
         aria-describedby={popupText ? textId : undefined}
         aria-label={!title ? (lang === "tr" ? "Stria Studio duyurusu" : "Stria Studio announcement") : undefined}
-        className={`relative max-h-[85vh] w-full max-w-md overflow-y-auto rounded-[28px] bg-cream shadow-[0_30px_90px_-25px_rgba(66,48,46,0.65)] transition-transform duration-300 motion-reduce:transition-none ${
+        className={`relative max-h-[85vh] w-full max-w-md overflow-y-auto rounded-[28px] bg-cream shadow-[0_30px_90px_-25px_rgba(76,19,19,0.65)] transition-transform duration-300 motion-reduce:transition-none ${
           visible ? "scale-100" : "scale-[0.97]"
         }`}
       >

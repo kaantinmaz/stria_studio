@@ -53,7 +53,7 @@ export function SubServicePage({ svc, sub }: { svc: ServiceFull; sub: SubService
             </a>
           </div>
         </div>
-        <div className="relative h-[min(56vh,460px)] overflow-hidden rounded-[32px] shadow-[0_40px_90px_-50px_rgba(197,124,105,0.7)]">
+        <div className="relative h-[min(56vh,460px)] overflow-hidden rounded-[32px] shadow-[0_40px_90px_-50px_rgba(229,135,146,0.7)]">
           <HeroCarousel
             images={svc.hero_images?.length ? svc.hero_images : (svc.image ? [svc.image] : [])}
             alt={`${sub.name} — Stria Studio Ankara`}

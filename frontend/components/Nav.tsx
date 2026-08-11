@@ -217,7 +217,7 @@ export function Nav() {
 
       {/* mobile menu panel */}
       {menuOpen && (
-        <div className="border-b border-line bg-cream px-[clamp(18px,5vw,56px)] pb-5 pt-1 shadow-[0_30px_60px_-40px_rgba(66,48,46,0.5)] md:hidden">
+        <div className="border-b border-line bg-cream px-[clamp(18px,5vw,56px)] pb-5 pt-1 shadow-[0_30px_60px_-40px_rgba(76,19,19,0.5)] md:hidden">
           <nav className="flex flex-col">
             {links.map((l) => (
               <a

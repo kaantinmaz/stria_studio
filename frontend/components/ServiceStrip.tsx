@@ -25,7 +25,7 @@ export function ServiceStrip() {
               <Link
                 key={s.slug}
                 href={s.url}
-                className="group flex h-full items-center gap-[13px] rounded-[20px] bg-cream/[0.92] p-3 pl-3 pr-4 text-ink shadow-[0_20px_40px_-18px_rgba(66,48,46,0.4)] backdrop-blur-[10px] transition duration-300 hover:-translate-y-1"
+                className="group flex h-full items-center gap-[13px] rounded-[20px] bg-cream/[0.92] p-3 pl-3 pr-4 text-ink shadow-[0_20px_40px_-18px_rgba(76,19,19,0.4)] backdrop-blur-[10px] transition duration-300 hover:-translate-y-1"
               >
                 <div className="relative h-14 w-14 flex-none overflow-hidden rounded-[14px]">
                   <ImageSlot src={s.image ?? ""} alt={name} placeholder={name} sizes="56px" />

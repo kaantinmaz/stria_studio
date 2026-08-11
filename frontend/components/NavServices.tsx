@@ -66,7 +66,7 @@ export function NavServices() {
         // top-full + transparent pt bridges the 14px gap so moving the cursor
         // from the button to the card never leaves the hover region (mouseleave).
         <div className="absolute left-1/2 top-full z-50 w-[min(680px,92vw)] -translate-x-1/2 pt-[14px]">
-          <div className="overflow-hidden rounded-[22px] border border-line bg-cream shadow-[0_30px_70px_-30px_rgba(66,48,46,0.45)]">
+          <div className="overflow-hidden rounded-[22px] border border-line bg-cream shadow-[0_30px_70px_-30px_rgba(76,19,19,0.45)]">
           <div className="grid grid-cols-1 md:grid-cols-[228px_1fr]">
             {/* featured service */}
             <div className="flex flex-col gap-3 border-b border-line bg-pink/60 p-5 md:border-b-0 md:border-r">

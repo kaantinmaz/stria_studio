@@ -17,7 +17,7 @@ export function About({
       className="bg-blush px-[clamp(18px,5vw,56px)] py-[clamp(64px,8vw,120px)]"
     >
       <div className="mx-auto grid max-w-[1160px] grid-cols-1 items-center gap-[clamp(36px,5vw,80px)] md:grid-cols-2">
-        <div className="reveal relative h-[min(64vh,520px)] overflow-hidden rounded-[32px] shadow-[0_40px_80px_-55px_rgba(197,124,105,0.7)]">
+        <div className="reveal relative h-[min(64vh,520px)] overflow-hidden rounded-[32px] shadow-[0_40px_80px_-55px_rgba(229,135,146,0.7)]">
           <ImageSlot
             src={IMG.powder}
             alt={t.aboutTitle}

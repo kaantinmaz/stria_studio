@@ -30,7 +30,7 @@ export function Services() {
           return (
             <div
               key={s.slug}
-              className="reveal flex flex-col overflow-hidden rounded-[24px] border border-line bg-white transition duration-300 hover:-translate-y-1 hover:shadow-[0_30px_60px_-40px_rgba(66,48,46,0.5)]"
+              className="reveal flex flex-col overflow-hidden rounded-[24px] border border-line bg-white transition duration-300 hover:-translate-y-1 hover:shadow-[0_30px_60px_-40px_rgba(76,19,19,0.5)]"
             >
               <div className="relative h-[200px]">
                 <ImageSlot

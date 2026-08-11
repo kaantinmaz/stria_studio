@@ -52,7 +52,7 @@ export function BlogList({
               <Link
                 key={p.slug}
                 href={`/blog/${p.slug}`}
-                className="group flex flex-col overflow-hidden rounded-[24px] border border-line bg-white transition hover:-translate-y-1 hover:shadow-[0_30px_60px_-40px_rgba(66,48,46,0.5)]"
+                className="group flex flex-col overflow-hidden rounded-[24px] border border-line bg-white transition hover:-translate-y-1 hover:shadow-[0_30px_60px_-40px_rgba(76,19,19,0.5)]"
               >
                 <div className="relative h-[200px] bg-pink">
                   {p.cover_url && (

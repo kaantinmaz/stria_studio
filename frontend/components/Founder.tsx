@@ -26,7 +26,7 @@ export function Founder() {
             {t.founderText}
           </p>
         </div>
-        <div className="reveal relative h-[min(70vh,560px)] overflow-hidden rounded-[32px] shadow-[0_40px_80px_-55px_rgba(197,124,105,0.7)] md:order-2">
+        <div className="reveal relative h-[min(70vh,560px)] overflow-hidden rounded-[32px] shadow-[0_40px_80px_-55px_rgba(229,135,146,0.7)] md:order-2">
           <ImageSlot
             src="/images/nilsu-kamisli.jpg"
             alt="Nilsu Kamişli — Stria Studio kurucusu, kalıcı makyaj uzmanı"

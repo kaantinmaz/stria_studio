@@ -31,7 +31,7 @@ export function PromoVideo() {
           </h2>
         </div>
 
-        <div className="relative aspect-video overflow-hidden rounded-[28px] border border-line bg-ink shadow-[0_40px_90px_-50px_rgba(197,124,105,0.7)]">
+        <div className="relative aspect-video overflow-hidden rounded-[28px] border border-line bg-ink shadow-[0_40px_90px_-50px_rgba(229,135,146,0.7)]">
           {embed ? (
             <iframe
               src={embed}
