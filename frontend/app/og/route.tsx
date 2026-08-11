@@ -14,17 +14,17 @@ export function GET() {
           flexDirection: "column",
           justifyContent: "center",
           padding: "80px",
-          background: "linear-gradient(135deg, #fbf4f1 0%, #f3ded7 100%)",
+          background: "linear-gradient(135deg, #fdf6f5 0%, #f8dfe2 100%)",
           fontFamily: "sans-serif",
         }}
       >
-        <div style={{ fontSize: 30, letterSpacing: 6, color: "#b26a4f", textTransform: "uppercase" }}>
+        <div style={{ fontSize: 30, letterSpacing: 6, color: "#a83f54", textTransform: "uppercase" }}>
           Ankara · Çankaya
         </div>
-        <div style={{ fontSize: 84, fontWeight: 600, color: "#42302e", marginTop: 24, lineHeight: 1.05 }}>
+        <div style={{ fontSize: 84, fontWeight: 600, color: "#4c1313", marginTop: 24, lineHeight: 1.05 }}>
           Stria Studio
         </div>
-        <div style={{ fontSize: 38, color: "#7a605b", marginTop: 24, maxWidth: 920 }}>
+        <div style={{ fontSize: 38, color: "#74494a", marginTop: 24, maxWidth: 920 }}>
           Kalıcı makyaj, kaş ve kirpik uygulamalarında doğal dokunuşlar
         </div>
       </div>

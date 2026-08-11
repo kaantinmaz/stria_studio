@@ -139,7 +139,7 @@ export function Hero() {
           <div className="text-[22px] font-medium leading-none tracking-[-0.02em]">
             5.0
           </div>
-          <div className="mt-1 text-[10px] tracking-[0.08em] text-[#e7d3cc]">
+          <div className="mt-1 text-[10px] tracking-[0.08em] text-[#eed6d7]">
             ★★★★★
           </div>
         </div>

@@ -1,18 +1,23 @@
 @import "tailwindcss";
 
+/* Palet logodan türetilir: koyu oxblood #4c1313 (wordmark) + pembe #e58792
+   (favicon zemini). CTA/link tonları bu pembenin koyultulmuş türevleridir —
+   beyaz metinle 4.9:1, krem üzerinde 5.6:1 (WCAG AA). */
 @theme {
-  --color-cream: #fbf4f1;
-  --color-ink: #42302e;
-  --color-accent: #c57c69;
-  --color-accent-dark: #b0654f;
-  --color-rose: #d89a8a;
-  --color-pink: #f3ded7;
-  --color-blush: #f5e6e0;
-  --color-muted: #8a6f6a;
-  --color-muted2: #7a605b;
-  --color-line: #f1e2dc;
-  --color-line2: #eeddd7;
-  --font-sans: var(--font-jost), system-ui, sans-serif;
+  --color-cream: #fdf6f5;
+  --color-ink: #4c1313;
+  --color-accent: #a83f54;
+  --color-accent-dark: #8b2e42;
+  --color-rose: #bb4a5f;
+  /* Logonun ham pembesi: dekoratif dolgular ve koyu zemindeki ikonlar. */
+  --color-blossom: #e58792;
+  --color-pink: #f8dfe2;
+  --color-blush: #fbecec;
+  --color-muted: #8a6060;
+  --color-muted2: #74494a;
+  --color-line: #f4e3e3;
+  --color-line2: #eed9d9;
+  --font-sans: var(--font-body), system-ui, sans-serif;
 }
 
 html {
@@ -26,7 +31,7 @@ body {
   padding-top: var(--promo-h, 0px);
   background: var(--color-cream);
   color: var(--color-ink);
-  font-family: var(--font-jost), system-ui, sans-serif;
+  font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
@@ -36,8 +41,9 @@ h1,
 h2,
 h3 {
   margin: 0;
-  font-weight: 500;
-  letter-spacing: -0.02em;
+  /* Sweet Sans Pro Light karakteri: başlıklar Light (300), hafif negatif tracking. */
+  font-weight: 300;
+  letter-spacing: -0.015em;
 }
 
 ::selection {

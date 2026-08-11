@@ -9,7 +9,7 @@ import { pickLang, phoneHref, formatHours } from "@/lib/content";
 import { InstagramIcon, PhoneIcon, PinIcon, WhatsAppIcon } from "@/components/Icons";
 
 const heading = "mb-4 text-[13px] font-medium uppercase tracking-[0.14em] text-cream";
-const link = "text-[13px] leading-none text-[#d6c3bd] transition-colors hover:text-cream";
+const link = "text-[13px] leading-none text-[#e6cccd] transition-colors hover:text-cream";
 
 export function Footer() {
   const { lang, t } = useLang();
@@ -37,7 +37,7 @@ export function Footer() {
   ];
 
   return (
-    <footer className="bg-ink px-[clamp(18px,5vw,56px)] pb-10 pt-[clamp(52px,7vw,88px)] text-[#d6c3bd]">
+    <footer className="bg-ink px-[clamp(18px,5vw,56px)] pb-10 pt-[clamp(52px,7vw,88px)] text-[#e6cccd]">
       <div className="mx-auto grid max-w-[1160px] grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1.3fr]">
         {/* brand + social */}
         <div>
@@ -52,7 +52,7 @@ export function Footer() {
           <p className="mb-6 max-w-[280px] text-[13px] leading-[1.6]">
             {t.footerTag}
           </p>
-          <div className="text-[11px] uppercase tracking-[0.14em] text-[#9a857e]">
+          <div className="text-[11px] uppercase tracking-[0.14em] text-[#b78e8f]">
             {t.footerFollow}
           </div>
           <div className="mt-3 flex gap-3">
@@ -61,7 +61,7 @@ export function Footer() {
               target="_blank"
               rel="noreferrer"
               aria-label="Instagram"
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-cream/20 text-[#d6c3bd] transition-colors hover:border-cream hover:text-cream"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-cream/20 text-[#e6cccd] transition-colors hover:border-cream hover:text-cream"
             >
               <InstagramIcon size={16} />
             </a>
@@ -70,7 +70,7 @@ export function Footer() {
               target="_blank"
               rel="noreferrer"
               aria-label="WhatsApp"
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-cream/20 text-[#d6c3bd] transition-colors hover:border-cream hover:text-cream"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-cream/20 text-[#e6cccd] transition-colors hover:border-cream hover:text-cream"
             >
               <WhatsAppIcon size={16} />
             </a>
@@ -112,12 +112,12 @@ export function Footer() {
           <div className={heading}>{t.navContact}</div>
           <ul className="flex flex-col gap-[14px]">
             <li className="flex items-start gap-[10px] text-[13px] leading-[1.5]">
-              <PinIcon size={14} className="mt-[2px] flex-none text-rose" />
+              <PinIcon size={14} className="mt-[2px] flex-none text-blossom" />
               {settings.address}
             </li>
             <li>
               <a href={phoneHref(settings.phone)} className={`flex items-center gap-[10px] ${link}`}>
-                <PhoneIcon size={14} className="flex-none text-rose" />
+                <PhoneIcon size={14} className="flex-none text-blossom" />
                 {settings.phone}
               </a>
             </li>
@@ -140,7 +140,7 @@ export function Footer() {
         </div>
       </div>
 
-      <div className="mx-auto mt-12 flex max-w-[1160px] flex-col gap-2 border-t border-cream/[0.14] pt-6 text-[11px] tracking-[0.06em] text-[#9a857e] sm:flex-row sm:items-center sm:justify-between">
+      <div className="mx-auto mt-12 flex max-w-[1160px] flex-col gap-2 border-t border-cream/[0.14] pt-6 text-[11px] tracking-[0.06em] text-[#b78e8f] sm:flex-row sm:items-center sm:justify-between">
         <span>© 2026 Stria Studio · {t.footerRights}</span>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
           <span>Çankaya, Ankara</span>
@@ -157,7 +157,7 @@ export function Footer() {
           </span>
         </div>
       </div>
-      <p className="mx-auto mt-5 max-w-[1160px] text-[10.5px] leading-[1.65] text-[#9a857e]">
+      <p className="mx-auto mt-5 max-w-[1160px] text-[10.5px] leading-[1.65] text-[#b78e8f]">
         Bu web sitesindeki tüm içerikler yalnızca bilgilendirme amaçlıdır; tıbbi
         öneri niteliği taşımaz, teşhis ve tedavi amacıyla kullanılamaz. Bu site
         sağlık hizmeti vermemektedir. Uzmana danışılmadan yapılan uygulamalardan

@@ -50,7 +50,7 @@ export function Contact({
             {t.info.map((i) => (
               <div
                 key={i.label}
-                className="flex gap-4 border-b border-[#f5eae5] py-4 last:border-b-0"
+                className="flex gap-4 border-b border-[#f4e3e3] py-4 last:border-b-0"
               >
                 <div className="w-24 flex-none pt-[3px] text-[11px] uppercase tracking-[0.12em] text-accent">
                   {i.label}
@@ -58,7 +58,7 @@ export function Contact({
                 <div className="text-base leading-[1.5] text-ink">{i.value}</div>
               </div>
             ))}
-            <div className="mt-5 flex h-[150px] items-center justify-center rounded-[20px] bg-gradient-to-br from-pink to-[#e9c4b8] text-[11px] uppercase tracking-[0.16em] text-accent">
+            <div className="mt-5 flex h-[150px] items-center justify-center rounded-[20px] bg-gradient-to-br from-pink to-[#f1bcc1] text-[11px] uppercase tracking-[0.16em] text-accent">
               {t.mapPh}
             </div>
           </div>

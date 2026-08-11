@@ -71,14 +71,14 @@ export function Nav() {
       {showPromo && (
         <div
           ref={promoRef}
-          className="relative flex items-center justify-center bg-rose px-11 py-[9px] text-center text-xs font-medium tracking-[0.02em] text-white"
+          className="relative flex items-center justify-center bg-blossom px-11 py-[9px] text-center text-xs font-medium tracking-[0.02em] text-ink"
         >
           <span>{promoText}</span>
           <button
             type="button"
             aria-label={lang === "tr" ? "Kapat" : "Close"}
             onClick={dismissPromo}
-            className="absolute right-3 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-white/80 hover:bg-white/15 hover:text-white"
+            className="absolute right-3 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-ink/70 hover:bg-ink/10 hover:text-ink"
           >
             ✕
           </button>
@@ -86,7 +86,7 @@ export function Nav() {
       )}
 
       {/* contact bar */}
-      <div className="flex flex-wrap items-center justify-center gap-x-[clamp(14px,2.4vw,28px)] gap-y-1 bg-ink px-5 py-[9px] text-xs tracking-[0.02em] text-[#e7d3cc]">
+      <div className="flex flex-wrap items-center justify-center gap-x-[clamp(14px,2.4vw,28px)] gap-y-1 bg-ink px-5 py-[9px] text-xs tracking-[0.02em] text-[#eed6d7]">
         <a
           href={phoneHref(settings.phone)}
           className="inline-flex items-center gap-[7px] font-medium text-cream"
@@ -101,14 +101,14 @@ export function Nav() {
           href={settings.instagram}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex items-center gap-[7px] text-[#e7d3cc]"
+          className="inline-flex items-center gap-[7px] text-[#eed6d7]"
         >
           <InstagramIcon size={13} />
           Instagram
         </a>
         <span className="hidden opacity-40 sm:inline">·</span>
         <span className="hidden items-center gap-[6px] sm:inline-flex">
-          <PinIcon size={12} className="text-rose" />
+          <PinIcon size={12} className="text-blossom" />
           {settings.address}
         </span>
       </div>
@@ -154,7 +154,7 @@ export function Nav() {
           </button>
           <a
             href={phoneHref(settings.phone)}
-            className="hidden items-center gap-[7px] rounded-[24px] border border-[#e3c9c1] px-4 py-[10px] text-[12.5px] text-ink lg:inline-flex"
+            className="hidden items-center gap-[7px] rounded-[24px] border border-[#eed9d9] px-4 py-[10px] text-[12.5px] text-ink lg:inline-flex"
           >
             <PhoneIcon size={13} />
             {t.callLabel}
@@ -234,7 +234,7 @@ export function Nav() {
           <div className="mt-4 flex items-center gap-3">
             <a
               href={phoneHref(settings.phone)}
-              className="inline-flex flex-1 items-center justify-center gap-2 rounded-[24px] border border-[#e3c9c1] bg-white px-4 py-[12px] text-[13px] text-ink"
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-[24px] border border-[#eed9d9] bg-white px-4 py-[12px] text-[13px] text-ink"
             >
               <PhoneIcon size={14} />
               {t.callLabel}

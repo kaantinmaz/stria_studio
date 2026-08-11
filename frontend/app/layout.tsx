@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Jost } from "next/font/google";
+import { Outfit } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/components/LanguageProvider";
 import { ServicesProvider } from "@/components/ServicesProvider";
@@ -15,10 +15,15 @@ import { beautySalonSchema } from "@/components/schema";
 import { site } from "@/lib/site";
 import { getServices, getSettings, SETTINGS_FALLBACK } from "@/lib/content";
 
-const jost = Jost({
+// Marka fontu Sweet Sans Pro Light (ticari, Mark Simonson) — lisanslı woff2
+// dosyaları elimize geçtiğinde burası `next/font/local` ile değişir; tüketiciler
+// yalnız `--font-body` değişkenini bildiği için başka dosyaya dokunmak gerekmez.
+// O gelene kadar en yakın ücretsiz karşılık: Outfit (geometrik, logodaki
+// "studio" harflerine yakın).
+const body = Outfit({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
-  variable: "--font-jost",
+  weight: ["300", "400", "500"],
+  variable: "--font-body",
   display: "swap",
 });
 
@@ -51,7 +56,7 @@ export default async function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   const [services, settings] = await Promise.all([getServices(), getSettings()]);
   return (
-    <html lang="tr" className={jost.variable}>
+    <html lang="tr" className={body.variable}>
       {/* Admin-managed raw code, rendered inside <head> so verification meta
           tags and vendor snippets land where they are expected. Next's own
           metadata tags are hoisted into this same <head> by React.
