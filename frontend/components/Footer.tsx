@@ -42,11 +42,12 @@ export function Footer() {
         {/* brand + social */}
         <div>
           <Image
-            src="/logo.png"
+            src="/Stria_Studio_Logo.svg"
             alt="Stria Studio"
-            width={772}
-            height={371}
-            className="mb-4 h-10 w-auto [filter:brightness(0)_invert(1)]"
+            width={1000}
+            height={212}
+            unoptimized
+            className="mb-4 h-7 w-auto [filter:brightness(0)_invert(1)]"
           />
           <p className="mb-6 max-w-[280px] text-[13px] leading-[1.6]">
             {t.footerTag}

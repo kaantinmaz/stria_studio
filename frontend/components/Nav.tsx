@@ -117,12 +117,14 @@ export function Nav() {
       <nav className="flex items-center justify-between border-b border-ink/[0.06] bg-cream/[0.88] px-[clamp(18px,5vw,56px)] py-[12px] backdrop-blur-[14px]">
         <a href="/" aria-label="Stria Studio" className="flex items-center">
           <Image
-            src="/logo.png"
+            src="/Stria_Studio_Logo.svg"
             alt="Stria Studio"
-            width={772}
-            height={371}
+            width={1000}
+            height={212}
             priority
-            className="h-8 w-auto sm:h-9"
+            // SVG'ler optimizer'dan geçmez (dangerouslyAllowSVG kapalı) — doğrudan servis edilir.
+            unoptimized
+            className="h-6 w-auto sm:h-7"
           />
         </a>
 
