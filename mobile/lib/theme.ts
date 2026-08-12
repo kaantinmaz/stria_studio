@@ -1,15 +1,18 @@
 import type { TextStyle, ViewStyle } from 'react-native';
 
+// Palet web ile aynı kaynaktan: logo wordmark'ı #4c1313 + favicon zemini #e58792.
+// Web tarafındaki frontend/app/globals.css @theme bloğuyla eşleşir.
 export const colors = {
-  cream: '#fbf4f1',
-  ink: '#42302e',
-  accent: '#c57c69',
-  accentDark: '#b0654f',
-  rose: '#d89a8a',
-  pink: '#f3ded7',
-  blush: '#f5e6e0',
-  line: '#f1e2dc',
-  muted: '#8a6f6a',
+  cream: '#fdf6f5',
+  ink: '#4c1313',
+  accent: '#a83f54',
+  accentDark: '#8b2e42',
+  rose: '#bb4a5f',
+  blossom: '#e58792',
+  pink: '#f8dfe2',
+  blush: '#fbecec',
+  line: '#f4e3e3',
+  muted: '#8a6060',
   white: '#ffffff',
   amber: '#b7791f',
   amberBg: '#fff1cf',
@@ -38,10 +41,14 @@ export const radius = {
   pill: 999,
 } as const;
 
+// Sweet Sans Pro Light lisanslı dosyaları gelene kadar en yakın ücretsiz karşılık
+// (web ile aynı seçim). Küçük punto vurgular mobilde 600'de daha okunur kaldığı
+// için `semibold` korundu; Light yalnız büyük başlıklarda.
 export const fonts = {
-  regular: 'Jost_400Regular',
-  medium: 'Jost_500Medium',
-  semibold: 'Jost_600SemiBold',
+  light: 'Outfit_300Light',
+  regular: 'Outfit_400Regular',
+  medium: 'Outfit_500Medium',
+  semibold: 'Outfit_600SemiBold',
 } as const;
 
 export const shadows: Record<'soft', ViewStyle> = {
@@ -55,8 +62,8 @@ export const shadows: Record<'soft', ViewStyle> = {
 };
 
 export const typography: Record<'title' | 'heading' | 'body' | 'caption', TextStyle> = {
-  title: { fontFamily: fonts.semibold, fontSize: 30, lineHeight: 36, color: colors.ink },
-  heading: { fontFamily: fonts.semibold, fontSize: 21, lineHeight: 27, color: colors.ink },
+  title: { fontFamily: fonts.light, fontSize: 30, lineHeight: 36, color: colors.ink },
+  heading: { fontFamily: fonts.medium, fontSize: 21, lineHeight: 27, color: colors.ink },
   body: { fontFamily: fonts.regular, fontSize: 16, lineHeight: 23, color: colors.ink },
   caption: { fontFamily: fonts.regular, fontSize: 14, lineHeight: 20, color: colors.muted },
 };

@@ -103,7 +103,8 @@ const styles = StyleSheet.create({
   tabLabel: { fontFamily: fonts.medium, fontSize: 11, textTransform: 'none', marginTop: 2 },
   indicator: { top: 0, height: 2, backgroundColor: colors.accentDark },
   icon: { fontFamily: fonts.semibold, fontSize: 23, lineHeight: 25 },
-  logo: { width: 52, height: 24 },
+  // Yeni wordmark 4.72:1 — eski 52×24 kutusu (2.17:1) logoyu sıkıştırıyordu.
+  logo: { width: 58, height: 13 },
   badge: {
     minWidth: 18,
     height: 18,

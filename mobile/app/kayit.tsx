@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, router } from 'expo-router';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Button, Card, Field } from '@/components/ui';
 import { ApiError, api, fieldError, friendlyError } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
@@ -50,8 +50,7 @@ export default function RegisterScreen() {
     <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.content}>
         <View style={styles.brand}>
-          <Text style={styles.sparkle}>✦</Text>
-          <Text style={styles.brandName}>STRIA STUDIO</Text>
+          <Image source={require('../assets/logo.png')} style={styles.logo} resizeMode="contain" />
           <Text style={styles.title}>Aramıza hoş geldin</Text>
           <Text style={styles.subtitle}>Birkaç bilgiyle hesabını oluşturalım.</Text>
         </View>
@@ -116,8 +115,8 @@ const styles = StyleSheet.create({
   flex: { flex: 1, backgroundColor: colors.cream },
   content: { flexGrow: 1, justifyContent: 'center', padding: spacing.lg, paddingVertical: spacing.xxl, gap: spacing.lg },
   brand: { alignItems: 'center', gap: spacing.xs },
-  sparkle: { fontFamily: fonts.regular, fontSize: 36, color: colors.accent },
-  brandName: { fontFamily: fonts.semibold, fontSize: 13, letterSpacing: 2.4, color: colors.accentDark },
+  // Wordmark 4.72:1 — metin "✦ STRIA STUDIO" yerine gerçek logo.
+  logo: { width: 176, height: 37 },
   title: { ...typography.title, marginTop: spacing.sm, textAlign: 'center' },
   subtitle: { ...typography.body, color: colors.muted, textAlign: 'center' },
   form: { gap: spacing.md, width: '100%', maxWidth: 460, alignSelf: 'center' },

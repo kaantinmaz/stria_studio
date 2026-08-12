@@ -1,20 +1,26 @@
 import { useEffect } from 'react';
 import { Stack } from 'expo-router';
 import {
-  Jost_400Regular,
-  Jost_500Medium,
-  Jost_600SemiBold,
+  Outfit_300Light,
+  Outfit_400Regular,
+  Outfit_500Medium,
+  Outfit_600SemiBold,
   useFonts,
-} from '@expo-google-fonts/jost';
+} from '@expo-google-fonts/outfit';
 import { ActivityIndicator, StatusBar, StyleSheet, View } from 'react-native';
 import { AuthProvider } from '@/lib/auth-context';
 import { colors } from '@/lib/theme';
 
 export default function RootLayout() {
-  const [fontsLoaded, fontError] = useFonts({ Jost_400Regular, Jost_500Medium, Jost_600SemiBold });
+  const [fontsLoaded, fontError] = useFonts({
+    Outfit_300Light,
+    Outfit_400Regular,
+    Outfit_500Medium,
+    Outfit_600SemiBold,
+  });
 
   useEffect(() => {
-    if (fontError) console.warn('Jost fontu yüklenemedi:', fontError);
+    if (fontError) console.warn('Outfit fontu yüklenemedi:', fontError);
   }, [fontError]);
 
   if (!fontsLoaded && !fontError) {

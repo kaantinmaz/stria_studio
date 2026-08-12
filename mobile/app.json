@@ -10,7 +10,7 @@
     "ios": {
       "bundleIdentifier": "com.striastudio.app",
       "supportsTablet": false,
-      "buildNumber": "1"
+      "buildNumber": "2"
     },
     "android": {
       "package": "com.striastudio.app"
@@ -23,7 +23,7 @@
         {
           "image": "./assets/splash.png",
           "imageWidth": 220,
-          "backgroundColor": "#fbf4f1"
+          "backgroundColor": "#fdf6f5"
         }
       ]
     ],
