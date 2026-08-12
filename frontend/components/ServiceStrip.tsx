@@ -7,9 +7,16 @@ import { pickLang } from "@/lib/content";
 import { ImageSlot } from "@/components/ImageSlot";
 
 // Compact 4-across highlight strip right under the hero (like the hero's featured card).
+// Öne çıkanlar owner tarafından sabitlendi — API sırası değil; listede olmayan
+// slug sessizce atlanır (hizmet adminden kaldırılırsa şerit bozulmasın).
+const FEATURED = ["microblading", "kas-pudralama", "kas-laminasyon", "kirpik-lifting"];
+
 export function ServiceStrip() {
   const { lang } = useLang();
-  const services = useServices().slice(0, 4);
+  const all = useServices();
+  const services = FEATURED.map((slug) => all.find((s) => s.slug === slug)).filter(
+    (s): s is NonNullable<typeof s> => Boolean(s),
+  );
   if (services.length === 0) return null;
 
   return (
