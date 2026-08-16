@@ -6,6 +6,7 @@ import { useSettings } from "@/components/SettingsProvider";
 import { formatHours, phoneHref, pickLang, type LinkItem } from "@/lib/content";
 import {
   CalendarIcon,
+  GoogleIcon,
   InstagramIcon,
   LinkIcon,
   MailIcon,
@@ -25,6 +26,7 @@ const ICONS = {
   mail: MailIcon,
   tiktok: TikTokIcon,
   youtube: YouTubeIcon,
+  google: GoogleIcon,
   web: LinkIcon,
 } as const;
 

@@ -71,3 +71,16 @@ export function YouTubeIcon({ size = 16, className }: IconProps) {
     </svg>
   );
 }
+
+/** Google's four-colour "G". Brand guidelines forbid recolouring, so this one
+    ignores the caller's text colour and keeps its own fills. */
+export function GoogleIcon({ size = 16, className }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} aria-hidden="true">
+      <path fill="#4285F4" d="M23.5 12.27c0-.85-.08-1.67-.22-2.45H12v4.64h6.44a5.5 5.5 0 0 1-2.39 3.61v3h3.86c2.26-2.08 3.59-5.15 3.59-8.8Z" />
+      <path fill="#34A853" d="M12 24c3.24 0 5.96-1.08 7.95-2.91l-3.86-3a7.2 7.2 0 0 1-4.09 1.17 7.19 7.19 0 0 1-6.76-4.98H1.25v3.1A12 12 0 0 0 12 24Z" />
+      <path fill="#FBBC05" d="M5.24 14.28a7.2 7.2 0 0 1 0-4.56v-3.1H1.25a12 12 0 0 0 0 10.76l3.99-3.1Z" />
+      <path fill="#EA4335" d="M12 4.75c1.76 0 3.34.6 4.58 1.79l3.42-3.42C17.95 1.19 15.24 0 12 0A12 12 0 0 0 1.25 6.62l3.99 3.1A7.19 7.19 0 0 1 12 4.75Z" />
+    </svg>
+  );
+}

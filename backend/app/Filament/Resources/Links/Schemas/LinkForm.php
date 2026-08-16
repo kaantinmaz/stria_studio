@@ -34,6 +34,7 @@ class LinkForm
                         'whatsapp' => 'WhatsApp',
                         'instagram' => 'Instagram',
                         'phone' => 'Telefon',
+                        'google' => 'Google',
                         'map' => 'Konum',
                         'calendar' => 'Randevu',
                         'mail' => 'E-posta',
