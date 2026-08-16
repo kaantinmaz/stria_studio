@@ -27,7 +27,7 @@ class LinkSeeder extends Seeder
             ['label_tr' => 'Kamuflaj Makyaj', 'label_en' => 'Camouflage Make-up', 'url' => '/hizmetler/kamuflaj-makyaj', 'icon' => 'web'],
             ['label_tr' => 'Çalışmalarımız', 'label_en' => 'Our Work', 'subtitle_tr' => 'Öncesi–sonrası galeri', 'url' => '/galeri', 'icon' => 'web'],
             ['label_tr' => 'Instagram', 'label_en' => 'Instagram', 'subtitle_tr' => '@striastudio', 'url' => 'https://instagram.com/striastudio', 'icon' => 'instagram'],
-            ['label_tr' => 'Konum & Ulaşım', 'label_en' => 'Location', 'subtitle_tr' => 'Çankaya, Ankara · Pzt–Cmt 10:00–19:00', 'url' => '/iletisim', 'icon' => 'map'],
+            ['label_tr' => 'Konum & Ulaşım', 'label_en' => 'Location', 'subtitle_tr' => 'Çankaya, Ankara · Yol tarifi ve iletişim', 'subtitle_en' => 'Çankaya, Ankara · Directions', 'url' => '/iletisim', 'icon' => 'map'],
             ['label_tr' => 'My Lamination Ürünleri', 'label_en' => 'My Lamination Products', 'url' => '/mylamination', 'icon' => 'web'],
             ['label_tr' => 'Blog', 'label_en' => 'Blog', 'url' => '/blog', 'icon' => 'web'],
         ];
