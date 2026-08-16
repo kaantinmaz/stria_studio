@@ -31,3 +31,43 @@ export function PinIcon({ size = 12, className }: IconProps) {
     </svg>
   );
 }
+
+export function LinkIcon({ size = 16, className }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M9.9 15.5 8.5 14.1l5.6-5.6 1.4 1.4-5.6 5.6ZM7.8 18.9a4.2 4.2 0 0 1-3-7.2l2.6-2.6L8.8 10.5l-2.6 2.6a2.2 2.2 0 0 0 3.1 3.1l2.6-2.6 1.4 1.4-2.6 2.6a4.2 4.2 0 0 1-2.9 1.3Zm8.1-8.2-1.4-1.4 2.6-2.6a2.2 2.2 0 0 0-3.1-3.1l-2.6 2.6L10 4.8l2.6-2.6a4.2 4.2 0 0 1 6 6l-2.7 2.5Z" />
+    </svg>
+  );
+}
+
+export function CalendarIcon({ size = 16, className }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M7 2v2H5.5A2.5 2.5 0 0 0 3 6.5v13A2.5 2.5 0 0 0 5.5 22h13a2.5 2.5 0 0 0 2.5-2.5v-13A2.5 2.5 0 0 0 18.5 4H17V2h-2v2H9V2H7Zm12 8v9.5a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5V10h14Zm-9 2H7v3h3v-3Z" />
+    </svg>
+  );
+}
+
+export function MailIcon({ size = 16, className }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M3 6.5A2.5 2.5 0 0 1 5.5 4h13A2.5 2.5 0 0 1 21 6.5v11a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5v-11Zm2.3-.5 6.7 5.2L18.7 6H5.3ZM19 8.1l-6.4 5a1 1 0 0 1-1.2 0L5 8.1v9.4c0 .28.22.5.5.5h13a.5.5 0 0 0 .5-.5V8.1Z" />
+    </svg>
+  );
+}
+
+export function TikTokIcon({ size = 16, className }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M16.6 2h-3v13.1a2.6 2.6 0 1 1-2.6-2.6c.27 0 .53.04.78.12V9.5a5.7 5.7 0 1 0 4.82 5.63V8.4a6.3 6.3 0 0 0 3.4 1.03V6.4a3.4 3.4 0 0 1-3.4-3.4V2Z" />
+    </svg>
+  );
+}
+
+export function YouTubeIcon({ size = 16, className }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M21.6 7.2a2.6 2.6 0 0 0-1.83-1.84C18.16 4.93 12 4.93 12 4.93s-6.16 0-7.77.43A2.6 2.6 0 0 0 2.4 7.2C2 8.8 2 12 2 12s0 3.2.4 4.8a2.6 2.6 0 0 0 1.83 1.84c1.61.43 7.77.43 7.77.43s6.16 0 7.77-.43a2.6 2.6 0 0 0 1.83-1.84C22 15.2 22 12 22 12s0-3.2-.4-4.8ZM10 15.2V8.8l5.2 3.2L10 15.2Z" />
+    </svg>
+  );
+}

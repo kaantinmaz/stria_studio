@@ -12,6 +12,7 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\GalleryController;
+use App\Http\Controllers\LinkController;
 use App\Http\Controllers\MicrositeController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SettingController;
@@ -33,6 +34,8 @@ Route::get('/settings', [SettingController::class, 'show']);
 
 Route::get('/gallery', [GalleryController::class, 'index']);
 Route::get('/faqs', [FaqController::class, 'index']);
+
+Route::get('/links', [LinkController::class, 'index']);
 
 Route::post('/track', [TrackController::class, 'store'])->middleware('throttle:120,1');
 

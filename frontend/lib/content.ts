@@ -176,6 +176,22 @@ export async function getFaqs(): Promise<FaqItem[]> {
   return out?.data ?? [];
 }
 
+/** One row of the /linkler bio-link page (admin-managed). */
+export type LinkItem = {
+  label_tr: string;
+  label_en: string | null;
+  subtitle_tr: string | null;
+  subtitle_en: string | null;
+  url: string;
+  icon: string;
+  is_featured: boolean;
+};
+
+export async function getLinks(): Promise<LinkItem[]> {
+  const out = await api<{ data: LinkItem[] }>("/links");
+  return out?.data ?? [];
+}
+
 export function phoneHref(phone: string): string {
   return "tel:" + (phone || "").replace(/[^\d+]/g, "");
 }

@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
         $this->call(SettingSeeder::class);
         $this->call(GalleryImageSeeder::class);
         $this->call(FaqSeeder::class);
+        $this->call(LinkSeeder::class);
         $this->call(MicrositeSeeder::class);
         $this->call(MainPostSeeder::class);
     }
