@@ -3,3 +3,11 @@
 .env
 .env.*
 !.env.example
+
+# Yerel varlık/araştırma klasörleri — uygulama kodu değil, deploy edilmiyor.
+# (reklam kampanyası görsel/video/metinleri, ham araştırma dökümleri, ham foto
+# stajı, üretim çıktıları) Repoyu onlarca MB şişirmesin.
+/marketing/
+/marketing-research/
+/örnek görseller/
+/output/
