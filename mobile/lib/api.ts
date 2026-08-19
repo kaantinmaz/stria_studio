@@ -8,8 +8,10 @@ import type {
   ChatMessage,
   GalleryImage,
   MeData,
+  NotificationFeed,
   Service,
   SlotData,
+  User,
   ValidationErrors,
 } from './types';
 
@@ -105,6 +107,37 @@ export const api = {
     return response.data;
   },
 
+  async pair(token: string) {
+    const response = await request<{ data: AuthData }>(`${APP_API_URL}/pair`, {
+      method: 'POST',
+      auth: false,
+      body: { token },
+    });
+    return response.data;
+  },
+
+  async updateProfile(payload: { name: string; phone?: string }) {
+    const response = await request<{ data: { user: User } }>(`${APP_API_URL}/profile`, {
+      method: 'POST',
+      body: payload,
+    });
+    return response.data;
+  },
+
+  // password: ilk kez belirlerken zorunlu, sonradan yalnız değiştirmek isterken.
+  // currentPassword: hesabın şifresi varsa zorunlu.
+  async setCredentials(payload: { email: string; password?: string; currentPassword?: string }) {
+    const response = await request<{ data: { user: User } }>(`${APP_API_URL}/credentials`, {
+      method: 'POST',
+      body: {
+        email: payload.email,
+        ...(payload.password ? { password: payload.password } : {}),
+        ...(payload.currentPassword ? { current_password: payload.currentPassword } : {}),
+      },
+    });
+    return response.data;
+  },
+
   logout: () => request<void>(`${APP_API_URL}/logout`, { method: 'POST' }),
 
   deleteAccount: () => request<void>(`${APP_API_URL}/account`, { method: 'DELETE' }),
@@ -119,8 +152,17 @@ export const api = {
     return response.data;
   },
 
-  async slots(date: string) {
-    const response = await request<{ data: SlotData }>(`${APP_API_URL}/slots?date=${encodeURIComponent(date)}`);
+  async notifications() {
+    const response = await request<{ data: NotificationFeed }>(`${APP_API_URL}/notifications`);
+    return response.data;
+  },
+
+  markNotificationsSeen: () =>
+    request<{ data: { unread: number } }>(`${APP_API_URL}/notifications/seen`, { method: 'POST' }),
+
+  async slots(date: string, serviceSlug: string) {
+    const query = `date=${encodeURIComponent(date)}&service_slug=${encodeURIComponent(serviceSlug)}`;
+    const response = await request<{ data: SlotData }>(`${APP_API_URL}/slots?${query}`);
     return response.data;
   },
 

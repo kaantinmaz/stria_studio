@@ -2,8 +2,9 @@ export type User = {
   id: number;
   code: string;
   name: string;
-  email: string;
+  email: string | null;
   phone: string | null;
+  has_password: boolean;
   customer_linked: boolean;
 };
 
@@ -20,6 +21,7 @@ export type Loyalty = {
 export type MeData = {
   user: User;
   loyalty: Loyalty | null;
+  unread_notifications: number;
 };
 
 export type AuthData = {
@@ -63,11 +65,27 @@ export type Announcement = {
   created_at: string;
 };
 
+export type AppNotification = {
+  id: string;
+  kind: 'announcement' | 'campaign';
+  title: string;
+  body: string | null;
+  image: string | null;
+  created_at: string | null;
+  is_new: boolean;
+};
+
+export type NotificationFeed = {
+  unread: number;
+  items: AppNotification[];
+};
+
 export type Service = {
   name_tr: string;
   name_en: string;
   slug: string;
   image: string | null;
+  duration_min: number;
 };
 
 export type GalleryImage = {
@@ -79,6 +97,7 @@ export type GalleryImage = {
 
 export type SlotData = {
   date: string;
+  duration_min: number;
   slots: string[];
 };
 

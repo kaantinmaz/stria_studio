@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, router } from 'expo-router';
-import { Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, KeyboardAvoidingView, Linking, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Button, Card, Field } from '@/components/ui';
 import { ApiError, api, fieldError, friendlyError } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
@@ -75,6 +75,10 @@ export default function LoginScreen() {
           İlk kez mi geliyorsun?{' '}
           <Link href="/kayit" style={styles.link}>Hesap oluştur</Link>
         </Text>
+
+        <Text style={styles.legalText}>
+          <Text style={styles.link} onPress={() => void Linking.openURL('https://striastudio.com.tr/gizlilik-politikasi')}>Gizlilik Politikası</Text>
+        </Text>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -91,5 +95,6 @@ const styles = StyleSheet.create({
   form: { gap: spacing.md, width: '100%', maxWidth: 460, alignSelf: 'center' },
   formError: { fontFamily: fonts.regular, color: colors.danger, textAlign: 'center' },
   switchText: { ...typography.body, color: colors.muted, textAlign: 'center' },
+  legalText: { ...typography.caption, textAlign: 'center' },
   link: { fontFamily: fonts.semibold, color: colors.accentDark },
 });

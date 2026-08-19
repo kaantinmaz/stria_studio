@@ -29,6 +29,10 @@ PODS:
     - Yoga
   - ExpoAsset (57.0.5):
     - ExpoModulesCore
+  - ExpoCamera (57.0.3):
+    - ExpoModulesCore
+  - ExpoCameraBarcodeScanning (57.0.3):
+    - ExpoCamera
   - ExpoClipboard (57.0.1):
     - ExpoModulesCore
   - ExpoDomWebView (57.0.1):
@@ -2277,6 +2281,8 @@ DEPENDENCIES:
   - EXConstants (from `../node_modules/expo-constants/ios`)
   - Expo (from `../node_modules/expo`)
   - ExpoAsset (from `../node_modules/expo-asset/ios`)
+  - ExpoCamera (from `../node_modules/expo-camera/ios/ExpoCamera.podspec`)
+  - ExpoCameraBarcodeScanning (from `../node_modules/expo-camera/ios/ExpoCameraBarcodeScanning.podspec`)
   - ExpoClipboard (from `../node_modules/expo-clipboard/ios`)
   - "ExpoDomWebView (from `../node_modules/@expo/dom-webview/ios`)"
   - ExpoFileSystem (from `../node_modules/expo-file-system/ios/ExpoFileSystem.podspec`)
@@ -2389,6 +2395,10 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo"
   ExpoAsset:
     :path: "../node_modules/expo-asset/ios"
+  ExpoCamera:
+    :podspec: "../node_modules/expo-camera/ios/ExpoCamera.podspec"
+  ExpoCameraBarcodeScanning:
+    :podspec: "../node_modules/expo-camera/ios/ExpoCameraBarcodeScanning.podspec"
   ExpoClipboard:
     :path: "../node_modules/expo-clipboard/ios"
   ExpoDomWebView:
@@ -2593,6 +2603,8 @@ SPEC CHECKSUMS:
   EXConstants: 12c2e6c69e21f3469f78f102072320fef2af46e3
   Expo: a218580724ffeb2e0c3c3d676a1b824704c33ecb
   ExpoAsset: 05797403b7ab18f56ea9ab1026ef8475f8457ed4
+  ExpoCamera: a5e9d9ce2fc06689eb2dd676f1f8d5f22f8aa292
+  ExpoCameraBarcodeScanning: b869ac87ebe30bb99b26c55b0e0471301383c90b
   ExpoClipboard: 95055b11758f339b61d4d8064dd799df1cf03b7f
   ExpoDomWebView: beaec034e51bd028428b98bb1f2633ab79c6d095
   ExpoFileSystem: e441dae0ae671fc451640517550973d9e024fdf0

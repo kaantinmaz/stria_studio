@@ -78,22 +78,38 @@ export default function BookingScreen() {
     }
   }, [matchedCampaign, selectedCampaignId]);
 
+  const selectedServiceRecord = useMemo(
+    () => services?.find((service) => service.slug === selectedService) ?? null,
+    [services, selectedService],
+  );
+
+  // Süre hizmete göre değiştiği için saatler ancak işlem seçildikten sonra
+  // istenebilir: 100 dakikalık işlemde 11:00 kapalı, 30 dakikalıkta açık.
   useEffect(() => {
+    if (!selectedService) {
+      setSlots(null);
+      setSlotError(null);
+      setSelectedTime(null);
+
+      return;
+    }
+
     let active = true;
     setSlots(null);
     setSlotError(null);
     setSelectedTime(null);
-    api.slots(dateKey)
+    api.slots(dateKey, selectedService)
       .then((data) => {
         if (active) setSlots(data.slots);
       })
       .catch((caught) => {
         if (active) setSlotError(caught);
       });
+
     return () => {
       active = false;
     };
-  }, [dateKey, slotReloadKey]);
+  }, [dateKey, selectedService, slotReloadKey]);
 
   async function submit() {
     if (!selectedTime || !selectedService) return;
@@ -144,67 +160,11 @@ export default function BookingScreen() {
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
       <View style={styles.inner}>
-        <PageHeader title="Randevu Al" description="Sana uygun günü, saati ve işlemi seç." />
+        <PageHeader title="Randevu Al" description="Önce işlemi, sonra günü ve saati seç." />
 
         <View style={styles.section}>
           <View style={styles.sectionHeading}>
             <Text style={styles.step}>1</Text>
-            <View style={styles.flex}>
-              <Text style={styles.sectionTitle}>Gün seç</Text>
-              <Text style={styles.sectionSubtitle}>{monthName(selectedDate)}</Text>
-            </View>
-          </View>
-          <FlatList
-            horizontal
-            data={nextThirtyDays}
-            keyExtractor={toDateKey}
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.dayList}
-            renderItem={({ item, index }: { item: Date; index: number }) => {
-              const selected = toDateKey(item) === dateKey;
-              return (
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityState={{ selected }}
-                  onPress={() => setSelectedDate(item)}
-                  style={[styles.dayChip, selected && styles.dayChipSelected]}
-                >
-                  <Text style={[styles.dayName, selected && styles.dayTextSelected]}>{index === 0 ? 'Bugün' : shortDay(item)}</Text>
-                  <Text style={[styles.dayNumber, selected && styles.dayTextSelected]}>{item.getDate()}</Text>
-                </Pressable>
-              );
-            }}
-          />
-        </View>
-
-        <View style={styles.section}>
-          <View style={styles.sectionHeading}>
-            <Text style={styles.step}>2</Text>
-            <Text style={styles.sectionTitle}>Saat seç</Text>
-          </View>
-          {!slots && !slotError ? <LoadingState label="Uygun saatlere bakılıyor…" /> : null}
-          {slotError ? <ErrorState message={friendlyError(slotError)} onRetry={() => setSlotReloadKey((key) => key + 1)} /> : null}
-          {slots?.length === 0 ? <Card style={styles.emptySlots}><Text style={styles.emptyText}>Bu gün için uygun saat yok</Text></Card> : null}
-          {slots?.length ? (
-            <View style={styles.chipGrid}>
-              {slots.map((slot) => {
-                const selected = selectedTime === slot;
-                return (
-                  <Pressable key={slot} onPress={() => setSelectedTime(slot)} style={[styles.timeChip, selected && styles.choiceSelected]}>
-                    <Text style={[styles.choiceText, selected && styles.choiceTextSelected]}>{slot}</Text>
-                  </Pressable>
-                );
-              })}
-            </View>
-          ) : null}
-          {fieldError(submitError, 'time') || fieldError(submitError, 'date') ? (
-            <Text style={styles.validationText}>{fieldError(submitError, 'time') ?? fieldError(submitError, 'date')}</Text>
-          ) : null}
-        </View>
-
-        <View style={styles.section}>
-          <View style={styles.sectionHeading}>
-            <Text style={styles.step}>3</Text>
             <Text style={styles.sectionTitle}>İşlem seç</Text>
           </View>
           {!services && !serviceError ? <LoadingState label="Hizmetler yükleniyor…" /> : null}
@@ -220,7 +180,10 @@ export default function BookingScreen() {
                 style={[styles.serviceCard, selected && styles.serviceCardSelected]}
               >
                 <View style={[styles.radio, selected && styles.radioSelected]}>{selected ? <View style={styles.radioDot} /> : null}</View>
-                <Text style={[styles.serviceName, selected && styles.serviceNameSelected]}>{service.name_tr}</Text>
+                <View style={styles.flex}>
+                  <Text style={[styles.serviceName, selected && styles.serviceNameSelected]}>{service.name_tr}</Text>
+                  <Text style={styles.serviceDuration}>≈ {service.duration_min} dk</Text>
+                </View>
               </Pressable>
             );
           })}
@@ -262,6 +225,80 @@ export default function BookingScreen() {
 
         <View style={styles.section}>
           <View style={styles.sectionHeading}>
+            <Text style={styles.step}>2</Text>
+            <View style={styles.flex}>
+              <Text style={styles.sectionTitle}>Gün seç</Text>
+              <Text style={styles.sectionSubtitle}>{monthName(selectedDate)}</Text>
+            </View>
+          </View>
+          <FlatList
+            horizontal
+            data={nextThirtyDays}
+            keyExtractor={toDateKey}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.dayList}
+            renderItem={({ item, index }: { item: Date; index: number }) => {
+              const selected = toDateKey(item) === dateKey;
+              return (
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityState={{ selected }}
+                  onPress={() => setSelectedDate(item)}
+                  style={[styles.dayChip, selected && styles.dayChipSelected]}
+                >
+                  <Text style={[styles.dayName, selected && styles.dayTextSelected]}>{index === 0 ? 'Bugün' : shortDay(item)}</Text>
+                  <Text style={[styles.dayNumber, selected && styles.dayTextSelected]}>{item.getDate()}</Text>
+                </Pressable>
+              );
+            }}
+          />
+        </View>
+
+        <View style={styles.section}>
+          <View style={styles.sectionHeading}>
+            <Text style={styles.step}>3</Text>
+            <View style={styles.flex}>
+              <Text style={styles.sectionTitle}>Saat seç</Text>
+              {selectedServiceRecord ? (
+                <Text style={styles.durationHint}>
+                  {selectedServiceRecord.name_tr} ≈ {selectedServiceRecord.duration_min} dk sürüyor
+                </Text>
+              ) : null}
+            </View>
+          </View>
+          {!selectedService ? (
+            <Card style={styles.emptySlots}>
+              <Text style={styles.emptyText}>Uygun saatleri görmek için önce işlemi seç</Text>
+            </Card>
+          ) : null}
+          {selectedService && !slots && !slotError ? <LoadingState label="Uygun saatlere bakılıyor…" /> : null}
+          {slotError ? <ErrorState message={friendlyError(slotError)} onRetry={() => setSlotReloadKey((key) => key + 1)} /> : null}
+          {slots?.length === 0 ? <Card style={styles.emptySlots}><Text style={styles.emptyText}>Bu gün için uygun saat yok</Text></Card> : null}
+          {slots?.length ? (
+            <View style={styles.chipGrid}>
+              {slots.map((slot) => {
+                const selected = selectedTime === slot;
+                return (
+                  <Pressable
+                    key={slot}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected }}
+                    onPress={() => setSelectedTime(slot)}
+                    style={[styles.timeChip, selected && styles.choiceSelected]}
+                  >
+                    <Text style={[styles.choiceText, selected && styles.choiceTextSelected]}>{slot}</Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          ) : null}
+          {fieldError(submitError, 'time') || fieldError(submitError, 'date') ? (
+            <Text style={styles.validationText}>{fieldError(submitError, 'time') ?? fieldError(submitError, 'date')}</Text>
+          ) : null}
+        </View>
+
+        <View style={styles.section}>
+          <View style={styles.sectionHeading}>
             <Text style={styles.step}>4</Text>
             <Text style={styles.sectionTitle}>Notun var mı?</Text>
           </View>
@@ -295,7 +332,7 @@ export default function BookingScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.cream },
-  content: { paddingHorizontal: spacing.lg, paddingTop: 56, paddingBottom: spacing.xxl },
+  content: { paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: spacing.xxl },
   inner: { width: '100%', maxWidth: 720, alignSelf: 'center', gap: spacing.xl },
   flex: { flex: 1 },
   section: { gap: spacing.md },
@@ -303,6 +340,8 @@ const styles = StyleSheet.create({
   step: { fontFamily: fonts.semibold, fontSize: 14, color: colors.white, backgroundColor: colors.accent, width: 28, height: 28, lineHeight: 28, textAlign: 'center', borderRadius: 14 },
   sectionTitle: typography.heading,
   sectionSubtitle: { ...typography.caption, textTransform: 'capitalize' },
+  // sectionSubtitle ay adını büyütmek için capitalize; süre metni bozulmasın.
+  durationHint: { ...typography.caption },
   dayList: { gap: spacing.sm, paddingRight: spacing.lg },
   dayChip: { width: 72, height: 84, alignItems: 'center', justifyContent: 'center', borderRadius: radius.md, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line },
   dayChipSelected: { backgroundColor: colors.rose, borderColor: colors.rose },
@@ -322,7 +361,8 @@ const styles = StyleSheet.create({
   radio: { width: 22, height: 22, borderRadius: 11, borderWidth: 1.5, borderColor: colors.rose, alignItems: 'center', justifyContent: 'center' },
   radioSelected: { borderColor: colors.accentDark },
   radioDot: { width: 11, height: 11, borderRadius: 6, backgroundColor: colors.accentDark },
-  serviceName: { flex: 1, fontFamily: fonts.medium, fontSize: 17, color: colors.ink },
+  serviceName: { fontFamily: fonts.medium, fontSize: 17, color: colors.ink },
+  serviceDuration: { fontFamily: fonts.regular, fontSize: 13, color: colors.muted, marginTop: 1 },
   serviceNameSelected: { color: colors.accentDark },
   campaignCard: { borderWidth: 1, borderColor: colors.accent, backgroundColor: colors.blush, borderRadius: radius.md, padding: spacing.md, gap: spacing.sm },
   campaignTitle: { fontFamily: fonts.semibold, fontSize: 16, color: colors.accentDark },

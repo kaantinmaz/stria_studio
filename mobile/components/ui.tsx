@@ -82,10 +82,9 @@ export function Field({ label, error, hint, style, ...props }: FieldProps) {
   );
 }
 
-export function PageHeader({ eyebrow, title, description }: { eyebrow?: string; title: string; description?: string }) {
+export function PageHeader({ title, description }: { title: string; description?: string }) {
   return (
     <View style={styles.header}>
-      {eyebrow ? <Text style={styles.eyebrow}>{eyebrow}</Text> : null}
       <Text style={styles.title}>{title}</Text>
       {description ? <Text style={styles.description}>{description}</Text> : null}
     </View>
@@ -169,7 +168,6 @@ const styles = StyleSheet.create({
   errorText: { fontFamily: fonts.regular, fontSize: 13, color: colors.danger, marginLeft: spacing.xs },
   hint: { ...typography.caption, marginLeft: spacing.xs },
   header: { gap: spacing.xs, marginBottom: spacing.md },
-  eyebrow: { fontFamily: fonts.semibold, color: colors.accentDark, fontSize: 13, letterSpacing: 1.4, textTransform: 'uppercase' },
   title: typography.title,
   description: { ...typography.body, color: colors.muted },
   state: { flex: 1, minHeight: 280, alignItems: 'center', justifyContent: 'center', gap: spacing.md, padding: spacing.xl },

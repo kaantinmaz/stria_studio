@@ -27,3 +27,26 @@ export async function clearToken() {
   }
   await SecureStore.deleteItemAsync(TOKEN_KEY);
 }
+
+const CHAT_CONSENT_KEY = 'chat_consent_v1';
+
+export async function getChatConsent() {
+  if (hasWebStorage()) return globalThis.localStorage.getItem(CHAT_CONSENT_KEY) === '1';
+  return (await SecureStore.getItemAsync(CHAT_CONSENT_KEY)) === '1';
+}
+
+export async function setChatConsent() {
+  if (hasWebStorage()) {
+    globalThis.localStorage.setItem(CHAT_CONSENT_KEY, '1');
+    return;
+  }
+  await SecureStore.setItemAsync(CHAT_CONSENT_KEY, '1');
+}
+
+export async function clearChatConsent() {
+  if (hasWebStorage()) {
+    globalThis.localStorage.removeItem(CHAT_CONSENT_KEY);
+    return;
+  }
+  await SecureStore.deleteItemAsync(CHAT_CONSENT_KEY);
+}

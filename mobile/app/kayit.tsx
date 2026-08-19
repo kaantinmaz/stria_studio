@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, router } from 'expo-router';
-import { Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, KeyboardAvoidingView, Linking, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, Card, Field } from '@/components/ui';
 import { ApiError, api, fieldError, friendlyError } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
@@ -8,6 +9,7 @@ import { colors, fonts, spacing, typography } from '@/lib/theme';
 
 export default function RegisterScreen() {
   const { saveSession } = useAuth();
+  const insets = useSafeAreaInsets();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -48,11 +50,27 @@ export default function RegisterScreen() {
 
   return (
     <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.content}>
+      <ScrollView
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.lg }]}
+      >
         <View style={styles.brand}>
           <Image source={require('../assets/logo.png')} style={styles.logo} resizeMode="contain" />
           <Text style={styles.title}>Aramıza hoş geldin</Text>
           <Text style={styles.subtitle}>Birkaç bilgiyle hesabını oluşturalım.</Text>
+        </View>
+
+        <Card style={styles.qrCard}>
+          <Button title="QR ile kayıt ol" onPress={() => router.push('/qr-kayit')} />
+          <Text style={styles.qrDescription}>
+            Stüdyoda sana gösterilen kareyi okut; bilgilerini yazmana gerek kalmaz, randevuların hesabına hazır gelir.
+          </Text>
+        </Card>
+
+        <View style={styles.divider}>
+          <View style={styles.dividerLine} />
+          <Text style={styles.dividerText}>ya da bilgilerini kendin yaz</Text>
+          <View style={styles.dividerLine} />
         </View>
 
         <Card style={styles.form}>
@@ -106,6 +124,12 @@ export default function RegisterScreen() {
         <Text style={styles.switchText}>
           Zaten hesabın var mı? <Link href="/giris" style={styles.link}>Giriş yap</Link>
         </Text>
+
+        <Text style={styles.legalText}>
+          Hesap oluşturarak{' '}
+          <Text style={styles.link} onPress={() => void Linking.openURL('https://striastudio.com.tr/gizlilik-politikasi')}>Gizlilik Politikası</Text>
+          'nı kabul etmiş olursun.
+        </Text>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -120,7 +144,13 @@ const styles = StyleSheet.create({
   title: { ...typography.title, marginTop: spacing.sm, textAlign: 'center' },
   subtitle: { ...typography.body, color: colors.muted, textAlign: 'center' },
   form: { gap: spacing.md, width: '100%', maxWidth: 460, alignSelf: 'center' },
+  qrCard: { gap: spacing.md, width: '100%', maxWidth: 460, alignSelf: 'center', backgroundColor: colors.pink },
+  qrDescription: { ...typography.caption, color: colors.muted, textAlign: 'center' },
+  divider: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, width: '100%', maxWidth: 460, alignSelf: 'center' },
+  dividerLine: { flex: 1, height: 1, backgroundColor: colors.line },
+  dividerText: { fontFamily: fonts.regular, fontSize: 13, color: colors.muted },
   formError: { fontFamily: fonts.regular, color: colors.danger, textAlign: 'center' },
   switchText: { ...typography.body, color: colors.muted, textAlign: 'center' },
+  legalText: { ...typography.caption, textAlign: 'center' },
   link: { fontFamily: fonts.semibold, color: colors.accentDark },
 });

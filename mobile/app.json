@@ -10,7 +10,10 @@
     "ios": {
       "bundleIdentifier": "com.striastudio.app",
       "supportsTablet": false,
-      "buildNumber": "2"
+      "buildNumber": "3",
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.striastudio.app"
@@ -24,6 +27,12 @@
           "image": "./assets/splash.png",
           "imageWidth": 220,
           "backgroundColor": "#fdf6f5"
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "QR kodunu okutup hesabını açman için kamerayı kullanıyoruz."
         }
       ]
     ],

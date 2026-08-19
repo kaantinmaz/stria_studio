@@ -244,7 +244,8 @@ export default function HomeScreen() {
           </View>
         ) : null}
 
-        <PageHeader eyebrow="STRIA STUDIO" title={`Merhaba, ${user?.name.split(' ')[0] ?? ''} ✦`} description="Bugün kendin için güzel bir şey yap." />
+        {/* Marka artık üst çubuktaki logoda; eyebrow tekrar olurdu. */}
+        <PageHeader title={`Merhaba, ${user?.name.split(' ')[0] ?? ''} ✦`} description="Bugün kendin için güzel bir şey yap." />
 
         {error ? <ErrorState message={friendlyError(error)} onRetry={() => void load()} /> : null}
 
@@ -377,7 +378,7 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.cream },
-  content: { paddingHorizontal: spacing.lg, paddingTop: 56, paddingBottom: spacing.xxl },
+  content: { paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: spacing.xxl },
   inner: { width: '100%', maxWidth: 720, alignSelf: 'center', gap: spacing.lg },
   flex: { flex: 1 },
   slider: { gap: spacing.sm },

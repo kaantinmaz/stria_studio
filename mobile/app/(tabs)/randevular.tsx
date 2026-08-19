@@ -147,8 +147,8 @@ function AppointmentCard({ appointment, onCancelled }: { appointment: Appointmen
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.cream },
-  errorScreen: { flex: 1, paddingHorizontal: spacing.lg, paddingTop: 56, backgroundColor: colors.cream },
-  content: { flexGrow: 1, width: '100%', maxWidth: 720, alignSelf: 'center', paddingHorizontal: spacing.lg, paddingTop: 56, paddingBottom: spacing.xxl },
+  errorScreen: { flex: 1, paddingHorizontal: spacing.lg, paddingTop: spacing.lg, backgroundColor: colors.cream },
+  content: { flexGrow: 1, width: '100%', maxWidth: 720, alignSelf: 'center', paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: spacing.xxl },
   separator: { height: spacing.md },
   card: { gap: spacing.sm },
   cardTop: { flexDirection: 'row', gap: spacing.md, alignItems: 'flex-start' },

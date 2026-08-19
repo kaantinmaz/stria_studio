@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type PropsWithChildren } from 'react';
 import { api } from './api';
+import { setUnreadNotifications } from './notification-store';
 import { clearToken, getToken, setToken } from './storage';
 import type { AuthData, Loyalty, User } from './types';
 
@@ -24,6 +25,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     const data = await api.me();
     setUser(data.user);
     setLoyalty(data.loyalty);
+    setUnreadNotifications(data.unread_notifications);
   }, []);
 
   useEffect(() => {
@@ -36,6 +38,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
           if (active) {
             setUser(data.user);
             setLoyalty(data.loyalty);
+            setUnreadNotifications(data.unread_notifications);
           }
         } catch {
           if (active) {
@@ -65,6 +68,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
       await clearToken();
       setUser(null);
       setLoyalty(null);
+      setUnreadNotifications(0);
     }
   }, []);
 

@@ -1,10 +1,12 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   FlatList,
   KeyboardAvoidingView,
+  Linking,
   Modal,
   Platform,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -12,22 +14,51 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { api } from '@/lib/api';
+import { getChatConsent, setChatConsent } from '@/lib/storage';
 import { colors, fonts, radius, spacing, typography } from '@/lib/theme';
 import type { ChatMessage } from '@/lib/types';
 
 const GREETING =
   'Merhaba! Randevuların, kampanyalar ve hizmetlerimiz hakkında bana sorabilirsin. ✨ Yanıtlar yapay zekâ tarafından oluşturulur.';
 const ERROR_REPLY = 'Şu an yanıt veremiyorum, birazdan tekrar dener misin?';
+const PRIVACY_URL = 'https://striastudio.com.tr/gizlilik-politikasi';
 
 type Bubble = ChatMessage | { role: 'typing'; content: '' };
 
 export function ChatWidget() {
   const insets = useSafeAreaInsets();
   const [visible, setVisible] = useState(false);
+  const [consent, setConsent] = useState(false);
+  const [consentReady, setConsentReady] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const listRef = useRef<FlatList<Bubble>>(null);
+
+  // Onay durumu açılışta okunur; okunana kadar modal gövdesi boş kalır (flicker olmaz).
+  useEffect(() => {
+    let active = true;
+    void getChatConsent().then((granted) => {
+      if (!active) return;
+      setConsent(granted);
+      setConsentReady(true);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // Onay profilden geri çekilebildiği için her açılışta yeniden okunur.
+  async function openChat() {
+    setConsent(await getChatConsent());
+    setConsentReady(true);
+    setVisible(true);
+  }
+
+  async function acceptConsent() {
+    await setChatConsent();
+    setConsent(true);
+  }
 
   function scrollToEnd() {
     requestAnimationFrame(() => listRef.current?.scrollToEnd({ animated: true }));
@@ -35,7 +66,7 @@ export function ChatWidget() {
 
   async function send() {
     const text = input.trim();
-    if (!text || sending) return;
+    if (!text || sending || !consent) return;
 
     const next = [...messages, { role: 'user', content: text } as ChatMessage];
     setMessages(next);
@@ -65,7 +96,7 @@ export function ChatWidget() {
     <>
       <Pressable
         style={[styles.fab, { bottom: insets.bottom + 64 + spacing.md }]}
-        onPress={() => setVisible(true)}
+        onPress={() => void openChat()}
         accessibilityLabel="Sohbeti aç"
       >
         <Text style={styles.fabIcon}>✉</Text>
@@ -86,38 +117,70 @@ export function ChatWidget() {
             </Pressable>
           </View>
 
-          <KeyboardAvoidingView
-            style={styles.flex}
-            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-          >
-            <FlatList
-              ref={listRef}
-              data={bubbles}
-              keyExtractor={(_, index) => String(index)}
-              contentContainerStyle={styles.content}
-              renderItem={({ item }) => <MessageBubble bubble={item} />}
-              onContentSizeChange={scrollToEnd}
-              keyboardShouldPersistTaps="handled"
-            />
-            <View style={styles.inputRow}>
-              <TextInput
-                style={styles.input}
-                value={input}
-                onChangeText={setInput}
-                placeholder="Bir mesaj yaz…"
-                placeholderTextColor={colors.muted}
-                multiline
-                editable={!sending}
+          {!consentReady ? null : consent ? (
+            <KeyboardAvoidingView
+              style={styles.flex}
+              behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            >
+              <FlatList
+                ref={listRef}
+                data={bubbles}
+                keyExtractor={(_, index) => String(index)}
+                contentContainerStyle={styles.content}
+                renderItem={({ item }) => <MessageBubble bubble={item} />}
+                onContentSizeChange={scrollToEnd}
+                keyboardShouldPersistTaps="handled"
               />
-              <Pressable
-                style={[styles.sendButton, (!input.trim() || sending) && styles.sendButtonDisabled]}
-                onPress={send}
-                disabled={!input.trim() || sending}
-              >
-                <Text style={styles.sendIcon}>↑</Text>
-              </Pressable>
+              <View style={styles.inputRow}>
+                <TextInput
+                  style={styles.input}
+                  value={input}
+                  onChangeText={setInput}
+                  placeholder="Bir mesaj yaz…"
+                  placeholderTextColor={colors.muted}
+                  multiline
+                  editable={!sending}
+                />
+                <Pressable
+                  style={[styles.sendButton, (!input.trim() || sending) && styles.sendButtonDisabled]}
+                  onPress={send}
+                  disabled={!input.trim() || sending}
+                >
+                  <Text style={styles.sendIcon}>↑</Text>
+                </Pressable>
+              </View>
+            </KeyboardAvoidingView>
+          ) : (
+            <View style={styles.flex}>
+              <ScrollView contentContainerStyle={styles.consentContent} keyboardShouldPersistTaps="handled">
+                <Text style={styles.consentTitle}>Sohbete başlamadan önce</Text>
+                <Text style={styles.consentBody}>
+                  Sorunu yanıtlayabilmek için sohbet mesajların ve hesabınla ilgili bir özet, yanıtı üreten
+                  yapay zekâ servisine (Anthropic) gönderilir. Bunu yalnızca sana yanıt üretmek için kullanırız.
+                </Text>
+                <Text style={styles.consentSubtitle}>Neler gönderilir?</Text>
+                <Text style={styles.consentItem}>• Adın</Text>
+                <Text style={styles.consentItem}>• Müşteri kodun</Text>
+                <Text style={styles.consentItem}>• Son randevuların</Text>
+                <Text style={styles.consentItem}>• Sadakat özetin</Text>
+                <Text style={styles.consentItem}>• Yazdığın mesajlar</Text>
+                <Text style={styles.consentNote}>
+                  E-posta adresin ve telefon numaran gönderilmez.
+                </Text>
+                <Pressable onPress={() => void Linking.openURL(PRIVACY_URL)} hitSlop={8}>
+                  <Text style={styles.consentLink}>Gizlilik Politikası ↗</Text>
+                </Pressable>
+              </ScrollView>
+              <View style={styles.consentActions}>
+                <Pressable style={styles.consentAccept} onPress={() => void acceptConsent()}>
+                  <Text style={styles.consentAcceptText}>Kabul ediyorum</Text>
+                </Pressable>
+                <Pressable style={styles.consentDecline} onPress={() => setVisible(false)}>
+                  <Text style={styles.consentDeclineText}>Şimdi değil</Text>
+                </Pressable>
+              </View>
             </View>
-          </KeyboardAvoidingView>
+          )}
         </View>
       </Modal>
     </>
@@ -224,4 +287,42 @@ const styles = StyleSheet.create({
   },
   sendButtonDisabled: { opacity: 0.4 },
   sendIcon: { fontFamily: fonts.semibold, fontSize: 22, color: colors.white, lineHeight: 24 },
+  consentContent: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.lg,
+    gap: spacing.sm,
+  },
+  consentTitle: { ...typography.heading, marginBottom: spacing.xs },
+  consentBody: { ...typography.body, color: colors.muted },
+  consentSubtitle: { fontFamily: fonts.semibold, fontSize: 16, color: colors.ink, marginTop: spacing.sm },
+  consentItem: { ...typography.body },
+  consentNote: { ...typography.caption, marginTop: spacing.sm },
+  consentLink: { fontFamily: fonts.medium, fontSize: 16, color: colors.accent, marginTop: spacing.sm },
+  consentActions: {
+    gap: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.md,
+    borderTopColor: colors.line,
+    borderTopWidth: StyleSheet.hairlineWidth,
+  },
+  consentAccept: {
+    minHeight: 52,
+    borderRadius: radius.pill,
+    backgroundColor: colors.rose,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  consentAcceptText: { fontFamily: fonts.semibold, fontSize: 16, color: colors.white },
+  consentDecline: {
+    minHeight: 52,
+    borderRadius: radius.pill,
+    backgroundColor: colors.blush,
+    borderWidth: 1,
+    borderColor: colors.pink,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  consentDeclineText: { fontFamily: fonts.semibold, fontSize: 16, color: colors.accentDark },
 });
