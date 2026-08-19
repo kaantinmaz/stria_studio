@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\ChatConversation;
 use App\Models\Service;
 use App\Models\Setting;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -63,6 +64,107 @@ class ChatApiTest extends TestCase
                 && str_contains($system, 'WhatsApp linkine yönlendir')
                 && str_contains($system, 'https://wa.me/905070000000');
         });
+    }
+
+    public function test_conversation_transcript_is_stored_and_appended_per_session(): void
+    {
+        config([
+            'services.anthropic.key' => 'test-anthropic-key',
+            'services.anthropic.model' => 'test-model',
+        ]);
+
+        Http::fakeSequence('api.anthropic.com/*')
+            ->push(['content' => [['type' => 'text', 'text' => 'İlk yanıt']]])
+            ->push(['content' => [['type' => 'text', 'text' => 'İkinci yanıt']]]);
+
+        $session = 'session-abcdef123456';
+
+        $this->postJson('/api/chat', [
+            'session_id' => $session,
+            'messages' => [
+                ['role' => 'assistant', 'content' => 'Merhaba!'],
+                ['role' => 'user', 'content' => 'Mikroblading acır mı?'],
+            ],
+        ])->assertOk();
+
+        $conversation = ChatConversation::query()->sole();
+
+        $this->assertSame('web', $conversation->source);
+        $this->assertNull($conversation->site);
+        $this->assertSame(3, $conversation->message_count);
+        $this->assertNull($conversation->summarized_at);
+        $this->assertSame('Mikroblading acır mı?', $conversation->firstUserMessage());
+
+        // İstemci pencereyi yeniden gönderir; döküm tekrar etmeden büyümeli.
+        $this->postJson('/api/chat', [
+            'session_id' => $session,
+            'messages' => [
+                ['role' => 'assistant', 'content' => 'Merhaba!'],
+                ['role' => 'user', 'content' => 'Mikroblading acır mı?'],
+                ['role' => 'assistant', 'content' => 'İlk yanıt'],
+                ['role' => 'user', 'content' => 'Randevu alabilir miyim?'],
+            ],
+        ])->assertOk();
+
+        $this->assertSame(1, ChatConversation::query()->count());
+
+        $conversation->refresh();
+
+        $this->assertSame(5, $conversation->message_count);
+        $this->assertSame(
+            ['Merhaba!', 'Mikroblading acır mı?', 'İlk yanıt', 'Randevu alabilir miyim?', 'İkinci yanıt'],
+            array_column($conversation->messages, 'content'),
+        );
+    }
+
+    public function test_engage_conversations_are_recorded_with_their_source_and_site(): void
+    {
+        config([
+            'services.anthropic.key' => 'test-anthropic-key',
+            'services.anthropic.model' => 'test-model',
+        ]);
+
+        Http::fake([
+            'https://api.anthropic.com/v1/messages' => Http::response([
+                'content' => [['type' => 'text', 'text' => 'Elbette yardımcı olurum.']],
+            ]),
+        ]);
+
+        $this->postJson('/api/chat', [
+            'site' => 'kas-tasarimi-ankara',
+            'intent' => 'engage',
+            'session_id' => 'engage-abcdef123456',
+            'messages' => [
+                ['role' => 'user', 'content' => 'Kaşlarım seyrek, ne önerirsiniz?'],
+            ],
+        ])->assertOk();
+
+        $conversation = ChatConversation::query()->sole();
+
+        $this->assertSame('engage', $conversation->source);
+        $this->assertSame('kas-tasarimi-ankara', $conversation->site);
+    }
+
+    public function test_failed_upstream_call_stores_nothing(): void
+    {
+        config(['services.anthropic.key' => 'test-anthropic-key']);
+
+        Http::fake(['https://api.anthropic.com/v1/messages' => Http::response([], 500)]);
+
+        $this->postJson('/api/chat', [
+            'session_id' => 'session-abcdef123456',
+            'messages' => [['role' => 'user', 'content' => 'Merhaba']],
+        ])->assertStatus(502);
+
+        $this->assertSame(0, ChatConversation::query()->count());
+    }
+
+    public function test_invalid_session_id_is_rejected(): void
+    {
+        $this->postJson('/api/chat', [
+            'session_id' => 'kısa',
+            'messages' => [['role' => 'user', 'content' => 'Merhaba']],
+        ])->assertStatus(422)->assertJsonValidationErrors('session_id');
     }
 
     public function test_empty_messages_are_rejected(): void

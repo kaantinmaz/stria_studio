@@ -48,6 +48,20 @@ class AppointmentController extends Controller
         return response()->json(['data' => $appointments]);
     }
 
+    /**
+     * Uygulama hep geçerli değer gönderiyor; bu mesajlar hizmet arada pasife
+     * alınırsa kullanıcının İngilizce hata görmemesi için.
+     */
+    private const VALIDATION_MESSAGES = [
+        'service_slug.required' => 'Bir işlem seçmelisin.',
+        'service_slug.exists' => 'Seçtiğin işlem artık uygun değil, lütfen tekrar seç.',
+        'date.required' => 'Bir gün seçmelisin.',
+        'date.date_format' => 'Geçersiz tarih.',
+        'time.required' => 'Bir saat seçmelisin.',
+        'time.date_format' => 'Geçersiz saat.',
+        'note.max' => 'Not en fazla 500 karakter olabilir.',
+    ];
+
     public function store(Request $request, AppointmentSlots $appointmentSlots): JsonResponse
     {
         $validated = $request->validate([
@@ -60,30 +74,31 @@ class AppointmentController extends Controller
             'time' => ['required', 'date_format:H:i'],
             'note' => ['nullable', 'string', 'max:500'],
             'campaign_id' => ['nullable', 'integer'],
-        ]);
+        ], self::VALIDATION_MESSAGES);
         $date = CarbonImmutable::createFromFormat('!Y-m-d', $validated['date']);
         $this->ensureNotPast($date);
 
-        if (! in_array($validated['time'], $appointmentSlots->forDate($date), true)) {
+        $service = Service::query()->where('slug', $validated['service_slug'])->firstOrFail();
+
+        if (! in_array($validated['time'], $appointmentSlots->forDate($date, (int) $service->duration_min), true)) {
             throw ValidationException::withMessages([
                 'time' => ['Seçilen randevu saati uygun değil.'],
             ]);
         }
 
         $user = $request->user();
-        $serviceId = Service::query()->where('slug', $validated['service_slug'])->value('id');
-        $campaignId = $this->resolveCampaignId($validated['campaign_id'] ?? null, $serviceId);
+        $campaignId = $this->resolveCampaignId($validated['campaign_id'] ?? null, $service->id);
 
         $appointment = Appointment::query()->create([
             'customer_id' => $user->customer()->value('id'),
             'app_user_id' => $user->id,
-            'service_id' => $serviceId,
+            'service_id' => $service->id,
             'campaign_id' => $campaignId,
             'starts_at' => CarbonImmutable::createFromFormat(
                 '!Y-m-d H:i',
                 $validated['date'].' '.$validated['time'],
             ),
-            'duration_min' => 60,
+            'duration_min' => (int) $service->duration_min,
             'note' => filled($validated['note'] ?? null) ? trim($validated['note']) : null,
             'status' => 'requested',
         ]);
@@ -139,14 +154,21 @@ class AppointmentController extends Controller
     {
         $validated = $request->validate([
             'date' => ['required', 'date_format:Y-m-d'],
-        ]);
+            'service_slug' => [
+                'required',
+                'string',
+                Rule::exists('services', 'slug')->where('is_active', true),
+            ],
+        ], self::VALIDATION_MESSAGES);
         $date = CarbonImmutable::createFromFormat('!Y-m-d', $validated['date']);
         $this->ensureNotPast($date);
+        $duration = (int) Service::query()->where('slug', $validated['service_slug'])->value('duration_min');
 
         return response()->json([
             'data' => [
                 'date' => $validated['date'],
-                'slots' => $appointmentSlots->forDate($date),
+                'duration_min' => $duration,
+                'slots' => $appointmentSlots->forDate($date, $duration),
             ],
         ]);
     }

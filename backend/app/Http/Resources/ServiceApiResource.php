@@ -32,6 +32,7 @@ class ServiceApiResource extends ServiceListResource
             'hero_images' => collect($this->hero_images ?? [])->map(fn ($p) => $this->imageUrl($p))->values()->all(),
             'gallery' => collect($this->gallery ?? [])->map(fn ($p) => $this->imageUrl($p))->values()->all(),
             'related' => $this->related ?? [],
+            'reviews' => ServiceReviewResource::collection($this->reviews),
         ];
     }
 }

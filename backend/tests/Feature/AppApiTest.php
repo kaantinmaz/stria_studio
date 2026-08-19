@@ -11,6 +11,7 @@ use App\Models\Service;
 use App\Models\Setting;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class AppApiTest extends TestCase
@@ -85,11 +86,20 @@ class AppApiTest extends TestCase
 
     public function test_delete_account_removes_user_and_token_but_keeps_business_records(): void
     {
+        Storage::fake('public');
+        $photoPath = 'customers/before.jpg';
+        Storage::disk('public')->put($photoPath, 'fake-image-bytes');
+
         $user = $this->appUser();
         $token = $user->createToken('test-device')->plainTextToken;
         $customer = Customer::query()->create([
             'name' => 'Mobil Müşteri',
             'app_user_id' => $user->id,
+            'phone' => '0555 123 45 67',
+            'email' => 'musteri@example.com',
+            'instagram' => 'musteri',
+            'notes' => 'Alerjik.',
+            'photos' => [$photoPath],
         ]);
         $service = Service::factory()->create(['name_tr' => 'Kaş Tasarımı']);
         $appointment = Appointment::query()->create([
@@ -100,6 +110,8 @@ class AppApiTest extends TestCase
             'status' => 'requested',
         ]);
 
+        Storage::disk('public')->assertExists($photoPath);
+
         $this->withToken($token)
             ->deleteJson('/api/app/account')
             ->assertNoContent();
@@ -107,10 +119,20 @@ class AppApiTest extends TestCase
         $this->assertDatabaseMissing('app_users', ['id' => $user->id]);
         $this->assertDatabaseCount('personal_access_tokens', 0);
 
+        // Müşteri kaydı muhasebe için kalır ama kimliğe götüren alanlar temizlenir.
         $this->assertDatabaseHas('customers', [
             'id' => $customer->id,
             'app_user_id' => null,
+            'name' => 'Silinmiş Müşteri',
+            'phone' => null,
+            'email' => null,
+            'instagram' => null,
+            'notes' => null,
         ]);
+        $this->assertSame([], $customer->fresh()->photos);
+        Storage::disk('public')->assertMissing($photoPath);
+
+        // Randevu tarih/hizmet/tutar için kalır, kişiye bağlanamaz.
         $this->assertDatabaseHas('appointments', [
             'id' => $appointment->id,
             'app_user_id' => null,
@@ -175,6 +197,7 @@ class AppApiTest extends TestCase
                 'close' => '19:00',
             ]],
         ]);
+        Service::factory()->create(['slug' => 'microblading', 'is_active' => true, 'duration_min' => 60]);
         Appointment::query()->create([
             'starts_at' => '2026-07-20 11:00:00',
             'duration_min' => 120,
@@ -186,27 +209,70 @@ class AppApiTest extends TestCase
             'status' => 'requested',
         ]);
 
-        $this->actingAsAppUser()->getJson('/api/app/slots?date=2026-07-20')
+        $this->actingAsAppUser()->getJson('/api/app/slots?date=2026-07-20&service_slug=microblading')
             ->assertOk()
             ->assertExactJson([
                 'data' => [
                     'date' => '2026-07-20',
+                    'duration_min' => 60,
                     'slots' => ['10:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'],
                 ],
             ]);
 
-        $this->getJson('/api/app/slots?date=2026-07-19')
+        $this->getJson('/api/app/slots?date=2026-07-19&service_slug=microblading')
             ->assertOk()
             ->assertExactJson([
                 'data' => [
                     'date' => '2026-07-19',
+                    'duration_min' => 60,
                     'slots' => [],
                 ],
             ]);
 
-        $this->getJson('/api/app/slots?date=2026-07-16')
+        $this->getJson('/api/app/slots?date=2026-07-16&service_slug=microblading')
             ->assertUnprocessable()
             ->assertJsonValidationErrors('date');
+
+        $this->getJson('/api/app/slots?date=2026-07-20')
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('service_slug');
+    }
+
+    public function test_slots_and_store_reject_hours_that_already_passed_today(): void
+    {
+        CarbonImmutable::setTestNow('2026-07-20 15:30:00');
+        Setting::forSite()->update([
+            'hours' => [[
+                'days' => ['Monday'],
+                'open' => '10:00',
+                'close' => '19:00',
+            ]],
+        ]);
+        Service::factory()->create(['slug' => 'microblading', 'is_active' => true, 'duration_min' => 60]);
+
+        $this->actingAsAppUser()->getJson('/api/app/slots?date=2026-07-20&service_slug=microblading')
+            ->assertOk()
+            ->assertExactJson([
+                'data' => [
+                    'date' => '2026-07-20',
+                    'duration_min' => 60,
+                    'slots' => ['16:00', '17:00', '18:00'],
+                ],
+            ]);
+
+        $this->postJson('/api/app/appointments', [
+            'service_slug' => 'microblading',
+            'date' => '2026-07-20',
+            'time' => '10:00',
+        ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('time');
+
+        $this->postJson('/api/app/appointments', [
+            'service_slug' => 'microblading',
+            'date' => '2026-07-20',
+            'time' => '16:00',
+        ])->assertCreated();
     }
 
     public function test_store_appointment_creates_request_and_rejects_occupied_slot(): void

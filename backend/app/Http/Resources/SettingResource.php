@@ -39,6 +39,10 @@ class SettingResource extends JsonResource
             'popup_cta_url' => $this->popup_cta_url,
             'header_code' => $this->header_code,
             'footer_code' => $this->footer_code,
+            'google_rating' => $this->google_rating !== null ? (float) $this->google_rating : null,
+            'google_review_count' => $this->google_review_count !== null ? (int) $this->google_review_count : null,
+            'google_maps_url' => $this->google_maps_url,
+            'google_reviews_synced_at' => $this->google_reviews_synced_at?->toIso8601String(),
         ];
     }
 

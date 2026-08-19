@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\AdsCommandController;
+use App\Http\Controllers\Admin\AdsIngestController;
 use App\Http\Controllers\AdminPostController;
 use App\Http\Controllers\App\AnnouncementController as AppAnnouncementController;
 use App\Http\Controllers\App\AppointmentController as AppAppointmentController;
@@ -7,11 +9,13 @@ use App\Http\Controllers\App\AuthController as AppAuthController;
 use App\Http\Controllers\App\CampaignController as AppCampaignController;
 use App\Http\Controllers\App\ChatController as AppChatController;
 use App\Http\Controllers\App\MeController as AppMeController;
+use App\Http\Controllers\App\NotificationController as AppNotificationController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\GalleryController;
+use App\Http\Controllers\InstagramController;
 use App\Http\Controllers\LinkController;
 use App\Http\Controllers\MicrositeController;
 use App\Http\Controllers\ServiceController;
@@ -34,6 +38,7 @@ Route::get('/settings', [SettingController::class, 'show']);
 
 Route::get('/gallery', [GalleryController::class, 'index']);
 Route::get('/faqs', [FaqController::class, 'index']);
+Route::get('/instagram', [InstagramController::class, 'index']);
 
 Route::get('/links', [LinkController::class, 'index']);
 
@@ -43,25 +48,38 @@ Route::prefix('app')->group(function () {
     Route::middleware('throttle:10,1')->group(function () {
         Route::post('/register', [AppAuthController::class, 'register']);
         Route::post('/login', [AppAuthController::class, 'login']);
+        Route::post('/pair', [AppAuthController::class, 'pair']);
     });
 
     Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
         Route::post('/logout', [AppAuthController::class, 'logout']);
         Route::delete('/account', [AppAuthController::class, 'destroy']);
+        Route::post('/profile', [AppAuthController::class, 'profile']);
+        Route::post('/credentials', [AppAuthController::class, 'credentials']);
         Route::get('/me', AppMeController::class);
         Route::get('/appointments', [AppAppointmentController::class, 'index']);
         Route::get('/slots', [AppAppointmentController::class, 'slots']);
         Route::post('/appointments', [AppAppointmentController::class, 'store']);
         Route::post('/appointments/{id}/cancel', [AppAppointmentController::class, 'cancel']);
         Route::get('/campaigns', [AppCampaignController::class, 'index']);
+        Route::get('/notifications', [AppNotificationController::class, 'index']);
+        Route::post('/notifications/seen', [AppNotificationController::class, 'seen']);
         Route::get('/announcements', [AppAnnouncementController::class, 'index']);
         Route::post('/chat', [AppChatController::class, 'store'])->middleware('throttle:20,1');
     });
 });
 
-Route::prefix('admin')->middleware(App\Http\Middleware\EnsureAdminApiToken::class)->group(function () {
+Route::prefix('admin')->middleware(App\Http\Middleware\EnsureAdminApiToken::class.':posts')->group(function () {
     Route::post('/posts', [AdminPostController::class, 'store']);
     Route::delete('/posts/{slug}', [AdminPostController::class, 'destroy']);
+});
+
+// Ayrı token: bu uca Google Ads arayüzüne yapıştırılan betik erişiyor, blog
+// yazma yetkisi taşımamalı.
+Route::prefix('admin')->middleware(App\Http\Middleware\EnsureAdminApiToken::class.':ads')->group(function () {
+    Route::post('/ads/ingest', AdsIngestController::class);
+    Route::get('/ads/commands', [AdsCommandController::class, 'index']);
+    Route::post('/ads/commands/results', [AdsCommandController::class, 'results']);
 });
 
 // Per-service SEO microsites (e.g. microbladingankara.com). Site-scoped, read-only + contact.

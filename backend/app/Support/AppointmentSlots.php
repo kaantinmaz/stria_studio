@@ -10,9 +10,13 @@ use Illuminate\Support\Collection;
 class AppointmentSlots
 {
     /**
+     * Verilen gün için, `$durationMin` dakikalık bir işlemin sığdığı saat
+     * başlarını döner. Saat başı ızgara korunuyor (stüdyo böyle çalışıyor);
+     * uzun işlem birden fazla saati kapatır.
+     *
      * @return array<int, string>
      */
-    public function forDate(CarbonImmutable $date): array
+    public function forDate(CarbonImmutable $date, int $durationMin): array
     {
         $hours = collect(Setting::forSite()->hours ?? [])->first(
             fn (array $period): bool => in_array($date->format('l'), $period['days'] ?? [], true),
@@ -29,14 +33,17 @@ class AppointmentSlots
             return [];
         }
 
+        $duration = max(5, $durationMin);
+        $now = CarbonImmutable::now();
+        // Önceki günden taşan uzun bir randevu da çakışabilir: bir gün geriden tara.
         $appointments = Appointment::query()
             ->where('status', 'confirmed')
-            ->whereDate('starts_at', $date->toDateString())
+            ->whereBetween('starts_at', [$date->subDay()->startOfDay(), $date->endOfDay()])
             ->get(['starts_at', 'duration_min']);
         $slots = [];
 
-        for ($slot = $open; $slot->addHour()->lessThanOrEqualTo($close); $slot = $slot->addHour()) {
-            if (! $this->overlaps($slot, $slot->addHour(), $appointments)) {
+        for ($slot = $open; $slot->addMinutes($duration)->lessThanOrEqualTo($close); $slot = $slot->addHour()) {
+            if ($slot->greaterThan($now) && ! $this->overlaps($slot, $slot->addMinutes($duration), $appointments)) {
                 $slots[] = $slot->format('H:i');
             }
         }

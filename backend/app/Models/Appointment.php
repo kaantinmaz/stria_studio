@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Appointment extends Model
 {
@@ -23,6 +24,9 @@ class Appointment extends Model
         'note',
         'status',
         'photos',
+        'parent_id',
+        'session_no',
+        'session_total',
     ];
 
     protected function casts(): array
@@ -53,5 +57,25 @@ class Appointment extends Model
     public function appUser(): BelongsTo
     {
         return $this->belongsTo(AppUser::class);
+    }
+
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'parent_id');
+    }
+
+    public function sessions(): HasMany
+    {
+        return $this->hasMany(self::class, 'parent_id')->orderBy('starts_at');
+    }
+
+    public function isSessionChild(): bool
+    {
+        return $this->parent_id !== null;
+    }
+
+    public function isSessionPackage(): bool
+    {
+        return $this->session_total !== null && $this->session_total > 1;
     }
 }

@@ -43,7 +43,20 @@ class AppUser extends Authenticatable
     {
         return [
             'password' => 'hashed',
+            'notifications_seen_at' => 'datetime',
         ];
+    }
+
+    /**
+     * E-postayı ASCII güvenli biçimde küçültür.
+     *
+     * `Str::lower`/`mb_strtolower` Türkçe "İ" harfini "i + birleşen nokta"ya
+     * çevirip adresi sessizce bozuyor (İkinci@X → i̇kinci@x). Geçerli e-posta
+     * adresleri ASCII olduğu için düz `strtolower` doğru davranıştır.
+     */
+    public static function normalizeEmail(?string $email): string
+    {
+        return strtolower(trim((string) $email));
     }
 
     public function customer(): HasOne
@@ -67,6 +80,9 @@ class AppUser extends Authenticatable
             'name' => $this->name,
             'email' => $this->email,
             'phone' => $this->phone,
+            // QR ile açılan hesapta şifre yok; uygulama hangi formu göstereceğini
+            // e-postanın boşluğundan tahmin etmek zorunda kalmasın.
+            'has_password' => filled($this->password),
             'customer_linked' => $this->customer()->exists(),
         ];
     }

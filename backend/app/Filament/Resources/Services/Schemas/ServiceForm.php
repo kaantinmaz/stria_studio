@@ -167,6 +167,15 @@ class ServiceForm
                                 TextInput::make('sort_order')
                                     ->numeric()
                                     ->default(0),
+                                TextInput::make('duration_min')
+                                    ->label('Ortalama süre (dakika)')
+                                    ->numeric()
+                                    ->required()
+                                    ->minValue(5)
+                                    ->maxValue(600)
+                                    ->step(5)
+                                    ->default(60)
+                                    ->helperText('Randevu saatleri buna göre açılır. 100 dk girilirse 10:00 alınan randevu 11:00 slotunu da kapatır.'),
                                 Toggle::make('is_active')
                                     ->default(true),
                             ]),

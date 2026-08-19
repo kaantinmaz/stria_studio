@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Service extends Model
 {
@@ -32,6 +33,10 @@ class Service extends Model
     protected static function booted(): void
     {
         static::saving(function (Service $service): void {
+            $service->keepStaticAssets();
+        });
+
+        static::saving(function (Service $service): void {
             $oldSubserviceGalleries = collect($service->getOriginal('subservices_tr') ?? [])
                 ->pluck('gallery')
                 ->filter()
@@ -49,8 +54,37 @@ class Service extends Model
         });
     }
 
+    /**
+     * `image`, `hero_images` ve `gallery` iki tür değer taşıyor: panelden
+     * yüklenen dosyalar ("services/x.png") ve frontend'in statik varlıkları
+     * ("/images/micro.png"). Filament FileUpload ikincisini public diskte
+     * bulamadığı için alan boş hidratlanıyor ve form kaydedilince değer
+     * sessizce siliniyordu. Boş gelen değer statik bir yolu eziyorsa eskisini
+     * koruyoruz; yeni dosya yüklemek yine değiştiriyor.
+     */
+    private function keepStaticAssets(): void
+    {
+        foreach (['image', 'hero_images', 'gallery'] as $column) {
+            if (filled($this->{$column})) {
+                continue;
+            }
+
+            $original = $this->getOriginal($column);
+            $first = is_array($original) ? ($original[0] ?? null) : $original;
+
+            if (is_string($first) && str_starts_with($first, '/')) {
+                $this->{$column} = $original;
+            }
+        }
+    }
+
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true)->orderBy('sort_order');
+    }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(ServiceReview::class);
     }
 }

@@ -17,6 +17,9 @@ class Setting extends Model
         'lng' => 'decimal:7',
         'campaign_enabled' => 'boolean',
         'popup_enabled' => 'boolean',
+        'google_rating' => 'float',
+        'google_review_count' => 'integer',
+        'google_reviews_synced_at' => 'datetime',
     ];
 
     // Settings row for a given site slug; NULL = the main site. Each microsite has

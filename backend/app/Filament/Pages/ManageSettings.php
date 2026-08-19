@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Models\Setting;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -165,6 +166,33 @@ class ManageSettings extends Page
                                     ])
                                     ->addActionLabel('Çalışma saati ekle')
                                     ->columnSpanFull(),
+                            ]),
+                        Tab::make('Google Puanı')
+                            ->schema([
+                                Placeholder::make('google_reviews_notice')
+                                    ->label('')
+                                    ->content('Buraya yalnızca Google İşletme Profilinizdeki GERÇEK değerleri girin. Uydurma puan girmeyin.'),
+                                TextInput::make('google_place_id')
+                                    ->label('Google Place ID')
+                                    ->helperText('Google İşletme Profili Place ID. `php artisan reviews:sync-google` bu ID ile puanı otomatik çeker.'),
+                                TextInput::make('google_rating')
+                                    ->label('Puan')
+                                    ->numeric()
+                                    ->minValue(1)
+                                    ->maxValue(5)
+                                    ->step(0.1),
+                                TextInput::make('google_review_count')
+                                    ->label('Yorum sayısı')
+                                    ->numeric()
+                                    ->integer(),
+                                TextInput::make('google_maps_url')
+                                    ->label('Google Haritalar bağlantısı')
+                                    ->url(),
+                                Placeholder::make('google_reviews_synced_info')
+                                    ->label('Son senkron')
+                                    ->content(fn ($get): string => filled($get('google_reviews_synced_at'))
+                                        ? $get('google_reviews_synced_at').' — `php artisan reviews:sync-google` ile otomatik güncellenir'
+                                        : 'Henüz senkronlanmadı — `php artisan reviews:sync-google` ile otomatik güncellenir'),
                             ]),
                     ])
                     ->columnSpanFull(),

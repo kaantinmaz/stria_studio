@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\Customers\Tables;
 
+use App\Support\CustomerPairing;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Support\Icons\Heroicon;
 
 class CustomersTable
 {
@@ -61,6 +63,24 @@ class CustomersTable
             ->defaultSort('created_at', 'desc')
             ->recordActions([
                 EditAction::make(),
+                Action::make('pairingQr')
+                    ->label('Uygulama QR')
+                    ->icon(Heroicon::OutlinedQrCode)
+                    ->visible(fn ($record): bool => $record->app_user_id === null)
+                    ->modalHeading('Uygulamaya bağla')
+                    ->modalContent(function ($record) {
+                        $pairing = app(CustomerPairing::class);
+                        $token = $pairing->token($record);
+
+                        return view('filament.customer-pairing-qr', [
+                            'svg' => $pairing->qrSvg($token),
+                            'customerName' => $record->name,
+                            'ttlMinutes' => CustomerPairing::TTL_MINUTES,
+                            'appointmentCount' => $record->appointments()->count(),
+                        ]);
+                    })
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Kapat'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
