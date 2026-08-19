@@ -25,6 +25,7 @@ function Linkified({ text }: { text: string }) {
 
 const OPEN_KEY = "stria-chat-open";
 const STORAGE_KEY = "stria-chat";
+const SESSION_ID_KEY = `${STORAGE_KEY}-sid`;
 const WELCOME_MESSAGE =
   "Merhaba! Stria hakkında sorularınızı yanıtlayabilirim. Randevu ve fiyat için sizi WhatsApp'a yönlendirebilirim.";
 const ERROR_MESSAGE = "Şu an yanıt veremiyorum. WhatsApp'tan yazabilirsiniz 👉";
@@ -88,6 +89,39 @@ function isStoredMessage(value: unknown): value is ChatMessage {
     (message.showWhatsAppLink === undefined ||
       typeof message.showWhatsAppLink === "boolean")
   );
+}
+
+let sessionId: string | null = null;
+
+function getSessionId(): string {
+  if (sessionId) return sessionId;
+
+  const isBrowser = typeof window !== "undefined";
+  let stored: string | null = null;
+  if (isBrowser) {
+    try {
+      stored = sessionStorage.getItem(SESSION_ID_KEY);
+    } catch {
+      // storage unavailable
+    }
+  }
+
+  const id =
+    stored ??
+    (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+      ? crypto.randomUUID()
+      : Math.random().toString(36).slice(2) + Date.now().toString(36));
+
+  if (isBrowser) {
+    try {
+      sessionStorage.setItem(SESSION_ID_KEY, id);
+    } catch {
+      // storage unavailable
+    }
+    sessionId = id;
+  }
+
+  return id;
 }
 
 function loadStoredMessages(): ChatMessage[] {
@@ -232,6 +266,7 @@ export function ChatWidget({ whatsappUrl }: { whatsappUrl: string }) {
         },
         body: JSON.stringify({
           site: null,
+          session_id: getSessionId(),
           messages: requestMessages.map(({ role, content: messageContent }) => ({
             role,
             content: messageContent,

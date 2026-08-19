@@ -8,6 +8,8 @@ import { WhatsAppIcon, PhoneIcon } from "@/components/Icons";
 import { CallLabel } from "@/components/CallLabel";
 import { useSettings } from "@/components/SettingsProvider";
 import { phoneHref, type ServiceFull, type SubService } from "@/lib/content";
+import { RatingBadge } from "@/components/RatingBadge";
+import { ServiceReviews } from "@/components/ServiceReviews";
 
 export function SubServicePage({ svc, sub }: { svc: ServiceFull; sub: SubService }) {
   const settings = useSettings();
@@ -29,6 +31,9 @@ export function SubServicePage({ svc, sub }: { svc: ServiceFull; sub: SubService
           <h1 className="mb-5 text-[clamp(32px,4.6vw,58px)] leading-[1.05]">
             {sub.name} <span className="text-accent">Ankara</span>
           </h1>
+          <div className="mb-5">
+            <RatingBadge value={svc.rating_avg} count={svc.rating_count} size={15} />
+          </div>
           <div className="mb-7 max-w-[520px] space-y-4 text-[clamp(15px,1.4vw,18px)] leading-[1.7] text-muted">
             {intro.map((paragraph, index) => (
               <p key={`${index}-${paragraph}`}>{paragraph}</p>
@@ -113,6 +118,13 @@ export function SubServicePage({ svc, sub }: { svc: ServiceFull; sub: SubService
           <WorkLightbox images={sub.gallery} altBase={sub.name} />
         </section>
       )}
+
+      <ServiceReviews
+        reviews={svc.reviews}
+        ratingAvg={svc.rating_avg}
+        ratingCount={svc.rating_count}
+        subjectName={svc.name_tr}
+      />
 
       {sub.faq && sub.faq.length > 0 && (
         <Faq title="Sıkça Sorulan Sorular" items={sub.faq} />

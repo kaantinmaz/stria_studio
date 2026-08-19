@@ -25,6 +25,7 @@ function Linkified({ text }: { text: string }) {
 
 const OPEN_KEY = "stria-chat-open";
 const STORAGE_KEY = "stria-chat";
+const SESSION_ID_KEY = `${STORAGE_KEY}-sid`;
 const COMPLETIONS = [
   "merhaba",
   "hizmetler",
@@ -89,6 +90,39 @@ function isStoredMessage(value: unknown): value is Message {
     message.content.length <= 1000 &&
     (message.kind === undefined || message.kind === "error")
   );
+}
+
+let sessionId: string | null = null;
+
+function getSessionId(): string {
+  if (sessionId) return sessionId;
+
+  const isBrowser = typeof window !== "undefined";
+  let stored: string | null = null;
+  if (isBrowser) {
+    try {
+      stored = sessionStorage.getItem(SESSION_ID_KEY);
+    } catch {
+      // storage unavailable
+    }
+  }
+
+  const id =
+    stored ??
+    (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+      ? crypto.randomUUID()
+      : Math.random().toString(36).slice(2) + Date.now().toString(36));
+
+  if (isBrowser) {
+    try {
+      sessionStorage.setItem(SESSION_ID_KEY, id);
+    } catch {
+      // storage unavailable
+    }
+    sessionId = id;
+  }
+
+  return id;
 }
 
 export function ChatWidget({ whatsapp }: { whatsapp: string }) {
@@ -244,6 +278,7 @@ export function ChatWidget({ whatsapp }: { whatsapp: string }) {
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({
           site: "mikroblading-ankara",
+          session_id: getSessionId(),
           messages: nextMessages.slice(-12).map(({ role, content: messageContent }) => ({
             role,
             content: messageContent,

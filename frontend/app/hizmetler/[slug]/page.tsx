@@ -44,7 +44,13 @@ export default async function ServiceRoute({ params }: Params) {
   return (
     <>
       <Nav />
-      <JsonLd data={serviceSchema(svc, name)} />
+      <JsonLd
+        data={serviceSchema(svc, name, `/hizmetler/${svc.slug}`, {
+          avg: svc.rating_avg,
+          count: svc.rating_count,
+          reviews: svc.reviews,
+        })}
+      />
       <JsonLd data={faqSchema(svc.faq_tr)} />
       {svc.process_tr.length > 0 && (
         <JsonLd

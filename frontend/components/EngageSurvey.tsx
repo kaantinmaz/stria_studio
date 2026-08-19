@@ -13,6 +13,7 @@ import { pickLang } from "@/lib/content";
 import { site } from "@/lib/site";
 
 const DONE_KEY = "stria-engage-done";
+const SESSION_ID_KEY = "stria-engage-sid";
 const VISIBLE_DELAY_MS = 30_000;
 const MAX_FOLLOW_UPS = 3;
 const URL_RE = /(https?:\/\/[^\s<>()]+[^\s<>().,!?;:'"])/g;
@@ -66,6 +67,39 @@ function Linkified({ text }: { text: string }) {
       )}
     </>
   );
+}
+
+let sessionId: string | null = null;
+
+function getSessionId(): string {
+  if (sessionId) return sessionId;
+
+  const isBrowser = typeof window !== "undefined";
+  let stored: string | null = null;
+  if (isBrowser) {
+    try {
+      stored = sessionStorage.getItem(SESSION_ID_KEY);
+    } catch {
+      // storage unavailable
+    }
+  }
+
+  const id =
+    stored ??
+    (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+      ? crypto.randomUUID()
+      : Math.random().toString(36).slice(2) + Date.now().toString(36));
+
+  if (isBrowser) {
+    try {
+      sessionStorage.setItem(SESSION_ID_KEY, id);
+    } catch {
+      // storage unavailable
+    }
+    sessionId = id;
+  }
+
+  return id;
 }
 
 export function EngageSurvey({ whatsappUrl }: { whatsappUrl: string }) {
@@ -246,6 +280,7 @@ export function EngageSurvey({ whatsappUrl }: { whatsappUrl: string }) {
         body: JSON.stringify({
           site: null,
           intent: "engage",
+          session_id: getSessionId(),
           messages: requestMessages.map(({ role, content }) => ({
             role,
             content,

@@ -5,6 +5,7 @@ import { useLang } from "@/components/LanguageProvider";
 import { useServices } from "@/components/ServicesProvider";
 import { pickLang } from "@/lib/content";
 import { ImageSlot } from "@/components/ImageSlot";
+import { RatingBadge } from "@/components/RatingBadge";
 
 // Compact 4-across highlight strip right under the hero (like the hero's featured card).
 // Öne çıkanlar owner tarafından sabitlendi — API sırası değil; listede olmayan
@@ -45,6 +46,12 @@ export function ServiceStrip() {
                   <div className="mt-[2px] text-[11px] leading-[1.45] text-muted">
                     {pickLang(s.desc_tr, s.desc_en, lang)}
                   </div>
+                  <RatingBadge
+                    value={s.rating_avg}
+                    count={s.rating_count}
+                    size={11}
+                    className="mt-[3px]"
+                  />
                 </div>
                 <span className="ml-auto flex h-[30px] w-[30px] flex-none items-center justify-center rounded-full bg-ink text-[15px] text-cream transition-colors group-hover:bg-accent">
                   →

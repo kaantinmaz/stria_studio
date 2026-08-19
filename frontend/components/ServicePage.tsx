@@ -12,6 +12,9 @@ import { MyLaminationBadge } from "@/components/MyLaminationBadge";
 import { MyLaminationServiceSection } from "@/components/MyLaminationServiceSection";
 import { ML_SERVICE_SCOPE } from "@/lib/mylamination";
 import { phoneHref, type ServiceFull, type ServiceListItem } from "@/lib/content";
+import { RatingBadge } from "@/components/RatingBadge";
+import { GoogleRatingBadge } from "@/components/GoogleRatingBadge";
+import { ServiceReviews } from "@/components/ServiceReviews";
 
 // Ayrı domainde duran uzman rehber sitesi olan hizmetler. microbladingankara.com
 // ve kastasarimiankara.com ana domaine 301 ile konsolide edildiği için burada
@@ -63,6 +66,10 @@ export function ServicePage({
           <h1 className="mb-5 text-[clamp(32px,4.6vw,58px)] leading-[1.05]">
             {name} <span className="text-accent">Ankara</span>
           </h1>
+          <div className="mb-5 flex flex-wrap items-center gap-x-5 gap-y-2">
+            <RatingBadge value={svc.rating_avg} count={svc.rating_count} size={15} />
+            <GoogleRatingBadge />
+          </div>
           <p className="mb-7 max-w-[520px] text-[clamp(15px,1.4vw,18px)] leading-[1.7] text-muted">
             {svc.intro_tr}
           </p>
@@ -207,6 +214,12 @@ export function ServicePage({
           })}
         </div>
       </section>
+
+      <ServiceReviews
+        reviews={svc.reviews}
+        ratingAvg={svc.rating_avg}
+        ratingCount={svc.rating_count}
+      />
 
       {/* FAQ */}
       <Faq title="Sıkça Sorulan Sorular" items={svc.faq_tr} />

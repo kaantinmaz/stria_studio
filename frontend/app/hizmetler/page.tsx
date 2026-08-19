@@ -5,6 +5,7 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ImageSlot } from "@/components/ImageSlot";
 import { MyLaminationChip } from "@/components/MyLaminationBadge";
 import { ML_SERVICE_SCOPE } from "@/lib/mylamination";
+import { RatingBadge } from "@/components/RatingBadge";
 import { JsonLd } from "@/components/JsonLd";
 import { breadcrumbSchema } from "@/components/schema";
 import { buildMetadata } from "@/lib/seo";
@@ -73,6 +74,7 @@ export default async function HizmetlerHub() {
                 <p className="flex-1 text-sm leading-[1.6] text-muted">
                   {s.desc_tr}
                 </p>
+                <RatingBadge value={s.rating_avg} count={s.rating_count} />
                 <span className="pt-2 text-[13px] font-medium text-accent">
                   Detaylar →
                 </span>

@@ -3,6 +3,7 @@ import { absUrl } from "@/lib/seo";
 import {
   phoneHref,
   type ServiceFull,
+  type ServiceReview,
   type Settings,
   type SubService,
 } from "@/lib/content";
@@ -93,7 +94,10 @@ export function serviceSchema(
   },
   name: string,
   path = `/hizmetler/${svc.slug}`,
+  rating?: { avg: number | null; count: number; reviews?: ServiceReview[] },
 ) {
+  const hasRating = Boolean(rating && rating.avg != null && rating.count > 0);
+  const reviews = rating?.reviews ?? [];
   return {
     "@context": "https://schema.org",
     "@type": "Service",
@@ -123,6 +127,33 @@ export function serviceSchema(
               },
             })),
           },
+        }
+      : {}),
+    ...(hasRating && rating
+      ? {
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: rating.avg,
+            reviewCount: rating.count,
+            bestRating: 5,
+            worstRating: 1,
+          },
+          ...(reviews.length
+            ? {
+                review: reviews.slice(0, 5).map((r) => ({
+                  "@type": "Review",
+                  author: { "@type": "Person", name: r.author_name },
+                  reviewRating: {
+                    "@type": "Rating",
+                    ratingValue: r.rating,
+                    bestRating: 5,
+                    worstRating: 1,
+                  },
+                  ...(r.reviewed_at ? { datePublished: r.reviewed_at } : {}),
+                  reviewBody: r.body,
+                })),
+              }
+            : {}),
         }
       : {}),
   };

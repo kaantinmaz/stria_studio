@@ -7,6 +7,8 @@ import { SettingsProvider } from "@/components/SettingsProvider";
 import { WhatsAppFab } from "@/components/WhatsAppFab";
 import { ChatWidget } from "@/components/ChatWidget";
 import { Analytics } from "@/components/Analytics";
+import { GoogleTag } from "@/components/GoogleTag";
+import { gtagBootstrapTag } from "@/lib/gtag";
 import { Popup } from "@/components/Popup";
 import { EngageSurvey } from "@/components/EngageSurvey";
 import { CookieConsent } from "@/components/CookieConsent";
@@ -60,9 +62,15 @@ export default async function RootLayout({
       {/* Admin-managed raw code, rendered inside <head> so verification meta
           tags and vendor snippets land where they are expected. Next's own
           metadata tags are hoisted into this same <head> by React.
-          Intentionally unescaped — admin-only. */}
-      <head dangerouslySetInnerHTML={{ __html: settings?.header_code ?? "" }} />
+          Consent Mode v2 varsayılanları en başa girer: gtag.js'ten önce
+          çalışmak zorunda. Intentionally unescaped — admin-only. */}
+      <head
+        dangerouslySetInnerHTML={{
+          __html: gtagBootstrapTag() + (settings?.header_code ?? ""),
+        }}
+      />
       <body>
+        <GoogleTag />
         <JsonLd data={beautySalonSchema(settings ?? SETTINGS_FALLBACK)} />
         <LanguageProvider>
           <SettingsProvider settings={settings}>

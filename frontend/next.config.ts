@@ -6,6 +6,10 @@ const nextConfig: NextConfig = {
   // hydration aborts → scroll-reveal never fires → below-hero content stays hidden.
   allowedDevOrigins: ["127.0.0.1"],
   images: {
+    // Next 16 SSRF koruması private IP'ye çözülen uzak görselleri reddeder;
+    // bu da yereldeki 127.0.0.1:8002 (Laravel /storage) desenlerini ölü
+    // bırakıyordu. Yalnızca dev'de açılır, prod'da kapalı kalır.
+    dangerouslyAllowLocalIP: process.env.NODE_ENV === "development",
     remotePatterns: [
       { protocol: "http", hostname: "127.0.0.1", port: "8002", pathname: "/storage/**" },
       { protocol: "http", hostname: "localhost", port: "8002", pathname: "/storage/**" },

@@ -68,6 +68,10 @@ export type Dict = {
   galleryKicker: string;
   galleryTitle: string;
   galleryText: string;
+  instagramKicker: string;
+  instagramTitle: string;
+  instagramText: string;
+  instagramCta: string;
   aboutKicker: string;
   aboutTitle: string;
   aboutText: string;
@@ -101,6 +105,12 @@ export type Dict = {
   formOk: string;
   formErr: string;
   formOr: string;
+  reviewsKicker: string;
+  reviewsTitle: string;
+  reviewCountLabel: string;
+  googleReviewsLabel: string;
+  googleViewLabel: string;
+  verifiedNote: string;
 };
 
 export const UI: Record<Lang, Dict> = {
@@ -136,6 +146,11 @@ export const UI: Record<Lang, Dict> = {
     galleryTitle: "Öncesi & Sonrası",
     galleryText:
       "Gerçek müşteri çalışmalarından bir seçki. Görselleri buraya yükleyebilirsin.",
+    instagramKicker: "INSTAGRAM",
+    instagramTitle: "Stüdyodan son paylaşımlar",
+    instagramText:
+      "Güncel çalışmalarımızı, öncesi–sonrası kareleri ve stüdyodan anları Instagram'da paylaşıyoruz.",
+    instagramCta: "Instagram'da takip et",
     aboutKicker: "Neden Stria",
     aboutTitle: "Rahat, güvenli ve tamamen sana özel",
     aboutText:
@@ -177,6 +192,12 @@ export const UI: Record<Lang, Dict> = {
     formOk: "Teşekkürler! Talebini aldık, en kısa sürede döneceğiz.",
     formErr: "Bir sorun oluştu. Lütfen tekrar dene ya da WhatsApp'tan yaz.",
     formOr: "veya",
+    reviewsKicker: "Yorumlar",
+    reviewsTitle: "Müşterilerimiz ne diyor?",
+    reviewCountLabel: "değerlendirme",
+    googleReviewsLabel: "Google yorumu",
+    googleViewLabel: "Google'da görüntüle",
+    verifiedNote: "Gerçek müşteri değerlendirmeleri",
   },
   en: {
     navServices: "Services",
@@ -210,6 +231,11 @@ export const UI: Record<Lang, Dict> = {
     galleryTitle: "Before & After",
     galleryText:
       "A selection of real client work. You can upload your own images here.",
+    instagramKicker: "INSTAGRAM",
+    instagramTitle: "Latest from the studio",
+    instagramText:
+      "We share our latest work, before-and-after shots and moments from the studio on Instagram.",
+    instagramCta: "Follow on Instagram",
     aboutKicker: "Why Stria",
     aboutTitle: "Relaxed, safe and entirely yours",
     aboutText:
@@ -252,5 +278,11 @@ export const UI: Record<Lang, Dict> = {
     formOk: "Thank you! We've received your request and will get back to you soon.",
     formErr: "Something went wrong. Please try again or message us on WhatsApp.",
     formOr: "or",
+    reviewsKicker: "Reviews",
+    reviewsTitle: "What our clients say",
+    reviewCountLabel: "reviews",
+    googleReviewsLabel: "Google reviews",
+    googleViewLabel: "View on Google",
+    verifiedNote: "Verified client feedback",
   },
 };

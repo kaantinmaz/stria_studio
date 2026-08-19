@@ -6,6 +6,12 @@ export const site = {
 
   // --- SEO / structured-data source of truth (owner replaces placeholders) ---
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? "https://striastudio.com.tr",
+
+  // GA4 ölçüm kimliği. Sabit bir kamusal değer; sunucuda build ortam değişkeni
+  // unutulursa etiket sessizce kaybolmasın diye varsayılan burada duruyor.
+  // Google Ads dönüşüm kimliği (AW-…) hesap açılınca `adsId`'ye eklenir.
+  gaId: process.env.NEXT_PUBLIC_GA_ID ?? "G-VHC49MXP5N",
+  adsId: process.env.NEXT_PUBLIC_ADS_ID ?? "",
   gbpUrl: "", // owner: paste the Google Business Profile URL when live
   nap: {
     name: "Stria Studio",

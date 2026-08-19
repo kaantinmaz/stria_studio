@@ -30,6 +30,10 @@ export type Settings = {
   popup_cta_url: string | null;
   header_code: string | null;
   footer_code: string | null;
+  google_rating: number | null;
+  google_review_count: number | null;
+  google_maps_url: string | null;
+  google_reviews_synced_at: string | null;
 };
 
 export const SETTINGS_FALLBACK: Settings = {
@@ -39,7 +43,7 @@ export const SETTINGS_FALLBACK: Settings = {
   instagram: "https://instagram.com/striastudio",
   instagram_handle: "@striastudio",
   address: "Çankaya, Ankara",
-  street_address: "[Mahalle] Cd. No: 00",
+  street_address: "Çankaya, Ankara",
   locality: "Çankaya",
   region: "Ankara",
   postal_code: "06000",
@@ -61,6 +65,10 @@ export const SETTINGS_FALLBACK: Settings = {
   popup_cta_url: null,
   header_code: null,
   footer_code: null,
+  google_rating: null,
+  google_review_count: null,
+  google_maps_url: null,
+  google_reviews_synced_at: null,
 };
 
 export type ServiceListItem = {
@@ -73,6 +81,8 @@ export type ServiceListItem = {
   desc_en: string;
   image: string | null;
   url: string;
+  rating_avg: number | null;
+  rating_count: number;
 };
 
 export type SubService = {
@@ -85,6 +95,16 @@ export type SubService = {
   intro?: string;
   benefits?: string[];
   faq?: { q: string; a: string }[];
+};
+
+export type ServiceReview = {
+  author_name: string;
+  rating: number;
+  body: string;
+  body_en: string | null;
+  source: string;
+  source_url: string | null;
+  reviewed_at: string | null;
 };
 
 export type ServiceFull = ServiceListItem & {
@@ -108,6 +128,7 @@ export type ServiceFull = ServiceListItem & {
   faq_en: { q: string; a: string }[];
   gallery: string[];
   related: string[];
+  reviews: ServiceReview[];
 };
 
 export type Lang = "tr" | "en";
@@ -133,9 +154,19 @@ async function api<T>(path: string, revalidate = 300): Promise<T | null> {
   }
 }
 
+// API'de puan alanları henüz olmayabilir; eksikse yıldız hiç görünmesin diye
+// rating_avg null, rating_count 0'a normalize edilir (sahte veri üretilmez).
+function normalizeListItem(item: ServiceListItem): ServiceListItem {
+  return {
+    ...item,
+    rating_avg: typeof item.rating_avg === "number" ? item.rating_avg : null,
+    rating_count: typeof item.rating_count === "number" ? item.rating_count : 0,
+  };
+}
+
 export async function getServices(): Promise<ServiceListItem[]> {
   const out = await api<{ data: ServiceListItem[] }>("/services");
-  return out?.data ?? [];
+  return (out?.data ?? []).map(normalizeListItem);
 }
 
 export async function getService(slug: string): Promise<ServiceFull | null> {
@@ -149,6 +180,9 @@ export async function getService(slug: string): Promise<ServiceFull | null> {
           (image): image is string => typeof image === "string" && image.length > 0,
         )
       : [],
+    rating_avg: typeof out.data.rating_avg === "number" ? out.data.rating_avg : null,
+    rating_count: typeof out.data.rating_count === "number" ? out.data.rating_count : 0,
+    reviews: Array.isArray(out.data.reviews) ? out.data.reviews : [],
   };
 }
 
@@ -160,7 +194,16 @@ export async function getServiceSlugs(): Promise<string[]> {
 export async function getSettings(): Promise<Settings | null> {
   // Short cache: admins toggle the campaign bar / contact info and expect it live.
   const out = await api<{ data: Settings }>("/settings", 30);
-  return out?.data ?? null;
+  if (!out?.data) return null;
+  // Google alanları API'de eksikse null'a normalize — graceful (rozet render edilmez).
+  return {
+    ...out.data,
+    google_rating: typeof out.data.google_rating === "number" ? out.data.google_rating : null,
+    google_review_count:
+      typeof out.data.google_review_count === "number" ? out.data.google_review_count : null,
+    google_maps_url: out.data.google_maps_url ?? null,
+    google_reviews_synced_at: out.data.google_reviews_synced_at ?? null,
+  };
 }
 
 export type GalleryItem2 = { image: string | null; alt_tr: string; alt_en: string | null };
@@ -173,6 +216,20 @@ export async function getGallery(): Promise<GalleryItem2[]> {
 
 export async function getFaqs(): Promise<FaqItem[]> {
   const out = await api<{ data: FaqItem[] }>("/faqs");
+  return out?.data ?? [];
+}
+
+export type InstagramPost = {
+  id: string;
+  permalink: string;
+  media_type: "IMAGE" | "VIDEO" | "CAROUSEL_ALBUM";
+  caption: string | null;
+  image: string | null;
+  posted_at: string | null;
+};
+
+export async function getInstagramPosts(): Promise<InstagramPost[]> {
+  const out = await api<{ data: InstagramPost[] }>("/instagram");
   return out?.data ?? [];
 }
 

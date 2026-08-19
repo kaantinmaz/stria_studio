@@ -4,13 +4,14 @@ import { ServiceStrip } from "@/components/ServiceStrip";
 import { PromoVideo } from "@/components/PromoVideo";
 import { Services } from "@/components/Services";
 import { Gallery } from "@/components/Gallery";
+import { InstagramFeed } from "@/components/InstagramFeed";
 import { About } from "@/components/About";
 import { Contact } from "@/components/Contact";
 import { HomeFaq } from "@/components/HomeFaq";
 import { Footer } from "@/components/Footer";
 import { JsonLd } from "@/components/JsonLd";
 import { faqSchema } from "@/components/schema";
-import { getGallery, getFaqs } from "@/lib/content";
+import { getGallery, getFaqs, getInstagramPosts } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata = buildMetadata({
@@ -23,7 +24,11 @@ export const metadata = buildMetadata({
 export const revalidate = 300;
 
 export default async function Home() {
-  const [gallery, faqs] = await Promise.all([getGallery(), getFaqs()]);
+  const [gallery, faqs, posts] = await Promise.all([
+    getGallery(),
+    getFaqs(),
+    getInstagramPosts(),
+  ]);
 
   return (
     <>
@@ -35,6 +40,7 @@ export default async function Home() {
         <PromoVideo />
         <Services />
         <Gallery items={gallery} />
+        <InstagramFeed posts={posts} />
         <About />
         <Contact />
         <HomeFaq faqs={faqs} title="Sıkça Sorulan Sorular" />

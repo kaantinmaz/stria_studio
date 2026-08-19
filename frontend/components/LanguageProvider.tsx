@@ -27,6 +27,9 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   }, [lang]);
 
   // Scroll-reveal: mirror the design's IntersectionObserver behaviour.
+  // This provider is mounted once in the root layout, so the effect must also
+  // pick up `.reveal` nodes mounted by later client-side route changes —
+  // otherwise they keep the `reveal-ready` opacity:0 and never animate in.
   useEffect(() => {
     // This code only runs from a loaded JS chunk. Marking the doc here (not in
     // CSS/inline) guarantees content stays visible if the chunk never loads.
@@ -42,13 +45,24 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       },
       { threshold: 0.12 },
     );
-    const id = setTimeout(() => {
-      document
-        .querySelectorAll(".reveal:not(.in)")
-        .forEach((el) => io.observe(el));
-    }, 60);
+    // Re-observing an element already observed is a no-op, so this is safe.
+    const observe = (root: ParentNode) => {
+      if (root instanceof Element && root.matches(".reveal:not(.in)")) {
+        io.observe(root);
+      }
+      root.querySelectorAll(".reveal:not(.in)").forEach((el) => io.observe(el));
+    };
+    observe(document);
+    const mo = new MutationObserver((records) => {
+      for (const record of records) {
+        record.addedNodes.forEach((node) => {
+          if (node.nodeType === Node.ELEMENT_NODE) observe(node as Element);
+        });
+      }
+    });
+    mo.observe(document.body, { childList: true, subtree: true });
     return () => {
-      clearTimeout(id);
+      mo.disconnect();
       io.disconnect();
     };
   }, []);

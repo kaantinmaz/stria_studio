@@ -7,6 +7,7 @@ import { pickLang } from "@/lib/content";
 import { ImageSlot } from "@/components/ImageSlot";
 import { MyLaminationChip } from "@/components/MyLaminationBadge";
 import { ML_SERVICE_SCOPE } from "@/lib/mylamination";
+import { RatingBadge } from "@/components/RatingBadge";
 
 export function Services() {
   const { lang, t } = useLang();
@@ -55,6 +56,7 @@ export function Services() {
                 <p className="flex-1 text-sm leading-[1.6] text-muted">
                   {pickLang(s.desc_tr, s.desc_en, lang)}
                 </p>
+                <RatingBadge value={s.rating_avg} count={s.rating_count} />
                 <div className="flex items-center justify-between pt-[6px]">
                   <span className="text-[11px] uppercase tracking-[0.06em] text-accent">
                     {t.priceNote}

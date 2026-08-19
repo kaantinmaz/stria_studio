@@ -6,7 +6,9 @@ import { useSettings } from "@/components/SettingsProvider";
 import { phoneHref } from "@/lib/content";
 import { IMG } from "@/lib/i18n";
 import { ImageSlot } from "@/components/ImageSlot";
-import { PhoneIcon, WhatsAppIcon } from "@/components/Icons";
+import { PhoneIcon, WhatsAppIcon, GoogleIcon } from "@/components/Icons";
+import { Stars } from "@/components/Stars";
+import { useGoogleRating } from "@/components/GoogleRatingBadge";
 import { CallLabel } from "@/components/CallLabel";
 
 export function Hero() {
@@ -134,16 +136,48 @@ export function Hero() {
           </span>
         </a>
 
-        {/* rating chip */}
-        <div className="absolute right-2 top-6 rounded-[18px] bg-ink px-4 py-3 text-center text-cream shadow-[0_20px_40px_-18px_rgba(76,19,19,0.5)] sm:right-[-8px]">
-          <div className="text-[22px] font-medium leading-none tracking-[-0.02em]">
-            5.0
-          </div>
-          <div className="mt-1 text-[10px] tracking-[0.08em] text-[#eed6d7]">
-            ★★★★★
-          </div>
-        </div>
+        {/* Google rating chip — real value only; hidden entirely when unset */}
+        <GoogleRatingChip />
       </div>
     </header>
+  );
+}
+
+// Dark hero variant of the Google rating badge. Same data and wording as
+// GoogleRatingBadge (shared hook) — only the chip styling differs.
+function GoogleRatingChip() {
+  const google = useGoogleRating();
+  if (!google) return null;
+
+  const { rating, num, label, aria, url } = google;
+  const chipClass =
+    "absolute right-2 top-6 flex flex-col items-center gap-[6px] rounded-[18px] bg-ink px-4 py-3 text-center text-cream shadow-[0_20px_40px_-18px_rgba(76,19,19,0.5)] sm:right-[-8px]";
+  const body = (
+    <>
+      <span className="text-[22px] font-medium leading-none tracking-[-0.02em]">
+        {num}
+      </span>
+      <Stars value={rating} size={12} />
+      <span className="inline-flex items-center gap-[5px] text-[10px] tracking-[0.06em] text-[#eed6d7]">
+        <GoogleIcon size={11} />
+        {label}
+      </span>
+    </>
+  );
+
+  return url ? (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={chipClass}
+      aria-label={aria}
+    >
+      {body}
+    </a>
+  ) : (
+    <div className={chipClass} aria-label={aria}>
+      {body}
+    </div>
   );
 }

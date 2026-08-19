@@ -74,8 +74,14 @@ export default function GizlilikPolitikasiPage() {
                 açık metin olarak tutulmaz.
               </li>
               <li>
+                <span className="font-medium text-ink">Hesap tanımlayıcıları:</span>{" "}
+                uygulama kullanıcı kimliğiniz ve müşteri kodunuz; hesabınızı doğru
+                kayıtlarla eşleştirmek için kullanılır.
+              </li>
+              <li>
                 <span className="font-medium text-ink">Randevu bilgileri:</span>{" "}
-                randevu tarihi, seçtiğiniz hizmet ve randevu durumu.
+                randevu tarihi, seçtiğiniz hizmet, randevu durumu ve varsa randevuya
+                eklediğiniz notlar.
               </li>
               <li>
                 <span className="font-medium text-ink">
@@ -90,7 +96,17 @@ export default function GizlilikPolitikasiPage() {
                 </span>{" "}
                 uygulama içindeki sohbet asistanına gönderdiğiniz mesajlar.
               </li>
+              <li>
+                <span className="font-medium text-ink">Uygulama kullanım verisi:</span>{" "}
+                bildirim listesini en son ne zaman görüntülediğiniz; yalnızca yeni
+                içerik rozetini sıfırlamak için tutulur.
+              </li>
             </ul>
+            <p className={`${textClass} mt-4`}>
+              Konum, kişiler, sağlık verisi, ödeme bilgisi, reklam kimliği veya
+              cihaz kimliği toplamayız; sizi izlemez, üçüncü taraf analitik ya da
+              reklam yazılımı kullanmayız.
+            </p>
           </section>
 
           <section className={sectionClass}>
@@ -101,19 +117,52 @@ export default function GizlilikPolitikasiPage() {
               <li>Size kampanya ve duyuruları göstermek,</li>
               <li>Destek taleplerinizi karşılamak ve sizinle iletişim kurmak.</li>
             </ul>
-          </section>
-
-          <section className={sectionClass}>
-            <h2 className={headingClass}>4. Yapay zekâ işlemesi</h2>
-            <p className={textClass}>
-              Sohbet asistanına gönderdiğiniz mesajlar, size yanıt üretebilmek
-              amacıyla bir yapay zekâ hizmet sağlayıcısına (Anthropic) iletilir.
-              Sohbet geçmişiniz profilleme veya reklam amacıyla kullanılmaz.
+            <p className={`${textClass} mt-4`}>
+              Verileriniz yalnızca uygulamanın çalışması için işlenir; reklam,
+              profilleme veya sizi izleme amacıyla kullanılmaz.
             </p>
           </section>
 
           <section className={sectionClass}>
-            <h2 className={headingClass}>5. Üçüncü taraflar</h2>
+            <h2 className={headingClass}>4. Yapay zekâ sohbeti ve onayınız</h2>
+            <p className={`${textClass} mb-4`}>
+              Sohbet asistanını ilk kez açtığınızda, hangi verinin nereye ve neden
+              gönderileceğini açıklayan bir onay adımı gösterilir. Onay vermeden
+              sohbet başlatılmaz.
+            </p>
+            <ul className={listClass}>
+              <li>
+                Size yanıt üretebilmek için yazdığınız mesajlar; adınız, müşteri
+                kodunuz, son randevularınız ve sadakat özetinizle birlikte bir
+                yapay zekâ hizmet sağlayıcısına (Anthropic) iletilir.
+              </li>
+              <li>
+                E-posta adresiniz ve telefon numaranız sohbet için gönderilmez.
+              </li>
+              <li>
+                Sohbet geçmişiniz profilleme veya reklam amacıyla kullanılmaz.
+              </li>
+              <li>
+                Verdiğiniz onayı dilediğiniz zaman{" "}
+                <span className="font-medium text-ink">Profil</span> ekranından
+                geri çekebilirsiniz; onayı geri çektiğinizde sohbet, yeniden onay
+                verene kadar açılmaz.
+              </li>
+            </ul>
+          </section>
+
+          <section className={sectionClass}>
+            <h2 className={headingClass}>5. Kamera ve QR ile eşleşme</h2>
+            <p className={textClass}>
+              Stüdyoda gösterilen QR kodunu okutarak mevcut müşteri kaydınızla
+              eşleşmek isteğe bağlıdır ve kamera izni gerektirir. Kamera
+              görüntüleri veya kareleri sunucuya yüklenmez; QR yalnızca cihazınızda
+              çözümlenir. Sunucuya yalnızca okunan eşleştirme kodu gönderilir.
+            </p>
+          </section>
+
+          <section className={sectionClass}>
+            <h2 className={headingClass}>6. Üçüncü taraflar</h2>
             <p className={textClass}>
               Verileriniz, hizmetin çalışması için gerekli olduğu ölçüde yalnızca
               barındırma sağlayıcımız ve yapay zekâ hizmet sağlayıcımızla
@@ -124,29 +173,39 @@ export default function GizlilikPolitikasiPage() {
           </section>
 
           <section className={sectionClass}>
-            <h2 className={headingClass}>6. Saklama ve silme</h2>
+            <h2 className={headingClass}>
+              7. Hesap silme, saklama ve anonimleştirme
+            </h2>
             <p className={`${textClass} mb-4`}>
               Hesabınızı dilediğiniz zaman doğrudan uygulama içinden{" "}
               <span className="font-medium text-ink">
                 Profil &gt; Hesabımı Sil
               </span>{" "}
-              adımını izleyerek kalıcı olarak silebilirsiniz.
+              adımını izleyerek silebilirsiniz. Bu işlem tek seferde yapılır ve
+              geri alınamaz.
             </p>
             <ul className={listClass}>
               <li>
-                Hesabınıza ait veriler (ad soyad, e-posta, telefon, oturum
-                anahtarları) derhal ve kalıcı olarak silinir.
+                Uygulama hesabınız ve tüm oturum anahtarlarınız (giriş token&apos;ları)
+                kalıcı olarak silinir; silinen hesapla tekrar giriş yapılamaz.
               </li>
               <li>
-                Randevu ve işletme kayıtları, tabi olduğumuz yasal saklama
-                süreleri boyunca kimliksizleştirilerek (sizinle ilişkilendirilemez
-                biçimde) saklanır.
+                Stüdyodaki müşteri kaydınızdaki kişisel bilgiler anonimleştirilir:
+                adınız &quot;Silinmiş Müşteri&quot; olarak değiştirilir; telefon,
+                e-posta, Instagram ve not alanları boşaltılır. Size ait randevu
+                fotoğrafları ve dosyaları silinir.
+              </li>
+              <li>
+                Geçmiş randevu kayıtları (tarih, hizmet ve tutar bilgisi) işletme
+                muhasebesi ve tabi olduğumuz yasal yükümlülükler için tutulmaya
+                devam eder; ancak bu kayıtlarda sizi tanımlayan ya da sizinle
+                ilişkilendirilebilecek hiçbir alan bırakılmaz.
               </li>
             </ul>
           </section>
 
           <section className={sectionClass}>
-            <h2 className={headingClass}>7. Haklarınız</h2>
+            <h2 className={headingClass}>8. Haklarınız</h2>
             <p className={textClass}>
               6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) kapsamındaki
               haklarınızın ayrıntılarına ve md. 11 uyarınca sahip olduğunuz
@@ -159,7 +218,7 @@ export default function GizlilikPolitikasiPage() {
           </section>
 
           <section className={sectionClass}>
-            <h2 className={headingClass}>8. İletişim</h2>
+            <h2 className={headingClass}>9. İletişim</h2>
             <p className={`${textClass} mb-4`}>
               Gizliliğinizle ilgili sorularınızı ve taleplerinizi{" "}
               <Link href="/iletisim" className={linkClass}>
@@ -167,7 +226,7 @@ export default function GizlilikPolitikasiPage() {
               </Link>{" "}
               güncel kanallardan Stria Studio&apos;ya iletebilirsiniz.
             </p>
-            <p className={textClass}>Yürürlük tarihi: 17.07.2026.</p>
+            <p className={textClass}>Yürürlük tarihi: 12.08.2026.</p>
           </section>
         </div>
       </main>
