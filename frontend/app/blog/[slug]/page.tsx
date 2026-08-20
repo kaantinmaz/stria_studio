@@ -7,7 +7,7 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { JsonLd } from "@/components/JsonLd";
 import { breadcrumbSchema } from "@/components/schema";
 import { buildMetadata, absUrl } from "@/lib/seo";
-import { getPost, getAllPosts, getCategories } from "@/lib/blog";
+import { getPost, getAllPosts, getCategories, extractFaq } from "@/lib/blog";
 
 export const revalidate = 300;
 
@@ -77,10 +77,28 @@ export default async function PostPage({
     mainEntityOfPage: absUrl(`/blog/${post.slug}`),
   };
 
+  // Yazıların "Sık Sorulan Sorular" bölümü hizmet sayfalarındaki gibi FAQPage'e
+  // dönüşür; bölümü olmayan yazıda şema hiç basılmaz.
+  const faq = extractFaq(post.body_tr);
+
   return (
     <>
       <Nav />
       <JsonLd data={blogPosting} />
+      {faq.length > 0 && (
+        <JsonLd
+          data={{
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "@id": absUrl(`/blog/${post.slug}#faq`),
+            mainEntity: faq.map((item) => ({
+              "@type": "Question",
+              name: item.q,
+              acceptedAnswer: { "@type": "Answer", text: item.a },
+            })),
+          }}
+        />
+      )}
       <JsonLd
         data={breadcrumbSchema([
           { name: "Ana Sayfa", path: "/" },

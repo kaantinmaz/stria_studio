@@ -97,6 +97,46 @@ export function readingMinutes(html: string): number {
   return Math.max(1, Math.round(words / 200));
 }
 
+export type FaqItem = { q: string; a: string };
+
+const FAQ_SECTION =
+  /<h([23])[^>]*>[^<]*(?:sık sorulan|sss|frequently asked|faq)[^<]*<\/h\1>([\s\S]*?)(?=<h[12]|$)/i;
+const FAQ_H3 =
+  /<h3[^>]*>([\s\S]*?)<\/h3>\s*((?:<(?:p|ul|ol)[^>]*>[\s\S]*?<\/(?:p|ul|ol)>\s*)+)/gi;
+const FAQ_STRONG = /<p[^>]*>\s*<strong>([\s\S]*?)<\/strong>([\s\S]*?)<\/p>/gi;
+
+const plain = (s: string) =>
+  s.replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
+
+/**
+ * Yazıların "Sık Sorulan Sorular" bölümünü FAQPage şemasına çevirmek için ayıklar.
+ * Editörde iki kalıp kullanılmış: `<h3>Soru</h3><p>Cevap</p>` ve
+ * `<p><strong>Soru?</strong> Cevap</p>`. İkincisi yalnız h3 kalıbı hiç eşleşmezse
+ * denenir, yoksa gövdedeki vurgulu cümleler soru sanılır.
+ */
+export function extractFaq(html: string): FaqItem[] {
+  const section = FAQ_SECTION.exec(html);
+  if (!section) return [];
+  const body = section[2];
+  const out: FaqItem[] = [];
+
+  FAQ_H3.lastIndex = 0;
+  for (let m = FAQ_H3.exec(body); m; m = FAQ_H3.exec(body)) {
+    const q = plain(m[1]);
+    const a = plain(m[2]);
+    if (q && a) out.push({ q, a });
+  }
+  if (out.length > 0) return out;
+
+  FAQ_STRONG.lastIndex = 0;
+  for (let m = FAQ_STRONG.exec(body); m; m = FAQ_STRONG.exec(body)) {
+    const q = plain(m[1]);
+    const a = plain(m[2]);
+    if (q && a.length > 20) out.push({ q, a });
+  }
+  return out;
+}
+
 const REVALIDATE = 300;
 
 async function api<T>(path: string): Promise<T | null> {
