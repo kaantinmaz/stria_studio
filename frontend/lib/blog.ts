@@ -31,6 +31,72 @@ export type Paginated<T> = {
   meta: { current_page: number; last_page: number; total: number };
 };
 
+export type Heading = { id: string; text: string; level: 2 | 3 };
+
+const TR_FOLD: Record<string, string> = {
+  ç: "c",
+  ğ: "g",
+  ı: "i",
+  ö: "o",
+  ş: "s",
+  ü: "u",
+  â: "a",
+  î: "i",
+  û: "u",
+};
+
+export function slugifyTr(text: string): string {
+  return (
+    text
+      .toLocaleLowerCase("tr")
+      .replace(/[çğıöşüâîû]/g, (c) => TR_FOLD[c] ?? c)
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "bolum"
+  );
+}
+
+/**
+ * Gövde HTML'i sahibi admin editöründe yazar; başlıklarda id bulunmaz. İçindekiler
+ * bağlantılarının çalışması için h2/h3'lere kararlı id basıp listeyi çıkarıyoruz.
+ */
+export function withHeadings(html: string): { html: string; headings: Heading[] } {
+  const headings: Heading[] = [];
+  const used = new Map<string, number>();
+
+  const out = html.replace(
+    /<h([23])\b([^>]*)>([\s\S]*?)<\/h\1>/gi,
+    (match, lvl: string, attrs: string, inner: string) => {
+      const text = inner.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+      if (!text) return match;
+
+      const existing = /\bid=["']([^"']+)["']/i.exec(attrs);
+      let id = existing?.[1] ?? slugifyTr(text);
+      if (!existing) {
+        const seen = used.get(id) ?? 0;
+        used.set(id, seen + 1);
+        if (seen > 0) id = `${id}-${seen + 1}`;
+      }
+
+      headings.push({ id, text, level: Number(lvl) as 2 | 3 });
+      return existing
+        ? match
+        : `<h${lvl}${attrs} id="${id}">${inner}</h${lvl}>`;
+    },
+  );
+
+  return { html: out, headings };
+}
+
+/** Dakika cinsinden kaba okuma süresi (200 kelime/dk). */
+export function readingMinutes(html: string): number {
+  const words = html
+    .replace(/<[^>]+>/g, " ")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean).length;
+  return Math.max(1, Math.round(words / 200));
+}
+
 const REVALIDATE = 300;
 
 async function api<T>(path: string): Promise<T | null> {
@@ -88,9 +154,4 @@ export async function getAllPosts(): Promise<PostList[]> {
     page++;
   }
   return posts;
-}
-
-export async function getAllPostSlugs(): Promise<string[]> {
-  const posts = await getAllPosts();
-  return posts.map((p) => p.slug);
 }

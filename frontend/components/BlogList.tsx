@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { useLang } from "@/components/LanguageProvider";
@@ -15,11 +15,15 @@ export function BlogList({
   categories: Category[];
 }) {
   const { lang } = useLang();
-  const [active, setActive] = useState<string | null>(null);
+  const router = useRouter();
+  const params = useSearchParams();
+  const active = params.get("kategori");
 
-  const posts = active
-    ? initial.filter((p) => p.category?.slug === active)
-    : initial;
+  const setActive = (slug: string | null) => {
+    router.replace(slug ? `/blog?kategori=${slug}` : "/blog", { scroll: false });
+  };
+
+  const posts = active ? initial.filter((p) => p.category?.slug === active) : initial;
 
   return (
     <section className="px-[clamp(18px,5vw,56px)] pb-[clamp(64px,8vw,120px)]">

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { BlogList } from "@/components/BlogList";
@@ -33,7 +34,9 @@ export default async function BlogPage() {
             <h1 className="text-[clamp(32px,4.6vw,58px)] leading-[1.05]">Blog</h1>
           </div>
         </header>
-        <BlogList initial={posts} categories={categories} />
+        <Suspense fallback={null}>
+          <BlogList initial={posts} categories={categories} />
+        </Suspense>
       </main>
       <Footer />
     </>

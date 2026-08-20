@@ -3,16 +3,17 @@ import type { Metadata } from "next";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { PostBody } from "@/components/PostBody";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { JsonLd } from "@/components/JsonLd";
 import { breadcrumbSchema } from "@/components/schema";
 import { buildMetadata, absUrl } from "@/lib/seo";
-import { getPost, getAllPostSlugs } from "@/lib/blog";
+import { getPost, getAllPosts, getCategories } from "@/lib/blog";
 
 export const revalidate = 300;
 
 export async function generateStaticParams() {
-  const slugs = await getAllPostSlugs();
-  return slugs.map((slug) => ({ slug }));
+  const posts = await getAllPosts();
+  return posts.map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({
@@ -37,8 +38,26 @@ export default async function PostPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const post = await getPost(slug);
+  const [post, allPosts, categories] = await Promise.all([
+    getPost(slug),
+    getAllPosts(),
+    getCategories(),
+  ]);
   if (!post) notFound();
+
+  const others = allPosts.filter((p) => p.slug !== slug);
+  const recent = others.slice(0, 5);
+  const related = post.category
+    ? others.filter((p) => p.category?.slug === post.category?.slug).slice(0, 2)
+    : [];
+  const counts: Record<string, number> = {};
+  for (const p of allPosts) {
+    if (p.category) counts[p.category.slug] = (counts[p.category.slug] ?? 0) + 1;
+  }
+  // API yeniden eskiye sıralar: listede bir sonraki kayıt daha eski yazıdır.
+  const i = allPosts.findIndex((p) => p.slug === slug);
+  const prev = i >= 0 ? (allPosts[i + 1] ?? null) : null;
+  const next = i > 0 ? allPosts[i - 1] : null;
 
   const blogPosting = {
     "@context": "https://schema.org",
@@ -69,8 +88,23 @@ export default async function PostPage({
           { name: post.title_tr, path: `/blog/${post.slug}` },
         ])}
       />
-      <main className="pt-[132px]">
-        <PostBody post={post} />
+      <Breadcrumbs
+        items={[
+          { name: "Ana Sayfa", path: "/" },
+          { name: "Blog", path: "/blog" },
+          { name: post.title_tr, path: `/blog/${post.slug}` },
+        ]}
+      />
+      <main>
+        <PostBody
+          post={post}
+          related={related}
+          prev={prev}
+          next={next}
+          categories={categories}
+          counts={counts}
+          recent={recent}
+        />
       </main>
       <Footer />
     </>
