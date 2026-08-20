@@ -6,6 +6,8 @@ import Link from "next/link";
 import { useLang } from "@/components/LanguageProvider";
 import { fmtDate } from "@/lib/date";
 import { BlogSidebar } from "@/components/BlogSidebar";
+import { PostServices } from "@/components/PostServices";
+import type { ServiceListItem } from "@/lib/content";
 import { readingMinutes, withHeadings, type Category, type PostFull, type PostList } from "@/lib/blog";
 
 export function PostBody({
@@ -16,6 +18,7 @@ export function PostBody({
   categories,
   counts,
   recent,
+  services,
 }: {
   post: PostFull;
   related: PostList[];
@@ -24,6 +27,7 @@ export function PostBody({
   categories: Category[];
   counts: Record<string, number>;
   recent: PostList[];
+  services: ServiceListItem[];
 }) {
   const { lang, t } = useLang();
   const tr = lang === "tr";
@@ -87,6 +91,8 @@ export function PostBody({
               ))}
             </div>
           )}
+
+          <PostServices services={services} />
 
           <section className="mt-10 flex flex-col gap-4 rounded-[24px] border border-line bg-white p-6 sm:flex-row sm:items-center">
             <div className="relative h-[72px] w-[72px] shrink-0 overflow-hidden rounded-full bg-pink">

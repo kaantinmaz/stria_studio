@@ -7,7 +7,8 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { JsonLd } from "@/components/JsonLd";
 import { breadcrumbSchema } from "@/components/schema";
 import { buildMetadata, absUrl } from "@/lib/seo";
-import { getPost, getAllPosts, getCategories, extractFaq } from "@/lib/blog";
+import { getPost, getAllPosts, getCategories, extractFaq, relatedServiceSlugs } from "@/lib/blog";
+import { getServices } from "@/lib/content";
 
 export const revalidate = 300;
 
@@ -38,10 +39,11 @@ export default async function PostPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const [post, allPosts, categories] = await Promise.all([
+  const [post, allPosts, categories, allServices] = await Promise.all([
     getPost(slug),
     getAllPosts(),
     getCategories(),
+    getServices(),
   ]);
   if (!post) notFound();
 
@@ -58,6 +60,10 @@ export default async function PostPage({
   const i = allPosts.findIndex((p) => p.slug === slug);
   const prev = i >= 0 ? (allPosts[i + 1] ?? null) : null;
   const next = i > 0 ? allPosts[i - 1] : null;
+  const wantedSlugs = relatedServiceSlugs(post, allServices);
+  const services = wantedSlugs
+    .map((s) => allServices.find((service) => service.slug === s))
+    .filter((service) => service !== undefined);
 
   const blogPosting = {
     "@context": "https://schema.org",
@@ -122,6 +128,7 @@ export default async function PostPage({
           categories={categories}
           counts={counts}
           recent={recent}
+          services={services}
         />
       </main>
       <Footer />

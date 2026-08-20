@@ -137,6 +137,45 @@ export function extractFaq(html: string): FaqItem[] {
   return out;
 }
 
+const SERVICE_HREF = /href="\/hizmetler\/([a-z0-9-]+)"/g;
+
+/**
+ * Yazının konusuyla ilgili hizmetleri bulur; okuyucu hizmet almak isterse
+ * yazının altından doğrudan hizmet sayfasına gider.
+ *
+ * Birincil sinyal gövdedeki hizmet bağlantılarıdır — bunları yazının kendisi
+ * bağlam içinde kurar, 45 yazının 43'ünde var ve isabetli. Bağlantı yoksa
+ * hizmet adı başlıkta veya girişte aranır. İkisi de tutmazsa blok basılmaz;
+ * duyuru tipi yazılara alakasız hizmet iliştirmek istemiyoruz.
+ */
+export function relatedServiceSlugs(
+  post: Pick<PostFull, "title_tr" | "body_tr">,
+  services: { slug: string; name_tr: string }[],
+  limit = 3,
+): string[] {
+  const known = new Set(services.map((s) => s.slug));
+  const found: string[] = [];
+
+  SERVICE_HREF.lastIndex = 0;
+  for (let m = SERVICE_HREF.exec(post.body_tr); m; m = SERVICE_HREF.exec(post.body_tr)) {
+    if (known.has(m[1]) && !found.includes(m[1])) found.push(m[1]);
+  }
+  if (found.length > 0) return found.slice(0, limit);
+
+  // Bağlantı yoksa ada göre eşle. Sıra hizmet listesinin sırası değil, alaka:
+  // başlıkta geçen hizmet önce, sonra gövdede erken geçen.
+  const title = post.title_tr.toLocaleLowerCase("tr");
+  const intro = plain(post.body_tr).slice(0, 600).toLocaleLowerCase("tr");
+  const scored: { slug: string; rank: number }[] = [];
+  for (const service of services) {
+    const name = service.name_tr.toLocaleLowerCase("tr");
+    if (title.includes(name)) scored.push({ slug: service.slug, rank: title.indexOf(name) });
+    else if (intro.includes(name)) scored.push({ slug: service.slug, rank: 1000 + intro.indexOf(name) });
+  }
+  scored.sort((a, b) => a.rank - b.rank);
+  return scored.slice(0, limit).map((s) => s.slug);
+}
+
 const REVALIDATE = 300;
 
 async function api<T>(path: string): Promise<T | null> {
