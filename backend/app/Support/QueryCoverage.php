@@ -48,6 +48,12 @@ final class QueryCoverage
         $tokens = $this->meaningfulTokens($normalized);
         $markers = $this->markers($normalized);
 
+        // Marka/gezinme sorgusu ("stria studio"): anlamlı token kalmaz. Bunu
+        // ana sayfa karşılar; blog yazısı üretilmemeli.
+        if ($tokens === []) {
+            return ['status' => 'covered', 'target' => '/', 'score' => 1.0];
+        }
+
         // Bilgi niyetli sorgular hizmet adını içerse bile yazı ister.
         if ($markers === []) {
             foreach ($this->inventory->services() as $service) {

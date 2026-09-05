@@ -71,10 +71,22 @@ class WriteBlogPost extends Command
                 break;
             }
 
+            // Yeni sorgu kalmadıysa günü boş geçirmek yerine, yüksek gösterimli
+            // bir sorguyu karşılayan EN ZAYIF (en kısa) yazı tazelenir. Yeni URL
+            // açılmaz; içerik çürümesi giderilir.
             if ($query === null) {
-                $this->error("'{$period}' döneminde yazılacak yeni (kapsanmamış) sorgu bulunamadı.");
+                $stale = $this->weakestCoveredPost($period, $coverage);
 
-                return self::FAILURE;
+                if ($stale === null) {
+                    $this->error("'{$period}' döneminde yazılacak yeni sorgu ve tazelenecek yazı bulunamadı.");
+
+                    return self::FAILURE;
+                }
+
+                $targetRow = $stale['row'];
+                $query = $stale['row']->query;
+                $this->line('Yeni (kapsanmamış) sorgu kalmadı; en zayıf mevcut yazı tazeleniyor: '.$stale['slug'].' ('.$stale['words'].' kelime).');
+                $this->input->setOption('slug', $stale['slug']);
             }
         }
 
@@ -206,6 +218,47 @@ class WriteBlogPost extends Command
         $this->line('Not: Next.js ISR penceresi 300 sn; değişiklik en geç 5 dakika içinde canlıda görünür.');
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Yüksek gösterimli sorguları karşılayan yayınlanmış yazılar arasından en
+     * kısa olanı (içerik çürümesi adayı) döndürür. Yeni sorgu kalmadığında
+     * günlük çalışma bunu tazeler; yeni URL açılmaz.
+     *
+     * @return array{row: SearchQuery, slug: string, words: int}|null
+     */
+    private function weakestCoveredPost(string $period, QueryCoverage $coverage): ?array
+    {
+        $best = null;
+
+        foreach (SearchQuery::where('period', $period)->opportunity()->take(25)->get() as $row) {
+            $result = $coverage->classify($row->query);
+            $target = $result['target'];
+
+            if ($result['status'] !== 'covered' || $target === null || ! str_starts_with($target, '/blog/')) {
+                continue;
+            }
+
+            $slug = substr($target, strlen('/blog/'));
+            $post = Post::published()->whereNull('site')->where('slug', $slug)->first();
+
+            if ($post === null) {
+                continue;
+            }
+
+            // Aynı gün iki kez tazelenmesin.
+            if ($post->updated_at !== null && $post->updated_at->isToday()) {
+                continue;
+            }
+
+            $words = count(preg_split('/\s+/', trim(strip_tags((string) $post->body_tr)), -1, PREG_SPLIT_NO_EMPTY) ?: []);
+
+            if ($best === null || $words < $best['words']) {
+                $best = ['row' => $row, 'slug' => $slug, 'words' => $words];
+            }
+        }
+
+        return $best;
     }
 
     private function relatedQueries(string $query, ?string $period, QueryCoverage $coverage): string
