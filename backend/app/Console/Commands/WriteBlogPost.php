@@ -235,7 +235,15 @@ class WriteBlogPost extends Command
         $cfg = config('content.post');
 
         return implode("\n", [
-            sprintf('- Gövde uzunluğu: %d-%d kelime.', $cfg['min_words'], $cfg['max_words']),
+            // Model alt sınıra yaklaşıp altında kalıyordu; net bir hedef aralık
+            // veriliyor ve sert sınır ayrıca hatırlatılıyor.
+            sprintf(
+                '- Gövde uzunluğu: HEDEF %d-%d kelime. %d kelimenin ALTI ve %d kelimenin ÜSTÜ reddedilir; kısa kalırsan yazı yayımlanmaz.',
+                min($cfg['min_words'] + 200, $cfg['max_words']),
+                min($cfg['min_words'] + 500, $cfg['max_words']),
+                $cfg['min_words'],
+                $cfg['max_words']
+            ),
             sprintf('- En az %d adet <h2> alt başlık.', $cfg['min_h2']),
             sprintf('- En az %d hizmet sayfası linki ve %d blog yazısı linki (yalnızca envanterdeki iç URL\'ler).', $cfg['min_service_links'], $cfg['min_post_links']),
             sprintf('- Meta başlık en fazla %d karakter.', $cfg['meta_title_max']),
