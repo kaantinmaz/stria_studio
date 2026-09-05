@@ -63,6 +63,48 @@ Log: `backend/storage/logs/content-write.log`. Cron (Plesk, dakikalık):
 Zamanlanmış çalışmayı beklemeden denemek için:
 `php artisan schedule:test --name="content:write"`.
 
+## Kapak görselleri
+
+Yazı kapakları `posts.cover_path` → `https://admin.striastudio.com.tr/storage/covers/...`
+olarak servis edilir ve frontend'de yazı başında, blog listesinde, ilgili yazı
+kartlarında ve `BlogPosting` JSON-LD `image` alanında kullanılır.
+
+### Özgün görsel bağlama
+
+```
+php artisan content:cover <slug> --url=<görsel-url>
+php artisan content:cover <slug> --file=/tmp/kapak.jpg
+```
+
+Tip Content-Type'a değil imza baytlarına göre doğrulanır (JPG/PNG/WebP, ≤5 MB),
+dosya `covers/<slug>-<ts>.<ext>` olarak yazılır, artık kullanılmayan eski kapak
+silinir ve yayındaki yazı için IndexNow ping'i atılır.
+
+### Otomatik yazının kapağı: havuz
+
+Görseller **Higgsfield MCP ile üretilir ve MCP istemci taraflıdır** — sunucudaki
+cron Higgsfield'ı çağıramaz. Bu yüzden `content:write` kapaksız kalan yazıya
+konu bazlı bir **havuz görseli** bağlar:
+
+- Havuz: `storage/app/public/covers/pool/<hizmet-slug>.jpg` + `genel.jpg`
+  (mevcut: microblading, kas-pudralama, eyeliner, dipliner, dudak-renklendirme,
+  kas-laminasyon, kirpik-lifting, kamuflaj-makyaj, genel).
+- Konu, gövdede **en çok geçen** `/hizmetler/<slug>` linkinden belirlenir; eşleşme
+  yoksa `genel.jpg`.
+- Havuz dosyaları paylaşımlıdır (kopyalanmaz); `content:cover` eski kapağı
+  yalnızca başka yazı kullanmıyorsa siler, yani havuz dosyaları korunur.
+- Havuz `storage/` altındadır, git deploy'u ile gelmez. Sunucu storage'ı
+  sıfırlanırsa görseller yeniden üretilip yüklenmelidir.
+
+### Üretim notları (Higgsfield)
+
+- Model: **`gpt_image_2`** (`resolution: 2k`, `quality: medium`, `aspect_ratio: 16:9`).
+- **`soul_2` kullanılmamalı:** çıktıya uydurma tipografi/logo/marka basıyor.
+- Prompt'ta zorunlu kısıtlar: tek kare (`no collage, no split screen`), yazısız
+  (`no text, no watermark, no logo, unbranded packaging`), sonucu kötü gösteren
+  ayrıntı yok (`no flaking, no crust, no redness`), klinik görünüm yok.
+- Yükleme öncesi 1600px genişliğe/JPEG q82'ye indirilir (~200-350 KB).
+
 ## Komutlar
 
 Tüm komutlar `backend/` dizininden `php artisan …` ile çalıştırılır.
