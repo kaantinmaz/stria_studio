@@ -4,6 +4,11 @@ import { getService, getServiceSlugs } from "@/lib/content";
 import { getAllPosts } from "@/lib/blog";
 import { ML_VISIBLE_PRODUCTS } from "@/lib/mylamination";
 
+// Sitemap rotası açıkça ISR: fetch seviyesindeki revalidate'e bırakıldığında
+// yeni yayımlanan yazı sitemap'e girmiyordu (x-nextjs-cache sürekli HIT).
+// Blog rotalarıyla aynı 300 sn penceresi.
+export const revalidate = 300;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
   const posts = await getAllPosts();
