@@ -111,6 +111,45 @@ final class QueryCoverage
     }
 
     /**
+     * Sorgunun anlamlı token'larının TAMAMINI başlığında taşıyan yayınlanmış
+     * yazılar. `classify()` niyet işaretine bakar ("nedir" sorgusunu "kaç yıl
+     * kalıcı" yazısı karşılamaz); burada ise varlık kümesi tam örtüşüyorsa
+     * ("kaş pudralama + microblading") farklı soru kalıbı kullanılmış olsa da
+     * aynı niyeti hedefleyen bir sayfa vardır: yeni sayfa açmak yamyamlıktır.
+     *
+     * @return list<array{slug:string,title:string,url:string}>
+     */
+    public function sameIntentPosts(string $query): array
+    {
+        // En az 3 anlamlı token: iki varlık/nitelik birlikte örtüşmeli. Aksi
+        // halde "kaş pudralama nedir" gibi tek varlıklı sorgular, aynı varlığı
+        // başka niyetle işleyen her yazıya takılırdı.
+        $tokens = $this->meaningfulTokens(self::normalize($query));
+        if (count($tokens) < 3) {
+            return [];
+        }
+
+        $matches = [];
+        foreach ($this->inventory->posts() as $post) {
+            $titleTokens = explode(' ', self::normalize($post['title']));
+
+            foreach ($tokens as $token) {
+                if (! in_array($token, $titleTokens, true)) {
+                    continue 2;
+                }
+            }
+
+            $matches[] = [
+                'slug' => $post['slug'],
+                'title' => $post['title'],
+                'url' => $post['url'],
+            ];
+        }
+
+        return $matches;
+    }
+
+    /**
      * Küçük harfe indirger, Türkçe aksanları katlar, harf/rakam dışındaki her
      * kesintiyi tek boşluğa indirger ve kırpar.
      */

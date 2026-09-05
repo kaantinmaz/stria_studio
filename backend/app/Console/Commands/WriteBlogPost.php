@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Post;
 use App\Models\SearchQuery;
 use App\Support\ClaudeCli;
 use App\Support\ClaudeCliException;
@@ -22,6 +23,8 @@ class WriteBlogPost extends Command
 {
     protected $signature = 'content:write {query? : Hedef sorgu (verilmezse en yüksek gösterimli "yeni" sorgu seçilir)}
         {--period= : GSC dönemi (YYYY-MM); varsayılan en yeni dönem}
+        {--slug= : Üretilen içeriği bu slug ile yaz (mevcut zayıf yazıyı yerinde tazeler)}
+        {--force : Aynı niyeti taşıyan mevcut yazı olsa da üret}
         {--dry-run : Hiçbir şey yazma; üretilen yazıyı ekrana bas}
         {--draft : is_published=false olarak kaydet (IndexNow ping atılmaz)}
         {--retries=2 : Doğrulama başarısız olursa yeniden deneme sayısı}';
@@ -68,6 +71,26 @@ class WriteBlogPost extends Command
 
         $this->info("Hedef sorgu: {$query}");
 
+        // Yamyamlık (cannibalization) önlemi: aynı anlamlı token kümesini
+        // başlığında taşıyan yayınlanmış bir yazı varsa yeni sayfa açmak yerine
+        // onu tazelemek gerekir. --slug ile hedef verildiyse zaten tazeliyoruz.
+        $forcedSlug = $this->option('slug') ?: null;
+        if ($forcedSlug === null && ! $this->option('force')) {
+            $rivals = $coverage->sameIntentPosts($query);
+            if ($rivals !== []) {
+                $this->error('Bu sorgunun niyetini zaten karşılayan yazı(lar) var:');
+                foreach ($rivals as $rival) {
+                    $this->line("  - {$rival['url']} — {$rival['title']}");
+                }
+                $this->line('');
+                $this->line('Mevcut yazıyı tazelemek için (önerilen):');
+                $this->line('  php artisan content:write "'.$query.'" --slug='.basename($rivals[0]['url']));
+                $this->line('Yine de yeni sayfa açmak için: --force');
+
+                return self::FAILURE;
+            }
+        }
+
         $queryStats = $targetRow !== null
             ? sprintf(
                 '%d gösterim, %d tıklama, pozisyon %s',
@@ -87,7 +110,7 @@ class WriteBlogPost extends Command
         ];
 
         $attempts = max(0, (int) $this->option('retries')) + 1;
-        $allowSlug = null;
+        $allowSlug = $forcedSlug;
         $post = null;
         $violations = [];
 
@@ -131,10 +154,15 @@ class WriteBlogPost extends Command
         }
 
         $published = ! $this->option('draft');
+        $slug = $forcedSlug ?? $post['slug'];
+
+        // Mevcut bir yazı tazeleniyorsa ilk yayın tarihi korunur; tazelik
+        // sinyalini updated_at taşır.
+        $existing = Post::whereNull('site')->where('slug', $slug)->first();
 
         $saved = $writer->upsert([
             'site' => null,
-            'slug' => $post['slug'],
+            'slug' => $slug,
             'title_tr' => $post['title_tr'],
             'excerpt_tr' => $post['excerpt_tr'] ?? '',
             'body_tr' => $post['body_tr'],
@@ -143,8 +171,12 @@ class WriteBlogPost extends Command
             'category' => $post['category'] ?? null,
             'tags' => $post['tags'] ?? [],
             'is_published' => $published,
-            'published_at' => now(),
+            'published_at' => $existing?->published_at ?? now(),
         ]);
+
+        if ($existing !== null) {
+            $this->line("Mevcut yazı tazelendi (ilk yayın: {$existing->published_at}).");
+        }
 
         $this->info("Yazı kaydedildi: /blog/{$saved->slug}");
         if (! $published) {

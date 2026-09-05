@@ -56,7 +56,7 @@ sınıflandırır.
 php artisan content:plan --status=new --limit=20
 ```
 
-### `content:write {query?} {--period=} {--dry-run} {--draft} {--retries=2}`
+### `content:write {query?} {--period=} {--slug=} {--force} {--dry-run} {--draft} {--retries=2}`
 
 Bir sorgudan yayına hazır Türkçe blog yazısı üretir.
 
@@ -69,6 +69,13 @@ Bir sorgudan yayına hazır Türkçe blog yazısı üretir.
   varsa **hiçbir şey yazılmaz** ve komut hata koduyla döner.
 - Yazı varsayılan olarak **anında yayımlanır** (`is_published=true`,
   `published_at=now()`) ve ana sitede IndexNow ping'i atılır.
+- **Yamyamlık (cannibalization) freni:** sorgunun anlamlı token'larının (≥3)
+  tamamını başlığında taşıyan yayınlanmış bir yazı varsa komut **üretmeyi
+  reddeder**, rakip yazıyı listeler ve tazeleme komutunu önerir. Bilinçli
+  olarak yeni sayfa açmak için `--force`.
+- `--slug=<mevcut-slug>` içeriği o slug'a yazar; **mevcut zayıf yazıyı yerinde
+  tazelemenin** yolu budur. Yazı zaten varsa **ilk yayın tarihi korunur**
+  (tazelik sinyali `updated_at`'te taşınır), yeni URL açılmaz, 301 gerekmez.
 
 ```
 # En iyi yeni fırsattan yazı üret ve yayımla:
@@ -79,6 +86,12 @@ php artisan content:write "microblading kalıcı mı" --dry-run
 
 # Taslak olarak kaydet (yayımlama, ping atma):
 php artisan content:write "microblading kalıcı mı" --draft
+```
+
+```
+# Aynı niyette zayıf bir yazı varsa onu yerinde tazele (yeni URL açma):
+php artisan content:write "kaş pudralama ve microblading arasındaki fark" \
+  --slug=microblading-vs-kas-pudralama
 ```
 
 `--dry-run` slug, başlık, meta, kelime sayısı, türe göre gruplanmış iç linkler
