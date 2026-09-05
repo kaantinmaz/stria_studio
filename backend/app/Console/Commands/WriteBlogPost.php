@@ -12,6 +12,7 @@ use App\Support\PostWriter;
 use App\Support\PromptTemplate;
 use App\Support\QueryCoverage;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * GSC sorgusundan yayına hazır bir Türkçe blog yazısı üretir. Metin Claude
@@ -30,6 +31,9 @@ class WriteBlogPost extends Command
         {--retries=2 : Doğrulama başarısız olursa yeniden deneme sayısı}';
 
     protected $description = 'GSC sorgusundan Claude CLI ile doğrulanmış, iç linklerle örülü Türkçe blog yazısı üretir';
+
+    /** Konu bazlı yedek kapak görsellerinin public disk klasörü. */
+    private const POOL_DIR = 'covers/pool';
 
     public function handle(
         ClaudeCli $claude,
@@ -207,6 +211,21 @@ class WriteBlogPost extends Command
             $this->line("Mevcut yazı tazelendi (ilk yayın: {$existing->published_at}).");
         }
 
+        // Kapaksız yazı görselsiz görünür. Üretim sunucuda çalıştığı için
+        // görsel üretimi (Higgsfield MCP) burada mümkün değil; konuya uygun
+        // havuz görseli atanır, sahibi istediğinde Filament'ten değiştirir.
+        if ($saved->cover_path === null) {
+            $poolPath = $this->poolCover($post['body_tr']);
+
+            if ($poolPath !== null) {
+                $saved->cover_path = $poolPath;
+                $saved->save();
+                $this->line('Kapak: havuzdan atandı ('.$poolPath.').');
+            } else {
+                $this->warn('Kapak yok: '.self::POOL_DIR.' altında uygun görsel bulunamadı.');
+            }
+        }
+
         $this->info("Yazı kaydedildi: /blog/{$saved->slug}");
         if (! $published) {
             $this->line('IndexNow: ping gönderilmedi (taslak).');
@@ -218,6 +237,30 @@ class WriteBlogPost extends Command
         $this->line('Not: Next.js ISR penceresi 300 sn; değişiklik en geç 5 dakika içinde canlıda görünür.');
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Gövdedeki ilk hizmet linkinden konuyu çıkarır ve `covers/pool/<hizmet>.jpg`
+     * görselini seçer; yoksa `covers/pool/genel.jpg`. Havuz dosyaları birden
+     * fazla yazı tarafından paylaşılır, kopyalanmaz.
+     */
+    private function poolCover(string $body): ?string
+    {
+        $candidates = [];
+
+        if (preg_match('#href="/hizmetler/([a-z0-9-]+)#', $body, $m) === 1) {
+            $candidates[] = $m[1];
+        }
+        $candidates[] = 'genel';
+
+        foreach ($candidates as $name) {
+            $path = self::POOL_DIR.'/'.$name.'.jpg';
+            if (Storage::disk('public')->exists($path)) {
+                return $path;
+            }
+        }
+
+        return null;
     }
 
     /**
