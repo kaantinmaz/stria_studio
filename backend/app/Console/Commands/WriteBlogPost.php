@@ -240,20 +240,22 @@ class WriteBlogPost extends Command
     }
 
     /**
-     * Gövdedeki ilk hizmet linkinden konuyu çıkarır ve `covers/pool/<hizmet>.jpg`
-     * görselini seçer; yoksa `covers/pool/genel.jpg`. Havuz dosyaları birden
-     * fazla yazı tarafından paylaşılır, kopyalanmaz.
+     * Gövdede EN ÇOK geçen hizmet linkinden konuyu çıkarır (ilk link yazının
+     * ana konusu olmayabiliyor) ve `covers/pool/<hizmet>.jpg` görselini seçer;
+     * yoksa `covers/pool/genel.jpg`. Havuz dosyaları paylaşımlıdır, kopyalanmaz.
      */
     private function poolCover(string $body): ?string
     {
-        $candidates = [];
+        $counts = [];
 
-        if (preg_match('#href="/hizmetler/([a-z0-9-]+)#', $body, $m) === 1) {
-            $candidates[] = $m[1];
+        if (preg_match_all('#href="/hizmetler/([a-z0-9-]+)#', $body, $m) > 0) {
+            foreach ($m[1] as $slug) {
+                $counts[$slug] = ($counts[$slug] ?? 0) + 1;
+            }
+            arsort($counts);
         }
-        $candidates[] = 'genel';
 
-        foreach ($candidates as $name) {
+        foreach ([...array_keys($counts), 'genel'] as $name) {
             $path = self::POOL_DIR.'/'.$name.'.jpg';
             if (Storage::disk('public')->exists($path)) {
                 return $path;
