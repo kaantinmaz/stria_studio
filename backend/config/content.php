@@ -64,7 +64,9 @@ return [
             '/kvkk',                                // frontend/app/kvkk/page.tsx
             '/cerez-politikasi',                    // frontend/app/cerez-politikasi/page.tsx
         ],
-        'meta_title_max' => 65,
+        // Frontend başlık şablonu "%s | Stria Studio" ekliyor (~16 karakter);
+        // SERP'te 65 karakteri aşmamak için meta başlık bütçesi buna göre.
+        'meta_title_max' => 48,
         'meta_desc_min' => 120,
         'meta_desc_max' => 170,
         'excerpt_max' => 200,
