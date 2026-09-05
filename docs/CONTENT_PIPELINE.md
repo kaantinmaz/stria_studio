@@ -25,8 +25,43 @@ GSC dışa aktarımı (CSV)
 
 Sahibi periyodik olarak GSC'den yeni bir sorgu dışa aktarımı alır (`query`,
 `clicks`, `impressions` sütunları; eski aktarımlarda ek `TO` yüzdesi ve
-`Pozisyon`). Bu döngü **manuel** çalıştırılır; zamanlanmış (scheduled) görev
-yoktur.
+`Pozisyon`). İçe aktarım ve hizmet metni güncellemeleri **manuel**; blog üretimi
+**otomatiktir**.
+
+## Otomatik günlük üretim (15:00)
+
+`backend/routes/console.php`:
+
+```php
+Schedule::command('content:write')
+    ->dailyAt('15:00')
+    ->timezone('Europe/Istanbul')
+    ->withoutOverlapping(30)
+    ->appendOutputTo(storage_path('logs/content-write.log'));
+```
+
+Her gün **15:00 (Europe/Istanbul)** bir içerik yayımlanır. Argümansız çalışan
+`content:write` şu sırayı izler:
+
+1. En yeni GSC döneminde, gösterimi en yüksek, sınıfı `new` **ve** aynı niyeti
+   taşıyan yayınlanmış yazısı olmayan sorguyu seçer.
+2. Böyle bir sorgu kalmadıysa **en zayıf (en kısa) mevcut yazıyı tazeler**
+   (`--slug` ile aynı URL'ye yazar; yeni URL açılmaz, ilk yayın tarihi korunur,
+   aynı yazı gün içinde iki kez tazelenmez).
+3. İkisi de yoksa hata koduyla döner ve o gün yazı üretilmez.
+
+Marka/gezinme sorguları (`stria studio`) ana sayfaya `covered` sayılır; onlar
+için yazı üretilmez.
+
+Log: `backend/storage/logs/content-write.log`. Cron (Plesk, dakikalık):
+
+```
+* * * * * runuser -u striastudio.com.tr_xn8csnuygii -- /opt/plesk/php/8.4/bin/php \
+  /var/www/vhosts/striastudio.com.tr/admin.striastudio.com.tr/artisan schedule:run >/dev/null 2>&1
+```
+
+Zamanlanmış çalışmayı beklemeden denemek için:
+`php artisan schedule:test --name="content:write"`.
 
 ## Komutlar
 
