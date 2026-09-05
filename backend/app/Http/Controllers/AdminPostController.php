@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
 use App\Models\Post;
-use App\Models\Tag;
 use App\Support\IndexNow;
+use App\Support\PostWriter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -17,7 +16,7 @@ use Throwable;
 
 class AdminPostController extends Controller
 {
-    public function store(Request $request): JsonResponse
+    public function store(Request $request, PostWriter $writer): JsonResponse
     {
         $data = $request->validate([
             'slug' => ['required', 'string', 'max:190'],
@@ -46,31 +45,23 @@ class AdminPostController extends Controller
             ? $this->downloadCover($data['cover_url'], $data['slug'])
             : null;
 
-        $category = null;
-        if (isset($data['category'])) {
-            $categoryNameTr = $data['category_name_tr'] ?? Str::headline($data['category']);
-            $category = Category::firstOrCreate(
-                ['slug' => $data['category']],
-                [
-                    'name_tr' => $categoryNameTr,
-                    'name_en' => $data['category_name_en'] ?? $categoryNameTr,
-                ]
-            );
-        }
-
         $attributes = [
             'site' => $data['site'] ?? null,
+            'slug' => $data['slug'],
             'title_tr' => $data['title_tr'],
-            'title_en' => $data['title_en'] ?? $data['title_tr'],
+            'title_en' => $data['title_en'] ?? null,
             'excerpt_tr' => $data['excerpt_tr'] ?? '',
-            'excerpt_en' => $data['excerpt_en'] ?? $data['excerpt_tr'] ?? '',
+            'excerpt_en' => $data['excerpt_en'] ?? null,
             'body_tr' => $data['body_tr'],
-            'body_en' => $data['body_en'] ?? $data['body_tr'],
-            'category_id' => $category?->id,
+            'body_en' => $data['body_en'] ?? null,
             'meta_title_tr' => $data['meta_title_tr'] ?? null,
             'meta_title_en' => $data['meta_title_en'] ?? null,
             'meta_desc_tr' => $data['meta_desc_tr'] ?? null,
             'meta_desc_en' => $data['meta_desc_en'] ?? null,
+            'category' => $data['category'] ?? null,
+            'category_name_tr' => $data['category_name_tr'] ?? null,
+            'category_name_en' => $data['category_name_en'] ?? null,
+            'tags' => $data['tags'] ?? [],
             'is_published' => $data['is_published'] ?? true,
             'published_at' => $data['published_at'] ?? now(),
         ];
@@ -79,24 +70,7 @@ class AdminPostController extends Controller
             $attributes['cover_path'] = $coverPath;
         }
 
-        $post = Post::updateOrCreate(
-            ['site' => $data['site'] ?? null, 'slug' => $data['slug']],
-            $attributes
-        );
-
-        $tagIds = collect($data['tags'] ?? [])->map(function (string $name) {
-            return Tag::firstOrCreate(
-                ['slug' => Str::slug($name)],
-                ['name_tr' => $name, 'name_en' => $name]
-            )->id;
-        });
-        $post->tags()->sync($tagIds);
-
-        if ($post->site === null && $post->is_published) {
-            IndexNow::submit([
-                'https://'.config('services.indexnow.host').'/blog/'.$post->slug,
-            ]);
-        }
+        $post = $writer->upsert($attributes);
 
         return response()->json([
             'data' => [
