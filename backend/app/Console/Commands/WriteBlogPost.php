@@ -54,12 +54,21 @@ class WriteBlogPost extends Command
                 return self::FAILURE;
             }
 
+            // Otomatik seçim (zamanlanmış günlük çalışma) yamyamlık frenine
+            // takılıp günü boş geçirmesin: aynı niyeti taşıyan yazısı olan
+            // aday atlanır, sıradaki fırsata geçilir.
             foreach (SearchQuery::where('period', $period)->opportunity()->get() as $row) {
-                if ($coverage->classify($row->query)['status'] === 'new') {
-                    $targetRow = $row;
-                    $query = $row->query;
-                    break;
+                if ($coverage->classify($row->query)['status'] !== 'new') {
+                    continue;
                 }
+
+                if ($coverage->sameIntentPosts($row->query) !== []) {
+                    continue;
+                }
+
+                $targetRow = $row;
+                $query = $row->query;
+                break;
             }
 
             if ($query === null) {

@@ -25,3 +25,14 @@ Schedule::command('instagram:sync')
     ->hourly()
     ->timezone('Europe/Istanbul')
     ->appendOutputTo(storage_path('logs/instagram-sync.log'));
+
+// Günde bir içerik: en yüksek gösterimli kapsanmamış GSC sorgusundan yazı üret
+// ve anında yayımla (docs/CONTENT_PIPELINE.md). Üretim ~2 dk sürebildiği ve
+// Claude CLI oturumu/doğrulama başarısız olabildiği için çıktı log'a yazılır;
+// üst üste çalışma engellenir. Yazılacak yeni sorgu kalmadığında komut hata
+// koduyla döner ve o gün yazı üretilmez (istenen davranış).
+Schedule::command('content:write')
+    ->dailyAt('15:00')
+    ->timezone('Europe/Istanbul')
+    ->withoutOverlapping(30)
+    ->appendOutputTo(storage_path('logs/content-write.log'));
