@@ -63,6 +63,13 @@ final class ClaudeCli
             $env['HOME'] = (string) $home;
         }
 
+        // Sunucuda interaktif oturum tutulamaz; `claude setup-token` ile
+        // üretilen uzun ömürlü abonelik token'ı bu değişkenle geçirilir.
+        $token = config('content.claude.oauth_token');
+        if (! empty($token)) {
+            $env['CLAUDE_CODE_OAUTH_TOKEN'] = (string) $token;
+        }
+
         $process = new Process(
             $command,
             (string) config('content.claude.cwd'),

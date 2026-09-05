@@ -166,11 +166,12 @@ eder, üretim yine abonelik kimliğiyle yapılır.
 
 | Değişken | Anlamı |
 |----------|--------|
-| `CLAUDE_BINARY` | `claude` çalıştırılabilirinin yolu (ör. `/home/<kullanıcı>/.local/bin/claude`). |
+| `CLAUDE_BINARY` | `claude` çalıştırılabilirinin yolu. Üretimde: `/opt/plesk/node/24/bin/claude`. |
 | `CLAUDE_MODEL` | Kullanılacak model (ör. `sonnet`). |
 | `CLAUDE_TIMEOUT` | Tek çağrı zaman aşımı (saniye). |
-| `CLAUDE_HOME` | CLI'nin kimlik bilgilerini okuyacağı `HOME` (abonelik kullanıcısının ev dizini). |
+| `CLAUDE_HOME` | CLI'nin `~/.claude`'unu arayacağı `HOME`. Üretimde: `/var/www/vhosts/striastudio.com.tr`. |
 | `CLAUDE_CWD` | CLI'nin çalışacağı dizin. |
+| `CLAUDE_CODE_OAUTH_TOKEN` | `claude setup-token` ile üretilen **1 yıl geçerli abonelik OAuth token'ı** (`sk-ant-oat01-…`). API anahtarı değildir. Üretimde bu kullanılır; boşsa CLI kendi interaktif oturumunu arar. |
 
 ## Üretim (production) kurulumu — Plesk / AlmaLinux
 
@@ -188,14 +189,19 @@ Sunucuda CLI'nin **abonelik kullanıcısı olarak** oturum açmış olması gere
    npm i -g @anthropic-ai/claude-code
    ```
 
-3. **Abonelik kullanıcısı olarak oturum aç.** Kimlik bilgileri o kullanıcının
-   `~/.claude` dizinine yazılır — bu yüzden `CLAUDE_HOME` o kullanıcının ev
-   dizinine ayarlanır. Abonelik kullanıcısı: `striastudio.com.tr_xn8csnuygii`.
+3. **Abonelik token'ını üret.** Sunucuda tarayıcı yok; interaktif oturum yerine
+   uzun ömürlü token kullanılır. Abonelik kullanıcısı olarak çalıştır:
 
    ```
-   su - striastudio.com.tr_xn8csnuygii
-   claude auth login          # veya: claude setup-token
+   sudo -u striastudio.com.tr_xn8csnuygii \
+     env HOME=/var/www/vhosts/striastudio.com.tr \
+         PATH=/opt/plesk/node/24/bin:/usr/bin:/bin \
+     /opt/plesk/node/24/bin/claude setup-token
    ```
+
+   Çıkan URL tarayıcıda açılır, dönen kod terminale yapıştırılır. Üretilen
+   `sk-ant-oat01-…` token'ı **bir kez** gösterilir; `.env`'e
+   `CLAUDE_CODE_OAUTH_TOKEN` olarak yazılır. Token 1 yıl sonra yenilenmeli.
 
 4. **Doğrula:**
 

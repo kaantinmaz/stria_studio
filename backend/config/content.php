@@ -24,6 +24,11 @@ return [
         'home' => env('CLAUDE_HOME'),
         // CLI'nin çalışacağı dizin; proje ağacına bulaşmasın diye geçici dizin.
         'cwd' => env('CLAUDE_CWD', sys_get_temp_dir()),
+        // `claude setup-token` ile üretilen uzun ömürlü (1 yıl) abonelik OAuth
+        // token'ı. Sunucuda interaktif oturum tutulamadığı için üretim bunu
+        // kullanır; API anahtarı DEĞİLDİR. null → CLI kendi ~/.claude
+        // oturumunu kullanır (yerel geliştirme).
+        'oauth_token' => env('CLAUDE_CODE_OAUTH_TOKEN'),
     ],
 
     /*
