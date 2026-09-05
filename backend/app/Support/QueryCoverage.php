@@ -102,8 +102,12 @@ final class QueryCoverage
             }
         }
 
-        // Tek token'lık tesadüfi örtüşmeler yeni yazı fırsatını gizlemesin.
-        if ($best >= 0.7 && $bestMatched >= 2) {
+        // Tesadüfi tek token örtüşmesi fırsatı gizlemesin; ama sorgunun kendisi
+        // tek anlamlı token'dan oluşuyorsa ("dipliner nedir" → [dipliner]) o tek
+        // token yeterlidir, aksi halde böyle sorgular asla kapsanmış sayılmaz ve
+        // her gün yeni bir "nedir" sayfası açılırdı.
+        $needed = min(2, count($tokens));
+        if ($best >= 0.7 && $bestMatched >= $needed && $needed > 0) {
             return ['status' => 'covered', 'target' => $bestUrl, 'score' => $best];
         }
 
