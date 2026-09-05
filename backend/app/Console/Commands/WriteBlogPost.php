@@ -245,6 +245,10 @@ class WriteBlogPost extends Command
                 $cfg['max_words']
             ),
             sprintf('- En az %d adet <h2> alt başlık.', $cfg['min_h2']),
+            // Kelime hedefi tek başına yetmiyor (model 650 civarında kalıyor);
+            // uzunluk yapısal zorunluluklarla garanti altına alınır.
+            '- Her <h2> bölümünde en az 2 paragraf; en az bir bölümde <ul> listesi.',
+            '- "Sık Sorulan Sorular (SSS)" bölümünde en az 5 <h3> soru + <p> cevap çifti.',
             sprintf('- En az %d hizmet sayfası linki ve %d blog yazısı linki (yalnızca envanterdeki iç URL\'ler).', $cfg['min_service_links'], $cfg['min_post_links']),
             sprintf('- Meta başlık en fazla %d karakter.', $cfg['meta_title_max']),
             sprintf('- Meta açıklama %d-%d karakter.', $cfg['meta_desc_min'], $cfg['meta_desc_max']),
