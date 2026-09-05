@@ -105,7 +105,9 @@ class WriteBlogPost extends Command
             'QUERY_STATS' => $queryStats,
             'RELATED_QUERIES' => $this->relatedQueries($query, $period, $coverage),
             'INVENTORY' => $inventory->promptMarkdown(),
-            'RULES' => $this->rules(),
+            'RULES' => $this->rules().($forcedSlug !== null
+                ? "\n- Bu yazının kendi URL'si /blog/{$forcedSlug}; kendine link VERME."
+                : ''),
             'FEEDBACK' => 'yok',
         ];
 
@@ -120,12 +122,18 @@ class WriteBlogPost extends Command
                 $prompt = PromptTemplate::render('blog-post', $vars);
                 $post = $claude->json($prompt, ContentGuard::postSchema());
 
+                // --slug ile hedef verildiyse modelin ürettiği slug yok sayılır;
+                // doğrulama (tekillik, kendine link) gerçek slug'la yapılmalı.
+                if ($forcedSlug !== null) {
+                    $post['slug'] = $forcedSlug;
+                }
+
                 $violations = $guard->postViolations($post, $allowSlug);
                 if ($violations === []) {
                     break;
                 }
 
-                $allowSlug = $post['slug'] ?? null;
+                $allowSlug = $forcedSlug ?? ($post['slug'] ?? null);
                 $vars['FEEDBACK'] = $this->numbered($violations);
                 $this->warn('Doğrulama başarısız, düzeltme isteniyor:');
                 foreach ($violations as $violation) {

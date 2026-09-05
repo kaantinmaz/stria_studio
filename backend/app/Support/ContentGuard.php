@@ -362,9 +362,15 @@ final class ContentGuard
                     continue;
                 }
 
+                if ($base === '/blog/'.$ownSlug) {
+                    $errors[] = 'Yazı kendine link veremez: '.$href;
+
+                    continue;
+                }
+
                 if (str_starts_with($base, '/hizmetler/')) {
                     $serviceLinks[$base] = true;
-                } elseif (str_starts_with($base, '/blog/') && $base !== '/blog/'.$ownSlug) {
+                } elseif (str_starts_with($base, '/blog/')) {
                     $postLinks[$base] = true;
                 }
             }
