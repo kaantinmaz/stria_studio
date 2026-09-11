@@ -45,6 +45,11 @@ export const metadata: Metadata = {
     images: [{ url: "/og" }],
   },
   twitter: { card: "summary_large_image" },
+  verification: {
+    // Meta Business Manager alan adı doğrulaması (Meta Ads / Pixel domain
+    // sahipliği). Kaldırılırsa reklam hesabında alan adı doğrulaması düşer.
+    other: { "facebook-domain-verification": "hzi5zsm5krzwmq9qwb60uli4v4q2lt" },
+  },
   other: {
     "geo.region": "TR-06",
     "geo.placename": "Çankaya, Ankara",
