@@ -314,6 +314,9 @@ Sunucuda CLI'nin **abonelik kullanıcısı olarak** oturum açmış olması gere
 
 | Belirti | Neden / Çözüm |
 |---------|---------------|
+| `claude CLI bulunamadı (CLAUDE_BINARY)` / exit 127 | **Plesk'in Node güncellemesi** `/opt/plesk/node/<v>/lib/node_modules`'ü sıfırlıyor ve oraya global kurulmuş `claude` siliniyor (24 Eyl 2026'da yaşandı, 9 gün yazı çıkmadı). Bu yüzden kurulum artık **`/usr/local/claude-code`** altında ve `CLAUDE_BINARY=/usr/local/bin/claude`. Yeniden kurmak için: `npm i -g --prefix /usr/local/claude-code @anthropic-ai/claude-code && ln -sf /usr/local/claude-code/bin/claude /usr/local/bin/claude` |
+| Günlerdir yazı çıkmıyor ama kimse fark etmiyor | Artık her başarısızlık **Telegram'a** bildiriliyor (`TELEGRAM_BOT_TOKEN`/`TELEGRAM_CHAT_ID`, ads digest ile aynı kanal). Bildirim gelmiyorsa `laravel.log`'a bakın. |
+| Aynı sorgu her gün seçilip doğrulamaya takılıyor | Otomatik mod artık **3 adayı sırayla** dener, hepsi düşerse tazeleme moduna geçer. Sorgunun statik bir sayfası varsa (`/mylamination` gibi) `covered` sayılır ve hiç seçilmez. |
 | `Claude CLI üretimi başarısız` / kimlik hatası | Oturum süresi dolmuş. Abonelik kullanıcısı olarak `claude auth login` (veya `claude setup-token`) tekrar çalıştırın; `CLAUDE_HOME`'un doğru ev dizinini gösterdiğini doğrulayın. |
 | Zaman aşımı | `CLAUDE_TIMEOUT`'u artırın; sunucunun ağ çıkışını ve modelin (`CLAUDE_MODEL`) erişilebilirliğini kontrol edin. |
 | Doğrulama döngüsü sürekli başarısız | `--dry-run` ile çıktıyı inceleyin; ihlaller ekrana basılır. Envanterin güncel olduğundan (yayınlanmış yazılar, aktif hizmetler) ve `config('content.post')` sınırlarının makul olduğundan emin olun. `--retries`'i geçici olarak artırabilirsiniz. |
