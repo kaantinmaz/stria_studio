@@ -29,7 +29,8 @@ class WriteBlogPost extends Command
         {--force : Aynı niyeti taşıyan mevcut yazı olsa da üret}
         {--dry-run : Hiçbir şey yazma; üretilen yazıyı ekrana bas}
         {--draft : is_published=false olarak kaydet (IndexNow ping atılmaz)}
-        {--retries=2 : Doğrulama başarısız olursa yeniden deneme sayısı}';
+        {--retries=2 : Doğrulama başarısız olursa yeniden deneme sayısı}
+        {--no-alert : Başarısızlıkta Telegram bildirimi gönderme (alt çağrılar için)}';
 
     protected $description = 'GSC sorgusundan Claude CLI ile doğrulanmış, iç linklerle örülü Türkçe blog yazısı üretir';
 
@@ -59,40 +60,41 @@ class WriteBlogPost extends Command
                 return self::FAILURE;
             }
 
-            // Otomatik seçim (zamanlanmış günlük çalışma) yamyamlık frenine
-            // takılıp günü boş geçirmesin: aynı niyeti taşıyan yazısı olan
-            // aday atlanır, sıradaki fırsata geçilir.
-            foreach (SearchQuery::where('period', $period)->opportunity()->get() as $row) {
-                if ($coverage->classify($row->query)['status'] !== 'new') {
-                    continue;
+            // Otomatik (zamanlanmış) mod: tek adaya bağlı kalmak günü boş
+            // geçiriyordu — "my lamination" her gün seçilip kelime sayısı
+            // doğrulamasına takıldı. Aday başarısız olursa sıradakine geçilir,
+            // hiçbiri olmazsa en zayıf yazı tazelenir.
+            $candidates = $this->newCandidates($period, $coverage, 3);
+
+            foreach ($candidates as $i => $candidate) {
+                if ($i > 0) {
+                    $this->warn('Sıradaki fırsata geçiliyor: '.$candidate);
                 }
 
-                if ($coverage->sameIntentPosts($row->query) !== []) {
-                    continue;
+                if ($this->delegate($candidate, $period) === self::SUCCESS) {
+                    return self::SUCCESS;
                 }
-
-                $targetRow = $row;
-                $query = $row->query;
-                break;
             }
 
-            // Yeni sorgu kalmadıysa günü boş geçirmek yerine, yüksek gösterimli
-            // bir sorguyu karşılayan EN ZAYIF (en kısa) yazı tazelenir. Yeni URL
-            // açılmaz; içerik çürümesi giderilir.
-            if ($query === null) {
-                $stale = $this->weakestCoveredPost($period, $coverage);
+            // Yeni sorgu kalmadıysa (ya da hepsi başarısız olduysa) günü boş
+            // geçirmek yerine en zayıf mevcut yazı tazelenir; yeni URL açılmaz.
+            $stale = $this->weakestCoveredPost($period, $coverage);
 
-                if ($stale === null) {
-                    $this->error("'{$period}' döneminde yazılacak yeni sorgu ve tazelenecek yazı bulunamadı.");
+            if ($stale === null) {
+                $this->error("'{$period}' döneminde yazılacak yeni sorgu ve tazelenecek yazı bulunamadı.");
+                $this->notifyFailure('Üretilecek sorgu ve tazelenecek yazı yok', null, "Dönem: {$period}");
 
-                    return self::FAILURE;
-                }
-
-                $targetRow = $stale['row'];
-                $query = $stale['row']->query;
-                $this->line('Yeni (kapsanmamış) sorgu kalmadı; en zayıf mevcut yazı tazeleniyor: '.$stale['slug'].' ('.$stale['words'].' kelime).');
-                $this->input->setOption('slug', $stale['slug']);
+                return self::FAILURE;
             }
+
+            $this->line('Tazeleme moduna geçiliyor: '.$stale['slug'].' ('.$stale['words'].' kelime).');
+            $code = $this->delegate($stale['row']->query, $period, $stale['slug']);
+
+            if ($code !== self::SUCCESS) {
+                $this->notifyFailure('Günlük üretim tamamen başarısız', $stale['row']->query, 'Adaylar: '.implode(' · ', $candidates).' · tazeleme: '.$stale['slug']);
+            }
+
+            return $code;
         }
 
         $this->info("Hedef sorgu: {$query}");
@@ -243,6 +245,62 @@ class WriteBlogPost extends Command
     }
 
     /**
+     * Kapsanmamış ve aynı niyetli yazısı olmayan, gösterimi en yüksek
+     * sorgular. Otomatik mod ilk adayda takılırsa sıradakine geçebilsin diye
+     * liste döner.
+     *
+     * @return list<string>
+     */
+    private function newCandidates(string $period, QueryCoverage $coverage, int $limit): array
+    {
+        $out = [];
+
+        foreach (SearchQuery::where('period', $period)->opportunity()->get() as $row) {
+            if (count($out) >= $limit) {
+                break;
+            }
+
+            if ($coverage->classify($row->query)['status'] !== 'new') {
+                continue;
+            }
+
+            if ($coverage->sameIntentPosts($row->query) !== []) {
+                continue;
+            }
+
+            $out[] = $row->query;
+        }
+
+        return $out;
+    }
+
+    /**
+     * Tek bir sorgu için komutu yeniden çağırır. Alt çağrı aday döngüsüne
+     * girmez (sorgu açıkça verilir) ve bildirim göndermez; bildirimi üst çağrı
+     * yönetir ki tek günde üç ayrı alarm düşmesin.
+     */
+    private function delegate(string $query, string $period, ?string $slug = null): int
+    {
+        $args = [
+            'query' => $query,
+            '--period' => $period,
+            '--retries' => $this->option('retries'),
+            '--no-alert' => true,
+        ];
+
+        if ($slug !== null) {
+            $args['--slug'] = $slug;
+            $args['--force'] = true;
+        }
+
+        if ($this->option('draft')) {
+            $args['--draft'] = true;
+        }
+
+        return $this->call('content:write', $args);
+    }
+
+    /**
      * Günlük üretim cron ile çalışıyor: başarısızlık yalnızca log'a düşerse
      * günlerce fark edilmiyor (Plesk'in Node güncellemesi claude binary'sini
      * sildiğinde 9 gün boyunca yazı çıkmadı). Bu yüzden her başarısızlık
@@ -250,6 +308,10 @@ class WriteBlogPost extends Command
      */
     private function notifyFailure(string $headline, ?string $query, string $detail): void
     {
+        if ($this->option('no-alert')) {
+            return;
+        }
+
         $text = '<b>Blog üretimi başarısız</b>'."\n"
             .htmlspecialchars($headline, ENT_QUOTES, 'UTF-8')."\n"
             .'Sorgu: '.htmlspecialchars((string) ($query ?? '—'), ENT_QUOTES, 'UTF-8')."\n"

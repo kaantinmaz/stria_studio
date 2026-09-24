@@ -62,6 +62,7 @@ return [
             '/ankara-kalici-makyaj-yapan-yerler',   // frontend/app/ankara-kalici-makyaj-yapan-yerler/page.tsx
             '/gizlilik-politikasi',                 // frontend/app/gizlilik-politikasi/page.tsx
             '/kvkk',                                // frontend/app/kvkk/page.tsx
+            '/mylamination',                        // frontend/app/mylamination/page.tsx
             '/cerez-politikasi',                    // frontend/app/cerez-politikasi/page.tsx
         ],
         // Frontend başlık şablonu "%s | Stria Studio" ekliyor (~16 karakter);

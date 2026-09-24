@@ -54,6 +54,16 @@ final class QueryCoverage
             return ['status' => 'covered', 'target' => '/', 'score' => 1.0];
         }
 
+        // Statik sayfası olan konular ("my lamination" → /mylamination): bu
+        // sorguları kapsayan sayfa zaten var, yeni yazı yamyamlık olur.
+        $joined = str_replace(' ', '', $normalized);
+        foreach ((array) config('content.post.static_links', []) as $path) {
+            $slug = trim(str_replace('-', '', self::normalize((string) $path)));
+            if ($slug !== '' && $slug === $joined) {
+                return ['status' => 'covered', 'target' => $path, 'score' => 1.0];
+            }
+        }
+
         // Bilgi niyetli sorgular hizmet adını içerse bile yazı ister.
         if ($markers === []) {
             foreach ($this->inventory->services() as $service) {
