@@ -11,6 +11,7 @@ use App\Support\ContentInventory;
 use App\Support\PostWriter;
 use App\Support\PromptTemplate;
 use App\Support\QueryCoverage;
+use App\Support\TelegramNotifier;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 
@@ -167,6 +168,7 @@ class WriteBlogPost extends Command
             }
         } catch (ClaudeCliException $exception) {
             $this->error('Claude CLI üretimi başarısız: '.$exception->getMessage());
+            $this->notifyFailure('Claude CLI üretimi başarısız', $query, $exception->getMessage());
 
             return self::FAILURE;
         }
@@ -176,6 +178,7 @@ class WriteBlogPost extends Command
             foreach ($violations as $violation) {
                 $this->line('  - '.$violation);
             }
+            $this->notifyFailure('Doğrulama geçmedi, yazı yazılmadı', $query, implode(' · ', $violations));
 
             return self::FAILURE;
         }
@@ -237,6 +240,28 @@ class WriteBlogPost extends Command
         $this->line('Not: Next.js ISR penceresi 300 sn; değişiklik en geç 5 dakika içinde canlıda görünür.');
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Günlük üretim cron ile çalışıyor: başarısızlık yalnızca log'a düşerse
+     * günlerce fark edilmiyor (Plesk'in Node güncellemesi claude binary'sini
+     * sildiğinde 9 gün boyunca yazı çıkmadı). Bu yüzden her başarısızlık
+     * Telegram'a da bildirilir.
+     */
+    private function notifyFailure(string $headline, ?string $query, string $detail): void
+    {
+        $text = '<b>Blog üretimi başarısız</b>'."\n"
+            .htmlspecialchars($headline, ENT_QUOTES, 'UTF-8')."\n"
+            .'Sorgu: '.htmlspecialchars((string) ($query ?? '—'), ENT_QUOTES, 'UTF-8')."\n"
+            .htmlspecialchars(mb_substr($detail, 0, 500), ENT_QUOTES, 'UTF-8');
+
+        $result = app(TelegramNotifier::class)->send($text, 'content:write');
+
+        if ($result === TelegramNotifier::NOT_CONFIGURED) {
+            $this->warn('Telegram yapılandırılmadı; bildirim gönderilmedi.');
+        } elseif ($result === null) {
+            $this->warn('Telegram bildirimi gönderilemedi (ayrıntı: laravel.log).');
+        }
     }
 
     /**

@@ -100,10 +100,22 @@ final class ClaudeCli
 
         if (! $process->isSuccessful()) {
             $stderr = trim($process->getErrorOutput());
+            $exitCode = (int) $process->getExitCode();
+
+            // 126/127 = çalıştırılamadı / bulunamadı. Plesk'in Node
+            // güncellemeleri /opt/plesk/node/<v>/lib/node_modules'ü sıfırlıyor;
+            // oraya kurulmuş bir claude sessizce kayboluyor. Kurulum
+            // /usr/local/claude-code'da durmalı ve CLAUDE_BINARY oraya bakmalı.
+            if ($exitCode === 126 || $exitCode === 127) {
+                throw new ClaudeCliException(sprintf(
+                    'claude CLI bulunamadı: %s (CLAUDE_BINARY). Plesk Node güncellemesi global npm paketlerini silmiş olabilir; /usr/local/claude-code altına yeniden kurun.',
+                    $binary,
+                ));
+            }
 
             throw new ClaudeCliException(sprintf(
-                "claude CLI %d çıkış kodu ile başarısız oldu: %s\nİpucu: sunucuda `claude auth login` veya `claude setup-token` ile oturum açılmış olmalı.",
-                (int) $process->getExitCode(),
+                "claude CLI %d çıkış kodu ile başarısız oldu: %s\nİpucu: sunucuda `claude setup-token` ile üretilen CLAUDE_CODE_OAUTH_TOKEN geçerli olmalı.",
+                $exitCode,
                 mb_substr($stderr, 0, 500),
             ));
         }

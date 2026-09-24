@@ -6,10 +6,9 @@ use App\Models\AdsAlert;
 use App\Models\AdsCommand;
 use App\Models\AdsDailyCampaign;
 use App\Support\AdsWatchdog;
+use App\Support\TelegramNotifier;
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 
 /**
  * Günlük Google Ads özeti + anomali taraması. Varsayılan olarak dünün
@@ -21,7 +20,7 @@ use Illuminate\Support\Facades\Log;
 class AdsDigestCommand extends Command
 {
     /** Telegram yapılandırılmamış - hata değil, atlanan gönderim. */
-    private const TELEGRAM_NOT_CONFIGURED = 'not-configured';
+    private const TELEGRAM_NOT_CONFIGURED = TelegramNotifier::NOT_CONFIGURED;
 
     protected $signature = 'ads:digest {--date= : İşlenecek gün (YYYY-MM-DD); varsayılan dün}';
 
@@ -224,44 +223,7 @@ class AdsDigestCommand extends Command
      */
     private function sendTelegram(string $text): int|string|null
     {
-        $token = config('services.telegram.bot_token');
-        $chatId = config('services.telegram.chat_id');
-
-        if (empty($token) || empty($chatId)) {
-            return self::TELEGRAM_NOT_CONFIGURED;
-        }
-
-        // parse_mode HTML: yalnızca bizim <b> başlıklarımız etiket; kampanya adı
-        // ve arama terimi gibi dinamik değerler formatMessage'da kaçırılıyor.
-        try {
-            $response = Http::timeout(15)->asForm()->post(
-                "https://api.telegram.org/bot{$token}/sendMessage",
-                [
-                    'chat_id' => $chatId,
-                    'text' => $text,
-                    'parse_mode' => 'HTML',
-                    'disable_web_page_preview' => true,
-                ]
-            );
-        } catch (\Throwable $e) {
-            Log::error('Ads digest Telegram gönderimi hata verdi.', ['exception' => $e->getMessage()]);
-
-            return null;
-        }
-
-        $messageId = $response->json('result.message_id');
-
-        if (! $response->successful() || $response->json('ok') !== true || $messageId === null) {
-            Log::error('Ads digest Telegram gönderimi reddedildi.', [
-                'status' => $response->status(),
-                // Telegram hata nedenini burada döndürür (ör. chat not found).
-                'description' => $response->json('description'),
-            ]);
-
-            return null;
-        }
-
-        return $messageId;
+        return app(TelegramNotifier::class)->send($text, 'Ads digest');
     }
 
     private function money(float $value): string

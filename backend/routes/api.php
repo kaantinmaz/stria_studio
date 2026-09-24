@@ -13,6 +13,8 @@ use App\Http\Controllers\App\NotificationController as AppNotificationController
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\Desktop\AuthController as DesktopAuthController;
+use App\Http\Controllers\Desktop\StudioController as DesktopStudioController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\InstagramController;
@@ -21,6 +23,8 @@ use App\Http\Controllers\MicrositeController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\TrackController;
+use App\Http\Middleware\EnsureAdminApiToken;
+use App\Http\Middleware\EnsureDesktopAdmin;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/contact', [ContactController::class, 'store']);
@@ -69,14 +73,29 @@ Route::prefix('app')->group(function () {
     });
 });
 
-Route::prefix('admin')->middleware(App\Http\Middleware\EnsureAdminApiToken::class.':posts')->group(function () {
+Route::prefix('desktop')->group(function () {
+    Route::post('/login', [DesktopAuthController::class, 'login'])->middleware('throttle:5,1');
+
+    Route::middleware(['auth:sanctum', EnsureDesktopAdmin::class, 'throttle:120,1'])
+        ->group(function () {
+            Route::post('/logout', [DesktopAuthController::class, 'logout']);
+            Route::get('/state', [DesktopStudioController::class, 'state']);
+            Route::post('/customers', [DesktopStudioController::class, 'storeCustomer']);
+            Route::patch('/customers/{id}', [DesktopStudioController::class, 'updateCustomer']);
+            Route::post('/appointments', [DesktopStudioController::class, 'storeAppointment']);
+            Route::patch('/appointments/{id}', [DesktopStudioController::class, 'updateAppointment']);
+            Route::put('/hours', [DesktopStudioController::class, 'updateHours']);
+        });
+});
+
+Route::prefix('admin')->middleware(EnsureAdminApiToken::class.':posts')->group(function () {
     Route::post('/posts', [AdminPostController::class, 'store']);
     Route::delete('/posts/{slug}', [AdminPostController::class, 'destroy']);
 });
 
 // Ayrı token: bu uca Google Ads arayüzüne yapıştırılan betik erişiyor, blog
 // yazma yetkisi taşımamalı.
-Route::prefix('admin')->middleware(App\Http\Middleware\EnsureAdminApiToken::class.':ads')->group(function () {
+Route::prefix('admin')->middleware(EnsureAdminApiToken::class.':ads')->group(function () {
     Route::post('/ads/ingest', AdsIngestController::class);
     Route::get('/ads/commands', [AdsCommandController::class, 'index']);
     Route::post('/ads/commands/results', [AdsCommandController::class, 'results']);
