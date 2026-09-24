@@ -241,6 +241,8 @@ class WriteBlogPost extends Command
         }
         $this->line('Not: Next.js ISR penceresi 300 sn; değişiklik en geç 5 dakika içinde canlıda görünür.');
 
+        $this->notifyPublished($saved, $query, $existing !== null, $published);
+
         return self::SUCCESS;
     }
 
@@ -323,6 +325,36 @@ class WriteBlogPost extends Command
             $this->warn('Telegram yapılandırılmadı; bildirim gönderilmedi.');
         } elseif ($result === null) {
             $this->warn('Telegram bildirimi gönderilemedi (ayrıntı: laravel.log).');
+        }
+    }
+
+    /**
+     * Yayımlanan/tazelenen yazıyı Telegram'a bildirir. `--no-alert` yalnızca
+     * hata alarmlarını susturur (alt çağrı gürültüsü için); yayın bildirimi
+     * yazıyı fiilen kaydeden çağrıdan gider.
+     */
+    private function notifyPublished(Post $post, ?string $query, bool $refreshed, bool $published): void
+    {
+        $esc = fn (string $v): string => htmlspecialchars($v, ENT_QUOTES, 'UTF-8');
+        $words = count(preg_split('/\s+/', trim(strip_tags((string) $post->body_tr)), -1, PREG_SPLIT_NO_EMPTY) ?: []);
+        $url = 'https://'.config('services.indexnow.host').'/blog/'.$post->slug;
+
+        $text = '<b>'.($refreshed ? 'Blog yazısı tazelendi' : 'Yeni blog yazısı yayında').'</b>'."\n"
+            .$esc((string) $post->title_tr)."\n"
+            .$esc($url)."\n"
+            .'Sorgu: '.$esc((string) ($query ?? '—'))."\n"
+            .$words.' kelime'
+            .($post->cover_path !== null ? ' · kapak var' : ' · kapak YOK')
+            .($published ? '' : ' · TASLAK');
+
+        $result = app(TelegramNotifier::class)->send($text, 'content:write');
+
+        if ($result === TelegramNotifier::NOT_CONFIGURED) {
+            $this->warn('Telegram yapılandırılmadı; yayın bildirimi gönderilmedi.');
+        } elseif ($result === null) {
+            $this->warn('Telegram yayın bildirimi gönderilemedi (ayrıntı: laravel.log).');
+        } else {
+            $this->line('Telegram: yayın bildirimi gönderildi.');
         }
     }
 
