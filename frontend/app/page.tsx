@@ -15,7 +15,7 @@ import { getGallery, getFaqs, getInstagramPosts } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata = buildMetadata({
-  title: "Stria Studio · Ankara Çankaya Kalıcı Makyaj Stüdyosu",
+  title: "Ankara Kalıcı Makyaj Stüdyosu · Çankaya | Stria Studio",
   description:
     "Ankara Çankaya'da kalıcı makyaj, microblading ve kaş-kirpik uygulamaları; doğal görünüm, hijyenik süreç ve kişiye özel tasarımla Stria Studio'da.",
   path: "/",

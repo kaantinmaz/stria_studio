@@ -123,7 +123,7 @@ export const UI: Record<Lang, Dict> = {
     navFaq: "S.S.S.",
     navCta: "Randevu Al",
     callLabel: "Ara",
-    heroKicker: "Ankara · Kaş Tasarımı, Microblading & Kalıcı Makyaj",
+    heroKicker: "Ankara Kalıcı Makyaj · Kaş Tasarımı & Microblading",
     heroTitle: "Kaşların, en doğal\nhaliyle güzel",
     heroText:
       "Microblading, kaş pudralama ve kalıcı makyajda yüz hatlarına göre kişiye özel tasarım. Kaşın yüzüne göre çizilir — Ankara Çankaya'da.",

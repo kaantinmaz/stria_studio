@@ -33,13 +33,14 @@ export function Hero() {
       className="mx-auto grid max-w-[1280px] grid-cols-1 items-center gap-[clamp(28px,4.5vw,72px)] px-[clamp(18px,5vw,56px)] pb-16 pt-[116px] sm:pt-[158px] md:grid-cols-[minmax(0,1.06fr)_minmax(0,0.94fr)]"
     >
       <div>
-        <div className="reveal in mb-[26px] inline-flex items-center gap-2 rounded-[22px] bg-pink px-4 py-2 text-[11px] uppercase tracking-[0.14em] text-accent">
+        {/* H1 = anahtar kelimeli kicker ("Ankara kalıcı makyaj"); büyük slogan görsel başlık olarak <p>. */}
+        <h1 className="reveal in mb-[26px] inline-flex items-center gap-2 rounded-[22px] bg-pink px-4 py-2 text-[11px] uppercase tracking-[0.14em] text-accent">
           <span className="h-[6px] w-[6px] rounded-full bg-rose" />
           {t.heroKicker}
-        </div>
-        <h1 className="reveal in mb-[22px] whitespace-pre-line text-[clamp(40px,5.6vw,78px)] leading-[1.03]">
-          {t.heroTitle}
         </h1>
+        <p className="reveal in mb-[22px] whitespace-pre-line text-[clamp(40px,5.6vw,78px)] font-light leading-[1.03] tracking-[-0.015em]">
+          {t.heroTitle}
+        </p>
         <p className="reveal in mb-[30px] max-w-[480px] text-[clamp(15px,1.4vw,18px)] leading-[1.7] text-muted">
           {t.heroText}
         </p>

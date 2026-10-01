@@ -15,6 +15,7 @@ import { phoneHref, type ServiceFull, type ServiceListItem } from "@/lib/content
 import { RatingBadge } from "@/components/RatingBadge";
 import { GoogleRatingBadge } from "@/components/GoogleRatingBadge";
 import { ServiceReviews } from "@/components/ServiceReviews";
+import { UI } from "@/lib/i18n";
 
 // Ayrı domainde duran uzman rehber sitesi olan hizmetler. microbladingankara.com
 // ve kastasarimiankara.com ana domaine 301 ile konsolide edildiği için burada
@@ -135,6 +136,28 @@ export function ServicePage({
       </section>
 
       {mlScope && <MyLaminationServiceSection scope={mlScope} serviceName={name} />}
+
+      {/* Uygulayan uzman — sayfanın kimin elinden çıktığını gösterir (E-E-A-T). */}
+      <section className="mx-auto max-w-[1160px] px-[clamp(18px,5vw,56px)] py-[clamp(24px,4vw,48px)]">
+        <div className="flex flex-col items-start gap-6 rounded-[28px] bg-blush p-[clamp(20px,3vw,36px)] sm:flex-row sm:items-center">
+          <div className="relative h-[120px] w-[120px] flex-none overflow-hidden rounded-full">
+            <ImageSlot
+              src="/images/nilsu-kamisli.jpg"
+              alt="Nilsu Kamişli — Stria Studio kurucusu, kalıcı makyaj uzmanı"
+              sizes="120px"
+            />
+          </div>
+          <div>
+            <div className="mb-1 text-xs uppercase tracking-[0.14em] text-accent">Uzmanınız</div>
+            <h2 className="mb-1 text-[clamp(22px,2.4vw,30px)]">{UI.tr.founderName}</h2>
+            <div className="mb-3 text-sm font-medium tracking-[0.04em] text-accent">{UI.tr.founderRole}</div>
+            <p className="max-w-[720px] text-[15px] leading-[1.7] text-muted2">{UI.tr.founderText}</p>
+            <Link href="/hakkimizda#nilsu-kamisli" className="mt-3 inline-block text-sm text-accent underline underline-offset-4">
+              Nilsu Kamişli hakkında
+            </Link>
+          </div>
+        </div>
+      </section>
 
       {svc.subservices_tr && svc.subservices_tr.length > 0 && (
         <section className="mx-auto max-w-[1160px] px-[clamp(18px,5vw,56px)] py-[clamp(32px,5vw,64px)]">
