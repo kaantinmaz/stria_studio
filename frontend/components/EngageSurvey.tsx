@@ -14,6 +14,7 @@ import { site } from "@/lib/site";
 
 const DONE_KEY = "stria-engage-done";
 const SESSION_ID_KEY = "stria-engage-sid";
+const DISMISS_KEY = "stria-engage-dismissed";
 const VISIBLE_DELAY_MS = 30_000;
 const MAX_FOLLOW_UPS = 3;
 const URL_RE = /(https?:\/\/[^\s<>()]+[^\s<>().,!?;:'"])/g;
@@ -121,6 +122,8 @@ export function EngageSurvey({ whatsappUrl }: { whatsappUrl: string }) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const hasShownRef = useRef(false);
   const closeTimerRef = useRef<number | undefined>(undefined);
+  const [isMobile, setIsMobile] = useState(false);
+  const [expandedSheet, setExpandedSheet] = useState(false);
 
   const markDone = useCallback(() => {
     try {
@@ -132,6 +135,11 @@ export function EngageSurvey({ whatsappUrl }: { whatsappUrl: string }) {
 
   const close = useCallback(() => {
     markDone();
+    try {
+      sessionStorage.setItem(DISMISS_KEY, "1");
+    } catch {
+      // Dismiss still holds for the current mount without storage.
+    }
     setVisible(false);
     window.clearTimeout(closeTimerRef.current);
     closeTimerRef.current = window.setTimeout(() => setMounted(false), 500);
@@ -139,7 +147,8 @@ export function EngageSurvey({ whatsappUrl }: { whatsappUrl: string }) {
 
   useEffect(() => {
     try {
-      if (sessionStorage.getItem(DONE_KEY)) return;
+      if (sessionStorage.getItem(DONE_KEY) || sessionStorage.getItem(DISMISS_KEY))
+        return;
     } catch {
       // Continue with the in-memory once-per-mount guard.
     }
@@ -232,6 +241,26 @@ export function EngageSurvey({ whatsappUrl }: { whatsappUrl: string }) {
     },
     [],
   );
+
+  // Track the mobile breakpoint (below Tailwind md) so we can show a compact
+  // chip instead of auto-opening the full sheet over the page.
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  // While the sheet is expanded on mobile, flag the body so the chat launcher
+  // hides (see globals.css) and never covers the sheet controls.
+  useEffect(() => {
+    if (!expandedSheet) return;
+    document.body.dataset.engageSheet = "open";
+    return () => {
+      delete document.body.dataset.engageSheet;
+    };
+  }, [expandedSheet]);
 
   const serviceNames = selectedServices
     .map((slug) => services.find((service) => service.slug === slug))
@@ -388,11 +417,54 @@ export function EngageSurvey({ whatsappUrl }: { whatsappUrl: string }) {
 
   if (!mounted) return null;
 
+  // On mobile, don't take over the screen: show a compact, dismissible chip above
+  // the action bar that expands into the full sheet on tap.
+  if (isMobile && !expandedSheet) {
+    return (
+      <div
+        className={`fixed bottom-[calc(var(--mobile-bar-h)+12px)] left-3 right-[72px] z-[60] transition-transform duration-500 motion-reduce:transition-none md:hidden ${
+          visible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
+        }`}
+      >
+        <div className="flex items-center gap-2 rounded-[18px] border border-line2 bg-cream/95 px-3 py-2.5 shadow-[0_18px_40px_-20px_rgba(76,19,19,0.55)] backdrop-blur-[10px]">
+          <button
+            type="button"
+            onClick={() => setExpandedSheet(true)}
+            className="flex min-h-11 min-w-0 flex-1 items-center gap-2.5 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          >
+            <span
+              aria-hidden="true"
+              className="h-2 w-2 flex-none animate-pulse rounded-full bg-accent motion-reduce:animate-none"
+            />
+            <span className="min-w-0">
+              <span className="block text-[10px] font-medium uppercase tracking-[0.16em] text-accent">
+                {lang === "tr" ? "Sana özel" : "Personalized"}
+              </span>
+              <span className="mt-0.5 block truncate text-[12.5px] text-ink">
+                {lang === "tr"
+                  ? "Hangi hizmetle ilgileniyorsun?"
+                  : "Which service are you interested in?"}
+              </span>
+            </span>
+          </button>
+          <button
+            type="button"
+            aria-label={lang === "tr" ? "Kapat" : "Close"}
+            onClick={close}
+            className="flex h-11 w-11 flex-none items-center justify-center rounded-full border border-line2 bg-white text-ink transition-colors hover:bg-blush focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <section
       role="dialog"
       aria-label={lang === "tr" ? "Hizmet anketi" : "Service survey"}
-      className={`fixed inset-x-0 bottom-0 z-[65] flex max-h-[70vh] w-full flex-col overflow-hidden rounded-t-[28px] border border-b-0 border-line bg-cream shadow-[0_28px_80px_-24px_rgba(76,19,19,0.55)] transition-transform duration-500 motion-reduce:transition-none sm:inset-x-auto sm:bottom-auto sm:right-0 sm:top-1/2 sm:max-h-[max(340px,calc(100vh-340px))] sm:w-[min(340px,calc(100vw-24px))] sm:-translate-y-1/2 sm:rounded-l-[28px] sm:rounded-r-none sm:border-b sm:border-r-0 ${
+      className={`fixed inset-x-0 bottom-[var(--mobile-bar-h)] z-[65] flex max-h-[70vh] w-full flex-col overflow-hidden rounded-t-[28px] border border-b-0 border-line bg-cream shadow-[0_28px_80px_-24px_rgba(76,19,19,0.55)] transition-transform duration-500 motion-reduce:transition-none md:inset-x-auto md:bottom-auto md:right-0 md:top-1/2 md:max-h-[max(320px,calc(100vh-360px))] md:w-[min(300px,calc(100vw-24px))] md:-translate-y-1/2 md:rounded-l-[24px] md:rounded-r-none md:border-b md:border-r-0 ${
         visible ? "translate-x-0" : "translate-x-full"
       }`}
     >

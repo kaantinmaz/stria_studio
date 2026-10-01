@@ -21,7 +21,7 @@ export function ServiceStrip() {
   if (services.length === 0) return null;
 
   return (
-    <section className="px-[clamp(18px,5vw,56px)] pt-[clamp(20px,3vw,40px)]">
+    <section className="hidden px-[clamp(18px,5vw,56px)] pt-[clamp(20px,3vw,40px)] md:block">
       <div className="mx-auto max-w-[1160px]">
         <div className="mb-5 text-center text-xs uppercase tracking-[0.14em] text-accent">
           {lang === "tr" ? "Öne Çıkan Hizmetler" : "Featured Services"}

@@ -328,7 +328,7 @@ export function ChatWidget({ whatsappUrl }: { whatsappUrl: string }) {
   };
 
   return (
-    <div className="fixed bottom-24 right-5 z-[70] sm:right-6">
+    <div className="fixed bottom-[calc(var(--mobile-bar-h)+12px)] right-4 z-[70] md:bottom-24 md:right-6">
       {isOpen && (
         <section
           role="dialog"
@@ -492,7 +492,7 @@ export function ChatWidget({ whatsappUrl }: { whatsappUrl: string }) {
         aria-label={isOpen ? "Stria Asistan'ı kapat" : "Stria Asistan'ı aç"}
         aria-expanded={isOpen}
         onClick={() => setIsOpen((open) => !open)}
-        className="flex h-14 w-14 cursor-pointer items-center justify-center rounded-full bg-ink text-cream shadow-[0_14px_34px_-10px_rgba(76,19,19,0.65)] transition-transform duration-200 hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        className="stria-chat-launcher flex h-[52px] w-[52px] cursor-pointer items-center justify-center rounded-full border border-cream/25 bg-ink text-cream shadow-[0_14px_34px_-10px_rgba(76,19,19,0.65)] ring-2 ring-cream/40 transition-transform duration-200 hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent md:h-14 md:w-14"
       >
         {isOpen ? (
           <svg

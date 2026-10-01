@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { HeroCarousel } from "@/components/HeroCarousel";
 import { ImageSlot } from "@/components/ImageSlot";
@@ -34,6 +35,31 @@ function workLabel(src: string): string | null {
   return null;
 }
 
+// Giriş paragrafı — mobilde ~4 satıra kırpılır, "Devamını oku" ile açılır.
+// Metin SEO için her zaman DOM'da; yalnızca CSS ile gizlenir.
+function IntroText({ text }: { text: string | null }) {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div className="mb-7 max-w-[520px]">
+      <p
+        className={`text-[clamp(15px,1.4vw,18px)] leading-[1.7] text-muted md:line-clamp-none ${
+          expanded ? "" : "line-clamp-4"
+        }`}
+      >
+        {text}
+      </p>
+      <button
+        type="button"
+        onClick={() => setExpanded((v) => !v)}
+        aria-expanded={expanded}
+        className="mt-1 inline-flex min-h-[44px] items-center text-sm text-accent underline underline-offset-4 md:hidden"
+      >
+        {expanded ? "Daha az göster" : "Devamını oku"}
+      </button>
+    </div>
+  );
+}
+
 // Client-rendered TR service page body (settings-driven contact links).
 export function ServicePage({
   svc,
@@ -46,8 +72,8 @@ export function ServicePage({
   const name = svc.name_tr;
   const guide = SERVICE_GUIDES[svc.slug];
   const mlScope = ML_SERVICE_SCOPE[svc.slug];
-  // Work photos — owner fills svc.gallery; until then show 3 fillable placeholders.
-  const shots = svc.gallery?.length ? svc.gallery : ["", "", ""];
+  // Work photos — owner fills svc.gallery; hidden until real photos exist.
+  const shots = svc.gallery ?? [];
   const related = svc.related
     .map((slug) => {
       const item = services.find((s) => s.slug === slug);
@@ -60,7 +86,6 @@ export function ServicePage({
       {/* header */}
       <header className="mx-auto grid max-w-[1160px] grid-cols-1 items-center gap-[clamp(28px,4.5vw,64px)] px-[clamp(18px,5vw,56px)] pb-12 pt-8 md:grid-cols-[1.05fr_0.95fr]">
         <div>
-          {mlScope && <MyLaminationBadge scope={mlScope} className="mb-5" />}
           <div className="mb-4 inline-flex items-center gap-2 rounded-[22px] bg-pink px-4 py-2 text-[11px] uppercase tracking-[0.14em] text-accent">
             {svc.tag_tr} · Ankara
           </div>
@@ -71,29 +96,28 @@ export function ServicePage({
             <RatingBadge value={svc.rating_avg} count={svc.rating_count} size={15} />
             <GoogleRatingBadge />
           </div>
-          <p className="mb-7 max-w-[520px] text-[clamp(15px,1.4vw,18px)] leading-[1.7] text-muted">
-            {svc.intro_tr}
-          </p>
-          <div className="flex flex-wrap gap-3">
+          <IntroText text={svc.intro_tr} />
+          <div className="flex flex-col gap-3 md:flex-row md:flex-wrap">
             <a
               href={settings.whatsapp}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-[9px] rounded-[28px] bg-ink px-7 py-[15px] text-sm text-cream"
+              className="inline-flex w-full items-center justify-center gap-[9px] rounded-[28px] bg-ink px-7 py-[15px] text-sm text-cream md:w-auto"
             >
               <WhatsAppIcon size={16} />
               WhatsApp&apos;tan Randevu
             </a>
             <a
               href={phoneHref(settings.phone)}
-              className="inline-flex items-center gap-[9px] rounded-[28px] border border-line2 bg-white px-7 py-[15px] text-sm text-ink"
+              className="inline-flex w-full items-center justify-center gap-[9px] rounded-[28px] border border-line2 bg-white px-7 py-[15px] text-sm text-ink md:w-auto"
             >
               <PhoneIcon size={15} />
               <CallLabel label="Hemen Ara" />
             </a>
           </div>
+          {mlScope && <MyLaminationBadge scope={mlScope} className="mt-7" />}
         </div>
-        <div className="relative h-[min(56vh,460px)] overflow-hidden rounded-[32px] shadow-[0_40px_90px_-50px_rgba(229,135,146,0.7)]">
+        <div className="relative h-[320px] overflow-hidden rounded-[32px] shadow-[0_40px_90px_-50px_rgba(229,135,146,0.7)] md:h-[min(56vh,460px)]">
           <HeroCarousel
             images={svc.hero_images?.length ? svc.hero_images : (svc.image ? [svc.image] : [])}
             alt={`${name} — Stria Studio Ankara`}
@@ -199,8 +223,9 @@ export function ServicePage({
         </section>
       )}
 
-      {/* work gallery — owner drops photos into ServiceFull.gallery */}
-      <section className="mx-auto max-w-[1160px] px-[clamp(18px,5vw,56px)] py-[clamp(32px,5vw,64px)]">
+      {/* work gallery — owner drops photos into ServiceFull.gallery; hidden when empty */}
+      {shots.length > 0 && (
+        <section className="mx-auto max-w-[1160px] px-[clamp(18px,5vw,56px)] py-[clamp(32px,5vw,64px)]">
         <h2 className="mb-2 text-[clamp(22px,2.4vw,30px)]">Çalışmalarımızdan</h2>
         <p className="mb-7 max-w-[520px] text-[15px] leading-[1.6] text-muted">
           {name} uygulamalarımızdan örnek görüntüler.
@@ -236,7 +261,8 @@ export function ServicePage({
             );
           })}
         </div>
-      </section>
+        </section>
+      )}
 
       <ServiceReviews
         reviews={svc.reviews}

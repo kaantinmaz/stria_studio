@@ -26,12 +26,17 @@ export function Nav() {
   const promoRef = useRef<HTMLDivElement>(null);
   const showPromo = promoActive && promoOpen;
 
-  // Close the mobile menu on Escape.
+  // Close the mobile menu on Escape; lock page scroll while it is open.
   useEffect(() => {
     if (!menuOpen) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMenuOpen(false);
     document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
+    const prevOverflow = document.documentElement.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.documentElement.style.overflow = prevOverflow;
+    };
   }, [menuOpen]);
 
   // Hide if this exact message was already dismissed (runs client-side only,
@@ -86,7 +91,7 @@ export function Nav() {
       )}
 
       {/* contact bar */}
-      <div className="flex flex-wrap items-center justify-center gap-x-[clamp(14px,2.4vw,28px)] gap-y-1 bg-ink px-5 py-[9px] text-xs tracking-[0.02em] text-[#eed6d7]">
+      <div className="hidden flex-wrap items-center justify-center gap-x-[clamp(14px,2.4vw,28px)] gap-y-1 bg-ink px-5 py-[9px] text-xs tracking-[0.02em] text-[#eed6d7] md:flex">
         <a
           href={phoneHref(settings.phone)}
           className="inline-flex items-center gap-[7px] font-medium text-cream"
@@ -171,60 +176,72 @@ export function Nav() {
 
         {/* mobile cluster */}
         <div className="flex items-center gap-2 md:hidden">
+          {/* Telefon numarası doğrudan görünür; dokununca arar. */}
           <a
-            href={settings.instagram}
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Instagram"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-line2 bg-white text-ink"
+            href={phoneHref(settings.phone)}
+            aria-label={`${t.callLabel}: ${settings.phone}`}
+            className="inline-flex h-10 items-center gap-[6px] whitespace-nowrap rounded-full border border-line2 bg-white px-3 text-[13px] font-medium tracking-[0.01em] text-ink"
           >
-            <InstagramIcon size={17} />
+            <PhoneIcon size={13} />
+            {settings.phone_local || settings.phone}
           </a>
+          {/* Dar ekranda (<400px) WhatsApp ikonu gizlenir; alt çubukta zaten var. */}
           <a
             href={settings.whatsapp}
             target="_blank"
             rel="noreferrer"
             aria-label={t.navCta}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-rose text-white"
+            className="hidden h-10 w-10 items-center justify-center rounded-full bg-rose text-white min-[400px]:flex"
           >
             <WhatsAppIcon size={17} />
           </a>
           <button
             type="button"
-            aria-label="Menu"
+            aria-label={menuOpen ? (lang === "tr" ? "Menüyü kapat" : "Close menu") : (lang === "tr" ? "Menüyü aç" : "Open menu")}
             aria-expanded={menuOpen}
+            aria-controls="mobile-menu"
             onClick={() => setMenuOpen((o) => !o)}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-line2 bg-white text-ink"
+            className="relative flex h-10 w-10 items-center justify-center rounded-full border border-line2 bg-white text-ink"
           >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-            >
-              {menuOpen ? (
-                <path d="M6 6l12 12M18 6L6 18" />
-              ) : (
-                <path d="M4 7h16M4 12h16M4 17h16" />
-              )}
-            </svg>
+            {/* Üç çizgi → X: üst/alt çizgi döner, orta çizgi kaybolur. */}
+            <span aria-hidden="true" className="relative block h-[14px] w-[18px]">
+              <span
+                className={`absolute left-0 top-0 h-[2px] w-full rounded-full bg-current transition-transform duration-300 ease-out motion-reduce:transition-none ${menuOpen ? "translate-y-[6px] rotate-45" : ""}`}
+              />
+              <span
+                className={`absolute left-0 top-[6px] h-[2px] w-full rounded-full bg-current transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none ${menuOpen ? "scale-x-0 opacity-0" : ""}`}
+              />
+              <span
+                className={`absolute left-0 top-[12px] h-[2px] w-full rounded-full bg-current transition-transform duration-300 ease-out motion-reduce:transition-none ${menuOpen ? "-translate-y-[6px] -rotate-45" : ""}`}
+              />
+            </span>
           </button>
         </div>
       </nav>
 
-      {/* mobile menu panel */}
-      {menuOpen && (
-        <div className="border-b border-line bg-cream px-[clamp(18px,5vw,56px)] pb-5 pt-1 shadow-[0_30px_60px_-40px_rgba(76,19,19,0.5)] md:hidden">
+      {/* backdrop — sayfayı karartır, dokununca menüyü kapatır */}
+      <div
+        aria-hidden="true"
+        onClick={() => setMenuOpen(false)}
+        className={`fixed inset-0 -z-10 bg-ink/30 backdrop-blur-[2px] transition-opacity duration-300 motion-reduce:transition-none md:hidden ${menuOpen ? "opacity-100" : "pointer-events-none opacity-0"}`}
+      />
+
+      {/* mobile menu panel — açılıp kapanırken yükseklik + opaklık animasyonu */}
+      <div
+        id="mobile-menu"
+        inert={!menuOpen}
+        className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:transition-none md:hidden ${menuOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
+      >
+        <div className="min-h-0 overflow-hidden">
+        <div className="max-h-[calc(100vh-var(--promo-h)-110px)] overflow-y-auto overscroll-contain border-b border-line bg-cream px-[clamp(18px,5vw,56px)] pb-5 pt-1 shadow-[0_30px_60px_-40px_rgba(76,19,19,0.5)]">
           <nav className="flex flex-col">
-            {links.map((l) => (
+            {links.map((l, i) => (
               <a
                 key={l.href}
                 href={l.href}
                 onClick={() => setMenuOpen(false)}
-                className="flex items-center justify-between border-b border-line/60 py-[13px] text-[15px] text-ink"
+                style={{ transitionDelay: menuOpen ? `${60 + i * 35}ms` : "0ms" }}
+                className={`flex min-h-[48px] items-center justify-between border-b border-line/60 py-[13px] text-[15px] text-ink transition-[opacity,transform] duration-300 ease-out motion-reduce:transition-none ${menuOpen ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"}`}
               >
                 {l.label}
                 <span className="text-accent">→</span>
@@ -273,7 +290,8 @@ export function Nav() {
             <span className="flex-none text-accent">→</span>
           </a>
         </div>
-      )}
+        </div>
+      </div>
     </div>
   );
 }

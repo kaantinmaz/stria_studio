@@ -19,18 +19,18 @@ export function MyLaminationBadge({
 
   return (
     <div
-      className={`flex flex-wrap items-center gap-x-4 gap-y-3 rounded-[20px] border border-line bg-white px-5 py-4 ${className}`}
+      className={`flex flex-wrap items-center gap-x-4 gap-y-3 rounded-[20px] border border-line bg-white px-4 py-3 md:px-5 md:py-4 ${className}`}
     >
       <Image
         src={ML_BRAND.logo}
         alt="My Lamination"
         width={250}
         height={150}
-        className="h-12 w-auto flex-none"
+        className="h-9 w-auto flex-none md:h-12"
       />
-      <div className="min-w-[220px] flex-1">
-        <p className="text-[14px] font-medium leading-[1.45] text-ink">{label}</p>
-        <p className="mt-1 text-[13px] leading-[1.6] text-muted">
+      <div className="min-w-[200px] flex-1 md:min-w-[220px]">
+        <p className="text-[13px] font-medium leading-[1.45] text-ink md:text-[14px]">{label}</p>
+        <p className="mt-1 hidden text-[13px] leading-[1.6] text-muted md:block">
           Stria Studio’nun kurucusu Nilsu Kamişli, My Lamination workshopunu
           tamamlamış sertifikalı uygulayıcıdır. Seansta İtalyan teknolojisiyle
           üretilen, T.C. Sağlık Bakanlığı’na kayıtlı{" "}

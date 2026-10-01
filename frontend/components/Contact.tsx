@@ -3,7 +3,7 @@
 import { useLang } from "@/components/LanguageProvider";
 import { useSettings } from "@/components/SettingsProvider";
 import { phoneHref } from "@/lib/content";
-import { WhatsAppIcon } from "@/components/Icons";
+import { PinIcon, WhatsAppIcon } from "@/components/Icons";
 import { ContactForm } from "@/components/ContactForm";
 
 export function Contact({
@@ -11,7 +11,7 @@ export function Contact({
 }: {
   headingAs?: "h1" | "h2";
 }) {
-  const { t } = useLang();
+  const { lang, t } = useLang();
   const settings = useSettings();
 
   return (
@@ -58,9 +58,20 @@ export function Contact({
                 <div className="text-base leading-[1.5] text-ink">{i.value}</div>
               </div>
             ))}
-            <div className="mt-5 flex h-[150px] items-center justify-center rounded-[20px] bg-gradient-to-br from-pink to-[#f1bcc1] text-[11px] uppercase tracking-[0.16em] text-accent">
-              {t.mapPh}
-            </div>
+            <a
+              href={
+                settings.google_maps_url ??
+                `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                  "Stria Studio Çankaya Ankara",
+                )}`
+              }
+              target="_blank"
+              rel="noreferrer"
+              className="mt-5 inline-flex min-h-[44px] items-center gap-2 rounded-[20px] border border-line2 bg-cream/60 px-5 py-3 text-[13px] font-medium text-ink transition-colors hover:border-accent hover:text-accent"
+            >
+              <PinIcon size={15} className="text-blossom" />
+              {lang === "en" ? "Open in Maps" : "Haritada aç"}
+            </a>
           </div>
         </div>
 

@@ -24,11 +24,30 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Mobile action bar height (see MobileActionBar + layout). 0 on desktop so the
+   fixed bottom bar only reserves space below Tailwind's md breakpoint (768px). */
+:root {
+  --mobile-bar-h: 0px;
+}
+@media (max-width: 767px) {
+  :root {
+    --mobile-bar-h: calc(64px + env(safe-area-inset-bottom));
+  }
+}
+
+/* While the engage survey sheet is expanded on mobile, hide the chat launcher
+   so it never covers the sheet's controls. */
+body[data-engage-sheet="open"] .stria-chat-launcher {
+  display: none;
+}
+
 body {
   margin: 0;
   /* Shifts in-flow content down by the campaign bar's height when it shows.
      The fixed nav stays viewport-pinned; Nav.tsx sets --promo-h (0 otherwise). */
   padding-top: var(--promo-h, 0px);
+  /* Keep the footer clear of the fixed mobile action bar. */
+  padding-bottom: var(--mobile-bar-h, 0px);
   background: var(--color-cream);
   color: var(--color-ink);
   font-family: var(--font-body), system-ui, sans-serif;

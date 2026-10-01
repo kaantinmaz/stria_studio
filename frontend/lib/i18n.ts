@@ -52,6 +52,7 @@ export type Dict = {
   navFaq: string;
   navCta: string;
   callLabel: string;
+  waBookCta: string;
   heroKicker: string;
   heroTitle: string;
   heroText: string;
@@ -123,6 +124,7 @@ export const UI: Record<Lang, Dict> = {
     navFaq: "S.S.S.",
     navCta: "Randevu Al",
     callLabel: "Ara",
+    waBookCta: "WhatsApp'tan Randevu",
     heroKicker: "Ankara Kalıcı Makyaj · Kaş Tasarımı & Microblading",
     heroTitle: "Kaşların, en doğal\nhaliyle güzel",
     heroText:
@@ -208,6 +210,7 @@ export const UI: Record<Lang, Dict> = {
     navFaq: "FAQ",
     navCta: "Book Now",
     callLabel: "Call",
+    waBookCta: "Book on WhatsApp",
     heroKicker: "Ankara · Brow Design, Microblading & Permanent Makeup",
     heroTitle: "Your brows, beautiful\nat their most natural",
     heroText:

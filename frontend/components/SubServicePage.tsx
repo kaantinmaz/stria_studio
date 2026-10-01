@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { HeroCarousel } from "@/components/HeroCarousel";
 import { Faq } from "@/components/Faq";
@@ -10,6 +11,33 @@ import { useSettings } from "@/components/SettingsProvider";
 import { phoneHref, type ServiceFull, type SubService } from "@/lib/content";
 import { RatingBadge } from "@/components/RatingBadge";
 import { ServiceReviews } from "@/components/ServiceReviews";
+
+// Giriş metni — mobilde kısaltılır, "Devamını oku" ile açılır. Paragraflar
+// SEO için her zaman DOM'da; mobilde yalnızca CSS ile yükseklik kısıtlanır.
+function SubIntro({ paragraphs }: { paragraphs: string[] }) {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div className="mb-7 max-w-[520px]">
+      <div
+        className={`space-y-4 overflow-hidden text-[clamp(15px,1.4vw,18px)] leading-[1.7] text-muted md:max-h-none ${
+          expanded ? "" : "max-h-[7.5rem]"
+        }`}
+      >
+        {paragraphs.map((paragraph, index) => (
+          <p key={`${index}-${paragraph}`}>{paragraph}</p>
+        ))}
+      </div>
+      <button
+        type="button"
+        onClick={() => setExpanded((v) => !v)}
+        aria-expanded={expanded}
+        className="mt-1 inline-flex min-h-[44px] items-center text-sm text-accent underline underline-offset-4 md:hidden"
+      >
+        {expanded ? "Daha az göster" : "Devamını oku"}
+      </button>
+    </div>
+  );
+}
 
 export function SubServicePage({ svc, sub }: { svc: ServiceFull; sub: SubService }) {
   const settings = useSettings();
@@ -34,31 +62,27 @@ export function SubServicePage({ svc, sub }: { svc: ServiceFull; sub: SubService
           <div className="mb-5">
             <RatingBadge value={svc.rating_avg} count={svc.rating_count} size={15} />
           </div>
-          <div className="mb-7 max-w-[520px] space-y-4 text-[clamp(15px,1.4vw,18px)] leading-[1.7] text-muted">
-            {intro.map((paragraph, index) => (
-              <p key={`${index}-${paragraph}`}>{paragraph}</p>
-            ))}
-          </div>
-          <div className="flex flex-wrap gap-3">
+          <SubIntro paragraphs={intro} />
+          <div className="flex flex-col gap-3 md:flex-row md:flex-wrap">
             <a
               href={settings.whatsapp}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-[9px] rounded-[28px] bg-ink px-7 py-[15px] text-sm text-cream"
+              className="inline-flex w-full items-center justify-center gap-[9px] rounded-[28px] bg-ink px-7 py-[15px] text-sm text-cream md:w-auto"
             >
               <WhatsAppIcon size={16} />
               WhatsApp&apos;tan Randevu
             </a>
             <a
               href={phoneHref(settings.phone)}
-              className="inline-flex items-center gap-[9px] rounded-[28px] border border-line2 bg-white px-7 py-[15px] text-sm text-ink"
+              className="inline-flex w-full items-center justify-center gap-[9px] rounded-[28px] border border-line2 bg-white px-7 py-[15px] text-sm text-ink md:w-auto"
             >
               <PhoneIcon size={15} />
               <CallLabel label="Hemen Ara" />
             </a>
           </div>
         </div>
-        <div className="relative h-[min(56vh,460px)] overflow-hidden rounded-[32px] shadow-[0_40px_90px_-50px_rgba(229,135,146,0.7)]">
+        <div className="relative h-[320px] overflow-hidden rounded-[32px] shadow-[0_40px_90px_-50px_rgba(229,135,146,0.7)] md:h-[min(56vh,460px)]">
           <HeroCarousel
             images={svc.hero_images?.length ? svc.hero_images : (svc.image ? [svc.image] : [])}
             alt={`${sub.name} — Stria Studio Ankara`}

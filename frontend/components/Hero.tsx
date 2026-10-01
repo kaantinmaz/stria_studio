@@ -44,19 +44,19 @@ export function Hero() {
         <p className="reveal in mb-[30px] max-w-[480px] text-[clamp(15px,1.4vw,18px)] leading-[1.7] text-muted">
           {t.heroText}
         </p>
-        <div className="reveal in mb-[30px] flex flex-wrap gap-3">
+        <div className="reveal in mb-[30px] flex flex-col gap-3 sm:flex-row sm:flex-wrap">
           <a
             href={settings.whatsapp}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-[9px] rounded-[28px] bg-ink px-7 py-[15px] text-sm text-cream"
+            className="inline-flex w-full items-center justify-center gap-[9px] rounded-[28px] bg-ink px-7 py-[15px] text-sm text-cream sm:w-auto"
           >
             <WhatsAppIcon size={16} />
             {t.heroCtaPrimary}
           </a>
           <a
             href={phoneHref(settings.phone)}
-            className="inline-flex items-center gap-[9px] rounded-[28px] border border-line2 bg-white px-7 py-[15px] text-sm text-ink"
+            className="inline-flex w-full items-center justify-center gap-[9px] rounded-[28px] border border-line2 bg-white px-7 py-[15px] text-sm text-ink sm:w-auto"
           >
             <PhoneIcon size={15} />
             <CallLabel label={t.heroCtaSecondary} />
@@ -78,7 +78,7 @@ export function Hero() {
       </div>
 
       <div className="reveal in relative">
-        <div className="relative h-[min(72vh,600px)] overflow-hidden rounded-[200px_200px_32px_32px] shadow-[0_40px_90px_-50px_rgba(229,135,146,0.7)]">
+        <div className="relative h-[clamp(240px,60vw,360px)] overflow-hidden rounded-[200px_200px_32px_32px] shadow-[0_40px_90px_-50px_rgba(229,135,146,0.7)] md:h-[min(72vh,600px)]">
           {slides.map((src, i) => (
             <div
               key={src}

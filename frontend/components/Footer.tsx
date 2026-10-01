@@ -82,10 +82,13 @@ export function Footer() {
           <Link href="/hizmetler" className={`${heading} block hover:text-cream`}>
             {t.navServices}
           </Link>
-          <ul className="flex flex-col gap-[14px]">
+          <ul className="grid grid-cols-2 gap-x-4 gap-y-1 sm:flex sm:flex-col sm:gap-y-[14px]">
             {services.map((s) => (
               <li key={s.slug}>
-                <Link href={s.url} className={link}>
+                <Link
+                  href={s.url}
+                  className={`${link} flex min-h-[44px] items-center sm:inline sm:min-h-0`}
+                >
                   {pickLang(s.name_tr, s.name_en, lang)}
                 </Link>
               </li>
@@ -96,10 +99,13 @@ export function Footer() {
         {/* explore */}
         <div>
           <div className={heading}>{t.footerExplore}</div>
-          <ul className="flex flex-col gap-[14px]">
+          <ul className="grid grid-cols-2 gap-x-4 gap-y-1 sm:flex sm:flex-col sm:gap-y-[14px]">
             {explore.map((e) => (
               <li key={e.href}>
-                <Link href={e.href} className={link}>
+                <Link
+                  href={e.href}
+                  className={`${link} flex min-h-[44px] items-center sm:inline sm:min-h-0`}
+                >
                   {e.label}
                 </Link>
               </li>

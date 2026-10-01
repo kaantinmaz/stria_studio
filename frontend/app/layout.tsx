@@ -5,6 +5,7 @@ import { LanguageProvider } from "@/components/LanguageProvider";
 import { ServicesProvider } from "@/components/ServicesProvider";
 import { SettingsProvider } from "@/components/SettingsProvider";
 import { WhatsAppFab } from "@/components/WhatsAppFab";
+import { MobileActionBar } from "@/components/MobileActionBar";
 import { ChatWidget } from "@/components/ChatWidget";
 import { Analytics } from "@/components/Analytics";
 import { GoogleTag } from "@/components/GoogleTag";
@@ -89,6 +90,7 @@ export default async function RootLayout({
             <CookieConsent />
             <ChatWidget whatsappUrl={(settings ?? SETTINGS_FALLBACK).whatsapp} />
             <WhatsAppFab />
+            <MobileActionBar />
             <Analytics />
           </SettingsProvider>
         </LanguageProvider>
