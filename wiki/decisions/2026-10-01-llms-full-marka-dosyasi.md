@@ -1,7 +1,7 @@
 # Decision: `/llms-full.txt` marka dosyası + gerçek ölçek verisi
 
 **Date:** 2026-10-01
-**Status:** Kod hazır, lokal doğrulandı; prod deploy bekliyor.
+**Status:** Prod'da (2026-10-01). Ölçek bölümü `SCALE_MIN_SESSIONS = 100` eşiğine kadar gizli (prod: 3 müşteri / 5 seans; owner kararı).
 
 ## Bağlam
 
