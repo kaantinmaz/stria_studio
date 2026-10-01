@@ -34,3 +34,11 @@ export const REPUTATION = {
   checkedAt: "2026-10-01",
   entries: [] as { source: string; url: string; date: string; summary: string; response: string }[],
 };
+
+/**
+ * Ölçek bölümü bu kadar tamamlanmış seans birikene kadar yayınlanmaz (owner
+ * kararı, 2026-10-01). Randevu sistemi Haziran 2026'da kullanılmaya başlandı;
+ * sistem öncesi işleri içermeyen küçük bir sayı AI'a yanlış "küçük işletme"
+ * paydası verir. Eşik aşılınca bölüm kendiliğinden görünür.
+ */
+export const SCALE_MIN_SESSIONS = 100;

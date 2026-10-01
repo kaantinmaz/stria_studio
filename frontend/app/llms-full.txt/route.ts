@@ -9,7 +9,7 @@ import {
   type ServiceFull,
 } from "@/lib/content";
 import { getAllPosts } from "@/lib/blog";
-import { ML_EXPERT_PARAGRAPH, REPUTATION, isPlaceholder, u } from "@/lib/llms";
+import { ML_EXPERT_PARAGRAPH, REPUTATION, SCALE_MIN_SESSIONS, isPlaceholder, u } from "@/lib/llms";
 import { site } from "@/lib/site";
 
 // Kapsamlı, doğrulanabilir marka dosyası (GEO). Tüm bilgi API verisinden, site
@@ -83,7 +83,7 @@ Bu dosya /llms.txt'i genişletir; tüm bilgiler sitenin sayfalarından ve stüdy
   sections.push(identity.join("\n"));
 
   // 3. Ölçek
-  if (facts && facts.completed_sessions > 0) {
+  if (facts && facts.completed_sessions >= SCALE_MIN_SESSIONS) {
     const since = trDate(facts.records_since);
     const scale = [
       "## Ölçek",
