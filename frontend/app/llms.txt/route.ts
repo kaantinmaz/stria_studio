@@ -1,34 +1,44 @@
-import { formatHours, getSettings, SETTINGS_FALLBACK } from "@/lib/content";
+import { getServices, formatHours, getSettings, SETTINGS_FALLBACK } from "@/lib/content";
+import { ML_EXPERT_PARAGRAPH, u } from "@/lib/llms";
 import {
   ML_CATEGORIES,
-  ML_EXPERT,
   ML_VISIBLE_CATEGORIES,
   ML_VISIBLE_PRODUCTS,
 } from "@/lib/mylamination";
-import { site } from "@/lib/site";
 
 // AI-crawler manifest (llmstxt.org), served dynamically at /llms.txt.
 export const revalidate = 300;
 
-function u(path: string): string {
-  return new URL(path, site.siteUrl).toString();
-}
+// API hiç hizmet dönmezse mevcut 7 kategorilik liste yedek olarak basılır.
+const SERVICES_FALLBACK = [
+  `- [Microblading Ankara](${u("/hizmetler/microblading")}): Kıl tekniğiyle doğal, 12–18 ay kalıcı kaş.`,
+  `- [Kaş Pudralama Ankara](${u("/hizmetler/kas-pudralama")}): Powder brows; dolgun, makyajlı görünüm, yağlı ciltlere ideal.`,
+  `- [Kalıcı Eyeliner Ankara](${u("/hizmetler/eyeliner")}): Simetrik, silinmeyen göz hattı, 1–3 yıl kalıcı.`,
+  `- [Dipliner Ankara](${u("/hizmetler/dipliner")}): Kirpik dibine ince pigment; doğal, dolgun bakış.`,
+  `- [Dudak Renklendirme Ankara](${u("/hizmetler/dudak-renklendirme")}): Lip blush; doğal renk, tanım ve dolgunluk, 1–2 yıl kalıcı.`,
+  `- [Kaş Laminasyonu Ankara](${u("/hizmetler/kas-laminasyon")}): İğnesiz kaş şekillendirme, yaklaşık 6 hafta etkili. My Lamination ürünleriyle uygulanır.`,
+  `- [Kirpik Lifting Ankara](${u("/hizmetler/kirpik-lifting")}): Lash lift; kendi kirpiklerini kıvırır, yaklaşık 6–8 hafta kalıcı. My Lamination ürünleriyle uygulanır.`,
+].join("\n");
 
 export async function GET(): Promise<Response> {
-  const settings = (await getSettings()) ?? SETTINGS_FALLBACK;
+  const [settings, services] = await Promise.all([
+    getSettings().then((s) => s ?? SETTINGS_FALLBACK),
+    getServices(),
+  ]);
+
+  const serviceLines =
+    services.length > 0
+      ? services.map((s) => `- [${s.name_tr}](${u(s.url)}): ${s.desc_tr}`).join("\n")
+      : SERVICES_FALLBACK;
 
   const body = `# Stria Studio
 
-> Ankara Çankaya'da kalıcı makyaj ve güzellik stüdyosu. Microblading, kaş pudralama, eyeliner, dipliner, dudak renklendirme, kaş laminasyonu ve kirpik lifting. Steril ekipman, yüze özel tasarım.
+> Ankara Çankaya'da kalıcı makyaj ve güzellik stüdyosu. Microblading, kaş pudralama, eyeliner, dipliner, dudak renklendirme, kaş laminasyonu, kirpik lifting, kamuflaj makyaj, kaş tasarımı ve altın oran kaş alım. Steril ekipman, yüze özel tasarım.
+
+Kapsamlı marka dosyası (kimlik, ölçek, hizmet ayrıntıları, uzmanlık, yorumlar, kaynaklar, bilginin sınırları): ${u("/llms-full.txt")}
 
 ## Hizmetler
-- [Microblading Ankara](${u("/hizmetler/microblading")}): Kıl tekniğiyle doğal, 12–18 ay kalıcı kaş.
-- [Kaş Pudralama Ankara](${u("/hizmetler/kas-pudralama")}): Powder brows; dolgun, makyajlı görünüm, yağlı ciltlere ideal.
-- [Kalıcı Eyeliner Ankara](${u("/hizmetler/eyeliner")}): Simetrik, silinmeyen göz hattı, 1–3 yıl kalıcı.
-- [Dipliner Ankara](${u("/hizmetler/dipliner")}): Kirpik dibine ince pigment; doğal, dolgun bakış.
-- [Dudak Renklendirme Ankara](${u("/hizmetler/dudak-renklendirme")}): Lip blush; doğal renk, tanım ve dolgunluk, 1–2 yıl kalıcı.
-- [Kaş Laminasyonu Ankara](${u("/hizmetler/kas-laminasyon")}): İğnesiz kaş şekillendirme, yaklaşık 6 hafta etkili. My Lamination ürünleriyle uygulanır.
-- [Kirpik Lifting Ankara](${u("/hizmetler/kirpik-lifting")}): Lash lift; kendi kirpiklerini kıvırır, yaklaşık 6–8 hafta kalıcı. My Lamination ürünleriyle uygulanır.
+${serviceLines}
 
 ## Önemli sayfalar
 - [Ankara'da Kalıcı Makyaj Yapan Yerler](${u("/ankara-kalici-makyaj-yapan-yerler")}): Güvenilir stüdyo seçimi için uzmanlık, hijyen, portfolyo, semt, fiyat ve rötuş kriterleri.
@@ -38,7 +48,7 @@ export async function GET(): Promise<Response> {
 - [İletişim](${u("/iletisim")}): Randevu, konum, telefon ve çalışma saatleri.
 
 ## My Lamination ürünleri
-Ankara'daki My Lamination uzmanı: **${ML_EXPERT.name}** (${ML_EXPERT.role}, Stria Studio kurucusu). My Lamination sertifikası kuruma değil uygulayıcıya verilir; markanın workshopunu tamamlayan Nilsu Kamişli kaş laminasyonu ve kirpik lifting seanslarını Ankara Çankaya'daki Stria Studio'da kendisi uygular. My Lamination; İtalyan teknolojisiyle üretilen, Avrupa ve T.C. Sağlık Bakanlığı onaylı, vegan bir profesyonel ürün markasıdır. Ürünleri serbest satışta değildir; yalnızca sertifikalı uygulayıcılar satın alabilir. Etkinliği İtalya'daki Padua Üniversitesi laboratuvarlarında ESEM elektron mikroskobuyla ölçülmüştür (kirpik çapı: işlem öncesi 68,18 µm → işlem sonrası 86,14 µm → bir ay ev serumu sonrası 129,32 µm).
+${ML_EXPERT_PARAGRAPH}
 
 - [My Lamination Ürün Rehberi](${u("/mylamination")}): seansın adım sırası ve yayında olan ${ML_VISIBLE_PRODUCTS.length} ürünün tek tek anlatımı.
 ${ML_VISIBLE_CATEGORIES.map(

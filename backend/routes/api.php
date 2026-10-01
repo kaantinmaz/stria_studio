@@ -22,6 +22,7 @@ use App\Http\Controllers\LinkController;
 use App\Http\Controllers\MicrositeController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\StudioFactsController;
 use App\Http\Controllers\TrackController;
 use App\Http\Middleware\EnsureAdminApiToken;
 use App\Http\Middleware\EnsureDesktopAdmin;
@@ -39,6 +40,7 @@ Route::get('/services', [ServiceController::class, 'index']);
 Route::get('/services/{slug}', [ServiceController::class, 'show']);
 
 Route::get('/settings', [SettingController::class, 'show']);
+Route::get('/studio-facts', StudioFactsController::class);
 
 Route::get('/gallery', [GalleryController::class, 'index']);
 Route::get('/faqs', [FaqController::class, 'index']);

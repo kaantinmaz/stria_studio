@@ -40,8 +40,8 @@ export const SETTINGS_FALLBACK: Settings = {
   phone: "+90 507 732 30 26",
   phone_local: "0507 732 30 26",
   whatsapp: "https://wa.me/905077323026",
-  instagram: "https://instagram.com/striastudio",
-  instagram_handle: "@striastudio",
+  instagram: "https://instagram.com/striabeautystudio",
+  instagram_handle: "@striabeautystudio",
   address: "Çankaya, Ankara",
   street_address: "Çankaya, Ankara",
   locality: "Çankaya",
@@ -203,6 +203,26 @@ export async function getSettings(): Promise<Settings | null> {
       typeof out.data.google_review_count === "number" ? out.data.google_review_count : null,
     google_maps_url: out.data.google_maps_url ?? null,
     google_reviews_synced_at: out.data.google_reviews_synced_at ?? null,
+  };
+}
+
+export type StudioFacts = {
+  completed_sessions: number;
+  customers_served: number;
+  records_since: string | null;
+};
+
+export async function getStudioFacts(): Promise<StudioFacts | null> {
+  // Eski backend'lerde endpoint 404 dönebilir → api() null verir, sorun değil.
+  const out = await api<{ data: StudioFacts }>("/studio-facts");
+  if (!out?.data) return null;
+  // Sayılar eksik/yanlış tipse sahte veri üretmeyelim diye normalize edilir.
+  return {
+    completed_sessions:
+      typeof out.data.completed_sessions === "number" ? out.data.completed_sessions : 0,
+    customers_served:
+      typeof out.data.customers_served === "number" ? out.data.customers_served : 0,
+    records_since: typeof out.data.records_since === "string" ? out.data.records_since : null,
   };
 }
 

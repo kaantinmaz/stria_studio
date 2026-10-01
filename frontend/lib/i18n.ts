@@ -174,7 +174,7 @@ export const UI: Record<Lang, Dict> = {
     info: [
       { label: "Adres", value: "Çankaya, Ankara" },
       { label: "Telefon", value: "+90 507 732 30 26" },
-      { label: "Instagram", value: "@striastudio" },
+      { label: "Instagram", value: "@striabeautystudio" },
       { label: "Çalışma Saatleri", value: "Pzt – Cmt · 10:00 – 19:00" },
     ],
     formTitle: "Randevu Talebi",
@@ -260,7 +260,7 @@ export const UI: Record<Lang, Dict> = {
     info: [
       { label: "Address", value: "Çankaya, Ankara" },
       { label: "Phone", value: "+90 507 732 30 26" },
-      { label: "Instagram", value: "@striastudio" },
+      { label: "Instagram", value: "@striabeautystudio" },
       { label: "Hours", value: "Mon – Sat · 10:00 – 19:00" },
     ],
     formTitle: "Appointment Request",
