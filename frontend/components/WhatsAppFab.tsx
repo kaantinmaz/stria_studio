@@ -1,15 +1,20 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useSettings } from "@/components/SettingsProvider";
+import { useServices } from "@/components/ServicesProvider";
+import { whatsappHref, pathWhatsappText } from "@/lib/whatsapp";
 import { WhatsAppIcon } from "@/components/Icons";
 
 // Sticky bottom-right WhatsApp button with a pulsing ring.
 export function WhatsAppFab() {
   const settings = useSettings();
+  const services = useServices();
+  const pathname = usePathname();
 
   return (
     <a
-      href={settings.whatsapp}
+      href={whatsappHref(settings.whatsapp, pathWhatsappText(pathname, services))}
       target="_blank"
       rel="noreferrer"
       aria-label="WhatsApp"

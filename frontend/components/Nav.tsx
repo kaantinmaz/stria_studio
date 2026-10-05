@@ -2,9 +2,12 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { useLang } from "@/components/LanguageProvider";
 import { useSettings } from "@/components/SettingsProvider";
+import { useServices } from "@/components/ServicesProvider";
 import { phoneHref, formatHours, pickLang } from "@/lib/content";
+import { whatsappHref, pathWhatsappText } from "@/lib/whatsapp";
 import { InstagramIcon, PhoneIcon, PinIcon, WhatsAppIcon } from "@/components/Icons";
 import { NavServices } from "@/components/NavServices";
 import { ML_BRAND, ML_EXPERT } from "@/lib/mylamination";
@@ -12,6 +15,9 @@ import { ML_BRAND, ML_EXPERT } from "@/lib/mylamination";
 export function Nav() {
   const { lang, t, toggle } = useLang();
   const settings = useSettings();
+  const services = useServices();
+  const pathname = usePathname();
+  const waHref = whatsappHref(settings.whatsapp, pathWhatsappText(pathname, services));
   const [menuOpen, setMenuOpen] = useState(false);
 
   // Campaign bar. Admin toggles it (campaign_enabled); a visitor can dismiss it,
@@ -165,7 +171,7 @@ export function Nav() {
             {t.callLabel}
           </a>
           <a
-            href={settings.whatsapp}
+            href={waHref}
             target="_blank"
             rel="noreferrer"
             className="rounded-[24px] bg-rose px-5 py-[11px] text-[12.5px] text-white"
@@ -187,7 +193,7 @@ export function Nav() {
           </a>
           {/* Dar ekranda (<400px) WhatsApp ikonu gizlenir; alt çubukta zaten var. */}
           <a
-            href={settings.whatsapp}
+            href={waHref}
             target="_blank"
             rel="noreferrer"
             aria-label={t.navCta}

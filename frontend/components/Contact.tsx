@@ -3,6 +3,7 @@
 import { useLang } from "@/components/LanguageProvider";
 import { useSettings } from "@/components/SettingsProvider";
 import { phoneHref } from "@/lib/content";
+import { whatsappHref, GENERIC_WHATSAPP_TEXT } from "@/lib/whatsapp";
 import { PinIcon, WhatsAppIcon } from "@/components/Icons";
 import { ContactForm } from "@/components/ContactForm";
 
@@ -29,7 +30,7 @@ export function Contact({
           </p>
           <div className="reveal mb-8 flex flex-wrap gap-3">
             <a
-              href={settings.whatsapp}
+              href={whatsappHref(settings.whatsapp, GENERIC_WHATSAPP_TEXT)}
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-[9px] rounded-[28px] bg-rose px-7 py-[15px] text-sm text-white"

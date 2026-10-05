@@ -17,6 +17,7 @@ import { RatingBadge } from "@/components/RatingBadge";
 import { GoogleRatingBadge } from "@/components/GoogleRatingBadge";
 import { ServiceReviews } from "@/components/ServiceReviews";
 import { UI } from "@/lib/i18n";
+import { whatsappHref, serviceWhatsappText } from "@/lib/whatsapp";
 
 // Ayrı domainde duran uzman rehber sitesi olan hizmetler. microbladingankara.com
 // ve kastasarimiankara.com ana domaine 301 ile konsolide edildiği için burada
@@ -99,7 +100,7 @@ export function ServicePage({
           <IntroText text={svc.intro_tr} />
           <div className="flex flex-col gap-3 md:flex-row md:flex-wrap">
             <a
-              href={settings.whatsapp}
+              href={whatsappHref(settings.whatsapp, serviceWhatsappText(name))}
               target="_blank"
               rel="noreferrer"
               className="inline-flex w-full items-center justify-center gap-[9px] rounded-[28px] bg-ink px-7 py-[15px] text-sm text-cream md:w-auto"

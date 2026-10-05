@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useLang } from "@/components/LanguageProvider";
 import { useSettings } from "@/components/SettingsProvider";
 import { phoneHref } from "@/lib/content";
+import { whatsappHref, GENERIC_WHATSAPP_TEXT } from "@/lib/whatsapp";
 import { IMG } from "@/lib/i18n";
 import { ImageSlot } from "@/components/ImageSlot";
 import { PhoneIcon, WhatsAppIcon, GoogleIcon } from "@/components/Icons";
@@ -46,7 +47,7 @@ export function Hero() {
         </p>
         <div className="reveal in mb-[30px] flex flex-col gap-3 sm:flex-row sm:flex-wrap">
           <a
-            href={settings.whatsapp}
+            href={whatsappHref(settings.whatsapp, GENERIC_WHATSAPP_TEXT)}
             target="_blank"
             rel="noreferrer"
             className="inline-flex w-full items-center justify-center gap-[9px] rounded-[28px] bg-ink px-7 py-[15px] text-sm text-cream sm:w-auto"

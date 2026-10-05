@@ -8,6 +8,7 @@ import { Nav } from "@/components/Nav";
 import { breadcrumbSchema, faqSchema, serviceSchema } from "@/components/schema";
 import { getSettings, SETTINGS_FALLBACK } from "@/lib/content";
 import { buildMetadata } from "@/lib/seo";
+import { whatsappHref, GENERIC_WHATSAPP_TEXT } from "@/lib/whatsapp";
 
 export const revalidate = 300;
 
@@ -329,7 +330,7 @@ export default async function AnkaraKaliciMakyajYapanYerlerPage() {
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <a
-                href={settings.whatsapp}
+                href={whatsappHref(settings.whatsapp, GENERIC_WHATSAPP_TEXT)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-[26px] bg-[#25D366] px-6 py-3 text-sm text-white transition-opacity hover:opacity-90"

@@ -11,6 +11,7 @@ import { useSettings } from "@/components/SettingsProvider";
 import { phoneHref, type ServiceFull, type SubService } from "@/lib/content";
 import { RatingBadge } from "@/components/RatingBadge";
 import { ServiceReviews } from "@/components/ServiceReviews";
+import { whatsappHref, serviceWhatsappText } from "@/lib/whatsapp";
 
 // Giriş metni — mobilde kısaltılır, "Devamını oku" ile açılır. Paragraflar
 // SEO için her zaman DOM'da; mobilde yalnızca CSS ile yükseklik kısıtlanır.
@@ -65,7 +66,7 @@ export function SubServicePage({ svc, sub }: { svc: ServiceFull; sub: SubService
           <SubIntro paragraphs={intro} />
           <div className="flex flex-col gap-3 md:flex-row md:flex-wrap">
             <a
-              href={settings.whatsapp}
+              href={whatsappHref(settings.whatsapp, serviceWhatsappText(sub.name))}
               target="_blank"
               rel="noreferrer"
               className="inline-flex w-full items-center justify-center gap-[9px] rounded-[28px] bg-ink px-7 py-[15px] text-sm text-cream md:w-auto"

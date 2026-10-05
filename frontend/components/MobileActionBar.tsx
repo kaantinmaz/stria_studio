@@ -1,8 +1,11 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useSettings } from "@/components/SettingsProvider";
+import { useServices } from "@/components/ServicesProvider";
 import { useLang } from "@/components/LanguageProvider";
 import { phoneHref } from "@/lib/content";
+import { whatsappHref, pathWhatsappText } from "@/lib/whatsapp";
 import { PhoneIcon, WhatsAppIcon } from "@/components/Icons";
 
 // Fixed bottom action bar, mobile only (below md). Replaces the stacked floating
@@ -10,6 +13,8 @@ import { PhoneIcon, WhatsAppIcon } from "@/components/Icons";
 // the delegated click tracking in Analytics still fires (tel: + wa.me/whatsapp).
 export function MobileActionBar() {
   const settings = useSettings();
+  const services = useServices();
+  const pathname = usePathname();
   const { t } = useLang();
 
   return (
@@ -25,7 +30,7 @@ export function MobileActionBar() {
         {t.callLabel}
       </a>
       <a
-        href={settings.whatsapp}
+        href={whatsappHref(settings.whatsapp, pathWhatsappText(pathname, services))}
         target="_blank"
         rel="noreferrer"
         className="flex min-h-12 flex-[1.4] items-center justify-center gap-2 rounded-[22px] bg-ink text-[14px] font-medium text-cream"

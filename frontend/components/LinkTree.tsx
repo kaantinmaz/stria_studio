@@ -16,6 +16,7 @@ import {
   WhatsAppIcon,
   YouTubeIcon,
 } from "@/components/Icons";
+import { whatsappHref, GENERIC_WHATSAPP_TEXT } from "@/lib/whatsapp";
 
 const ICONS = {
   whatsapp: WhatsAppIcon,
@@ -40,7 +41,7 @@ export function LinkTree({ links }: { links: LinkItem[] }) {
   const settings = useSettings();
 
   const social = [
-    { href: settings.whatsapp, label: "WhatsApp", Icon: WhatsAppIcon },
+    { href: whatsappHref(settings.whatsapp, GENERIC_WHATSAPP_TEXT), label: "WhatsApp", Icon: WhatsAppIcon },
     { href: settings.instagram, label: "Instagram", Icon: InstagramIcon },
     { href: phoneHref(settings.phone), label: settings.phone, Icon: PhoneIcon },
   ];

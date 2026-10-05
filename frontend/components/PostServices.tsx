@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useLang } from "@/components/LanguageProvider";
 import { useSettings } from "@/components/SettingsProvider";
 import type { ServiceListItem } from "@/lib/content";
+import { whatsappHref, GENERIC_WHATSAPP_TEXT } from "@/lib/whatsapp";
 
 /**
  * Yazının konusuyla ilgili hizmetler — okuma biten yerde dönüşüm noktası.
@@ -61,7 +62,7 @@ export function PostServices({ services }: { services: ServiceListItem[] }) {
 
       <div className="mt-6 flex flex-wrap items-center gap-3">
         <a
-          href={settings.whatsapp}
+          href={whatsappHref(settings.whatsapp, GENERIC_WHATSAPP_TEXT)}
           target="_blank"
           rel="noopener noreferrer"
           className="rounded-[20px] bg-rose px-5 py-[10px] text-[14px] text-white transition-colors hover:bg-accent-dark"

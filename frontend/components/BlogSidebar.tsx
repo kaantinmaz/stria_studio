@@ -6,6 +6,7 @@ import { useLang } from "@/components/LanguageProvider";
 import { useSettings } from "@/components/SettingsProvider";
 import { fmtDate } from "@/lib/date";
 import type { Category, Heading, PostList } from "@/lib/blog";
+import { whatsappHref, GENERIC_WHATSAPP_TEXT } from "@/lib/whatsapp";
 
 const CARD = "rounded-[24px] border border-line bg-white p-6";
 const CARD_TITLE = "mb-4 text-[12px] uppercase tracking-[0.14em] text-accent";
@@ -115,7 +116,7 @@ export function BlogSidebar({
             : "Book your spot at our Çankaya, Ankara studio for brow, lip and lash treatments."}
         </p>
         <a
-          href={settings.whatsapp}
+          href={whatsappHref(settings.whatsapp, GENERIC_WHATSAPP_TEXT)}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-block rounded-[20px] bg-blossom px-5 py-[10px] text-[14px] text-ink transition-colors hover:bg-pink"

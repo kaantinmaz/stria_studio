@@ -11,6 +11,7 @@ import { WhatsAppIcon } from "@/components/Icons";
 import { breadcrumbSchema, faqSchema, howToSchema } from "@/components/schema";
 import { getSettings, SETTINGS_FALLBACK } from "@/lib/content";
 import { absUrl, buildMetadata } from "@/lib/seo";
+import { whatsappHref, GENERIC_WHATSAPP_TEXT } from "@/lib/whatsapp";
 import {
   ML_BRAND,
   ML_CATEGORIES,
@@ -302,7 +303,7 @@ export default async function MyLaminationProductPage({ params }: Params) {
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <a
-                href={settings.whatsapp}
+                href={whatsappHref(settings.whatsapp, GENERIC_WHATSAPP_TEXT)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-[26px] bg-[#25D366] px-6 py-3 text-sm text-white transition-opacity hover:opacity-90"

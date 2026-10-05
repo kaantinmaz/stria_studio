@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { useLang } from "@/components/LanguageProvider";
 import { useSettings } from "@/components/SettingsProvider";
 import { useServices } from "@/components/ServicesProvider";
 import { pickLang, phoneHref, formatHours } from "@/lib/content";
+import { whatsappHref, pathWhatsappText } from "@/lib/whatsapp";
 import { InstagramIcon, PhoneIcon, PinIcon, WhatsAppIcon } from "@/components/Icons";
 
 const heading = "mb-4 text-[13px] font-medium uppercase tracking-[0.14em] text-cream";
@@ -15,6 +17,8 @@ export function Footer() {
   const { lang, t } = useLang();
   const settings = useSettings();
   const services = useServices();
+  const pathname = usePathname();
+  const waHref = whatsappHref(settings.whatsapp, pathWhatsappText(pathname, services));
 
   const explore = [
     { href: "/hizmetler", label: t.navServices },
@@ -66,7 +70,7 @@ export function Footer() {
               <InstagramIcon size={16} />
             </a>
             <a
-              href={settings.whatsapp}
+              href={waHref}
               target="_blank"
               rel="noreferrer"
               aria-label="WhatsApp"
@@ -135,7 +139,7 @@ export function Footer() {
             <li className="text-[13px] leading-[1.5]">{formatHours(settings.hours, lang)}</li>
           </ul>
           <a
-            href={settings.whatsapp}
+            href={waHref}
             target="_blank"
             rel="noreferrer"
             className="mt-5 inline-flex items-center gap-2 rounded-[24px] bg-rose px-5 py-[11px] text-[12.5px] text-white"
