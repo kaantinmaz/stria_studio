@@ -12,6 +12,11 @@ export const site = {
   // Google Ads dönüşüm kimliği (AW-…) hesap açılınca `adsId`'ye eklenir.
   gaId: process.env.NEXT_PUBLIC_GA_ID ?? "G-VHC49MXP5N",
   adsId: process.env.NEXT_PUBLIC_ADS_ID ?? "",
+
+  // Meta (Facebook/Instagram) Pixel kimliği — "Stria Studio Web" veri seti.
+  // gaId ile aynı gerekçe: kamusal değer, build env unutulursa sessizce düşmesin.
+  // Boş string verilirse pixel tamamen kapalı (hiçbir betik basılmaz).
+  metaPixelId: process.env.NEXT_PUBLIC_META_PIXEL_ID ?? "2933007867083958",
   gbpUrl: "", // owner: paste the Google Business Profile URL when live
   nap: {
     name: "Stria Studio",

@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { gtagEvent, gtagPageview } from "@/lib/gtag";
+import { trackContact } from "@/lib/metaPixel";
 import { site } from "@/lib/site";
 
 function post(body: Record<string, unknown>) {
@@ -46,9 +47,11 @@ export function Analytics() {
       if (href.startsWith("tel:")) {
         post({ type: "event", name: "call_click", path: window.location.pathname });
         gtagEvent("call_click", { page_path: window.location.pathname });
+        trackContact("phone", window.location.pathname);
       } else if (href.includes("wa.me") || href.includes("whatsapp")) {
         post({ type: "event", name: "whatsapp_click", path: window.location.pathname });
         gtagEvent("whatsapp_click", { page_path: window.location.pathname });
+        trackContact("whatsapp", window.location.pathname);
       }
     };
     document.addEventListener("click", onClick, true);

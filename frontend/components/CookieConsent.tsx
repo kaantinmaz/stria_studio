@@ -37,6 +37,8 @@ export function CookieConsent() {
       // Dismiss even when storage is unavailable in strict privacy modes.
     }
     gtagConsent("granted");
+    // Meta Pixel aynı anda devreye girsin (sayfa yenilemeden).
+    window.dispatchEvent(new Event("stria-consent-accepted"));
     setAccepted(true);
   };
 
