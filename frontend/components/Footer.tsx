@@ -8,7 +8,8 @@ import { useSettings } from "@/components/SettingsProvider";
 import { useServices } from "@/components/ServicesProvider";
 import { pickLang, phoneHref, formatHours } from "@/lib/content";
 import { whatsappHref, pathWhatsappText } from "@/lib/whatsapp";
-import { InstagramIcon, PhoneIcon, PinIcon, WhatsAppIcon } from "@/components/Icons";
+import { FacebookIcon, InstagramIcon, PhoneIcon, PinIcon, WhatsAppIcon } from "@/components/Icons";
+import { site } from "@/lib/site";
 
 const heading = "mb-4 text-[13px] font-medium uppercase tracking-[0.14em] text-cream";
 const link = "text-[13px] leading-none text-[#e6cccd] transition-colors hover:text-cream";
@@ -68,6 +69,15 @@ export function Footer() {
               className="flex h-9 w-9 items-center justify-center rounded-full border border-cream/20 text-[#e6cccd] transition-colors hover:border-cream hover:text-cream"
             >
               <InstagramIcon size={16} />
+            </a>
+            <a
+              href={site.facebookUrl}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Facebook"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-cream/20 text-[#e6cccd] transition-colors hover:border-cream hover:text-cream"
+            >
+              <FacebookIcon size={16} />
             </a>
             <a
               href={waHref}

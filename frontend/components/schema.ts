@@ -41,7 +41,7 @@ export function beautySalonSchema(s: Settings) {
     // Kardeş domainler (microbladingankara.com, kastasarimiankara.com) ana
     // domaine 301 yönlendiriliyor; redirect'e işaret eden sameAs yanlış otorite
     // sinyali olur — bu yüzden listeden çıkarıldı.
-    sameAs: [s.instagram, site.gbpUrl].filter(Boolean),
+    sameAs: [s.instagram, site.facebookUrl, site.gbpUrl].filter(Boolean),
     founder: { "@id": absUrl("/hakkimizda#nilsu-kamisli") },
     priceRange: "₺₺",
   };

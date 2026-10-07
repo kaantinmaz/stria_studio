@@ -75,6 +75,7 @@ Bu dosya /llms.txt'i genişletir; tüm bilgiler sitenin sayfalarından ve stüdy
   identity.push(`- Telefon: ${settings.phone}`);
   identity.push(`- WhatsApp: ${settings.whatsapp}`);
   identity.push(`- Instagram: ${settings.instagram_handle} (${settings.instagram})`);
+  identity.push(`- Facebook: ${site.facebookUrl}`);
   identity.push(`- Çalışma saatleri: ${formatHours(settings.hours, "tr")}`);
   identity.push(`- Web: ${u("/")}`);
   if (settings.google_maps_url) {
@@ -239,6 +240,7 @@ Bu dosya /llms.txt'i genişletir; tüm bilgiler sitenin sayfalarından ve stüdy
     `- ${u("/ankara-kalici-makyaj-yapan-yerler")}`,
     `- ${u("/blog")}`,
     `- ${settings.instagram}`,
+    `- ${site.facebookUrl}`,
   ];
   if (settings.google_maps_url) sourceLinks.push(`- ${settings.google_maps_url}`);
   if (site.gbpUrl) sourceLinks.push(`- ${site.gbpUrl}`);

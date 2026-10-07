@@ -18,6 +18,8 @@ export const site = {
   // Boş string verilirse pixel tamamen kapalı (hiçbir betik basılmaz).
   metaPixelId: process.env.NEXT_PUBLIC_META_PIXEL_ID ?? "2933007867083958",
   gbpUrl: "", // owner: paste the Google Business Profile URL when live
+  // Facebook sayfası (2026-10-07'de "Çatlak Kamuflaj Makyaj" → "Stria Studio").
+  facebookUrl: "https://www.facebook.com/striastudioankara",
   nap: {
     name: "Stria Studio",
   },

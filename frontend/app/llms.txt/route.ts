@@ -1,4 +1,5 @@
 import { getServices, formatHours, getSettings, SETTINGS_FALLBACK } from "@/lib/content";
+import { site } from "@/lib/site";
 import { ML_EXPERT_PARAGRAPH, u } from "@/lib/llms";
 import {
   ML_CATEGORIES,
@@ -70,6 +71,7 @@ ${ML_VISIBLE_PRODUCTS.map((p) => `- [${p.name}](${u(`/mylamination/${p.slug}`)})
 - Telefon: ${settings.phone}
 - WhatsApp: ${settings.whatsapp}
 - Instagram: ${settings.instagram_handle} (${settings.instagram})
+- Facebook: ${site.facebookUrl}
 - Çalışma saatleri: ${formatHours(settings.hours, "tr")}
 
 ## Uygulama notları
