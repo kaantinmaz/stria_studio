@@ -50,7 +50,7 @@ export const SETTINGS_FALLBACK: Settings = {
   country: "TR",
   lat: 39.9208,
   lng: 32.8541,
-  hours: [{ days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"], open: "10:00", close: "19:00" }],
+  hours: [{ days: ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], open: "09:00", close: "20:00" }],
   campaign_enabled: false,
   campaign_text_tr: "",
   campaign_text_en: "",

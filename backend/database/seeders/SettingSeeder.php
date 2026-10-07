@@ -24,9 +24,9 @@ class SettingSeeder extends Seeder
             'lat' => 39.9208,
             'lng' => 32.8541,
             'hours' => [[
-                'days' => ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-                'open' => '10:00',
-                'close' => '19:00',
+                'days' => ['Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+                'open' => '09:00',
+                'close' => '20:00',
             ]],
         ]);
     }
