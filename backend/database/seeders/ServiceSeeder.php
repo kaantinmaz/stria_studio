@@ -415,6 +415,28 @@ class ServiceSeeder extends Seeder
                         ],
                     ],
                     [
+                        'slug' => 'jilet-ve-faca-izi-kapatma',
+                        'gallery' => [],
+                        'name' => 'Jilet ve Faça İzi Kapatma',
+                        'desc' => 'Tamamen iyileşmiş jilet ve faça izlerinin ton farkı, cilt tonuna uyumlu örtücü pigmentle kamufle edilir.',
+                        'seo_title' => 'Jilet ve Faça İzi Kapatma Ankara | Kamuflaj',
+                        'seo_desc' => "Ankara'da jilet izi ve faça izi kapatma ile iyileşmiş izlerin ton farkını cilt tonunuza uyumlu örtücü pigmentle kamufle edin. Gizli görüşme için yazın.",
+                        'intro' => "Jilet izi ve faça izi kapatma, zamanla iyileşmiş ve rengi oturmuş çizgisel izlerin çevre ciltten daha açık görünen ton farkını azaltmaya yönelik bir kamuflaj uygulamasıdır. Bu bir kamuflaj uygulamasıdır, medikal işlem değildir; izin dokusunu veya yüzeyini değiştirmez, yalnızca rengini çevre tene yaklaştırmayı amaçlar. Kol, bilek ve ön kol gibi çizgisel izlerin bulunduğu bölgelerde ölçülü biçimde çalışılır.\n\nStria Studio'da yapılan görüşme tamamen gizlidir; fotoğraf ve bilgiler izniniz olmadan paylaşılmaz ve izin geçmişi sorgulanmaz. Yalnızca tamamen iyileşmiş, düz ve rengi stabil hâle gelmiş izler değerlendirmeye alınır. Çevre ciltten renk örnekleri alınır, cilt tonuna uyumlu örtücü pigment önce küçük bir alanda denenir, ardından steril tek kullanımlık uçlarla iz hattı boyunca kontrollü şekilde uygulanır.",
+                        'benefits' => [
+                            'İnce çizgisel jilet ve faça izlerindeki açık renk farkını yumuşatır',
+                            'Kol, bilek ve ön kol bölgelerine göre hassas çalışma planı sunar',
+                            'Çevre tene uyum için birden fazla örtücü pigment tonunu birleştirir',
+                            'Günlük yüksek kapatıcılı makyaj ihtiyacını azaltabilir',
+                        ],
+                        'faq' => [
+                            ['q' => 'Eski jilet ve faça izlerine uygulanabilir mi?', 'a' => 'Tamamen iyileşmiş, düz ve rengi oturmuş eski izler değerlendirmeye uygundur. İz hâlâ kırmızı, kabarık, hassas veya renk değişimi sürüyorsa uygulama ertelenir.'],
+                            ['q' => 'Kaç seansta sonuç alınır?', 'a' => 'İzin uzunluğu, alt tonu ve pigmenti kabul etmesi belirleyicidir. Genellikle ilk uygulama iyileştikten sonra tonu dengelemek için rötuş gerekebilir; sonuçlar kişiden kişiye değişir.'],
+                            ['q' => 'Kabarık veya keloid izler uygun mudur?', 'a' => 'Kabarık, keloid eğilimli, kızarık veya taze izler bu uygulama için uygun değildir. Kamuflaj yalnızca elverişli, iyileşmiş ve düz dokuda planlanır.'],
+                            ['q' => 'Kol ve bilek bölgesindeki izlere çalışılır mı?', 'a' => 'Evet, kol, bilek ve ön kol gibi bölgelerdeki uygun izlerde hassas bir plan yapılabilir. Bölgenin hareketi ve cilt tonu çalışma yoğunluğuna göre gözetilir.'],
+                            ['q' => 'Görüşme ve bilgilerim gizli kalır mı?', 'a' => 'Görüşme tamamen gizlidir. Fotoğraf ve kişisel bilgileriniz izniniz olmadan paylaşılmaz; izin nedenini sorgulamadan yalnızca uygunluk ve renk uyumuna odaklanırız.'],
+                        ],
+                    ],
+                    [
                         'slug' => 'sezaryen-izi-kapatma',
                         'gallery' => ['/images/works/sezaryen-izi-kapatma-1.png', '/images/works/sezaryen-izi-kapatma-2.png'],
                         'name' => 'Sezaryen İzi Kapatma',
