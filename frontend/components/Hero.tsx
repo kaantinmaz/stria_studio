@@ -116,11 +116,11 @@ export function Hero() {
 
         {/* featured service card */}
         <a
-          href="#services"
+          href="/hizmetler/kas-laminasyon"
           className="absolute bottom-[26px] left-2 flex items-center gap-[13px] rounded-[20px] bg-cream/[0.92] p-3 pl-3 pr-4 text-ink shadow-[0_20px_40px_-18px_rgba(76,19,19,0.4)] backdrop-blur-[10px] sm:left-[-14px]"
         >
           <div className="relative h-14 w-14 flex-none overflow-hidden rounded-[14px]">
-            <ImageSlot src={IMG.micro} alt={t.featuredName} sizes="56px" />
+            <ImageSlot src={IMG.lam} alt={t.featuredName} sizes="56px" />
           </div>
           <div>
             <div className="mb-[3px] text-[10px] uppercase tracking-[0.1em] text-accent">

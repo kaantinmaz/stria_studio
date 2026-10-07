@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     template: "%s · Stria Studio",
   },
   description:
-    "Ankara Çankaya'da microblading, kalıcı makyaj ve kaş–kirpik bakımı. Doğal, steril ve tamamen size özel dokunuşlar.",
+    "Ankara Çankaya'da kaş laminasyon, kirpik lifting, kamuflaj makyaj ve kalıcı makyaj. Doğal, steril ve tamamen size özel dokunuşlar.",
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",

@@ -17,7 +17,7 @@ import { buildMetadata } from "@/lib/seo";
 export const metadata = buildMetadata({
   title: "Ankara Kalıcı Makyaj Stüdyosu · Çankaya | Stria Studio",
   description:
-    "Ankara Çankaya'da kalıcı makyaj, microblading ve kaş-kirpik uygulamaları; doğal görünüm, hijyenik süreç ve kişiye özel tasarımla Stria Studio'da.",
+    "Ankara Çankaya'da kaş laminasyon, kirpik lifting ve kamuflaj makyaj; doğal görünüm, hijyenik süreç ve kişiye özel uygulama Stria Studio'da.",
   path: "/",
 });
 

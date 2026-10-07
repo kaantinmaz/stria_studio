@@ -4,8 +4,8 @@ export type LS = { tr: string; en: string };
 export const IMG = {
   hero: "/images/hero.png",
   // Hero slider slides — add/remove paths here to change the rotation.
-  heroSlides: ["/images/eyeliner.png"],
-  micro: "/images/micro.png",
+  heroSlides: ["/images/laminasyon.png", "/images/kirpik.png"],
+  lam: "/images/laminasyon.png",
   powder: "/images/powder.png",
   eyeliner: "/images/eyeliner.png",
   dipliner: "/images/dipliner.png",
@@ -125,10 +125,10 @@ export const UI: Record<Lang, Dict> = {
     navCta: "Randevu Al",
     callLabel: "Ara",
     waBookCta: "WhatsApp'tan Randevu",
-    heroKicker: "Ankara Kalıcı Makyaj · Kaş Tasarımı & Microblading",
+    heroKicker: "Ankara Kalıcı Makyaj · Kaş Laminasyon, Kirpik Lifting & Kamuflaj",
     heroTitle: "Kaşların, en doğal\nhaliyle güzel",
     heroText:
-      "Microblading, kaş pudralama ve kalıcı makyajda yüz hatlarına göre kişiye özel tasarım. Kaşın yüzüne göre çizilir — Ankara Çankaya'da.",
+      "Kaş laminasyon, kirpik lifting / kirpik laminasyon ve kamuflaj makyajda yüz hatlarına ve cilt tonuna göre kişiye özel uygulama — Ankara Çankaya'da.",
     heroCtaPrimary: "WhatsApp'tan Randevu",
     heroCtaSecondary: "Hemen Ara",
     heroFeatures: [
@@ -137,8 +137,8 @@ export const UI: Record<Lang, Dict> = {
       "5+ yıl uzmanlık",
     ],
     featuredLabel: "Öne çıkan hizmet",
-    featuredName: "Microblading",
-    featuredHint: "Kıl tekniği · doğal kaş",
+    featuredName: "Kaş Laminasyon",
+    featuredHint: "İğnesiz · ~6 hafta etki",
     servicesKicker: "Hizmetlerimiz",
     servicesTitle: "Sana özel dokunuşlar",
     servicesText:
@@ -169,7 +169,7 @@ export const UI: Record<Lang, Dict> = {
     contactText:
       "Sorular ve randevu için WhatsApp'tan yaz ya da bizi ara. En kısa sürede dönüş yapıyoruz.",
     mapPh: "Harita · Çankaya, Ankara",
-    footerTag: "Ankara'da microblading, kalıcı makyaj ve kaş–kirpik bakımı.",
+    footerTag: "Ankara'da kaş laminasyon, kirpik lifting, kamuflaj makyaj ve kalıcı makyaj.",
     footerExplore: "Keşfet",
     footerFollow: "Bizi takip et",
     footerRights: "Tüm hakları saklıdır.",
@@ -211,10 +211,10 @@ export const UI: Record<Lang, Dict> = {
     navCta: "Book Now",
     callLabel: "Call",
     waBookCta: "Book on WhatsApp",
-    heroKicker: "Ankara · Brow Design, Microblading & Permanent Makeup",
+    heroKicker: "Ankara · Brow Lamination, Lash Lift & Camouflage Makeup",
     heroTitle: "Your brows, beautiful\nat their most natural",
     heroText:
-      "Bespoke microblading, powder brows and permanent makeup, designed for your features. In Çankaya, Ankara.",
+      "Bespoke brow lamination, lash lift and camouflage makeup, tailored to your features and skin tone. In Çankaya, Ankara.",
     heroCtaPrimary: "Book on WhatsApp",
     heroCtaSecondary: "Call Now",
     heroFeatures: [
@@ -223,8 +223,8 @@ export const UI: Record<Lang, Dict> = {
       "5+ years of expertise",
     ],
     featuredLabel: "Featured service",
-    featuredName: "Microblading",
-    featuredHint: "Hair-stroke · natural brows",
+    featuredName: "Brow Lamination",
+    featuredHint: "Needle-free · ~6 weeks",
     servicesKicker: "Our Services",
     servicesTitle: "Touches made for you",
     servicesText:
@@ -256,7 +256,7 @@ export const UI: Record<Lang, Dict> = {
       "Message us on WhatsApp or call for questions and bookings. We reply as soon as we can.",
     mapPh: "Map · Çankaya, Ankara",
     footerTag:
-      "Microblading, permanent makeup and brow & lash care in Ankara.",
+      "Brow lamination, lash lift, camouflage and permanent makeup in Ankara.",
     footerExplore: "Explore",
     footerFollow: "Follow us",
     footerRights: "All rights reserved.",

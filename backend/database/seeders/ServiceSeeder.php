@@ -12,7 +12,7 @@ class ServiceSeeder extends Seeder
         $services = [
             [
                 'slug' => 'microblading',
-                'sort_order' => 0,
+                'sort_order' => 4,
                 'name_tr' => 'Microblading', 'name_en' => 'Microblading',
                 'tag_tr' => 'Kaş', 'tag_en' => 'Brows',
                 'desc_tr' => 'Kıl tekniğiyle çizilen, gerçek kaşlardan ayırt edilemeyen doğal ve ince detaylı kaşlar.',
@@ -49,7 +49,7 @@ class ServiceSeeder extends Seeder
             ],
             [
                 'slug' => 'kas-pudralama',
-                'sort_order' => 1,
+                'sort_order' => 3,
                 'name_tr' => 'Kaş Pudralama', 'name_en' => 'Powder Brows',
                 'tag_tr' => 'Kaş', 'tag_en' => 'Brows',
                 'desc_tr' => 'Pudra dokusuyla dolgun, makyajlı bir kaş görünümü — yağlı ciltler için ideal.',
@@ -83,7 +83,7 @@ class ServiceSeeder extends Seeder
             ],
             [
                 'slug' => 'eyeliner',
-                'sort_order' => 2,
+                'sort_order' => 5,
                 'name_tr' => 'Eyeliner', 'name_en' => 'Eyeliner',
                 'tag_tr' => 'Göz', 'tag_en' => 'Eyes',
                 'desc_tr' => 'Bakışlarınızı belirginleştiren, kalıcı ve simetrik eyeliner uygulaması.',
@@ -117,7 +117,7 @@ class ServiceSeeder extends Seeder
             ],
             [
                 'slug' => 'dipliner',
-                'sort_order' => 3,
+                'sort_order' => 6,
                 'name_tr' => 'Dipliner', 'name_en' => 'Lash-line Enhancement',
                 'tag_tr' => 'Göz', 'tag_en' => 'Eyes',
                 'desc_tr' => 'Kirpik diplerine uygulanan ince pigment ile daha yoğun ve uyanık bir bakış.',
@@ -151,7 +151,7 @@ class ServiceSeeder extends Seeder
             ],
             [
                 'slug' => 'dudak-renklendirme',
-                'sort_order' => 4,
+                'sort_order' => 7,
                 'name_tr' => 'Dudak Renklendirme', 'name_en' => 'Lip Blush',
                 'tag_tr' => 'Dudak', 'tag_en' => 'Lips',
                 'desc_tr' => 'Dudaklara doğal renk, tanım ve dolgunluk kazandıran kalıcı renklendirme.',
@@ -185,7 +185,7 @@ class ServiceSeeder extends Seeder
             ],
             [
                 'slug' => 'kas-laminasyon',
-                'sort_order' => 5,
+                'sort_order' => 0,
                 'name_tr' => 'Kaş Laminasyon', 'name_en' => 'Brow Lamination',
                 'tag_tr' => 'Kaş', 'tag_en' => 'Brows',
                 'desc_tr' => 'Kaş kıllarını şekillendirerek daha dolgun, bakımlı ve düzenli bir görünüm.',
@@ -225,7 +225,7 @@ class ServiceSeeder extends Seeder
             ],
             [
                 'slug' => 'kirpik-lifting',
-                'sort_order' => 6,
+                'sort_order' => 1,
                 'name_tr' => 'Kirpik Lifting', 'name_en' => 'Lash Lift',
                 'tag_tr' => 'Kirpik', 'tag_en' => 'Lashes',
                 'desc_tr' => 'Kendi kirpiklerinizi kıvırarak uzatan, doğal ve kalıcı bir kirpik bakımı.',
@@ -270,7 +270,7 @@ class ServiceSeeder extends Seeder
             ],
             [
                 'slug' => 'kamuflaj-makyaj',
-                'sort_order' => 7,
+                'sort_order' => 2,
                 'name_tr' => 'Kamuflaj Makyaj', 'name_en' => 'Camouflage Makeup',
                 'tag_tr' => 'Cilt', 'tag_en' => 'Skin',
                 'desc_tr' => 'Çatlak, vitiligo, yanık ve ameliyat izlerini cilt tonunuza özel medikal pigmentlerle doğal görünüme kavuşturan kalıcı kamuflaj uygulaması.',

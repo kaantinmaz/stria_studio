@@ -7,7 +7,7 @@ import { useServices } from "@/components/ServicesProvider";
 import { pickLang } from "@/lib/content";
 import { ImageSlot } from "@/components/ImageSlot";
 
-// Hizmetler mega-menu: full service list + a featured service (Microblading).
+// Hizmetler mega-menu: full service list + a featured service (Kaş Laminasyon).
 export function NavServices() {
   const { lang, t } = useLang();
   const [open, setOpen] = useState(false);
@@ -30,7 +30,8 @@ export function NavServices() {
   }, [open]);
 
   const services = useServices();
-  const featured = services[0]; // Microblading
+  // Owner kararı (2026-10-07): menüde öne çıkan hizmet kaş laminasyon.
+  const featured = services.find((s) => s.slug === "kas-laminasyon") ?? services[0];
 
   if (!featured) return null;
 

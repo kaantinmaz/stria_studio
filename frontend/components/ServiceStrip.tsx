@@ -10,7 +10,7 @@ import { RatingBadge } from "@/components/RatingBadge";
 // Compact 4-across highlight strip right under the hero (like the hero's featured card).
 // Öne çıkanlar owner tarafından sabitlendi — API sırası değil; listede olmayan
 // slug sessizce atlanır (hizmet adminden kaldırılırsa şerit bozulmasın).
-const FEATURED = ["microblading", "kas-pudralama", "kas-laminasyon", "kirpik-lifting"];
+const FEATURED = ["kas-laminasyon", "kirpik-lifting", "kamuflaj-makyaj"];
 
 export function ServiceStrip() {
   const { lang } = useLang();
@@ -26,7 +26,7 @@ export function ServiceStrip() {
         <div className="mb-5 text-center text-xs uppercase tracking-[0.14em] text-accent">
           {lang === "tr" ? "Öne Çıkan Hizmetler" : "Featured Services"}
         </div>
-        <div className="grid grid-cols-1 gap-[14px] sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-[14px] sm:grid-cols-3">
           {services.map((s) => {
             const name = pickLang(s.name_tr, s.name_en, lang);
             return (
