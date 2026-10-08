@@ -62,6 +62,23 @@ export default async function MyLaminationProductPage({ params }: Params) {
     (p) => p.category === product.category && p.slug !== product.slug,
   ).slice(0, 6);
 
+  // İç link: ürün kapsamına uyan stüdyo hizmetine açıklayıcı çıpayla bağlan.
+  // Kaş kapsamı → kaş laminasyon, kirpik kapsamı → kirpik lifting, "ikisi" → her ikisi.
+  const kasLink = {
+    href: "/hizmetler/kas-laminasyon",
+    label: "Ankara'da kaş laminasyon",
+  };
+  const kirpikLink = {
+    href: "/hizmetler/kirpik-lifting",
+    label: "Ankara'da kirpik lifting / kirpik laminasyonu",
+  };
+  const serviceLinks =
+    product.scope === "kas"
+      ? [kasLink]
+      : product.scope === "kirpik"
+        ? [kirpikLink]
+        : [kasLink, kirpikLink];
+
   const crumbs = [
     { name: "Ana Sayfa", path: "/" },
     { name: "My Lamination Ürünleri", path: "/mylamination" },
@@ -276,20 +293,16 @@ export default async function MyLaminationProductPage({ params }: Params) {
             sayfasında anlattık.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <Link
-              href="/hizmetler/kas-laminasyon"
-              className="inline-flex items-center gap-2 rounded-[24px] border border-line bg-white px-5 py-3 text-sm text-ink transition-colors hover:border-accent hover:text-accent"
-            >
-              Kaş Laminasyonu Ankara
-              <span className="text-accent">→</span>
-            </Link>
-            <Link
-              href="/hizmetler/kirpik-lifting"
-              className="inline-flex items-center gap-2 rounded-[24px] border border-line bg-white px-5 py-3 text-sm text-ink transition-colors hover:border-accent hover:text-accent"
-            >
-              Kirpik Lifting Ankara
-              <span className="text-accent">→</span>
-            </Link>
+            {serviceLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="inline-flex items-center gap-2 rounded-[24px] border border-line bg-white px-5 py-3 text-sm text-ink transition-colors hover:border-accent hover:text-accent"
+              >
+                {link.label}
+                <span className="text-accent">→</span>
+              </Link>
+            ))}
           </div>
 
           <div className="mt-8 rounded-[26px] bg-ink px-[clamp(22px,4vw,40px)] py-[clamp(26px,4vw,38px)] text-cream">

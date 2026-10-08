@@ -83,7 +83,7 @@ export function ServicePage({
     .filter((r): r is { slug: string; name: string } => Boolean(r));
 
   return (
-    <article>
+    <main>
       {/* header */}
       <header className="mx-auto grid max-w-[1160px] grid-cols-1 items-center gap-[clamp(28px,4.5vw,64px)] px-[clamp(18px,5vw,56px)] pb-12 pt-8 md:grid-cols-[1.05fr_0.95fr]">
         <div>
@@ -309,6 +309,6 @@ export function ServicePage({
           </div>
         </section>
       )}
-    </article>
+    </main>
   );
 }

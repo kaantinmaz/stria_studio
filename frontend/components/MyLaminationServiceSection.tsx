@@ -81,7 +81,7 @@ function MlCard({ product }: { product: MlProduct }) {
         />
       </div>
       <div className="min-w-0">
-        <h4 className="text-[15px] leading-[1.35] text-ink">{product.name}</h4>
+        <h3 className="text-[15px] leading-[1.35] text-ink">{product.name}</h3>
         <p className="mt-1.5 text-[13px] leading-[1.6] text-muted2">
           {product.summary}
         </p>

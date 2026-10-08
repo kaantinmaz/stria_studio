@@ -185,7 +185,7 @@ export function Nav() {
           {/* Telefon numarası doğrudan görünür; dokununca arar. */}
           <a
             href={phoneHref(settings.phone)}
-            aria-label={`${t.callLabel}: ${settings.phone}`}
+            aria-label={`${t.callLabel}: ${settings.phone_local || settings.phone}`}
             className="inline-flex h-10 items-center gap-[6px] whitespace-nowrap rounded-full border border-line2 bg-white px-3 text-[13px] font-medium tracking-[0.01em] text-ink"
           >
             <PhoneIcon size={13} />
