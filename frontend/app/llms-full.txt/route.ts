@@ -49,7 +49,7 @@ export async function GET(): Promise<Response> {
   sections.push(
     `# Stria Studio — Kapsamlı Marka Dosyası
 
-> Ankara Çankaya'da kalıcı makyaj ve güzellik stüdyosu. Microblading, kaş pudralama, eyeliner, dipliner, dudak renklendirme, kaş laminasyonu, kirpik lifting, kamuflaj makyaj, kaş tasarımı ve altın oran kaş alım. Steril ekipman, yüze özel tasarım.
+> Ankara Çankaya'da kalıcı makyaj ve güzellik stüdyosu. Microblading, kaş pudralama, dudak renklendirme, kaş laminasyonu, kirpik lifting, kamuflaj makyaj, kaş tasarımı ve altın oran kaş alım. Steril ekipman, yüze özel tasarım.
 
 Son güncelleme: ${today}
 

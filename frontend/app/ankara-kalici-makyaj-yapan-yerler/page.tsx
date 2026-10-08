@@ -256,8 +256,6 @@ export default async function AnkaraKaliciMakyajYapanYerlerPage() {
                 {[
                   ["Microblading", "Farklı ciltlerde iyileşmiş, kıl yönü doğal ve çizgileri dağılmamış kaş sonuçları", "/hizmetler/microblading"],
                   ["Kaş pudralama", "Yağlı ve karma ciltlerde dengeli iyileşmiş, başlangıcı yumuşak gölgeleme örnekleri", "/hizmetler/kas-pudralama"],
-                  ["Kalıcı eyeliner", "Farklı göz formlarında simetrik kuyruk ve kontrollü çizgi portfolyosu", "/hizmetler/eyeliner"],
-                  ["Dipliner", "Kirpik dibinde taşma yapmadan ince, iki gözde dengeli hat çalışabilme", "/hizmetler/dipliner"],
                   ["Dudak renklendirme", "Renk teorisi, nötralizasyon ve iyileşmiş dudak tonu örnekleri", "/hizmetler/dudak-renklendirme"],
                   ["Kaş laminasyonu", "Kıl yönü analizi, ürün süresi kontrolü ve kaş telini yıpratmadan şekillendirme", "/hizmetler/kas-laminasyon"],
                   ["Kirpik lifting", "Göz çevresini koruyan izolasyon, doğru kalıp ve ürün süresi seçimi", "/hizmetler/kirpik-lifting"],

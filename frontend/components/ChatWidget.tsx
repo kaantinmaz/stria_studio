@@ -61,8 +61,6 @@ const WORD_COMPLETIONS = [
   "rötuş",
   "microblading",
   "kaş pudralama",
-  "kalıcı eyeliner",
-  "dipliner",
   "dudak renklendirme",
   "kaş laminasyonu",
   "kirpik lifting",

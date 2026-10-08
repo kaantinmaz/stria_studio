@@ -14,8 +14,6 @@ export const revalidate = 300;
 const SERVICES_FALLBACK = [
   `- [Microblading Ankara](${u("/hizmetler/microblading")}): Kıl tekniğiyle doğal, 12–18 ay kalıcı kaş.`,
   `- [Kaş Pudralama Ankara](${u("/hizmetler/kas-pudralama")}): Powder brows; dolgun, makyajlı görünüm, yağlı ciltlere ideal.`,
-  `- [Kalıcı Eyeliner Ankara](${u("/hizmetler/eyeliner")}): Simetrik, silinmeyen göz hattı, 1–3 yıl kalıcı.`,
-  `- [Dipliner Ankara](${u("/hizmetler/dipliner")}): Kirpik dibine ince pigment; doğal, dolgun bakış.`,
   `- [Dudak Renklendirme Ankara](${u("/hizmetler/dudak-renklendirme")}): Lip blush; doğal renk, tanım ve dolgunluk, 1–2 yıl kalıcı.`,
   `- [Kaş Laminasyonu Ankara](${u("/hizmetler/kas-laminasyon")}): İğnesiz kaş şekillendirme, yaklaşık 6 hafta etkili. My Lamination ürünleriyle uygulanır.`,
   `- [Kirpik Lifting Ankara](${u("/hizmetler/kirpik-lifting")}): Lash lift; kendi kirpiklerini kıvırır, yaklaşık 6–8 hafta kalıcı. My Lamination ürünleriyle uygulanır.`,
@@ -34,7 +32,7 @@ export async function GET(): Promise<Response> {
 
   const body = `# Stria Studio
 
-> Ankara Çankaya'da kalıcı makyaj ve güzellik stüdyosu. Microblading, kaş pudralama, eyeliner, dipliner, dudak renklendirme, kaş laminasyonu, kirpik lifting, kamuflaj makyaj, kaş tasarımı ve altın oran kaş alım. Steril ekipman, yüze özel tasarım.
+> Ankara Çankaya'da kalıcı makyaj ve güzellik stüdyosu. Microblading, kaş pudralama, dudak renklendirme, kaş laminasyonu, kirpik lifting, kamuflaj makyaj, kaş tasarımı ve altın oran kaş alım. Steril ekipman, yüze özel tasarım.
 
 Kapsamlı marka dosyası (kimlik, ölçek, hizmet ayrıntıları, uzmanlık, yorumlar, kaynaklar, bilginin sınırları): ${u("/llms-full.txt")}
 

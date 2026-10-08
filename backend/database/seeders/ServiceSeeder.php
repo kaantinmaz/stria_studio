@@ -112,7 +112,8 @@ class ServiceSeeder extends Seeder
                     '4–6 hafta sonra rötuş',
                 ],
                 'faq_tr' => ServiceFaqSeeder::FAQ['eyeliner'],
-                'related' => ['dipliner', 'microblading'],
+                'related' => ['microblading'],
+                'is_active' => false,
                 'gallery' => [],
             ],
             [
@@ -146,7 +147,8 @@ class ServiceSeeder extends Seeder
                     '4–6 hafta sonra rötuş',
                 ],
                 'faq_tr' => ServiceFaqSeeder::FAQ['dipliner'],
-                'related' => ['eyeliner', 'kirpik-lifting'],
+                'related' => ['kirpik-lifting'],
+                'is_active' => false,
                 'gallery' => [],
             ],
             [
@@ -180,7 +182,7 @@ class ServiceSeeder extends Seeder
                     '4–6 hafta sonra rötuş',
                 ],
                 'faq_tr' => ServiceFaqSeeder::FAQ['dudak-renklendirme'],
-                'related' => ['microblading', 'eyeliner'],
+                'related' => ['microblading'],
                 'gallery' => [],
             ],
             [
@@ -260,7 +262,7 @@ class ServiceSeeder extends Seeder
                     'Hydrating Serum ile kapanış (~45–60 dakika)',
                 ],
                 'faq_tr' => ServiceFaqSeeder::FAQ['kirpik-lifting'],
-                'related' => ['dipliner', 'eyeliner'],
+                'related' => [],
                 'gallery' => [
                     '/images/works/kirpik-lifting-oncesi-1.jpg',
                     '/images/works/kirpik-lifting-sonrasi-1.jpg',

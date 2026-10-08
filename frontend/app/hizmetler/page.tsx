@@ -16,7 +16,7 @@ export const revalidate = 300;
 export const metadata = buildMetadata({
   title: "Hizmetler · Ankara Kalıcı Makyaj | Stria Studio",
   description:
-    "Ankara Çankaya'da microblading, kaş pudralama, eyeliner, dipliner, dudak renklendirme, kaş laminasyonu ve kirpik lifting. Tüm kalıcı makyaj hizmetleri.",
+    "Ankara Çankaya'da microblading, kaş pudralama, dudak renklendirme, kaş laminasyonu ve kirpik lifting. Tüm kalıcı makyaj hizmetleri.",
   path: "/hizmetler",
 });
 

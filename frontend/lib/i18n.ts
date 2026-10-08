@@ -7,8 +7,6 @@ export const IMG = {
   heroSlides: ["/images/laminasyon.png", "/images/kirpik.png"],
   lam: "/images/laminasyon.png",
   powder: "/images/powder.png",
-  eyeliner: "/images/eyeliner.png",
-  dipliner: "/images/dipliner.png",
 } as const;
 
 export type TrustItem = { stat: LS; label: LS };

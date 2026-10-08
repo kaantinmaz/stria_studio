@@ -64,7 +64,6 @@ export function personSchema() {
     knowsAbout: [
       "Microblading",
       "Kaş pudralama",
-      "Kalıcı eyeliner",
       "Dudak renklendirme",
       "Kaş laminasyonu",
       "Kirpik lifting",

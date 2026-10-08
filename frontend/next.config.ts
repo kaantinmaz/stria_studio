@@ -17,6 +17,27 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "admin.striastudio.com.tr", pathname: "/storage/**" },
     ],
   },
+  async redirects() {
+    // Eyeliner ve dipliner hizmetleri kaldırıldı; eski hizmet ve blog
+    // URL'leri SEO için kalıcı olarak yönlendirilir.
+    const blogSlugs = [
+      "kalici-dipliner-ne-kadar-kalir",
+      "kalici-eyeliner-ne-kadar-sure-kalir",
+      "dipliner-nedir-kirpik-dibi-renklendirme",
+      "kalici-eyeliner-uygulama-iyilesme",
+      "kalici-eyeliner-kac-yil-kalici",
+      "dipliner-mi-eyeliner-mi",
+    ];
+    return [
+      { source: "/hizmetler/eyeliner", destination: "/hizmetler", permanent: true },
+      { source: "/hizmetler/dipliner", destination: "/hizmetler", permanent: true },
+      ...blogSlugs.map((slug) => ({
+        source: `/blog/${slug}`,
+        destination: "/blog",
+        permanent: true,
+      })),
+    ];
+  },
 };
 
 export default nextConfig;
