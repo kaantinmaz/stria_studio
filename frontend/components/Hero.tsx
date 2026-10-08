@@ -18,15 +18,17 @@ export function Hero() {
   const slides = IMG.heroSlides;
   const [slide, setSlide] = useState(0);
 
+  // setTimeout keyed on `slide`: a manual pick restarts the 5 s timer, keeping
+  // the progress bar in the active dot in sync.
   useEffect(() => {
     if (slides.length < 2) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const id = setInterval(
+    const id = setTimeout(
       () => setSlide((n) => (n + 1) % slides.length),
       5000,
     );
-    return () => clearInterval(id);
-  }, [slides.length]);
+    return () => clearTimeout(id);
+  }, [slides.length, slide]);
 
   return (
     <header
@@ -87,30 +89,65 @@ export function Hero() {
                 i === slide ? "opacity-100" : "opacity-0"
               }`}
             >
-              <ImageSlot
-                src={src}
-                alt="Stria Studio — Ankara kalıcı makyaj stüdyosu"
-                sizes="(max-width: 768px) 100vw, 45vw"
-                priority={i === 0}
-              />
+              <div
+                className={`absolute inset-0 transition-transform duration-[6000ms] ease-out motion-reduce:scale-100 motion-reduce:transition-none ${
+                  i === slide ? "scale-[1.06]" : "scale-100"
+                }`}
+              >
+                <ImageSlot
+                  src={src}
+                  alt="Stria Studio — Ankara kalıcı makyaj stüdyosu"
+                  sizes="(max-width: 768px) 100vw, 45vw"
+                  priority={i === 0}
+                />
+              </div>
             </div>
           ))}
 
           {slides.length > 1 && (
-            <div className="absolute bottom-5 left-1/2 z-10 flex -translate-x-1/2 gap-2">
-              {slides.map((src, i) => (
+            <>
+              {[-1, 1].map((step) => (
                 <button
-                  key={src}
+                  key={step}
                   type="button"
-                  aria-label={`Görsel ${i + 1}`}
-                  aria-current={i === slide}
-                  onClick={() => setSlide(i)}
-                  className={`h-2 rounded-full transition-all ${
-                    i === slide ? "w-5 bg-cream" : "w-2 bg-cream/60"
+                  aria-label={step < 0 ? "Önceki görsel" : "Sonraki görsel"}
+                  onClick={() =>
+                    setSlide((n) => (n + step + slides.length) % slides.length)
+                  }
+                  className={`absolute top-[36%] z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-cream/85 text-ink shadow-[0_10px_24px_-12px_rgba(76,19,19,0.6)] backdrop-blur-[6px] transition-colors hover:bg-cream md:top-1/2 ${
+                    step < 0 ? "left-3" : "right-3"
                   }`}
-                />
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d={step < 0 ? "M15 6l-6 6 6 6" : "M9 6l6 6-6 6"} />
+                  </svg>
+                </button>
               ))}
-            </div>
+
+              <div className="absolute bottom-3 right-3 z-10 flex items-center gap-2 rounded-full bg-ink/45 px-3 py-2 backdrop-blur-[6px] md:bottom-[46px] md:right-4">
+                {slides.map((src, i) => (
+                  <button
+                    key={src}
+                    type="button"
+                    aria-label={`Görsel ${i + 1}`}
+                    aria-current={i === slide}
+                    onClick={() => setSlide(i)}
+                    className={`relative h-2.5 overflow-hidden rounded-full transition-all ${
+                      i === slide
+                        ? "w-9 bg-cream/40 motion-reduce:bg-cream"
+                        : "w-2.5 bg-cream/70 hover:bg-cream"
+                    }`}
+                  >
+                    {i === slide && (
+                      <span
+                        key={slide}
+                        className="absolute inset-y-0 left-0 w-full origin-left animate-[heroProgress_5s_linear_forwards] rounded-full bg-cream motion-reduce:hidden"
+                      />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </>
           )}
         </div>
 
