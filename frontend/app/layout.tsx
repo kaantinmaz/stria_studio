@@ -49,8 +49,12 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image" },
   verification: {
     // Meta Business Manager alan adı doğrulaması (Meta Ads / Pixel domain
-    // sahipliği). Kaldırılırsa reklam hesabında alan adı doğrulaması düşer.
-    other: { "facebook-domain-verification": "hzi5zsm5krzwmq9qwb60uli4v4q2lt" },
+    // sahipliği) + Bing Webmaster Tools site doğrulaması. Kaldırılırsa ilgili
+    // hesapta doğrulama düşer.
+    other: {
+      "facebook-domain-verification": "hzi5zsm5krzwmq9qwb60uli4v4q2lt",
+      "msvalidate.01": "0BB2EA19C6441E8A3A634F72650E2EB1",
+    },
   },
   other: {
     "geo.region": "TR-06",
