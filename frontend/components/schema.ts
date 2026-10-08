@@ -86,6 +86,8 @@ export function personSchema() {
 const SERVICE_ALTERNATE_NAMES: Record<string, string[]> = {
   microblading: ["Kıl Tekniği Kaş", "Kaş Microblading"],
   "kas-laminasyon": ["Kaş Laminasyonu", "Brow Lamination", "Kaş Lifting", "Kaş Kaldırma"],
+  "kirpik-lifting": ["Kirpik Laminasyonu", "Kirpik Perması", "Lash Lift", "Kirpik Kaldırma"],
+  "kamuflaj-makyaj": ["Kamuflaj Makyajı", "İz Kamuflajı", "Çatlak Kapatma", "Skin Camouflage"],
 };
 
 export function serviceSchema(
