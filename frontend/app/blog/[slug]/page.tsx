@@ -25,8 +25,14 @@ export async function generateMetadata({
   const { slug } = await params;
   const post = await getPost(slug);
   if (!post) return {};
+  // meta_title_tr bazı kayıtlarda zaten "... | Stria Studio" ile bitiyor; marka
+  // sonekini yalnızca başlıkta marka yoksa ekle, aksi halde çift marka oluşur.
+  const rawTitle = post.meta_title_tr || post.title_tr;
+  const title = /stria\s*studio/i.test(rawTitle)
+    ? rawTitle
+    : `${rawTitle} · Stria Studio`;
   return buildMetadata({
-    title: (post.meta_title_tr || post.title_tr) + " · Stria Studio",
+    title,
     description: post.meta_desc_tr || post.excerpt_tr,
     path: `/blog/${post.slug}`,
     image: post.cover_url ?? undefined,

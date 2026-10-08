@@ -1,5 +1,6 @@
 import { site } from "@/lib/site";
 import { absUrl } from "@/lib/seo";
+import { isPlaceholder } from "@/lib/llms";
 import {
   phoneHref,
   type ServiceFull,
@@ -21,7 +22,9 @@ export function beautySalonSchema(s: Settings) {
     image: absUrl("/images/hero.png"),
     address: {
       "@type": "PostalAddress",
-      streetAddress: s.street_address,
+      // Prod ayarlarında bazı alanlar hâlâ yer tutucu (ör. "[Mahalle] Cd. No:
+      // 00"); köşeli parantezli değerleri şemaya basmak yanlış NAP sinyali olur.
+      ...(isPlaceholder(s.street_address) ? {} : { streetAddress: s.street_address }),
       addressLocality: s.locality,
       addressRegion: s.region,
       postalCode: s.postal_code,
