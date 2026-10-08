@@ -5,9 +5,17 @@ import { Footer } from "@/components/Footer";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ServicePage } from "@/components/ServicePage";
 import { JsonLd } from "@/components/JsonLd";
-import { serviceSchema, faqSchema, howToSchema, breadcrumbSchema } from "@/components/schema";
+import {
+  serviceSchema,
+  faqSchema,
+  howToSchema,
+  breadcrumbSchema,
+  serviceWebPageSchema,
+} from "@/components/schema";
 import { buildMetadata } from "@/lib/seo";
 import { getService, getServices, getServiceSlugs } from "@/lib/content";
+import { getPost } from "@/lib/blog";
+import { SERVICE_DETAILS } from "@/lib/serviceDetails";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -33,6 +41,12 @@ export default async function ServiceRoute({ params }: Params) {
   const { slug } = await params;
   const [svc, services] = await Promise.all([getService(slug), getServices()]);
   if (!svc) notFound();
+
+  const details = SERVICE_DETAILS[svc.slug];
+  // Yayından kalkmış yazılar (getPost → null) listeden düşer.
+  const guides = (await Promise.all((details?.guides ?? []).map((s) => getPost(s))))
+    .filter((p) => p !== null)
+    .map((p) => ({ slug: p.slug, title: p.title_tr }));
 
   const name = svc.name_tr;
   const crumbs = [
@@ -62,8 +76,17 @@ export default async function ServiceRoute({ params }: Params) {
         />
       )}
       <JsonLd data={breadcrumbSchema(crumbs)} />
+      {details && (
+        <JsonLd
+          data={serviceWebPageSchema({
+            name: svc.seo_title_tr || name,
+            path: `/hizmetler/${svc.slug}`,
+            dateModified: details.updated,
+          })}
+        />
+      )}
       <Breadcrumbs items={crumbs} />
-      <ServicePage svc={svc} services={services} />
+      <ServicePage svc={svc} services={services} details={details} guides={guides} />
       <Footer />
     </>
   );

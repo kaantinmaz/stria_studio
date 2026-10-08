@@ -11,6 +11,7 @@ import {
 import { getAllPosts } from "@/lib/blog";
 import { ML_EXPERT_PARAGRAPH, REPUTATION, SCALE_MIN_SESSIONS, isPlaceholder, u } from "@/lib/llms";
 import { site } from "@/lib/site";
+import { SERVICE_DETAILS } from "@/lib/serviceDetails";
 
 // Kapsamlı, doğrulanabilir marka dosyası (GEO). Tüm bilgi API verisinden, site
 // kopyasından veya lib sabitlerinden gelir; eksik veri uydurulmaz, sınır olarak yazılır.
@@ -113,6 +114,20 @@ Bu dosya /llms.txt'i genişletir; tüm bilgiler sitenin sayfalarından ve stüdy
       s.benefits_tr.forEach((item) => b.push(`- ${stripHtml(item)}`));
     }
     if (s.aftercare_tr) b.push("", `Bakım: ${stripHtml(s.aftercare_tr)}`);
+    const details = SERVICE_DETAILS[s.slug];
+    if (details) {
+      b.push("", `Kısa bilgiler (son güncelleme ${trDate(details.updated)}):`);
+      details.facts.forEach((f) => b.push(`- ${f.label}: ${f.value}`));
+      b.push("", "Kimler için uygun:");
+      details.suitable.forEach((item) => b.push(`- ${item}`));
+      b.push("", "Ertelenir / önce ön değerlendirme:");
+      details.postpone.forEach((item) => b.push(`- ${item}`));
+      if (details.comparison) {
+        const c = details.comparison;
+        b.push("", `${c.caption}:`, "", `| Özellik | ${c.columns.join(" | ")} |`, `|${" --- |".repeat(c.columns.length + 1)}`);
+        c.rows.forEach((r) => b.push(`| ${r.label} | ${r.values.join(" | ")} |`));
+      }
+    }
     if (s.subservices_tr && s.subservices_tr.length > 0) {
       b.push("", "Alt hizmetler:");
       for (const sub of s.subservices_tr) {

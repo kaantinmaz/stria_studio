@@ -12,7 +12,9 @@ import { useSettings } from "@/components/SettingsProvider";
 import { MyLaminationBadge } from "@/components/MyLaminationBadge";
 import { MyLaminationServiceSection } from "@/components/MyLaminationServiceSection";
 import { ML_SERVICE_SCOPE } from "@/lib/mylamination";
-import { phoneHref, type ServiceFull, type ServiceListItem } from "@/lib/content";
+import { formatHours, phoneHref, type ServiceFull, type ServiceListItem } from "@/lib/content";
+import { isPlaceholder } from "@/lib/llms";
+import type { ServiceDetails } from "@/lib/serviceDetails";
 import { RatingBadge } from "@/components/RatingBadge";
 import { GoogleRatingBadge } from "@/components/GoogleRatingBadge";
 import { ServiceReviews } from "@/components/ServiceReviews";
@@ -65,9 +67,13 @@ function IntroText({ text }: { text: string | null }) {
 export function ServicePage({
   svc,
   services,
+  details,
+  guides,
 }: {
   svc: ServiceFull;
   services: ServiceListItem[];
+  details?: ServiceDetails;
+  guides: { slug: string; title: string }[];
 }) {
   const settings = useSettings();
   const name = svc.name_tr;
@@ -126,6 +132,34 @@ export function ServicePage({
         </div>
       </header>
 
+      {/* Kısa bilgiler — AI motorlarının ve aramanın tek bakışta alıntılayabileceği özet. */}
+      {details && (
+        <section className="mx-auto max-w-[1160px] px-[clamp(18px,5vw,56px)] pb-[clamp(8px,2vw,24px)]">
+          <div className="rounded-[28px] border border-line bg-white p-[clamp(20px,3vw,36px)]">
+            <h2 className="mb-1 text-[clamp(22px,2.4vw,30px)]">{name}: kısa bilgiler</h2>
+            <p className="mb-6 text-[13px] text-muted">
+              Son güncelleme:{" "}
+              <time dateTime={details.updated}>
+                {new Date(details.updated).toLocaleDateString("tr-TR", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                  timeZone: "UTC",
+                })}
+              </time>
+            </p>
+            <dl className="grid grid-cols-1 gap-x-10 gap-y-4 sm:grid-cols-2">
+              {details.facts.map((f) => (
+                <div key={f.label} className="border-b border-line pb-3">
+                  <dt className="mb-1 text-xs uppercase tracking-[0.12em] text-accent">{f.label}</dt>
+                  <dd className="text-[15px] leading-[1.6] text-ink">{f.value}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </section>
+      )}
+
       {/* benefits + process */}
       <section className="mx-auto grid max-w-[1160px] grid-cols-1 gap-[clamp(28px,4vw,56px)] px-[clamp(18px,5vw,56px)] py-[clamp(32px,5vw,64px)] md:grid-cols-2">
         <div>
@@ -159,6 +193,79 @@ export function ServicePage({
           </div>
         </div>
       </section>
+
+      {details && (
+        <section className="mx-auto grid max-w-[1160px] grid-cols-1 gap-[clamp(20px,3vw,40px)] px-[clamp(18px,5vw,56px)] pb-[clamp(24px,4vw,48px)] md:grid-cols-2">
+          <div className="rounded-[24px] bg-blush p-[clamp(20px,3vw,32px)]">
+            <h2 className="mb-4 text-[clamp(20px,2.2vw,26px)]">{name} kimler için uygun?</h2>
+            <ul className="flex flex-col gap-3">
+              {details.suitable.map((s) => (
+                <li key={s} className="flex items-start gap-3 text-[15px] leading-[1.6] text-muted2">
+                  <span className="mt-[2px] flex h-[18px] w-[18px] flex-none items-center justify-center rounded-full bg-pink text-[11px] text-accent">
+                    ✓
+                  </span>
+                  {s}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="rounded-[24px] border border-line bg-white p-[clamp(20px,3vw,32px)]">
+            <h2 className="mb-4 text-[clamp(20px,2.2vw,26px)]">Ne zaman ertelenir?</h2>
+            <ul className="flex flex-col gap-3">
+              {details.postpone.map((s) => (
+                <li key={s} className="flex items-start gap-3 text-[15px] leading-[1.6] text-muted2">
+                  <span className="mt-[9px] h-[6px] w-[6px] flex-none rounded-full bg-accent" />
+                  {s}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-4 text-[13px] leading-[1.6] text-muted">
+              Emin değilseniz ücretsiz ön görüşmede birlikte değerlendiririz.
+            </p>
+          </div>
+        </section>
+      )}
+
+      {details?.comparison && (
+        <section className="mx-auto max-w-[1160px] px-[clamp(18px,5vw,56px)] pb-[clamp(24px,4vw,48px)]">
+          <h2 className="mb-5 text-[clamp(22px,2.4vw,30px)]">{details.comparison.caption}</h2>
+          <div className="overflow-x-auto rounded-[22px] border border-line bg-white">
+            <table className="w-full min-w-[640px] border-collapse text-left text-[14px] leading-[1.6]">
+              <caption className="sr-only">{details.comparison.caption}</caption>
+              <thead>
+                <tr className="bg-blush">
+                  <th scope="col" className="px-5 py-4 font-medium text-muted">
+                    Özellik
+                  </th>
+                  {details.comparison.columns.map((c, i) => (
+                    <th
+                      key={c}
+                      scope="col"
+                      className={`px-5 py-4 font-medium ${i === 0 ? "text-accent" : "text-ink"}`}
+                    >
+                      {c}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {details.comparison.rows.map((r) => (
+                  <tr key={r.label} className="border-t border-line">
+                    <th scope="row" className="px-5 py-4 font-medium text-ink">
+                      {r.label}
+                    </th>
+                    {r.values.map((v, i) => (
+                      <td key={i} className={`px-5 py-4 ${i === 0 ? "text-ink" : "text-muted2"}`}>
+                        {v}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
 
       {mlScope && <MyLaminationServiceSection scope={mlScope} serviceName={name} />}
 
@@ -274,6 +381,25 @@ export function ServicePage({
       {/* FAQ */}
       <Faq title="Sıkça Sorulan Sorular" items={svc.faq_tr} />
 
+      {guides.length > 0 && (
+        <section className="mx-auto max-w-[820px] px-[clamp(18px,5vw,56px)] pb-[clamp(32px,5vw,64px)]">
+          <h2 className="mb-5 text-[clamp(20px,2.2vw,28px)]">{name} rehberleri</h2>
+          <ul className="flex flex-col gap-2">
+            {guides.map((g) => (
+              <li key={g.slug}>
+                <Link
+                  href={`/blog/${g.slug}`}
+                  className="inline-flex items-start gap-2 text-[15px] leading-[1.6] text-ink underline decoration-line underline-offset-4 transition-colors hover:text-accent"
+                >
+                  <span className="text-accent">→</span>
+                  {g.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       {guide && (
         <section className="mx-auto max-w-[820px] px-[clamp(18px,5vw,56px)] pb-[clamp(32px,5vw,64px)]">
           <p className="text-center text-[14px] leading-[1.7] text-muted">
@@ -288,6 +414,38 @@ export function ServicePage({
             </a>
             .
           </p>
+        </section>
+      )}
+
+      {/* Konum — yerel arama ve "Ankara'da nerede" sorguları için sayfa içinde NAP. */}
+      {!isPlaceholder(settings.address) && settings.address && (
+        <section className="mx-auto max-w-[1160px] px-[clamp(18px,5vw,56px)] pb-[clamp(16px,3vw,32px)]">
+          <div className="rounded-[24px] bg-blush p-[clamp(20px,3vw,32px)]">
+            <h2 className="mb-3 text-[clamp(20px,2.2vw,26px)]">{name} Ankara&apos;da nerede yapılır?</h2>
+            <p className="mb-2 max-w-[760px] text-[15px] leading-[1.7] text-muted2">
+              {name}, Stria Studio&apos;da uygulanır: {settings.address}. Randevuyla çalışıyoruz.
+            </p>
+            {settings.hours?.length > 0 && (
+              <p className="mb-4 text-[15px] leading-[1.7] text-muted2">
+                Çalışma saatleri: {formatHours(settings.hours, "tr")}
+              </p>
+            )}
+            <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+              {settings.google_maps_url && (
+                <a
+                  href={settings.google_maps_url}
+                  target="_blank"
+                  rel="noopener"
+                  className="text-accent underline underline-offset-4"
+                >
+                  Google Haritalar&apos;da aç
+                </a>
+              )}
+              <Link href="/iletisim" className="text-accent underline underline-offset-4">
+                Yol tarifi ve iletişim
+              </Link>
+            </div>
+          </div>
         </section>
       )}
 

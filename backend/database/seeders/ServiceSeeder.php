@@ -194,7 +194,7 @@ class ServiceSeeder extends Seeder
                 'desc_en' => 'Sets and lifts brow hairs for a fuller, groomed and lasting shape.',
                 'image' => '/images/laminasyon.png',
                 'seo_title_tr' => 'Kaş Laminasyonu Ankara | My Lamination Uzmanı',
-                'seo_desc_tr' => "Ankara'da kaş laminasyonu: My Lamination ürünleriyle kaş kıllarını şekillendirip sabitler. İğnesiz, ~6 hafta etkili. Randevu alın.",
+                'seo_desc_tr' => "Ankara Çankaya'da kaş laminasyonu: My Lamination ürünleriyle iğnesiz, 45–60 dakika, ortalama 6 hafta etkili. Sertifikalı uzman Nilsu Kamişli. Randevu alın.",
                 'keywords_tr' => [
                     'kaş laminasyonu ankara',
                     'brow lamination ankara',
@@ -204,15 +204,15 @@ class ServiceSeeder extends Seeder
                     'my lamination uzmanı ankara',
                     'my lamination ankara',
                 ],
-                'intro_tr' => "Kaş laminasyonu, Ankara Stria Studio'da kaş kıllarını yukarı doğru şekillendirip sabitleyen iğnesiz bir bakım işlemidir. Uygulamayı, sertifikalı My Lamination uzmanı ve stüdyonun kurucusu Nilsu Kamişli yapar; İtalyan teknolojisiyle üretilen ve T.C. Sağlık Bakanlığı'na kayıtlı My Lamination ürünleri kullanılır. Seyrek ya da dağınık kaşları dolgun, düzenli ve bakımlı gösterir; etkisi yaklaşık 6 hafta sürer.",
-                'aftercare_tr' => 'İlk 24 saat kaşları ıslatmayın ve dokunmayın; sonrasında düzenli olarak besleyici yağ ya da My Lamination ev serumu uygulayın.',
+                'intro_tr' => "Kaş laminasyonu, Ankara Çankaya'daki Stria Studio'da kaş kıllarını yukarı doğru şekillendirip sabitleyen iğnesiz bir bakım işlemidir. Uygulamayı, sertifikalı My Lamination uzmanı ve stüdyonun kurucusu Nilsu Kamişli yapar; İtalyan teknolojisiyle üretilen ve T.C. Sağlık Bakanlığı'na kayıtlı My Lamination ürünleri kullanılır. Seyrek ya da dağınık kaşları dolgun, düzenli ve bakımlı gösterir; etkisi ortalama 6 hafta (kişiye göre 4–8 hafta) sürer.",
+                'aftercare_tr' => 'İlk 24–48 saat kaşları ıslatmayın ve ovalamayın; sauna, buhar, yoğun terleme, makyaj ve yağlı ürünlerden uzak durun. Sonrasında kılları her gün temiz bir fırçayla yukarı doğru tarayın ve My Lamination ev serumu ya da besleyici bir yağla düzenli bakım yapın. Etki geçince (ortalama 6 hafta) yenileme yapılabilir; işlemi daha sık tekrarlamayın.',
                 'benefits_tr' => [
                     'İğnesiz ve acısız uygulama',
                     'Sertifikalı My Lamination uzmanı Nilsu Kamişli uygular',
                     'My Lamination ürünleriyle uygulama — vegan, paraben ve sülfat içermez',
                     'Dolgun, düzenli ve kaldırılmış kaş',
                     'Seyrek kaşları toparlar',
-                    'Yaklaşık 6 hafta etki',
+                    'Ortalama 6 hafta (4–8 hafta) etki',
                 ],
                 'process_tr' => [
                     'Kaş analizi ve şekil planı',
@@ -222,7 +222,7 @@ class ServiceSeeder extends Seeder
                     'Şekillendirme ve alma (~45–60 dakika)',
                 ],
                 'faq_tr' => ServiceFaqSeeder::FAQ['kas-laminasyon'],
-                'related' => ['microblading', 'kas-pudralama'],
+                'related' => ['kirpik-lifting', 'altin-oran-kas-alim'],
                 'gallery' => [],
             ],
             [

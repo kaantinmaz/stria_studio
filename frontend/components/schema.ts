@@ -85,11 +85,13 @@ export function personSchema() {
 // alternateName so search/AI engines map variant queries to the same page.
 const SERVICE_ALTERNATE_NAMES: Record<string, string[]> = {
   microblading: ["Kıl Tekniği Kaş", "Kaş Microblading"],
+  "kas-laminasyon": ["Kaş Laminasyonu", "Brow Lamination", "Kaş Lifting", "Kaş Kaldırma"],
 };
 
 export function serviceSchema(
   svc: {
     slug: string;
+    image?: string | null;
     intro_tr: string | null;
     desc_tr: string;
     subservices_tr?: SubService[];
@@ -109,6 +111,7 @@ export function serviceSchema(
       ? { alternateName: SERVICE_ALTERNATE_NAMES[svc.slug] }
       : {}),
     description: svc.intro_tr || svc.desc_tr,
+    ...(svc.image ? { image: absUrl(svc.image) } : {}),
     url: absUrl(path),
     provider: { "@id": absUrl("/#business") },
     areaServed: { "@type": "City", name: "Ankara" },
@@ -174,6 +177,23 @@ export function subServiceSchema(svc: ServiceFull, sub: SubService) {
     provider: { "@id": absUrl("/#business") },
     areaServed: "Ankara",
     category: svc.name_tr,
+  };
+}
+
+// Hizmet sayfasının kendisi: içerik tazeliği (dateModified) ve yazar/uygulayıcı
+// bağlantısı AI motorları için ayrı bir düğümde verilir.
+export function serviceWebPageSchema(opts: { name: string; path: string; dateModified: string }) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": absUrl(opts.path),
+    url: absUrl(opts.path),
+    name: opts.name,
+    inLanguage: "tr-TR",
+    dateModified: opts.dateModified,
+    isPartOf: { "@type": "WebSite", url: site.siteUrl },
+    about: { "@id": absUrl("/#business") },
+    author: { "@id": absUrl("/hakkimizda#nilsu-kamisli") },
   };
 }
 
