@@ -17,6 +17,9 @@ export const site = {
   // gaId ile aynı gerekçe: kamusal değer, build env unutulursa sessizce düşmesin.
   // Boş string verilirse pixel tamamen kapalı (hiçbir betik basılmaz).
   metaPixelId: process.env.NEXT_PUBLIC_META_PIXEL_ID ?? "2933007867083958",
+  // Microsoft Clarity (ısı haritası + oturum kaydı) — proje "Stria Studio Web".
+  // Aynı gerekçe: kamusal değer. Boş string verilirse Clarity tamamen kapalı.
+  clarityId: process.env.NEXT_PUBLIC_CLARITY_ID ?? "yv3acyzmqz",
   gbpUrl: "", // owner: paste the Google Business Profile URL when live
   // Facebook sayfası (2026-10-07'de "Çatlak Kamuflaj Makyaj" → "Stria Studio").
   facebookUrl: "https://www.facebook.com/striastudioankara",

@@ -10,6 +10,7 @@ import { ChatWidget } from "@/components/ChatWidget";
 import { Analytics } from "@/components/Analytics";
 import { GoogleTag } from "@/components/GoogleTag";
 import { MetaPixel } from "@/components/MetaPixel";
+import { Clarity } from "@/components/Clarity";
 import { gtagBootstrapTag } from "@/lib/gtag";
 import { Popup } from "@/components/Popup";
 import { EngageSurvey } from "@/components/EngageSurvey";
@@ -98,6 +99,7 @@ export default async function RootLayout({
             <MobileActionBar />
             <Analytics />
             <MetaPixel />
+            <Clarity />
           </SettingsProvider>
         </LanguageProvider>
         {settings?.footer_code && (
