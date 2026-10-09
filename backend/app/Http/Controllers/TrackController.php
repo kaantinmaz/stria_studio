@@ -4,13 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\Visit;
+use App\Support\MetaConversions;
 use App\Support\TrafficSource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class TrackController extends Controller
 {
-    public function store(Request $request)
+    /** Meta'ya `Contact` olarak giden site olayları → yöntem. */
+    private const META_CONTACT = ['whatsapp_click' => 'whatsapp', 'call_click' => 'phone'];
+
+    public function store(Request $request, MetaConversions $meta)
     {
         $data = $request->validate([
             'type' => ['required', 'in:pageview,event'],
@@ -21,7 +25,7 @@ class TrackController extends Controller
             'utm_source' => ['nullable', 'string', 'max:255'],
             'utm_medium' => ['nullable', 'string', 'max:255'],
             'utm_campaign' => ['nullable', 'string', 'max:255'],
-        ]);
+        ] + MetaConversions::rules());
 
         // Microsites send their slug; the main site sends none. Keep only known
         // slugs so a bad value can't pollute the per-site dashboard. NULL = main.
@@ -44,6 +48,11 @@ class TrackController extends Controller
                 'name' => $data['name'],
                 'path' => $data['path'],
             ]);
+            // Yalnız ana site (pixel yalnız orada); mikrositeler Meta'ya gitmez.
+            $method = self::META_CONTACT[$data['name']] ?? null;
+            if ($method !== null && $site === null) {
+                $meta->dispatch('Contact', $data['meta'] ?? null, $request, [], ['method' => $method]);
+            }
         } else {
             $referrer = $data['referrer'] ?? null;
             Visit::create([

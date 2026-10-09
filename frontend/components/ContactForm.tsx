@@ -5,6 +5,7 @@ import { useLang } from "@/components/LanguageProvider";
 import { site } from "@/lib/site";
 import { useServices } from "@/components/ServicesProvider";
 import { pickLang } from "@/lib/content";
+import { metaContext, newEventId, trackLead } from "@/lib/metaPixel";
 
 type Status = "idle" | "sending" | "ok" | "err";
 
@@ -23,6 +24,8 @@ export function ContactForm() {
     const form = e.currentTarget;
     const fd = new FormData(form);
     setStatus("sending");
+    const eventId = newEventId();
+    const service = (fd.get("service") as string) || null;
     try {
       const res = await fetch(`${site.apiUrl}/api/contact`, {
         method: "POST",
@@ -31,13 +34,16 @@ export function ContactForm() {
           name: fd.get("name"),
           phone: fd.get("phone"),
           email: fd.get("email") || null,
-          service: fd.get("service") || null,
+          service,
           preferred_date: fd.get("preferred_date") || null,
           message: fd.get("message") || null,
           locale: lang,
+          meta: metaContext(eventId),
         }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      // Yalnız başarılı kayıtta dönüşüm sayılır (Pixel + sunucu aynı event_id).
+      trackLead(window.location.pathname, eventId, service);
       setStatus("ok");
       form.reset();
     } catch {

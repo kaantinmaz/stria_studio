@@ -144,7 +144,48 @@ export function trackServiceView(path: string, now = Date.now()): void {
   }
 }
 
-export function trackContact(method: "whatsapp" | "phone", path: string): void {
+export function trackContact(method: "whatsapp" | "phone", path: string, eventId?: string): void {
   if (!fbqReady() || isKamuflaj(path)) return;
-  window.fbq!("track", "Contact", { method });
+  window.fbq!("track", "Contact", { method }, eventId ? { eventID: eventId } : undefined);
+}
+
+export function trackLead(path: string, eventId: string, service?: string | null): void {
+  if (!fbqReady() || isKamuflaj(path)) return;
+  window.fbq!("track", "Lead", service ? { content_name: service } : {}, { eventID: eventId });
+}
+
+// --- Dönüşümler API'si (sunucu) bağlamı ---
+// Pixel olayı ile sunucu olayı aynı event_id'yi taşır → Meta tek sayar.
+
+export function newEventId(): string {
+  return typeof crypto !== "undefined" && "randomUUID" in crypto
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+function cookie(name: string): string | null {
+  const m = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
+  return m ? decodeURIComponent(m[1]) : null;
+}
+
+/**
+ * Sunucuya giden `meta` bloğu. Onay yoksa ya da kamuflaj sayfasındaysa
+ * `consent:false` gider ve sunucu Meta'ya hiçbir şey göndermez.
+ */
+export function metaContext(eventId: string): Record<string, unknown> {
+  const path = window.location.pathname;
+  let consent = false;
+  try {
+    consent = localStorage.getItem("stria-cookie-consent") === "accepted";
+  } catch {
+    /* onay yok say */
+  }
+  if (!META_PIXEL_ENABLED || !consent || isKamuflaj(path)) return { consent: false };
+  return {
+    event_id: eventId,
+    consent: true,
+    fbp: cookie("_fbp"),
+    fbc: cookie("_fbc"),
+    url: window.location.href,
+  };
 }
