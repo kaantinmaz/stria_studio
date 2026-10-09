@@ -7,6 +7,7 @@ import { useLang } from "@/components/LanguageProvider";
 import { phoneHref } from "@/lib/content";
 import { whatsappHref, pathWhatsappText } from "@/lib/whatsapp";
 import { PhoneIcon, WhatsAppIcon } from "@/components/Icons";
+import { CallLabel } from "@/components/CallLabel";
 
 // Fixed bottom action bar, mobile only (below md). Replaces the stacked floating
 // FABs with two equal, thumb-friendly primary actions. Links are plain anchors so
@@ -26,8 +27,10 @@ export function MobileActionBar() {
         href={phoneHref(settings.phone)}
         className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-[22px] border border-line2 bg-white text-[14px] font-medium text-ink"
       >
-        <PhoneIcon size={15} />
-        {t.callLabel}
+        <span className="phone-ring" aria-hidden>
+          <PhoneIcon size={15} />
+        </span>
+        <CallLabel label={t.callLabel} />
       </a>
       <a
         href={whatsappHref(settings.whatsapp, pathWhatsappText(pathname, services))}

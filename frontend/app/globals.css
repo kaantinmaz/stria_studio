@@ -105,6 +105,30 @@ h3 {
   }
 }
 
+/* Mobile call button: the phone icon "rings" (short wiggle), then rests.
+   2.4 s cycle matches CallLabel's label ↔ number swap. */
+@keyframes phoneRing {
+  0%, 30%, 100% {
+    transform: rotate(0);
+  }
+  4%, 12%, 20% {
+    transform: rotate(-14deg);
+  }
+  8%, 16%, 24% {
+    transform: rotate(14deg);
+  }
+}
+.phone-ring {
+  display: inline-flex;
+  transform-origin: 50% 60%;
+  animation: phoneRing 2.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .phone-ring {
+    animation: none;
+  }
+}
+
 /* Sticky WhatsApp button pulse ring */
 @keyframes waPulse {
   0% {
