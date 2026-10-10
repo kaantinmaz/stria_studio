@@ -11,6 +11,8 @@ import { CallLabel } from "@/components/CallLabel";
 import { useSettings } from "@/components/SettingsProvider";
 import { MyLaminationBadge } from "@/components/MyLaminationBadge";
 import { MyLaminationServiceSection } from "@/components/MyLaminationServiceSection";
+import { HeroVideoStrip, ItalyFlag } from "@/components/HeroVideoStrip";
+import { SERVICE_HERO } from "@/lib/serviceHero";
 import { ML_SERVICE_SCOPE } from "@/lib/mylamination";
 import { formatHours, phoneHref, type ServiceFull, type ServiceListItem } from "@/lib/content";
 import { isPlaceholder } from "@/lib/llms";
@@ -79,6 +81,7 @@ export function ServicePage({
   const name = svc.name_tr;
   const guide = SERVICE_GUIDES[svc.slug];
   const mlScope = ML_SERVICE_SCOPE[svc.slug];
+  const hero = SERVICE_HERO[svc.slug];
   // Work photos — owner fills svc.gallery; hidden until real photos exist.
   const shots = svc.gallery ?? [];
   const related = svc.related
@@ -90,15 +93,46 @@ export function ServicePage({
 
   return (
     <main>
-      {/* header */}
-      <header className="mx-auto grid max-w-[1160px] grid-cols-1 items-center gap-[clamp(28px,4.5vw,64px)] px-[clamp(18px,5vw,56px)] pb-12 pt-8 md:grid-cols-[1.05fr_0.95fr]">
-        <div>
-          <div className="mb-4 inline-flex items-center gap-2 rounded-[22px] bg-pink px-4 py-2 text-[11px] uppercase tracking-[0.14em] text-accent">
-            {svc.tag_tr} · Ankara
+      {/* header — videolu sayfalarda mobilde sıra: başlık → videolar → metin/CTA;
+          masaüstünde videolar sağ sütunda iki satırı kaplar. */}
+      <header className="mx-auto grid max-w-[1160px] grid-cols-1 items-center gap-x-[clamp(28px,4.5vw,64px)] px-[clamp(18px,5vw,56px)] pb-12 pt-8 md:grid-cols-[1.05fr_0.95fr]">
+        <div className="md:col-start-1 md:row-start-1 md:self-end">
+          <div className="mb-4 flex flex-wrap items-center gap-2">
+            <div className="inline-flex items-center gap-2 rounded-[22px] bg-pink px-4 py-2 text-[11px] uppercase tracking-[0.14em] text-accent">
+              {svc.tag_tr} · Ankara
+            </div>
+            {mlScope && (
+              <div className="inline-flex items-center gap-2 rounded-[22px] border border-line bg-white px-4 py-[7px] text-[12px] text-ink">
+                <ItalyFlag />
+                İtalya üretimi · Avrupa standartlarında My Lamination ürünleri
+              </div>
+            )}
           </div>
           <h1 className="mb-5 text-[clamp(32px,4.6vw,58px)] leading-[1.05]">
             {name} <span className="text-accent">Ankara</span>
           </h1>
+          {hero && (
+            <ul className="mb-5 flex flex-wrap gap-2" aria-label={`${name} öne çıkanlar`}>
+              {hero.highlights.map((h) => (
+                <li
+                  key={h}
+                  className="inline-flex items-center gap-[7px] rounded-[18px] bg-blush px-[13px] py-[6px] text-[13px] text-ink"
+                >
+                  <span className="text-[11px] text-accent" aria-hidden>
+                    ✓
+                  </span>
+                  {h}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+        {hero && (
+          <div className="mb-7 min-w-0 md:col-start-2 md:row-span-2 md:row-start-1 md:mb-0 md:self-center">
+            <HeroVideoStrip videos={hero.videos} title={name} />
+          </div>
+        )}
+        <div className="md:col-start-1 md:row-start-2 md:self-start">
           <div className="mb-5 flex flex-wrap items-center gap-x-5 gap-y-2">
             <RatingBadge value={svc.rating_avg} count={svc.rating_count} size={15} />
             <GoogleRatingBadge />
@@ -124,12 +158,14 @@ export function ServicePage({
           </div>
           {mlScope && <MyLaminationBadge scope={mlScope} className="mt-7" />}
         </div>
-        <div className="relative h-[320px] overflow-hidden rounded-[32px] shadow-[0_40px_90px_-50px_rgba(229,135,146,0.7)] md:h-[min(56vh,460px)]">
-          <HeroCarousel
-            images={svc.hero_images?.length ? svc.hero_images : (svc.image ? [svc.image] : [])}
-            alt={`${name} — Stria Studio Ankara`}
-          />
-        </div>
+        {!hero && (
+          <div className="relative mt-[clamp(28px,4.5vw,64px)] h-[320px] overflow-hidden rounded-[32px] shadow-[0_40px_90px_-50px_rgba(229,135,146,0.7)] md:col-start-2 md:row-span-2 md:row-start-1 md:mt-0 md:h-[min(56vh,460px)]">
+            <HeroCarousel
+              images={svc.hero_images?.length ? svc.hero_images : (svc.image ? [svc.image] : [])}
+              alt={`${name} — Stria Studio Ankara`}
+            />
+          </div>
+        )}
       </header>
 
       {/* Kısa bilgiler — AI motorlarının ve aramanın tek bakışta alıntılayabileceği özet. */}

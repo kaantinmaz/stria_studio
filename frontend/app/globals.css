@@ -105,6 +105,26 @@ h3 {
   }
 }
 
+/* HeroVideoStrip: arka plan yumuşak belirir, video ortada hafifçe büyüyerek açılır. */
+@keyframes heroVideoFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes heroVideoIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* Mobile call button: the phone icon "rings" (short wiggle), then rests.
    2.4 s cycle matches CallLabel's label ↔ number swap. */
 @keyframes phoneRing {
