@@ -149,6 +149,11 @@ export function trackContact(method: "whatsapp" | "phone", path: string, eventId
   window.fbq!("track", "Contact", { method }, eventId ? { eventID: eventId } : undefined);
 }
 
+export function trackFindLocation(path: string, eventId: string): void {
+  if (!fbqReady() || isKamuflaj(path)) return;
+  window.fbq!("track", "FindLocation", {}, { eventID: eventId });
+}
+
 export function trackLead(path: string, eventId: string, service?: string | null): void {
   if (!fbqReady() || isKamuflaj(path)) return;
   window.fbq!("track", "Lead", service ? { content_name: service } : {}, { eventID: eventId });

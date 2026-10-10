@@ -74,6 +74,14 @@ class MetaConversionsTest extends TestCase
         Http::assertSent(fn (Request $r) => $r['data'][0]['event_name'] === 'Contact' && $r['data'][0]['custom_data']['method'] === 'whatsapp');
     }
 
+    public function test_maps_click_sends_find_location(): void
+    {
+        $this->postJson('/api/track', ['type' => 'event', 'name' => 'maps_click', 'path' => '/iletisim', 'meta' => $this->meta(['url' => 'https://striastudio.com.tr/iletisim'])])->assertNoContent();
+
+        Http::assertSentCount(1);
+        Http::assertSent(fn (Request $r) => $r['data'][0]['event_name'] === 'FindLocation' && ! isset($r['data'][0]['custom_data']));
+    }
+
     public function test_missing_token_skips_without_breaking_lead(): void
     {
         config(['services.meta.capi_token' => null]);

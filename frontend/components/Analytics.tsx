@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { gtagEvent, gtagPageview } from "@/lib/gtag";
-import { metaContext, newEventId, trackContact } from "@/lib/metaPixel";
+import { metaContext, newEventId, trackContact, trackFindLocation } from "@/lib/metaPixel";
 import { site } from "@/lib/site";
 
 function post(body: Record<string, unknown>) {
@@ -18,6 +18,9 @@ function post(body: Record<string, unknown>) {
     /* ignore */
   }
 }
+
+// Harita / yol tarifi bağlantıları (Google Maps, Apple Maps, Yandex Haritalar).
+const MAPS_HREF = /google\.[a-z.]+\/maps|maps\.google\.|maps\.app\.goo\.gl|goo\.gl\/maps|maps\.apple\.com|yandex\.[a-z.]+\/maps/i;
 
 export function Analytics() {
   const pathname = usePathname();
@@ -37,7 +40,7 @@ export function Analytics() {
     gtagPageview(pathname);
   }, [pathname]);
 
-  // delegated click tracking for WhatsApp + call links (no per-component edits)
+  // delegated click tracking for WhatsApp, call and map links (no per-component edits)
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
       const el = e.target as HTMLElement | null;
@@ -54,6 +57,10 @@ export function Analytics() {
         post({ type: "event", name: "whatsapp_click", path, meta: metaContext(eventId) });
         gtagEvent("whatsapp_click", { page_path: path });
         trackContact("whatsapp", path, eventId);
+      } else if (MAPS_HREF.test(href)) {
+        post({ type: "event", name: "maps_click", path, meta: metaContext(eventId) });
+        gtagEvent("maps_click", { page_path: path });
+        trackFindLocation(path, eventId);
       }
     };
     document.addEventListener("click", onClick, true);

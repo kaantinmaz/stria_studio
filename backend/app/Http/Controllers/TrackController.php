@@ -11,8 +11,12 @@ use Illuminate\Support\Str;
 
 class TrackController extends Controller
 {
-    /** Meta'ya `Contact` olarak giden site olayları → yöntem. */
-    private const META_CONTACT = ['whatsapp_click' => 'whatsapp', 'call_click' => 'phone'];
+    /** Meta'ya giden site olayları → [Meta standart olayı, custom_data]. */
+    private const META_EVENTS = [
+        'whatsapp_click' => ['Contact', ['method' => 'whatsapp']],
+        'call_click' => ['Contact', ['method' => 'phone']],
+        'maps_click' => ['FindLocation', []],
+    ];
 
     public function store(Request $request, MetaConversions $meta)
     {
@@ -49,9 +53,9 @@ class TrackController extends Controller
                 'path' => $data['path'],
             ]);
             // Yalnız ana site (pixel yalnız orada); mikrositeler Meta'ya gitmez.
-            $method = self::META_CONTACT[$data['name']] ?? null;
-            if ($method !== null && $site === null) {
-                $meta->dispatch('Contact', $data['meta'] ?? null, $request, [], ['method' => $method]);
+            $metaEvent = self::META_EVENTS[$data['name']] ?? null;
+            if ($metaEvent !== null && $site === null) {
+                $meta->dispatch($metaEvent[0], $data['meta'] ?? null, $request, [], $metaEvent[1]);
             }
         } else {
             $referrer = $data['referrer'] ?? null;
