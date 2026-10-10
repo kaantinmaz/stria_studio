@@ -9,8 +9,6 @@ const CONSENT_KEYS = [
   "analytics_storage",
 ] as const;
 
-type ConsentState = "granted" | "denied";
-
 declare global {
   interface Window {
     dataLayer?: unknown[];
@@ -44,29 +42,21 @@ export function gtagPageview(path: string): void {
 }
 
 /**
- * Çerez onayı verildiğinde çağrılır. Onaydan önce her şey `denied`; bu hâlde
- * GA4 çerezsiz (modellenmiş) ping atar, kişiselleştirme yapılmaz.
- */
-export function gtagConsent(state: ConsentState): void {
-  if (!GA_ENABLED) return;
-  call("consent", "update", Object.fromEntries(CONSENT_KEYS.map((key) => [key, state])));
-}
-
-/**
  * <head>'in EN BAŞINA basılan başlangıç betiği: gtag stub'ı, Consent Mode v2
- * varsayılanları (hepsi denied) ve `js` komutu.
+ * varsayılanları ve `js` komutu. Varsayılanlar `granted` (owner kararı
+ * 2026-10-10: rızasız remarketing) — GA4 ve Google Ads remarketing çerezleri
+ * ilk sayfadan itibaren yazılır, çerez bildirimine bağlı değildir.
  *
  * Bilinçli olarak `next/script` kullanılmıyor: `beforeInteractive` bile Next'in
- * istemci kuyruğuna (`__next_s`) düşüyor. Onay varsayılanı hukuken taşıyıcı
- * olduğu için framework semantiğine bağlı bırakılmaz — düz inline script,
- * gtag.js'ten önce, garantili.
+ * istemci kuyruğuna (`__next_s`) düşüyor. Onay varsayılanı framework
+ * semantiğine bağlı bırakılmaz — düz inline script, gtag.js'ten önce, garantili.
  */
 export function gtagBootstrapTag(): string {
   if (!GA_ENABLED) return "";
 
-  const defaults = CONSENT_KEYS.map((key) => `${key}:'denied'`).join(",");
+  const defaults = CONSENT_KEYS.map((key) => `${key}:'granted'`).join(",");
 
-  return `<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{${defaults},wait_for_update:500});gtag('js',new Date());</script>`;
+  return `<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('consent','default',{${defaults}});gtag('js',new Date());</script>`;
 }
 
 /**

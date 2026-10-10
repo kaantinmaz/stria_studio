@@ -3,8 +3,8 @@ import { site } from "@/lib/site";
 // Meta (Facebook/Instagram) Pixel yardımcıları: yükleme/init, izleme, yol
 // kuralları ve Google Ads geliş bayrağı. `NEXT_PUBLIC_META_PIXEL_ID` boşsa
 // (varsayılan) pixel tamamen kapalı — hiçbir betik basılmaz, hiçbir fbq çağrısı
-// gitmez. Onay denetimi çağıran tarafta (MetaPixel bileşeni) yapılır; buradaki
-// izleme yardımcıları yalnızca pixel yüklüyse (fbq hazırsa) iş görür.
+// gitmez. Çerez onayı BEKLENMEZ (owner kararı 2026-10-10: rızasız remarketing);
+// tek istisna kamuflaj yolları (aşağıda).
 export const META_PIXEL_ENABLED = site.metaPixelId !== "";
 
 type FbqStub = ((...args: unknown[]) => void) & {
@@ -169,18 +169,13 @@ function cookie(name: string): string | null {
 }
 
 /**
- * Sunucuya giden `meta` bloğu. Onay yoksa ya da kamuflaj sayfasındaysa
- * `consent:false` gider ve sunucu Meta'ya hiçbir şey göndermez.
+ * Sunucuya giden `meta` bloğu. `consent` alanı sunucu için "gönderilebilir"
+ * bayrağıdır: pixel kapalıysa ya da kamuflaj sayfasındaysa `false` gider ve
+ * sunucu Meta'ya hiçbir şey göndermez. Çerez onayına bakılmaz.
  */
 export function metaContext(eventId: string): Record<string, unknown> {
   const path = window.location.pathname;
-  let consent = false;
-  try {
-    consent = localStorage.getItem("stria-cookie-consent") === "accepted";
-  } catch {
-    /* onay yok say */
-  }
-  if (!META_PIXEL_ENABLED || !consent || isKamuflaj(path)) return { consent: false };
+  if (!META_PIXEL_ENABLED || isKamuflaj(path)) return { consent: false };
   return {
     event_id: eventId,
     consent: true,

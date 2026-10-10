@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { gtagConsent } from "@/lib/gtag";
 
 const CONSENT_KEY = "stria-cookie-consent";
 
@@ -19,9 +18,7 @@ export function CookieConsent() {
       // Storage may be unavailable; the notice can still be dismissed for this view.
     }
 
-    // Daha önce onay vermiş ziyaretçi `denied` durumunda kalmasın.
-    if (hasAccepted) gtagConsent("granted");
-
+    // GA/Google Ads/Meta bu bildirime bağlı değil; yalnız Clarity bekler.
     const frame = window.requestAnimationFrame(() => {
       setAccepted(hasAccepted);
       setMounted(true);
@@ -36,8 +33,7 @@ export function CookieConsent() {
     } catch {
       // Dismiss even when storage is unavailable in strict privacy modes.
     }
-    gtagConsent("granted");
-    // Meta Pixel aynı anda devreye girsin (sayfa yenilemeden).
+    // Clarity aynı anda devreye girsin (sayfa yenilemeden).
     window.dispatchEvent(new Event("stria-consent-accepted"));
     setAccepted(true);
   };
