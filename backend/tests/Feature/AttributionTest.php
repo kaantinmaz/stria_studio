@@ -143,4 +143,33 @@ class AttributionTest extends TestCase
             ->call('createAppointment')
             ->assertHasErrors('refInput');
     }
+
+    public function test_call_time_suggests_nearby_unlinked_call_clicks_and_links_selected_one(): void
+    {
+        $click = fn (string $at, string $campaign) => $this->travelTo(\Carbon\CarbonImmutable::parse($at, 'Europe/Istanbul'),
+            fn () => $this->postJson('/api/track', ['type' => 'event', 'name' => 'call_click', 'path' => '/hizmetler/kirpik-lifting',
+                'attr' => ['gclid' => "G-$campaign", 'utm_campaign' => $campaign]])->assertNoContent());
+        $click('2026-10-11 14:30', 'yakin');
+        $click('2026-10-11 14:55', 'uzak');
+        $alreadyLinked = (new Touchpoint(['channel' => 'call']))->forceFill(['created_at' => '2026-10-11 14:33']);
+        $alreadyLinked->save();
+        Customer::create(['name' => 'Eski', 'touchpoint_id' => $alreadyLinked->id]);
+
+        $this->actingAs(\App\Models\User::factory()->create());
+        \Filament\Facades\Filament::setCurrentPanel(\Filament\Facades\Filament::getPanel('admin'));
+
+        $page = \Livewire\Livewire::test(\App\Filament\Pages\Calendar::class)
+            ->call('useNewCustomer')
+            ->set('newCustomerName', 'Arayan')
+            ->set('newCustomerPhone', '05001112233')
+            ->set('selectedDate', '2026-10-12')
+            ->set('callAt', '2026-10-11T14:35');
+
+        // ±10 dk içinde yalnız bağlanmamış "yakin" tıklaması; tek aday olduğu için seçili gelir.
+        $this->assertCount(1, $page->get('callCandidates'));
+        $page->set('heardFrom', 'google')->call('createAppointment')->assertHasNoErrors();
+
+        $c = Customer::where('name', 'Arayan')->sole();
+        $this->assertSame(['G-yakin', 'google'], [$c->touchpoint->gclid, $c->heard_from]);
+    }
 }

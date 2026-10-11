@@ -68,6 +68,10 @@ class CustomerForm
                         ->mapWithKeys(fn (Touchpoint $tp): array => [$tp->id => $tp->label()])
                         ->all())
                     ->getOptionLabelUsing(fn ($value): ?string => Touchpoint::query()->find($value)?->label()),
+                Select::make('heard_from')
+                    ->label('Bizi nereden buldunuz?')
+                    ->options(\App\Models\Customer::HEARD_FROM)
+                    ->nullable(),
                 Placeholder::make('completed_appointments')
                     ->label('Tamamlanan İşlem')
                     ->content(fn ($record): string => $record

@@ -766,6 +766,39 @@
                                     </div>
                                 @endif
                             </div>
+
+                            <div class="stria-field">
+                                <label class="stria-label" for="appointment-call-at">Telefonla aradıysa: arama saati</label>
+                                <input id="appointment-call-at" type="datetime-local" class="stria-input" wire:model.live="callAt">
+                                @error('callTouchpointId') <div class="stria-error">{{ $message }}</div> @enderror
+                            </div>
+
+                            <div class="stria-field">
+                                <label class="stria-label" for="appointment-heard-from">Bizi nereden buldunuz?</label>
+                                <select id="appointment-heard-from" class="stria-input" wire:model="heardFrom">
+                                    <option value="">Seçilmedi</option>
+                                    @foreach (\App\Models\Customer::HEARD_FROM as $key => $label)
+                                        <option value="{{ $key }}">{{ $label }}</option>
+                                    @endforeach
+                                </select>
+                                @error('heardFrom') <div class="stria-error">{{ $message }}</div> @enderror
+                            </div>
+
+                            @if (filled($callAt))
+                                <div class="stria-field is-full">
+                                    @if ($callCandidates === [])
+                                        <small class="stria-session-locked-note">Bu saatin ±10 dakikasında sitede "Ara" tıklaması yok — müşteri numarayı siteden görmeden aramış olabilir. "Bizi nereden buldunuz?" seçimi yine kaydedilir.</small>
+                                    @else
+                                        <span class="stria-label">Sitedeki "Ara" tıklamaları (saate en yakın önce)</span>
+                                        @foreach ($callCandidates as $tpId => $tpLabel)
+                                            <label class="stria-stat" style="display:flex;gap:8px;align-items:center;margin-top:6px;cursor:pointer">
+                                                <input type="radio" wire:model="callTouchpointId" value="{{ $tpId }}">
+                                                {{ $tpLabel }}
+                                            </label>
+                                        @endforeach
+                                    @endif
+                                </div>
+                            @endif
                         @endunless
 
                         @if ($isSessionChild)

@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Models\Customer;
+use Carbon\CarbonInterface;
 use App\Models\Touchpoint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -113,6 +114,26 @@ final class Attribution
             ->where('created_at', '>=', now()->subDays(self::WINDOW_DAYS))
             ->latest('id')
             ->first();
+    }
+
+    /**
+     * Sitedeki "Ara" tıklamaları, verilen arama saatinin ±$minutes dakikası içinde;
+     * henüz bir müşteriye bağlanmamış olanlar, saate en yakın önce.
+     *
+     * @return \Illuminate\Support\Collection<int, Touchpoint>
+     */
+    public static function callCandidates(CarbonInterface $calledAt, int $minutes = 10): \Illuminate\Support\Collection
+    {
+        // Sorgu sınırları DB'nin yazıldığı uygulama saat dilimine çevrilir.
+        $at = \Carbon\CarbonImmutable::instance($calledAt)->setTimezone(config('app.timezone'));
+
+        return Touchpoint::query()
+            ->where('channel', 'call')
+            ->whereBetween('created_at', [$at->subMinutes($minutes), $at->addMinutes($minutes)])
+            ->whereNotIn('id', Customer::query()->whereNotNull('touchpoint_id')->select('touchpoint_id'))
+            ->get()
+            ->sortBy(fn (Touchpoint $tp) => abs($tp->created_at->diffInSeconds($at)))
+            ->values();
     }
 
     /** Müşteri henüz bağlı değilse formdan gelen telefonla otomatik bağlar. */

@@ -12,10 +12,22 @@ class Customer extends Model
 {
     use HasFactory;
 
+    /** "Bizi nereden buldunuz?" seçenekleri (anahtar → panel etiketi). */
+    public const HEARD_FROM = [
+        'google' => 'Google arama / Haritalar',
+        'instagram' => 'Instagram',
+        'facebook' => 'Facebook',
+        'tavsiye' => 'Tavsiye / arkadaş',
+        'yoldan' => 'Yoldan geçerken',
+        'eski_musteri' => 'Eski müşteri',
+        'diger' => 'Diğer',
+    ];
+
     protected $fillable = [
         'name',
         'app_user_id',
         'touchpoint_id',
+        'heard_from',
         'phone',
         'email',
         'instagram',

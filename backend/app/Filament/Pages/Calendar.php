@@ -5,6 +5,7 @@ namespace App\Filament\Pages;
 use App\Models\Appointment;
 use App\Models\Customer;
 use App\Models\Service;
+use App\Models\Touchpoint;
 use App\Support\AppointmentSessions;
 use App\Support\Attribution;
 use App\Support\CustomerPairing;
@@ -60,6 +61,17 @@ class Calendar extends Page
 
     /** Seçili müşterinin bağlı olduğu reklam/geliş kaydının özeti. */
     public ?string $customerSource = null;
+
+    /** Telefonla arayan müşterinin arama saati (datetime-local); sitedeki "Ara" tıklamalarıyla eşleştirilir. */
+    public string $callAt = '';
+
+    /** @var array<int, string> arama saatine yakın, bağlanmamış "Ara" tıklamaları (id → özet) */
+    public array $callCandidates = [];
+
+    public ?int $callTouchpointId = null;
+
+    /** "Bizi nereden buldunuz?" (Customer::HEARD_FROM anahtarı) */
+    public string $heardFrom = '';
 
     public string $selectedDate = '';
 
@@ -199,6 +211,27 @@ class Calendar extends Page
         $this->showAppointmentModal = true;
     }
 
+    public function updatedCallAt(): void
+    {
+        $this->callCandidates = [];
+        $this->callTouchpointId = null;
+        try {
+            $at = CarbonImmutable::createFromFormat('!Y-m-d\TH:i', $this->callAt, 'Europe/Istanbul');
+        } catch (Throwable) {
+            return;
+        }
+        if ($at === false) {
+            return;
+        }
+        $this->callCandidates = Attribution::callCandidates($at)
+            ->mapWithKeys(fn (Touchpoint $tp) => [$tp->id => $tp->label()])
+            ->all();
+        // Tek aday varsa (stüdyo yoğunluğunda tipik durum) önceden seçili gelsin.
+        if (count($this->callCandidates) === 1) {
+            $this->callTouchpointId = array_key_first($this->callCandidates);
+        }
+    }
+
     public function closeAppointmentModal(): void
     {
         $this->showAppointmentModal = false;
@@ -283,7 +316,7 @@ class Calendar extends Page
 
         DB::transaction(function (): void {
             $customerId = $this->resolveCustomerId();
-            $this->linkRef($customerId);
+            $this->linkSource($customerId);
             Appointment::query()->create([
                 'customer_id' => $customerId,
                 'service_id' => $this->serviceId,
@@ -335,7 +368,7 @@ class Calendar extends Page
             }
 
             // Ref önce bağlansın: ödeme bu kayıtta işaretlendiyse Purchase kaynağı görsün.
-            $this->linkRef((int) ($payload['customer_id'] ?? $appointment->customer_id));
+            $this->linkSource((int) ($payload['customer_id'] ?? $appointment->customer_id));
             $appointment->update($payload);
 
             // Paket üyesiyse tarih değişince kök/numara yeniden kurulsun ve
@@ -697,20 +730,36 @@ class Calendar extends Page
                 'refInput' => 'Bu referans kodu son 90 günde bulunamadı. Mesajdaki "(Ref: XXXX)" kısmını kontrol edin.',
             ]);
         }
+        if ($this->callTouchpointId !== null && ! array_key_exists($this->callTouchpointId, $this->callCandidates)) {
+            throw ValidationException::withMessages(['callTouchpointId' => 'Seçilen arama tıklaması listede yok; arama saatini yeniden girin.']);
+        }
+        if (filled($this->heardFrom) && ! array_key_exists($this->heardFrom, Customer::HEARD_FROM)) {
+            throw ValidationException::withMessages(['heardFrom' => 'Geçersiz seçim.']);
+        }
 
         if (! $this->is_paid) {
             $this->payment_method = null;
         }
     }
 
-    /** Girilen ref kodunu müşteriye bağlar (müşterinin geliş kaynağı olur). */
-    private function linkRef(int $customerId): void
+    /**
+     * Müşterinin geliş kaynağını bağlar: WhatsApp ref kodu, yoksa seçilen "Ara"
+     * tıklaması; "Bizi nereden buldunuz?" cevabı ayrıca saklanır.
+     */
+    private function linkSource(int $customerId): void
     {
-        $tp = Attribution::findByRef($this->refInput);
-        if ($tp === null || $customerId === 0) {
+        if ($customerId === 0) {
             return;
         }
-        Customer::query()->whereKey($customerId)->update(['touchpoint_id' => $tp->id]);
+        $tp = Attribution::findByRef($this->refInput)
+            ?? ($this->callTouchpointId !== null ? Touchpoint::query()->find($this->callTouchpointId) : null);
+        $update = array_filter([
+            'touchpoint_id' => $tp?->id,
+            'heard_from' => filled($this->heardFrom) ? $this->heardFrom : null,
+        ]);
+        if ($update !== []) {
+            Customer::query()->whereKey($customerId)->update($update);
+        }
     }
 
     private function resolveCustomerId(): int
@@ -745,6 +794,10 @@ class Calendar extends Page
         $this->newCustomerPhone = '';
         $this->refInput = '';
         $this->customerSource = null;
+        $this->callAt = '';
+        $this->callCandidates = [];
+        $this->callTouchpointId = null;
+        $this->heardFrom = '';
         $this->appointmentTime = '10:00';
         $this->durationMin = 60;
         $this->price = null;
@@ -832,7 +885,9 @@ class Calendar extends Page
             return;
         }
 
-        $this->customerSource = Customer::query()->with('touchpoint')->find($customerId)?->touchpoint?->label();
+        $customer = Customer::query()->with('touchpoint')->find($customerId);
+        $this->customerSource = $customer?->touchpoint?->label();
+        $this->heardFrom = $customer?->heard_from ?? '';
 
         $this->customerDoneCount = Appointment::query()
             ->where('customer_id', $customerId)

@@ -30,7 +30,10 @@ class CustomersTable
                 TextColumn::make('source')
                     ->label('Kaynak')
                     ->badge()
-                    ->getStateUsing(fn ($record): ?string => $record->touchpoint?->source())
+                    // Ölçülen kaynak (reklam tıklaması) önce; yoksa müşterinin beyanı.
+                    ->getStateUsing(fn ($record): ?string => $record->touchpoint?->source()
+                        ?? (\App\Models\Customer::HEARD_FROM[$record->heard_from] ?? null))
+                    ->color(fn ($record): string => $record->touchpoint ? 'success' : 'gray')
                     ->placeholder('—'),
                 TextColumn::make('instagram')
                     ->label('Instagram')
