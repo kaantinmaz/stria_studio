@@ -6,6 +6,7 @@ use App\Models\Appointment;
 use App\Models\Customer;
 use App\Models\Service;
 use App\Support\AppointmentSessions;
+use App\Support\Attribution;
 use App\Support\CustomerPairing;
 use BackedEnum;
 use Carbon\CarbonImmutable;
@@ -15,6 +16,7 @@ use Filament\Pages\Page;
 use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Storage;
 use Livewire\WithFileUploads;
 use Throwable;
@@ -52,6 +54,12 @@ class Calendar extends Page
     public string $newCustomerName = '';
 
     public string $newCustomerPhone = '';
+
+    /** WhatsApp mesajındaki "(Ref: K7F3)" kodu ya da mesajın tamamı. */
+    public string $refInput = '';
+
+    /** Seçili müşterinin bağlı olduğu reklam/geliş kaydının özeti. */
+    public ?string $customerSource = null;
 
     public string $selectedDate = '';
 
@@ -274,8 +282,10 @@ class Calendar extends Page
         $this->validateAppointment();
 
         DB::transaction(function (): void {
+            $customerId = $this->resolveCustomerId();
+            $this->linkRef($customerId);
             Appointment::query()->create([
-                'customer_id' => $this->resolveCustomerId(),
+                'customer_id' => $customerId,
                 'service_id' => $this->serviceId,
                 'starts_at' => $this->appointmentStartsAt(),
                 'duration_min' => $this->durationMin,
@@ -324,6 +334,8 @@ class Calendar extends Page
                 $payload['payment_method'] = $this->payment_method;
             }
 
+            // Ref önce bağlansın: ödeme bu kayıtta işaretlendiyse Purchase kaynağı görsün.
+            $this->linkRef((int) ($payload['customer_id'] ?? $appointment->customer_id));
             $appointment->update($payload);
 
             // Paket üyesiyse tarih değişince kök/numara yeniden kurulsun ve
@@ -680,9 +692,25 @@ class Calendar extends Page
             'note' => 'not',
         ]);
 
+        if (filled($this->refInput) && Attribution::findByRef($this->refInput) === null) {
+            throw ValidationException::withMessages([
+                'refInput' => 'Bu referans kodu son 90 günde bulunamadı. Mesajdaki "(Ref: XXXX)" kısmını kontrol edin.',
+            ]);
+        }
+
         if (! $this->is_paid) {
             $this->payment_method = null;
         }
+    }
+
+    /** Girilen ref kodunu müşteriye bağlar (müşterinin geliş kaynağı olur). */
+    private function linkRef(int $customerId): void
+    {
+        $tp = Attribution::findByRef($this->refInput);
+        if ($tp === null || $customerId === 0) {
+            return;
+        }
+        Customer::query()->whereKey($customerId)->update(['touchpoint_id' => $tp->id]);
     }
 
     private function resolveCustomerId(): int
@@ -715,6 +743,8 @@ class Calendar extends Page
         $this->creatingCustomer = false;
         $this->newCustomerName = '';
         $this->newCustomerPhone = '';
+        $this->refInput = '';
+        $this->customerSource = null;
         $this->appointmentTime = '10:00';
         $this->durationMin = 60;
         $this->price = null;
@@ -797,9 +827,12 @@ class Calendar extends Page
         if (! $customerId) {
             $this->customerDoneCount = null;
             $this->appointmentSequence = null;
+            $this->customerSource = null;
 
             return;
         }
+
+        $this->customerSource = Customer::query()->with('touchpoint')->find($customerId)?->touchpoint?->label();
 
         $this->customerDoneCount = Appointment::query()
             ->where('customer_id', $customerId)

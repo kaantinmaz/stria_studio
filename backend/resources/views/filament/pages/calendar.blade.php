@@ -754,6 +754,20 @@
                             </div>
                         @endif
 
+                        @unless ($isSessionChild)
+                            <div class="stria-field is-full">
+                                <label class="stria-label" for="appointment-ref">Referans kodu (isteğe bağlı)</label>
+                                <input id="appointment-ref" type="text" class="stria-input" wire:model="refInput"
+                                       placeholder="WhatsApp mesajındaki (Ref: K7F3) — mesajın tamamını da yapıştırabilirsiniz">
+                                @error('refInput') <div class="stria-error">{{ $message }}</div> @enderror
+                                @if ($customerSource)
+                                    <div class="stria-customer-stats">
+                                        <span class="stria-stat">Kaynak: {{ $customerSource }}</span>
+                                    </div>
+                                @endif
+                            </div>
+                        @endunless
+
                         @if ($isSessionChild)
                             <div class="stria-field is-full">
                                 <label class="stria-label" for="appointment-service-locked">Hizmet</label>

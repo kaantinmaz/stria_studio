@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Models\Appointment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -58,7 +59,7 @@ final class MetaConversions
      *
      * @return array<string, mixed>|null
      */
-    public function payload(string $eventName, ?array $meta, ?string $ip, string $userAgent, array $person = [], array $custom = []): ?array
+    public function payload(string $eventName, ?array $meta, ?string $ip, string $userAgent, array $person = [], array $custom = [], string $actionSource = 'website'): ?array
     {
         if (empty(config('services.meta.capi_token')) || empty(config('services.meta.pixel_id'))) {
             return null;
@@ -85,8 +86,8 @@ final class MetaConversions
             'event_name' => $eventName,
             'event_time' => time(),
             'event_id' => $meta['event_id'],
-            'action_source' => 'website',
-            'event_source_url' => $url ?: null,
+            'action_source' => $actionSource,
+            'event_source_url' => $actionSource === 'website' ? ($url ?: null) : null,
             'user_data' => $userData,
             'custom_data' => $custom ?: null,
         ]);
@@ -95,6 +96,47 @@ final class MetaConversions
             'data' => [$event],
             'test_event_code' => config('services.meta.test_event_code') ?: null,
         ]);
+    }
+
+    /**
+     * Stüdyoda ödemesi alınan randevu → `Purchase` (action_source=physical_store).
+     * Eşleşme: müşterinin şifreli telefonu/e-postası + bağlıysa touchpoint'teki
+     * _fbc/_fbp, IP, tarayıcı. Kamuflaj hizmeti gönderilmez (sağlık politikası);
+     * Meta 7 günden eski olayları reddettiği için eski ödemeler atlanır.
+     */
+    public function purchase(Appointment $appointment): bool
+    {
+        if (! $appointment->is_paid || $appointment->meta_purchase_sent_at !== null || $appointment->isSessionChild()) {
+            return false;
+        }
+        $appointment->loadMissing(['customer.touchpoint', 'service']);
+        $customer = $appointment->customer;
+        if ($customer === null || str_starts_with((string) $appointment->service?->slug, 'kamuflaj')) {
+            return false;
+        }
+        if ($appointment->paid_at !== null && $appointment->paid_at->lt(now()->subDays(7))) {
+            return false;
+        }
+        $tp = $customer->touchpoint;
+        $value = $appointment->price !== null ? (float) $appointment->price : (float) config('services.meta.default_purchase_value', 2500);
+
+        $payload = $this->payload('Purchase', [
+            'event_id' => 'purchase-'.$appointment->id,
+            'consent' => true,
+            'fbp' => $tp?->fbp,
+            'fbc' => $tp?->fbc,
+            'url' => $tp?->landing_url,
+        ], $tp?->ip, (string) ($tp?->user_agent ?? ''),
+            ['email' => $customer->email, 'phone' => $customer->phone],
+            array_filter(['value' => $value, 'currency' => 'TRY', 'content_name' => $appointment->service?->slug]),
+            'physical_store');
+        if ($payload === null) {
+            return false;
+        }
+
+        \Illuminate\Support\defer(fn () => $this->post($payload));
+
+        return true;
     }
 
     /** @param  array<string, mixed>  $payload */

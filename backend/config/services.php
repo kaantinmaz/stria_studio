@@ -77,6 +77,16 @@ return [
         'capi_token' => env('META_CAPI_TOKEN'),
         // Olay Yöneticisi › Olayları test et kodu; yalnız doğrulama sırasında doldurulur.
         'test_event_code' => env('META_TEST_EVENT_CODE'),
+        // Randevuda fiyat girilmemişse Purchase değeri (ortalama sepet).
+        'default_purchase_value' => (float) env('META_DEFAULT_PURCHASE_VALUE', 2500),
+    ],
+
+    // Google Ads çevrimdışı dönüşüm beslemesi: Ads › Yüklemeler › Zaman planlaması
+    // (HTTPS kaynağı) her gün GET /api/conversions/google/{token}.csv çeker.
+    // Token yoksa uç nokta 404 döner.
+    'google_ads' => [
+        'offline_token' => env('GOOGLE_ADS_OFFLINE_TOKEN'),
+        'conversion_name' => env('GOOGLE_ADS_PURCHASE_CONVERSION', 'Stria Müşteri (ödeme)'),
     ],
 
 ];

@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\Customers\Schemas;
 
 use App\Models\AppUser;
+use App\Models\Touchpoint;
+use App\Support\Attribution;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
@@ -50,6 +52,22 @@ class CustomerForm
                     ->label('E-posta')
                     ->email()
                     ->maxLength(255),
+                Select::make('touchpoint_id')
+                    ->label('Geliş kaynağı (Ref kodu)')
+                    ->helperText('WhatsApp mesajındaki "(Ref: K7F3)" kodunu yazın. Formdan gelenler telefonla otomatik bağlanır.')
+                    ->searchable()
+                    ->nullable()
+                    ->getSearchResultsUsing(fn (string $search): array => Touchpoint::query()
+                        ->where('created_at', '>=', now()->subDays(Attribution::WINDOW_DAYS))
+                        ->where(fn ($q) => $q
+                            ->where('ref_code', Attribution::parseRef($search) ?? strtoupper(trim($search)))
+                            ->orWhere('phone', Touchpoint::normalizePhone($search) ?? '__none__'))
+                        ->latest('id')
+                        ->limit(20)
+                        ->get()
+                        ->mapWithKeys(fn (Touchpoint $tp): array => [$tp->id => $tp->label()])
+                        ->all())
+                    ->getOptionLabelUsing(fn ($value): ?string => Touchpoint::query()->find($value)?->label()),
                 Placeholder::make('completed_appointments')
                     ->label('Tamamlanan İşlem')
                     ->content(fn ($record): string => $record

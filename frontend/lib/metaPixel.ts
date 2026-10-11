@@ -53,8 +53,8 @@ export function serviceSlug(path: string): string | null {
 }
 
 // --- Google Ads geliş bayrağı ---
-// Kimlik taşımaz; yalnızca "bu ziyaretçi Google reklamından geldi" bilgisini
-// 30 gün tutar. Tıklama kimliği (gclid vb.) hiçbir yere gönderilmez.
+// Yalnızca "bu ziyaretçi Google reklamından geldi" bayrağını 30 gün tutar (Meta
+// retargeting olayı için). Tıklama kimliklerinin saklanması: lib/attribution.ts.
 const AD_SRC_KEY = "stria-ad-src";
 const AD_SRC_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 

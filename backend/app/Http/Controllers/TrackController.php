@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\Visit;
+use App\Support\Attribution;
 use App\Support\MetaConversions;
 use App\Support\TrafficSource;
 use Illuminate\Http\Request;
@@ -18,6 +19,9 @@ class TrackController extends Controller
         'maps_click' => ['FindLocation', []],
     ];
 
+    /** Geliş bilgisi (touchpoint) saklanan iletişim tıklamaları → kanal. */
+    private const CHANNELS = ['whatsapp_click' => 'whatsapp', 'call_click' => 'call'];
+
     public function store(Request $request, MetaConversions $meta)
     {
         $data = $request->validate([
@@ -29,7 +33,7 @@ class TrackController extends Controller
             'utm_source' => ['nullable', 'string', 'max:255'],
             'utm_medium' => ['nullable', 'string', 'max:255'],
             'utm_campaign' => ['nullable', 'string', 'max:255'],
-        ] + MetaConversions::rules());
+        ] + MetaConversions::rules() + Attribution::rules());
 
         // Microsites send their slug; the main site sends none. Keep only known
         // slugs so a bad value can't pollute the per-site dashboard. NULL = main.
@@ -56,6 +60,10 @@ class TrackController extends Controller
             $metaEvent = self::META_EVENTS[$data['name']] ?? null;
             if ($metaEvent !== null && $site === null) {
                 $meta->dispatch($metaEvent[0], $data['meta'] ?? null, $request, [], $metaEvent[1]);
+            }
+            $channel = self::CHANNELS[$data['name']] ?? null;
+            if ($channel !== null) {
+                Attribution::record($channel, ['site' => $site] + $data, $request);
             }
         } else {
             $referrer = $data['referrer'] ?? null;

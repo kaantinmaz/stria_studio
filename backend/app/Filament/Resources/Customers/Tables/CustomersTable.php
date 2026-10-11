@@ -18,6 +18,7 @@ class CustomersTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query->with('touchpoint'))
             ->columns([
                 TextColumn::make('name')
                     ->label('Ad Soyad')
@@ -25,6 +26,11 @@ class CustomersTable
                     ->sortable(),
                 TextColumn::make('phone')
                     ->label('Telefon')
+                    ->placeholder('—'),
+                TextColumn::make('source')
+                    ->label('Kaynak')
+                    ->badge()
+                    ->getStateUsing(fn ($record): ?string => $record->touchpoint?->source())
                     ->placeholder('—'),
                 TextColumn::make('instagram')
                     ->label('Instagram')

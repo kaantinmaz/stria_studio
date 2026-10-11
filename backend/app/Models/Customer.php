@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Support\Attribution;
 
 class Customer extends Model
 {
@@ -14,6 +15,7 @@ class Customer extends Model
     protected $fillable = [
         'name',
         'app_user_id',
+        'touchpoint_id',
         'phone',
         'email',
         'instagram',
@@ -26,6 +28,17 @@ class Customer extends Model
         return [
             'photos' => 'array',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        // Formdan aynı telefonla gelmiş bir reklam tıklaması varsa otomatik bağla.
+        static::saving(fn (Customer $customer) => Attribution::autoLink($customer));
+    }
+
+    public function touchpoint(): BelongsTo
+    {
+        return $this->belongsTo(Touchpoint::class);
     }
 
     public function appointments(): HasMany

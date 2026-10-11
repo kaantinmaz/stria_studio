@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Lead;
+use App\Support\Attribution;
 use App\Support\MetaConversions;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -19,12 +20,14 @@ class ContactController extends Controller
             'preferred_date' => ['nullable', 'date'],
             'message' => ['nullable', 'string', 'max:2000'],
             'locale' => ['nullable', 'string', 'in:tr,en'],
-        ] + MetaConversions::rules());
+        ] + MetaConversions::rules() + Attribution::rules());
 
         $metaBlock = $data['meta'] ?? null;
-        unset($data['meta']);
+        $tracking = array_intersect_key($data, array_flip(['meta', 'attr', 'ref']));
+        unset($data['meta'], $data['attr'], $data['ref']);
 
         $lead = Lead::create($data + ['locale' => $data['locale'] ?? 'tr']);
+        Attribution::record('form', $tracking + ['path' => $request->input('path')], $request, $data['phone']);
 
         $meta->dispatch('Lead', $metaBlock, $request,
             ['email' => $data['email'] ?? null, 'phone' => $data['phone']],

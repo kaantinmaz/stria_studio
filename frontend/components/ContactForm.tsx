@@ -6,6 +6,7 @@ import { site } from "@/lib/site";
 import { useServices } from "@/components/ServicesProvider";
 import { pickLang } from "@/lib/content";
 import { metaContext, newEventId, trackLead } from "@/lib/metaPixel";
+import { getAttribution } from "@/lib/attribution";
 
 type Status = "idle" | "sending" | "ok" | "err";
 
@@ -39,6 +40,8 @@ export function ContactForm() {
           message: fd.get("message") || null,
           locale: lang,
           meta: metaContext(eventId),
+          attr: getAttribution(),
+          path: window.location.pathname,
         }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);

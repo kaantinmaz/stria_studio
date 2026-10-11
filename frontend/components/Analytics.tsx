@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { gtagEvent, gtagPageview } from "@/lib/gtag";
 import { metaContext, newEventId, trackContact, trackFindLocation } from "@/lib/metaPixel";
+import { captureAttribution, getAttribution, newRefCode, withRef } from "@/lib/attribution";
 import { site } from "@/lib/site";
 
 function post(body: Record<string, unknown>) {
@@ -36,6 +37,8 @@ export function Analytics() {
       utm_medium: params.get("utm_medium"),
       utm_campaign: params.get("utm_campaign"),
     });
+    // Reklam gelişi (gclid/fbclid/UTM) 90 gün saklanır; iletişim tıklamasında backend'e gider.
+    captureAttribution(window.location.href, document.referrer);
     // Aynı olay Google'a da gider; ikinci bir izleme mimarisi kurulmuyor.
     gtagPageview(pathname);
   }, [pathname]);
@@ -50,11 +53,16 @@ export function Analytics() {
       const path = window.location.pathname;
       const eventId = newEventId();
       if (href.startsWith("tel:")) {
-        post({ type: "event", name: "call_click", path, meta: metaContext(eventId) });
+        post({ type: "event", name: "call_click", path, meta: metaContext(eventId), attr: getAttribution() });
         gtagEvent("call_click", { page_path: path });
         trackContact("phone", path, eventId);
       } else if (href.includes("wa.me") || href.includes("whatsapp")) {
-        post({ type: "event", name: "whatsapp_click", path, meta: metaContext(eventId) });
+        // Mesaja kısa kod eklenir; panelde müşteriye girilince ödeme doğru reklama yazılır.
+        // Taban bağlantı saklanır ki tekrar tıklamada kodlar üst üste eklenmesin.
+        const ref = newRefCode();
+        a.dataset.waBase ??= href;
+        a.setAttribute("href", withRef(a.dataset.waBase, ref));
+        post({ type: "event", name: "whatsapp_click", path, ref, meta: metaContext(eventId), attr: getAttribution() });
         gtagEvent("whatsapp_click", { page_path: path });
         trackContact("whatsapp", path, eventId);
       } else if (MAPS_HREF.test(href)) {
