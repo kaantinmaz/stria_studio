@@ -21,6 +21,7 @@ use App\Http\Controllers\GoogleOfflineConversionsController;
 use App\Http\Controllers\InstagramController;
 use App\Http\Controllers\LinkController;
 use App\Http\Controllers\MicrositeController;
+use App\Http\Controllers\NetgsmWebhookController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\StudioFactsController;
@@ -33,6 +34,7 @@ Route::post('/contact', [ContactController::class, 'store']);
 Route::post('/chat', [ChatController::class, 'store'])->middleware('throttle:20,1');
 Route::get('/conversions/google/{token}.csv', GoogleOfflineConversionsController::class)
     ->middleware('throttle:30,1');
+Route::post('/netgsm/{token}', NetgsmWebhookController::class)->middleware('throttle:300,1');
 
 Route::get('/posts', [BlogController::class, 'index']);
 Route::get('/posts/{slug}', [BlogController::class, 'show']);

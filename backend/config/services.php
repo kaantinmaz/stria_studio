@@ -89,4 +89,12 @@ return [
         'conversion_name' => env('GOOGLE_ADS_PURCHASE_CONVERSION', 'Stria Müşteri (ödeme)'),
     ],
 
+    // Netgsm Netsantral: webhook (santral dinleme) /api/netgsm/{webhook_token};
+    // rapor çekimi API yetkili alt kullanıcıyla. Boşsa ikisi de kapalı.
+    'netgsm' => [
+        'usercode' => env('NETGSM_USERCODE'),
+        'password' => env('NETGSM_PASSWORD'),
+        'webhook_token' => env('NETGSM_WEBHOOK_TOKEN'),
+    ],
+
 ];

@@ -18,6 +18,13 @@ Schedule::command('chat:summarize')
     ->everyThirtyMinutes()
     ->timezone('Europe/Istanbul');
 
+// Netsantral çağrı kayıtları: webhook'un kaçırdıklarını tamamlar (kayıtlar unique_id ile tekilleşir).
+Schedule::command('netgsm:sync-calls')
+    ->everyThirtyMinutes()
+    ->timezone('Europe/Istanbul')
+    ->withoutOverlapping(10)
+    ->appendOutputTo(storage_path('logs/netgsm-sync.log'));
+
 // Instagram gönderilerini saatlik senkronla. Token süresi dolduğunda komut
 // hata verir; çıktı log dosyasına yazılır ki sessiz kalmasın (site bu arada
 // indirilmiş son gönderileri göstermeye devam eder).
