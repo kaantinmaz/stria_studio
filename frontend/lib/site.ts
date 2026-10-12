@@ -9,9 +9,9 @@ export const site = {
 
   // GA4 ölçüm kimliği. Sabit bir kamusal değer; sunucuda build ortam değişkeni
   // unutulursa etiket sessizce kaybolmasın diye varsayılan burada duruyor.
-  // Google Ads dönüşüm kimliği (AW-…) hesap açılınca `adsId`'ye eklenir.
+  // Google Ads etiketi (AW-…): remarketing kitleleri bununla dolar. Aynı gerekçe.
   gaId: process.env.NEXT_PUBLIC_GA_ID ?? "G-VHC49MXP5N",
-  adsId: process.env.NEXT_PUBLIC_ADS_ID ?? "",
+  adsId: process.env.NEXT_PUBLIC_ADS_ID ?? "AW-18327215850",
 
   // Meta (Facebook/Instagram) Pixel kimliği — "Stria Studio Web" veri seti.
   // gaId ile aynı gerekçe: kamusal değer, build env unutulursa sessizce düşmesin.
