@@ -107,8 +107,10 @@ class StudioController extends Controller
     {
         $validated = $request->validate($this->appointmentRules(false));
         $startsAt = $this->startsAt($validated['starts_at']);
+        $total = (int) ($validated['session_total'] ?? 1);
+        $interval = (int) ($validated['interval_days'] ?? 28);
 
-        return DB::transaction(function () use ($validated, $startsAt): JsonResponse {
+        return DB::transaction(function () use ($validated, $startsAt, $total, $interval): JsonResponse {
             // Every desktop writer locks the same main settings row before its
             // overlap query. This serializes desktop creates on MySQL.
             $setting = Setting::query()->whereNull('site')->lockForUpdate()->first();
@@ -126,10 +128,137 @@ class StudioController extends Controller
                 'note' => $this->nullableString($validated['note'] ?? null),
             ]);
 
+            if ($total >= 2) {
+                AppointmentSessions::split($appointment, $total, $interval);
+
+                if ($validated['status'] === 'confirmed') {
+                    // The created appointment is the root (earliest session); the
+                    // children split() added must also fit hours and not overlap.
+                    foreach (AppointmentSessions::all($appointment) as $session) {
+                        $this->validateSession($session, $setting);
+                    }
+                }
+            }
+
+            $root = AppointmentSessions::root($appointment->refresh());
+
             return response()->json([
-                'appointment' => DesktopApi::appointment($appointment->refresh()),
+                'appointment' => DesktopApi::appointment($root),
+                'appointments' => AppointmentSessions::all($root)
+                    ->map(fn (Appointment $session): array => DesktopApi::appointment($session))
+                    ->all(),
             ], 201);
         });
+    }
+
+    public function addSession(Request $request, int $id): JsonResponse
+    {
+        $validated = $request->validate([
+            'revision' => ['required', 'string', 'size:64'],
+            'interval_days' => ['sometimes', 'integer', 'between:1,365'],
+        ]);
+        $interval = (int) ($validated['interval_days'] ?? 28);
+
+        return DB::transaction(function () use ($validated, $id, $interval): JsonResponse {
+            // Same lock order as creates/updates: studio lock, then row lock.
+            $setting = Setting::query()->whereNull('site')->lockForUpdate()->first();
+            $appointment = Appointment::query()->lockForUpdate()->findOrFail($id);
+
+            if (! hash_equals(DesktopApi::revision($appointment), $validated['revision'])) {
+                return response()->json([
+                    'message' => 'Randevu başka bir yerde güncellendi.',
+                    'appointment' => DesktopApi::appointment($appointment),
+                ], 409);
+            }
+
+            $child = AppointmentSessions::add($appointment, $interval);
+
+            if ($child->status === 'confirmed') {
+                $this->validateSession($child, $setting);
+            }
+
+            $root = AppointmentSessions::root($appointment->refresh());
+
+            return response()->json([
+                'appointment' => DesktopApi::appointment($child->refresh()),
+                'appointments' => AppointmentSessions::all($root)
+                    ->map(fn (Appointment $session): array => DesktopApi::appointment($session))
+                    ->all(),
+            ], 201);
+        });
+    }
+
+    public function destroyAppointment(Request $request, int $id): JsonResponse
+    {
+        $validated = $request->validate([
+            'revision' => ['required', 'string', 'size:64'],
+        ]);
+
+        return DB::transaction(function () use ($validated, $id): JsonResponse {
+            $setting = Setting::query()->whereNull('site')->lockForUpdate()->first();
+            $appointment = Appointment::query()->lockForUpdate()->findOrFail($id);
+
+            if (! hash_equals(DesktopApi::revision($appointment), $validated['revision'])) {
+                return response()->json([
+                    'message' => 'Randevu başka bir yerde güncellendi.',
+                    'appointment' => DesktopApi::appointment($appointment),
+                ], 409);
+            }
+
+            $deletedId = $appointment->id;
+            // Capture surviving member ids before removal; remove() renumbers and
+            // may move the package root, so re-query by id afterwards.
+            $remainingIds = AppointmentSessions::all($appointment)
+                ->reject(fn (Appointment $member): bool => $member->is($appointment))
+                ->pluck('id')
+                ->all();
+
+            // remove() plain-deletes a single appointment and reorganizes packages.
+            AppointmentSessions::remove($appointment);
+
+            $remaining = Appointment::query()
+                ->whereIn('id', $remainingIds)
+                ->orderBy('starts_at')
+                ->get();
+
+            return response()->json([
+                'deleted_id' => $deletedId,
+                'appointments' => $remaining
+                    ->map(fn (Appointment $session): array => DesktopApi::appointment($session))
+                    ->all(),
+            ]);
+        });
+    }
+
+    /**
+     * Validate one session against hours/overlap and, on failure, rethrow a 422
+     * naming the session: "N. seans (d.m.Y H:i): <original message>".
+     */
+    private function validateSession(Appointment $session, ?Setting $setting): void
+    {
+        if ($session->status !== 'confirmed') {
+            return;
+        }
+
+        try {
+            $this->schedule->validate(
+                $session->starts_at->toImmutable(),
+                $session->duration_min,
+                $session,
+                $setting,
+            );
+        } catch (ValidationException $exception) {
+            $messages = $exception->errors()['starts_at'] ?? ['Randevu doğrulanamadı.'];
+
+            throw ValidationException::withMessages([
+                'starts_at' => [sprintf(
+                    '%d. seans (%s): %s',
+                    $session->session_no ?? 1,
+                    $session->starts_at->format('d.m.Y H:i'),
+                    $messages[0],
+                )],
+            ]);
+        }
     }
 
     public function updateAppointment(Request $request, int $id): JsonResponse
@@ -261,6 +390,8 @@ class StudioController extends Controller
             'duration_min' => [$presence, 'integer', 'between:5,1440'],
             'status' => [$presence, 'string', Rule::in(self::STATUSES)],
             'note' => ['sometimes', 'nullable', 'string', 'max:10000'],
+            'session_total' => $patch ? ['prohibited'] : ['sometimes', 'integer', 'between:1,12'],
+            'interval_days' => $patch ? ['prohibited'] : ['sometimes', 'integer', 'between:1,365'],
             'revision' => $patch ? ['required', 'string', 'size:64'] : ['prohibited'],
         ];
     }

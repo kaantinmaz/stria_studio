@@ -173,12 +173,29 @@ ve `note` `null` olabilir. Süre 5–1440 dakika aralığındadır. Create iste�
 `revision` yasaktır. Başarılı cevap `201`:
 
 ```json
-{ "appointment": { "id": 2, "customer_id": 1, "service_id": 1, "starts_at": "...", "duration_min": 60, "status": "confirmed", "note": null, "updated_at": "...", "revision": "...", "parent_id": null, "session_no": null, "session_total": null } }
+{ "appointment": { "id": 2, "customer_id": 1, "service_id": 1, "starts_at": "...", "duration_min": 60, "status": "confirmed", "note": null, "updated_at": "...", "revision": "...", "parent_id": null, "session_no": null, "session_total": null }, "appointments": ["paketin tüm seansları, starts_at ARTAN"] }
 ```
 
 `confirmed` randevu ana sitenin çalışma saatleri içinde olmalı ve başka bir
 `confirmed` randevuyla çakışmamalıdır. Bu iki kural ihlalinde `422` döner.
 Diğer durumlar bu takvim kontrolüne tabi değildir.
+
+Opsiyonel olarak seans paketi oluşturulabilir:
+
+- `session_total` 1–12 arası tam sayı (1 veya gönderilmezse tek randevu,
+  mevcut davranış).
+- `interval_days` 1–365 arası tam sayı, varsayılan 28; yalnız `session_total >= 2`
+  iken anlamlıdır. Her seans bir öncekinden `interval_days` gün sonra, aynı
+  saat/süre/müşteri/hizmetle oluşturulur.
+
+`session_total >= 2` iken oluşturulan randevu 1. seans (kök) olur ve kalan
+seanslar aynı işlemle eklenir. Durum `confirmed` ise üretilen her seans çalışma
+saati ve çakışma denetiminden geçer; herhangi biri başarısız olursa işlem bütün
+olarak geri alınır ve `422` seansı adlandıran bir mesaj döndürür:
+`errors.starts_at = ["3. seans (12.12.2026 10:00): ..."]`.
+
+Cevabın `appointments` alanı paketin tüm seanslarını `starts_at` ARTAN sırayla
+içerir; tek randevuda yalnız o randevuyu içerir.
 
 ### `PATCH /appointments/{id}`
 
@@ -200,6 +217,42 @@ Bir seans paketinin çocuk randevusunda `customer_id` ve `service_id` paketin
 kökünden alınır; çocuk bu alanlarla başka müşteriye veya hizmete taşınamaz.
 Paket üyesi düzenlenince mevcut `AppointmentSessions` kurallarıyla paket yeniden
 senkronize edilir.
+
+### `POST /appointments/{id}/sessions`
+
+Pakete bir seans ekler (tek randevuysa 2 seanslı pakete dönüştürür):
+
+```json
+{ "revision": "revision from the last response", "interval_days": 28 }
+```
+
+`revision` zorunludur; `interval_days` 1–365 arası tam sayı olup gönderilmezse
+28 kullanılır. Yeni seans son seanstan `interval_days` gün sonra, aynı
+saat/süre/müşteri/hizmetle oluşturulur. Kayıt arada değiştiyse `409` güncel
+nesneyi döndürür (yukarıdaki biçim). Yeni seans `confirmed` ise çalışma saati ve
+çakışma denetimine tabidir; başarısızlıkta işlem geri alınır ve seansı adlandıran
+`422` döner. Başarılı cevap `201`:
+
+```json
+{ "appointment": { "id": 6, "parent_id": 2, "session_no": 2, "session_total": 2, "...": "..." }, "appointments": ["paketin tüm seansları, starts_at ARTAN"] }
+```
+
+### `DELETE /appointments/{id}`
+
+Randevuyu siler; paket üyesiyse seansı paketten çıkarır:
+
+```json
+{ "revision": "revision from the last response" }
+```
+
+`revision` zorunludur. Kayıt arada değiştiyse `409` güncel nesneyi döndürür.
+Paket üyesi silinince para alanları (`price`/`is_paid`/`payment_method`) gerekirse
+yeni köke taşınır, kalan seanslar yeniden numaralandırılır ve geriye tek seans
+kalınca paket çözülür; tek başına randevu doğrudan silinir. Başarılı cevap `200`:
+
+```json
+{ "deleted_id": 5, "appointments": ["kalan paket seansları, starts_at ARTAN; boş olabilir"] }
+```
 
 ## Çalışma saatleri
 
@@ -254,11 +307,15 @@ kullanıcının değişikliğini yeniden uygulatmalıdır. Saatlerde aynı göre
   cevapta görünmez ve korunur.
 - Randevu yazma uçları yalnız sözleşmede görünen alanları değiştirir. `price`,
   `is_paid`, `payment_method`, `photos`, `campaign_id` ve `app_user_id` korunur.
-- `parent_id`, `session_no`, `session_total` salt okunurdur. Masaüstü API seans
-  paketi oluşturmaz, bölmez veya silmez; var olan paket kuralını koruyarak
-  yeniden senkronize eder.
-- Bu sürümde müşteri veya randevu silme, fotoğraf yönetimi, ödeme yönetimi,
-  kampanya bağlama ve mobil hesap eşleme ucu yoktur.
+- `parent_id`, `session_no`, `session_total` istemci tarafından yazılamayan,
+  sunucunun ürettiği salt okunur alanlardır. Masaüstü API bunları doğrudan
+  değiştiremez; seans paketleri yalnız `POST /appointments` (`session_total >= 2`),
+  `POST /appointments/{id}/sessions` ve `DELETE /appointments/{id}` uçlarıyla
+  oluşturulur, büyütülür, küçültülür ve `AppointmentSessions` kurallarıyla
+  numaralandırılarak senkronize edilir.
+- `DELETE /appointments/{id}` randevu veya seans siler; kök seans silinince para
+  alanları yeni köke taşınır. Fotoğraf yönetimi, ödeme yönetimi, kampanya bağlama
+  ve mobil hesap eşleme ucu bu sürümde yoktur.
 - Masaüstü istemcisi yalnız bu API ile yapılan değişiklikleri yerel uygulama
   durumuna yansıtır. Filament'te yapılan değişiklikler yeni `/state` çağrısında
   alınır; canlı push/soket senkronizasyonu yoktur.
