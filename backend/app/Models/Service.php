@@ -87,4 +87,14 @@ class Service extends Model
     {
         return $this->hasMany(ServiceReview::class);
     }
+
+    /** @return array<int, string> Alt uygulama adları (subservices_tr[*].name), tanım sırasıyla. */
+    public function subserviceNames(): array
+    {
+        return collect($this->subservices_tr ?? [])
+            ->pluck('name')
+            ->filter(fn ($name): bool => is_string($name) && $name !== '')
+            ->values()
+            ->all();
+    }
 }

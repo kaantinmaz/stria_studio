@@ -25,6 +25,7 @@ class Appointment extends Model
         'note',
         'status',
         'photos',
+        'subservices',
         'parent_id',
         'session_no',
         'session_total',
@@ -39,6 +40,7 @@ class Appointment extends Model
             'paid_at' => 'datetime',
             'meta_purchase_sent_at' => 'datetime',
             'photos' => 'array',
+            'subservices' => 'array',
         ];
     }
 
@@ -90,6 +92,15 @@ class Appointment extends Model
     public function sessions(): HasMany
     {
         return $this->hasMany(self::class, 'parent_id')->orderBy('starts_at');
+    }
+
+    /** @return array<int, string> Fotoğraf URL'leri; storage yolları mutlak URL'ye çevrilir, http veya / ile başlayanlar olduğu gibi kalır. */
+    public function photoUrls(): array
+    {
+        return collect($this->photos ?? [])
+            ->map(fn ($p) => str_starts_with($p, 'http') || str_starts_with($p, '/') ? $p : asset('storage/'.$p))
+            ->values()
+            ->all();
     }
 
     public function isSessionChild(): bool

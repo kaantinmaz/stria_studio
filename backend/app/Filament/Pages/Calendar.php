@@ -17,6 +17,7 @@ use Filament\Pages\Page;
 use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Storage;
 use Livewire\WithFileUploads;
@@ -51,6 +52,9 @@ class Calendar extends Page
     public ?int $customerId = null;
 
     public ?int $serviceId = null;
+
+    /** @var array<int, string> seçili alt uygulama adları (services.subservices_tr[*].name) */
+    public array $subservices = [];
 
     public string $newCustomerName = '';
 
@@ -172,6 +176,8 @@ class Calendar extends Page
         if ($duration !== null) {
             $this->durationMin = (int) $duration;
         }
+
+        $this->subservices = [];
     }
 
     public function openEditModal(int $appointmentId): void
@@ -183,6 +189,7 @@ class Calendar extends Page
         $this->appointmentStatus = $appointment->status;
         $this->customerId = $appointment->customer_id;
         $this->serviceId = $appointment->service_id;
+        $this->subservices = array_values($appointment->subservices ?? []);
         $this->selectedDate = $appointment->starts_at->format('Y-m-d');
         $this->appointmentTime = $appointment->starts_at->format('H:i');
         $this->durationMin = $appointment->duration_min;
@@ -320,6 +327,7 @@ class Calendar extends Page
             Appointment::query()->create([
                 'customer_id' => $customerId,
                 'service_id' => $this->serviceId,
+                'subservices' => $this->subservices ?: null,
                 'starts_at' => $this->appointmentStartsAt(),
                 'duration_min' => $this->durationMin,
                 'price' => filled($this->price) ? $this->price : null,
@@ -359,9 +367,11 @@ class Calendar extends Page
                 $root = AppointmentSessions::root($appointment);
                 $payload['customer_id'] = $root->customer_id;
                 $payload['service_id'] = $root->service_id;
+                $payload['subservices'] = $root->subservices;
             } else {
                 $payload['customer_id'] = $this->resolveCustomerId();
                 $payload['service_id'] = $this->serviceId;
+                $payload['subservices'] = $this->subservices ?: null;
                 $payload['price'] = filled($this->price) ? $this->price : null;
                 $payload['is_paid'] = $this->is_paid;
                 $payload['payment_method'] = $this->payment_method;
@@ -623,6 +633,7 @@ class Calendar extends Page
                 ->orderBy('sort_order')
                 ->pluck('name_tr', 'id')
                 ->all(),
+            'subserviceOptions' => $this->subserviceOptions(),
             'monthName' => $this->turkishMonthName($month->month),
             'monthYear' => $month->year,
         ];
@@ -696,6 +707,8 @@ class Calendar extends Page
             'appointmentTime' => ['required', 'date_format:H:i'],
             'durationMin' => ['required', 'integer', 'min:5', 'max:1440'],
             'serviceId' => ['nullable', 'integer', 'exists:services,id'],
+            'subservices' => ['array'],
+            'subservices.*' => [Rule::in($this->subserviceOptions())],
             'price' => ['nullable', 'numeric', 'min:0'],
             'is_paid' => ['boolean'],
             'payment_method' => ['nullable', 'in:nakit,kart,havale'],
@@ -716,6 +729,7 @@ class Calendar extends Page
             'appointmentTime' => 'saat',
             'durationMin' => 'süre',
             'serviceId' => 'hizmet',
+            'subservices.*' => 'alt uygulama',
             'customerId' => 'müşteri',
             'newCustomerName' => 'yeni müşteri adı',
             'newCustomerPhone' => 'telefon',
@@ -762,6 +776,14 @@ class Calendar extends Page
         }
     }
 
+    /** @return array<int, string> seçili hizmetin alt uygulama adları */
+    private function subserviceOptions(): array
+    {
+        return $this->serviceId
+            ? (Service::query()->find($this->serviceId)?->subserviceNames() ?? [])
+            : [];
+    }
+
     private function resolveCustomerId(): int
     {
         if (! $this->creatingCustomer) {
@@ -789,6 +811,7 @@ class Calendar extends Page
         $this->appointmentStatus = 'confirmed';
         $this->customerId = null;
         $this->serviceId = null;
+        $this->subservices = [];
         $this->creatingCustomer = false;
         $this->newCustomerName = '';
         $this->newCustomerPhone = '';

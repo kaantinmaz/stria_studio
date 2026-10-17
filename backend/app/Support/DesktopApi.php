@@ -47,6 +47,8 @@ final class DesktopApi
             'status' => $appointment->status,
             'note' => $appointment->note,
             'price' => $appointment->price === null ? null : (float) $appointment->price,
+            'subservices' => array_values($appointment->subservices ?? []),
+            'photos' => $appointment->photoUrls(),
             'updated_at' => $appointment->updated_at?->toIso8601String(),
             'revision' => self::revision($appointment),
             'parent_id' => $appointment->parent_id,

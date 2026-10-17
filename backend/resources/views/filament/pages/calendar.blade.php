@@ -822,6 +822,22 @@
                             </div>
                         @endif
 
+                        @if ($subserviceOptions !== [])
+                            <div class="stria-field is-full">
+                                <span class="stria-label">Alt uygulamalar</span>
+                                @foreach ($subserviceOptions as $subserviceName)
+                                    <label class="stria-input stria-checkbox" wire:key="subservice-{{ $loop->index }}">
+                                        <input type="checkbox" wire:model="subservices" value="{{ $subserviceName }}" @disabled($isSessionChild)>
+                                        <span>{{ $subserviceName }}</span>
+                                    </label>
+                                @endforeach
+                                @if ($isSessionChild)
+                                    <small class="stria-session-locked-note">Paketin 1. seansında yönetilir</small>
+                                @endif
+                                @error('subservices.*') <div class="stria-error">{{ $message }}</div> @enderror
+                            </div>
+                        @endif
+
                         <div class="stria-field">
                             <label class="stria-label" for="appointment-date">Tarih</label>
                             <input id="appointment-date" type="date" class="stria-input" wire:model="selectedDate" required>

@@ -15,8 +15,8 @@ use InvalidArgumentException;
  *     parent_id ile gösterir (tek seviye, torun yok).
  *  2. Para yalnızca kökte. price/is_paid/payment_method kökte tutulur;
  *     çocuk seanslarda price = null, is_paid = false, payment_method = null.
- *  3. Müşteri ve hizmet paket boyunca aynıdır. customer_id ve service_id
- *     kökten miras alınır; kökte değişirse tüm seanslara yayılır.
+ *  3. Müşteri ve hizmet paket boyunca aynıdır. customer_id, service_id ve
+ *     subservices kökten miras alınır; kökte değişirse tüm seanslara yayılır.
  *  4. session_no = starts_at sırasına göre 1..N, session_total = N.
  *     Tek başına randevuda ikisi de null.
  *  5. Her seansın kendi starts_at, duration_min, status, note, photos değeri vardır.
@@ -215,7 +215,7 @@ final class AppointmentSessions
                     ]);
                 } else {
                     // Değişmez #2: çocuklarda para alanları sıfırlanır.
-                    // Değişmez #3: customer_id/service_id kökten yayılır.
+                    // Değişmez #3: customer_id/service_id/subservices kökten yayılır.
                     $member->fill([
                         'parent_id' => $newRoot->id,
                         'session_no' => $no,
@@ -225,6 +225,7 @@ final class AppointmentSessions
                         'payment_method' => null,
                         'customer_id' => $newRoot->customer_id,
                         'service_id' => $newRoot->service_id,
+                        'subservices' => $newRoot->subservices,
                     ]);
                 }
 
@@ -242,6 +243,7 @@ final class AppointmentSessions
             'customer_id' => $source->customer_id,
             'app_user_id' => $source->app_user_id,
             'service_id' => $source->service_id,
+            'subservices' => $source->subservices,
             'starts_at' => $startsAt,
             'duration_min' => $source->duration_min,
             'price' => null,

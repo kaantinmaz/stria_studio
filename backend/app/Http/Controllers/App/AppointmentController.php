@@ -37,7 +37,7 @@ class AppointmentController extends Controller
                 'starts_at' => $appointment->starts_at->toIso8601String(),
                 'duration_min' => $appointment->duration_min,
                 'status' => $appointment->status,
-                'photos' => collect($appointment->photos ?? [])->map(fn ($p) => str_starts_with($p, 'http') || str_starts_with($p, '/') ? $p : asset('storage/'.$p))->values()->all(),
+                'photos' => $appointment->photoUrls(),
                 'campaign' => $appointment->campaign !== null ? [
                     'title' => $appointment->campaign->title,
                     'new_price' => $appointment->campaign->new_price !== null ? (string) $appointment->campaign->new_price : null,

@@ -85,6 +85,8 @@ verisini döndürür:
       "status": "confirmed",
       "note": "Disposable desktop QA appointment.",
       "price": 1500.5,
+      "subservices": ["Çatlak Gizleme"],
+      "photos": ["https://striastudio.com/storage/appointments/abc.jpg"],
       "updated_at": "2026-09-13T15:31:52+03:00",
       "revision": "64-character opaque value",
       "parent_id": null,
@@ -93,7 +95,7 @@ verisini döndürür:
     }
   ],
   "services": [
-    { "id": 1, "title": "Masaüstü QA Hizmeti", "duration_min": 60 }
+    { "id": 1, "title": "Masaüstü QA Hizmeti", "duration_min": 60, "subservices": ["Çatlak Gizleme", "Yanık İzi"] }
   ],
   "hours": [
     { "id": 1, "enabled": false, "open": 540, "close": 1140 },
@@ -105,7 +107,13 @@ verisini döndürür:
 
 Müşteriler ada, randevular başlangıç zamanına göre sıralanır. Hizmet listesi tüm
 aktif hizmetleri ve geçmiş randevuların referans verdiği pasif hizmetleri içerir.
-`title`, hizmetin Türkçe adıdır.
+`title`, hizmetin Türkçe adıdır. `subservices`, hizmetin alt uygulama adlarıdır
+(`services.subservices_tr[*].name`, tanım sırasıyla); alt uygulaması olmayan
+hizmette `[]`.
+
+Randevudaki `subservices`, randevunun kapsadığı alt uygulama adlarıdır (yoksa
+`[]`). `photos`, randevu fotoğraflarının URL'leridir (yükleme sırasıyla; yoksa
+`[]`); fotoğraflar seans başınadır, pakette yayılmaz.
 
 Çalışma günü kimlikleri Foundation `Calendar` düzenindedir: `1=Pazar`,
 `2=Pazartesi`, ..., `7=Cumartesi`. `open` ve `close`, gece yarısından sonraki
@@ -166,7 +174,8 @@ Geçerli durumlar: `confirmed`, `requested`, `cancelled`, `no_show`.
   "duration_min": 60,
   "status": "confirmed",
   "note": "Not",
-  "price": 1500
+  "price": 1500,
+  "subservices": ["Çatlak Gizleme"]
 }
 ```
 
@@ -178,7 +187,7 @@ sayısı (`1500`, `1500.5`) ya da `null`'dır. Create isteğinde
 `revision` yasaktır. Başarılı cevap `201`:
 
 ```json
-{ "appointment": { "id": 2, "customer_id": 1, "service_id": 1, "starts_at": "...", "duration_min": 60, "status": "confirmed", "note": null, "price": null, "updated_at": "...", "revision": "...", "parent_id": null, "session_no": null, "session_total": null }, "appointments": ["paketin tüm seansları, starts_at ARTAN"] }
+{ "appointment": { "id": 2, "customer_id": 1, "service_id": 1, "starts_at": "...", "duration_min": 60, "status": "confirmed", "note": null, "price": null, "subservices": [], "photos": [], "updated_at": "...", "revision": "...", "parent_id": null, "session_no": null, "session_total": null }, "appointments": ["paketin tüm seansları, starts_at ARTAN"] }
 ```
 
 `confirmed` randevu ana sitenin çalışma saatleri içinde olmalı ve başka bir
@@ -212,6 +221,13 @@ içerir; tek randevuda yalnız o randevuyu içerir.
 Pakette `price` yalnız köke (1. seans, `parent_id = null`) yazılır; çocuk
 seansların `price` değeri `null`'dır. Paket fiyatı istemcide kökten okunur.
 
+`subservices` opsiyonel: en çok 30 elemanlı string dizisi ya da `null`. Her
+eleman, randevunun hizmetinin (`service_id`) `/state` `subservices` listesinde
+olmalıdır; alt uygulaması olmayan veya seçilmemiş hizmette yalnız `[]`/`null`
+kabul edilir. İhlalde `422` `errors.subservices` döner. Sunucu listeyi hizmetteki
+sırayla ve tekrarsız saklar; `[]` ile `null` aynıdır. Alt uygulamalar hizmet gibi
+paket düzeyindedir: köke yazılır ve tüm seanslara kopyalanır.
+
 ### `PATCH /appointments/{id}`
 
 Yalnız gönderilen alanları değiştirir; `revision` zorunludur. Değişiklik
@@ -237,6 +253,38 @@ senkronize edilir.
 değişikliği tek başına çalışma saati/çakışma denetimini tetiklemez. Paketin çocuk
 seansına `price` gönderilirse `422` döner:
 `errors.price = ["Paket fiyatı 1. seansta düzenlenir."]`.
+
+`subservices` create ile aynı kurallarla, değişiklik sonrası hizmete göre
+doğrulanır. `service_id` değişip `subservices` gönderilmezse alt uygulamalar
+temizlenir. Kökte değişen alt uygulamalar tüm seanslara yayılır. Paketin çocuk
+seansına `subservices` gönderilirse `422` döner:
+`errors.subservices = ["Alt uygulamalar 1. seansta düzenlenir."]`.
+
+### `POST /appointments/{id}/photos`
+
+`multipart/form-data`; alan `photos[]`, 1–10 dosya, her biri resim ve en çok
+10 MB. Dosyalar mevcut fotoğrafların sonuna eklenir; `revision` gerekmez.
+Geçersiz dosyada `422` (`errors.photos` / `errors["photos.N"]`), bilinmeyen
+randevuda `404`. Başarılı cevap `201`:
+
+```json
+{ "appointment": { "id": 2, "photos": ["https://.../storage/appointments/abc.jpg"], "revision": "new revision", "...": "..." } }
+```
+
+Yükleme `revision`'ı değiştirir; istemci cevaptaki nesneyi kullanmalıdır.
+
+### `DELETE /appointments/{id}/photos/{index}`
+
+`index`, `photos` dizisindeki 0 tabanlı sıradır.
+
+```json
+{ "revision": "revision from the last response" }
+```
+
+`revision` zorunludur; kayıt arada değiştiyse `409` güncel nesneyi döndürür.
+`index` aralık dışındaysa `404`. Fotoğraf listeden çıkarılır, kalanlar yeniden
+sıralanır ve panelin yüklediği dosya (`appointments/...`) diskten silinir.
+Başarılı cevap `200`: `{ "appointment": { "...": "..." } }`.
 
 ### `POST /appointments/{id}/sessions`
 
@@ -325,9 +373,10 @@ kullanıcının değişikliğini yeniden uygulatmalıdır. Saatlerde aynı göre
 - Müşteri yazma uçları yalnız `name`, `phone`, `email`, `notes` alanlarını
   değiştirir. `photos`, `instagram` ve mobil uygulama kullanıcı bağlantısı
   cevapta görünmez ve korunur.
-- Randevu yazma uçları yalnız sözleşmede görünen alanları değiştirir. `price`
-  yazılabilir (paket kökünde); `is_paid`, `payment_method`, `paid_at`, `photos`,
-  `campaign_id` ve `app_user_id` görünmez ve korunur. Ödeme alanları Meta/Google
+- Randevu yazma uçları yalnız sözleşmede görünen alanları değiştirir. `price` ve
+  `subservices` yazılabilir (paket kökünde); `photos` yalnız fotoğraf uçlarıyla
+  değişir. `is_paid`, `payment_method`, `paid_at`, `campaign_id` ve
+  `app_user_id` görünmez ve korunur. Ödeme alanları Meta/Google
   dönüşüm yüklemesini tetiklediği için bilerek kapsam dışıdır.
 - `parent_id`, `session_no`, `session_total` istemci tarafından yazılamayan,
   sunucunun ürettiği salt okunur alanlardır. Masaüstü API bunları doğrudan
@@ -336,8 +385,8 @@ kullanıcının değişikliğini yeniden uygulatmalıdır. Saatlerde aynı göre
   oluşturulur, büyütülür, küçültülür ve `AppointmentSessions` kurallarıyla
   numaralandırılarak senkronize edilir.
 - `DELETE /appointments/{id}` randevu veya seans siler; kök seans silinince para
-  alanları yeni köke taşınır. Fotoğraf yönetimi, ödeme yönetimi, kampanya bağlama
-  ve mobil hesap eşleme ucu bu sürümde yoktur.
+  alanları yeni köke taşınır. Ödeme yönetimi, kampanya bağlama ve mobil hesap
+  eşleme ucu bu sürümde yoktur.
 - Masaüstü istemcisi yalnız bu API ile yapılan değişiklikleri yerel uygulama
   durumuna yansıtır. Filament'te yapılan değişiklikler yeni `/state` çağrısında
   alınır; canlı push/soket senkronizasyonu yoktur.

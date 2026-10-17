@@ -92,6 +92,8 @@ Route::prefix('desktop')->group(function () {
             Route::post('/appointments', [DesktopStudioController::class, 'storeAppointment']);
             Route::patch('/appointments/{id}', [DesktopStudioController::class, 'updateAppointment']);
             Route::post('/appointments/{id}/sessions', [DesktopStudioController::class, 'addSession']);
+            Route::post('/appointments/{id}/photos', [DesktopStudioController::class, 'storePhotos']);
+            Route::delete('/appointments/{id}/photos/{index}', [DesktopStudioController::class, 'destroyPhoto'])->whereNumber('index');
             Route::delete('/appointments/{id}', [DesktopStudioController::class, 'destroyAppointment']);
             Route::put('/hours', [DesktopStudioController::class, 'updateHours']);
         });

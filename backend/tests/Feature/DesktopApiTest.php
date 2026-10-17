@@ -12,6 +12,8 @@ use App\Models\User;
 use App\Support\AppointmentSessions;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\PersonalAccessToken;
 use Tests\TestCase;
 
@@ -797,6 +799,166 @@ class DesktopApiTest extends TestCase
             'price' => -1,
         ])->assertUnprocessable()->assertJsonValidationErrors('price');
         $this->assertDatabaseCount('appointments', 0);
+    }
+
+    public function test_photos_upload_appends_and_returns_urls(): void
+    {
+        Storage::fake('public');
+        $appointment = $this->plainAppointment(['photos' => ['appointments/old.jpg']]);
+
+        $response = $this->desktop()->post("/api/desktop/appointments/{$appointment->id}/photos", [
+            'photos' => [UploadedFile::fake()->image('a.jpg'), UploadedFile::fake()->image('b.png')],
+        ], ['Accept' => 'application/json'])->assertCreated();
+
+        $photos = $appointment->refresh()->photos;
+        $this->assertCount(3, $photos);
+        $this->assertSame('appointments/old.jpg', $photos[0]);
+        Storage::disk('public')->assertExists([$photos[1], $photos[2]]);
+        $this->assertSame(
+            array_map(fn (string $p): string => asset('storage/'.$p), $photos),
+            $response->json('appointment.photos'),
+        );
+        $this->desktop()->getJson('/api/desktop/state')
+            ->assertJsonPath('appointments.0.photos.0', asset('storage/appointments/old.jpg'));
+
+        $this->desktop()->post("/api/desktop/appointments/{$appointment->id}/photos", [
+            'photos' => [UploadedFile::fake()->create('notes.pdf', 10, 'application/pdf')],
+        ], ['Accept' => 'application/json'])->assertUnprocessable()->assertJsonValidationErrors('photos.0');
+        $this->assertCount(3, $appointment->refresh()->photos);
+
+        $this->desktop()->post('/api/desktop/appointments/999999/photos', [
+            'photos' => [UploadedFile::fake()->image('c.jpg')],
+        ], ['Accept' => 'application/json'])->assertNotFound();
+    }
+
+    public function test_photo_delete_by_index_removes_file_and_reindexes_with_revision_guard(): void
+    {
+        Storage::fake('public');
+        Storage::disk('public')->put('appointments/a.jpg', 'a');
+        Storage::disk('public')->put('appointments/b.jpg', 'b');
+        $appointment = $this->plainAppointment(['photos' => ['appointments/a.jpg', 'appointments/b.jpg']]);
+        $url = "/api/desktop/appointments/{$appointment->id}/photos";
+
+        $this->desktop()->deleteJson("{$url}/0", ['revision' => str_repeat('0', 64)])
+            ->assertConflict()
+            ->assertJsonPath('appointment.id', $appointment->id);
+        $this->assertCount(2, $appointment->refresh()->photos);
+
+        $this->desktop()->deleteJson("{$url}/5", ['revision' => $this->appointmentRevision($appointment)])
+            ->assertNotFound();
+
+        $this->desktop()->deleteJson("{$url}/0", ['revision' => $this->appointmentRevision($appointment)])
+            ->assertOk()
+            ->assertJsonPath('appointment.photos', [asset('storage/appointments/b.jpg')]);
+        $this->assertSame(['appointments/b.jpg'], $appointment->refresh()->photos);
+        Storage::disk('public')->assertMissing('appointments/a.jpg');
+        Storage::disk('public')->assertExists('appointments/b.jpg');
+    }
+
+    public function test_state_exposes_service_subservices(): void
+    {
+        $this->subserviceService();
+        Service::factory()->create(['name_tr' => 'Microblading', 'sort_order' => 2]);
+
+        $this->desktop()->getJson('/api/desktop/state')
+            ->assertJsonPath('services.0.subservices', ['Çatlak Gizleme', 'Yanık İzi'])
+            ->assertJsonPath('services.1.subservices', []);
+    }
+
+    public function test_create_stores_subservices_on_package_and_rejects_invalid_names(): void
+    {
+        $this->mondayHours();
+        $service = $this->subserviceService();
+        $other = Service::factory()->create();
+        $customer = Customer::query()->create(['name' => 'Ayşe']);
+        $payload = [
+            'customer_id' => $customer->id,
+            'service_id' => $service->id,
+            'starts_at' => '2026-09-14T10:00:00+03:00',
+            'duration_min' => 60,
+            'status' => 'requested',
+        ];
+
+        $package = $this->desktop()->postJson('/api/desktop/appointments', $payload + [
+            'subservices' => ['Yanık İzi', 'Çatlak Gizleme'],
+            'session_total' => 3,
+        ])->assertCreated();
+        $this->assertSame(
+            array_fill(0, 3, ['Çatlak Gizleme', 'Yanık İzi']),
+            array_column($package->json('appointments'), 'subservices'),
+        );
+
+        $this->desktop()->postJson('/api/desktop/appointments', $payload + ['subservices' => ['Dövme']])
+            ->assertUnprocessable()->assertJsonValidationErrors('subservices');
+        $this->desktop()->postJson('/api/desktop/appointments', [
+            ...$payload,
+            'service_id' => $other->id,
+            'subservices' => ['Yanık İzi'],
+        ])->assertUnprocessable()->assertJsonValidationErrors('subservices');
+        $this->assertDatabaseCount('appointments', 3);
+
+        $this->desktop()->postJson('/api/desktop/appointments', [...$payload, 'service_id' => $other->id, 'subservices' => []])
+            ->assertCreated()->assertJsonPath('appointment.subservices', []);
+    }
+
+    public function test_patch_subservices_on_root_propagates_rejects_child_and_service_change_clears(): void
+    {
+        $this->mondayHours();
+        $service = $this->subserviceService();
+        $other = Service::factory()->create();
+        $customer = Customer::query()->create(['name' => 'Ayşe']);
+        $root = Appointment::query()->create([
+            'customer_id' => $customer->id,
+            'service_id' => $service->id,
+            'starts_at' => '2026-09-14 10:00:00',
+            'duration_min' => 60,
+            'status' => 'requested',
+        ]);
+        AppointmentSessions::split($root, 2, 28);
+        $child = AppointmentSessions::all($root)->last();
+
+        $this->desktop()->patchJson("/api/desktop/appointments/{$root->id}", [
+            'subservices' => ['Yanık İzi'],
+            'revision' => $this->appointmentRevision($root->refresh()),
+        ])->assertOk()->assertJsonPath('appointment.subservices', ['Yanık İzi']);
+        $this->assertSame(['Yanık İzi'], $child->refresh()->subservices);
+
+        $this->desktop()->patchJson("/api/desktop/appointments/{$child->id}", [
+            'subservices' => [],
+            'revision' => $this->appointmentRevision($child),
+        ])->assertUnprocessable()
+            ->assertJsonValidationErrors(['subservices' => 'Alt uygulamalar 1. seansta düzenlenir.']);
+
+        $this->desktop()->patchJson("/api/desktop/appointments/{$root->id}", [
+            'service_id' => $other->id,
+            'revision' => $this->appointmentRevision($root->refresh()),
+        ])->assertOk()->assertJsonPath('appointment.subservices', []);
+        $this->assertNull($root->refresh()->subservices);
+        $this->assertNull($child->refresh()->subservices);
+    }
+
+    private function subserviceService(): Service
+    {
+        return Service::factory()->create([
+            'name_tr' => 'Kamuflaj Makyaj',
+            'sort_order' => 1,
+            'subservices_tr' => [
+                ['name' => 'Çatlak Gizleme', 'desc' => '...'],
+                ['name' => 'Yanık İzi', 'desc' => '...'],
+            ],
+        ]);
+    }
+
+    /** @param array<string, mixed> $attributes */
+    private function plainAppointment(array $attributes = []): Appointment
+    {
+        return Appointment::query()->create([
+            'customer_id' => Customer::query()->create(['name' => 'Ayşe'])->id,
+            'starts_at' => '2026-09-14 10:00:00',
+            'duration_min' => 60,
+            'status' => 'confirmed',
+            ...$attributes,
+        ]);
     }
 
     private function desktop()

@@ -16,6 +16,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
@@ -50,7 +51,7 @@ class StudioController extends Controller
             })
             ->orderBy('sort_order')
             ->orderBy('id')
-            ->get(['id', 'name_tr', 'duration_min']);
+            ->get(['id', 'name_tr', 'duration_min', 'subservices_tr']);
 
         return response()->json([
             'customers' => Customer::query()
@@ -66,6 +67,7 @@ class StudioController extends Controller
                 'id' => $service->id,
                 'title' => $service->name_tr,
                 'duration_min' => $service->duration_min,
+                'subservices' => $service->subserviceNames(),
             ])->values(),
             'hours' => $hours,
             'timezone' => config('app.timezone'),
@@ -128,6 +130,7 @@ class StudioController extends Controller
                 'status' => $validated['status'],
                 'note' => $this->nullableString($validated['note'] ?? null),
                 'price' => $validated['price'] ?? null,
+                'subservices' => $this->subservices($validated['subservices'] ?? null, $validated['service_id'] ?? null),
             ]);
 
             if ($total >= 2) {
@@ -191,6 +194,62 @@ class StudioController extends Controller
                     ->map(fn (Appointment $session): array => DesktopApi::appointment($session))
                     ->all(),
             ], 201);
+        });
+    }
+
+    public function storePhotos(Request $request, int $id): JsonResponse
+    {
+        $validated = $request->validate([
+            'photos' => ['required', 'array', 'min:1', 'max:10'],
+            'photos.*' => ['image', 'max:10240'],
+        ]);
+
+        return DB::transaction(function () use ($validated, $id): JsonResponse {
+            $appointment = Appointment::query()->lockForUpdate()->findOrFail($id);
+            $photos = array_values($appointment->photos ?? []);
+
+            foreach ($validated['photos'] as $photo) {
+                $photos[] = $photo->store('appointments', 'public');
+            }
+
+            $appointment->photos = $photos;
+            $appointment->save();
+
+            return response()->json(['appointment' => DesktopApi::appointment($appointment->refresh())], 201);
+        });
+    }
+
+    public function destroyPhoto(Request $request, int $id, int $index): JsonResponse
+    {
+        $validated = $request->validate([
+            'revision' => ['required', 'string', 'size:64'],
+        ]);
+
+        return DB::transaction(function () use ($validated, $id, $index): JsonResponse {
+            $appointment = Appointment::query()->lockForUpdate()->findOrFail($id);
+
+            if (! hash_equals(DesktopApi::revision($appointment), $validated['revision'])) {
+                return response()->json([
+                    'message' => 'Randevu başka bir yerde güncellendi.',
+                    'appointment' => DesktopApi::appointment($appointment),
+                ], 409);
+            }
+
+            $photos = array_values($appointment->photos ?? []);
+            abort_unless(array_key_exists($index, $photos), 404, 'Fotoğraf bulunamadı.');
+
+            $path = $photos[$index];
+            unset($photos[$index]);
+
+            $appointment->photos = array_values($photos);
+            $appointment->save();
+
+            // Panel (Calendar) ile aynı: yalnızca bizim yüklediğimiz dosyalar silinir.
+            if (is_string($path) && str_starts_with($path, 'appointments/')) {
+                Storage::disk('public')->delete($path);
+            }
+
+            return response()->json(['appointment' => DesktopApi::appointment($appointment->refresh())]);
         });
     }
 
@@ -287,6 +346,11 @@ class StudioController extends Controller
             if ($appointment->isSessionChild() && array_key_exists('price', $validated)) {
                 throw ValidationException::withMessages([
                     'price' => ['Paket fiyatı 1. seansta düzenlenir.'],
+                ]);
+            }
+            if ($appointment->isSessionChild() && array_key_exists('subservices', $validated)) {
+                throw ValidationException::withMessages([
+                    'subservices' => ['Alt uygulamalar 1. seansta düzenlenir.'],
                 ]);
             }
 
@@ -404,6 +468,8 @@ class StudioController extends Controller
             'status' => [$presence, 'string', Rule::in(self::STATUSES)],
             'note' => ['sometimes', 'nullable', 'string', 'max:10000'],
             'price' => ['sometimes', 'nullable', 'numeric', 'min:0', 'max:99999999.99'],
+            'subservices' => ['sometimes', 'nullable', 'array', 'max:30'],
+            'subservices.*' => ['string', 'max:255'],
             'session_total' => $patch ? ['prohibited'] : ['sometimes', 'integer', 'between:1,12'],
             'interval_days' => $patch ? ['prohibited'] : ['sometimes', 'integer', 'between:1,365'],
             'session_starts' => $patch ? ['prohibited'] : ['sometimes', 'array', 'max:11', function (string $attribute, mixed $value, $fail): void {
@@ -453,6 +519,15 @@ class StudioController extends Controller
         if ($appointment->isSessionChild()) {
             $payload['customer_id'] = $root->customer_id;
             $payload['service_id'] = $root->service_id;
+            $payload['subservices'] = $root->subservices;
+        } elseif (array_key_exists('subservices', $validated)) {
+            $payload['subservices'] = $this->subservices(
+                $validated['subservices'],
+                array_key_exists('service_id', $payload) ? $payload['service_id'] : $appointment->service_id,
+            );
+        } elseif (array_key_exists('service_id', $payload) && $payload['service_id'] !== $appointment->service_id) {
+            // Hizmet değişti, alt uygulamalar gönderilmedi: eski hizmetinkiler geçersiz.
+            $payload['subservices'] = null;
         }
 
         return $payload;
@@ -484,6 +559,34 @@ class StudioController extends Controller
 
             return compact('id', 'enabled', 'open', 'close');
         })->all();
+    }
+
+    /**
+     * Alt uygulama adlarını hizmetin tanımına göre doğrular; hizmet sırasıyla,
+     * tekrarsız döner. Boş liste null olarak saklanır.
+     *
+     * @param  array<int, string>|null  $names
+     * @return array<int, string>|null
+     */
+    private function subservices(?array $names, mixed $serviceId): ?array
+    {
+        if ($names === null || $names === []) {
+            return null;
+        }
+
+        $allowed = $serviceId === null
+            ? []
+            : (Service::query()->find($serviceId)?->subserviceNames() ?? []);
+
+        if (array_diff($names, $allowed) !== []) {
+            throw ValidationException::withMessages([
+                'subservices' => [$allowed === []
+                    ? 'Seçilen hizmetin alt uygulaması yok.'
+                    : 'Alt uygulamalar seçilen hizmete ait olmalı.'],
+            ]);
+        }
+
+        return array_values(array_intersect($allowed, $names));
     }
 
     /**
