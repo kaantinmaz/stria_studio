@@ -26,6 +26,7 @@ class Appointment extends Model
         'status',
         'photos',
         'subservices',
+        'body_regions',
         'parent_id',
         'session_no',
         'session_total',
@@ -41,6 +42,7 @@ class Appointment extends Model
             'meta_purchase_sent_at' => 'datetime',
             'photos' => 'array',
             'subservices' => 'array',
+            'body_regions' => 'array',
         ];
     }
 

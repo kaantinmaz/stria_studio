@@ -8,6 +8,7 @@ use App\Models\Customer;
 use App\Models\Service;
 use App\Models\Setting;
 use App\Support\AppointmentSessions;
+use App\Support\BodyRegions;
 use App\Support\DesktopApi;
 use App\Support\DesktopAppointmentSchedule;
 use Carbon\CarbonImmutable;
@@ -51,7 +52,7 @@ class StudioController extends Controller
             })
             ->orderBy('sort_order')
             ->orderBy('id')
-            ->get(['id', 'name_tr', 'duration_min', 'subservices_tr']);
+            ->get(['id', 'slug', 'name_tr', 'duration_min', 'subservices_tr']);
 
         return response()->json([
             'customers' => Customer::query()
@@ -65,6 +66,7 @@ class StudioController extends Controller
                 ->values(),
             'services' => $services->map(fn (Service $service): array => [
                 'id' => $service->id,
+                'slug' => $service->slug,
                 'title' => $service->name_tr,
                 'duration_min' => $service->duration_min,
                 'subservices' => $service->subserviceNames(),
@@ -131,6 +133,7 @@ class StudioController extends Controller
                 'note' => $this->nullableString($validated['note'] ?? null),
                 'price' => $validated['price'] ?? null,
                 'subservices' => $this->subservices($validated['subservices'] ?? null, $validated['service_id'] ?? null),
+                'body_regions' => BodyRegions::normalize($validated['body_regions'] ?? null),
             ]);
 
             if ($total >= 2) {
@@ -353,6 +356,11 @@ class StudioController extends Controller
                     'subservices' => ['Alt uygulamalar 1. seansta düzenlenir.'],
                 ]);
             }
+            if ($appointment->isSessionChild() && array_key_exists('body_regions', $validated)) {
+                throw ValidationException::withMessages([
+                    'body_regions' => ['Bölgeler 1. seansta düzenlenir.'],
+                ]);
+            }
 
             $root = $appointment->isSessionChild()
                 ? AppointmentSessions::root($appointment)
@@ -470,6 +478,15 @@ class StudioController extends Controller
             'price' => ['sometimes', 'nullable', 'numeric', 'min:0', 'max:99999999.99'],
             'subservices' => ['sometimes', 'nullable', 'array', 'max:30'],
             'subservices.*' => ['string', 'max:255'],
+            'body_regions' => ['sometimes', 'nullable', 'array', 'max:'.count(BodyRegions::LABELS), function (string $attribute, mixed $value, $fail): void {
+                foreach ((array) $value as $key) {
+                    if (! is_string($key) || ! array_key_exists($key, BodyRegions::LABELS)) {
+                        $fail('Bölgeler geçerli bölge anahtarları olmalı.');
+
+                        return;
+                    }
+                }
+            }],
             'session_total' => $patch ? ['prohibited'] : ['sometimes', 'integer', 'between:1,12'],
             'interval_days' => $patch ? ['prohibited'] : ['sometimes', 'integer', 'between:1,365'],
             'session_starts' => $patch ? ['prohibited'] : ['sometimes', 'array', 'max:11', function (string $attribute, mixed $value, $fail): void {
@@ -520,6 +537,7 @@ class StudioController extends Controller
             $payload['customer_id'] = $root->customer_id;
             $payload['service_id'] = $root->service_id;
             $payload['subservices'] = $root->subservices;
+            $payload['body_regions'] = $root->body_regions;
         } elseif (array_key_exists('subservices', $validated)) {
             $payload['subservices'] = $this->subservices(
                 $validated['subservices'],
@@ -528,6 +546,9 @@ class StudioController extends Controller
         } elseif (array_key_exists('service_id', $payload) && $payload['service_id'] !== $appointment->service_id) {
             // Hizmet değişti, alt uygulamalar gönderilmedi: eski hizmetinkiler geçersiz.
             $payload['subservices'] = null;
+        }
+        if (! $appointment->isSessionChild() && array_key_exists('body_regions', $validated)) {
+            $payload['body_regions'] = BodyRegions::normalize($validated['body_regions']);
         }
 
         return $payload;

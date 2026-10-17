@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Pages\Calendar;
 use App\Models\Appointment;
 use App\Models\AppUser;
 use App\Models\Campaign;
@@ -15,6 +16,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\PersonalAccessToken;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class DesktopApiTest extends TestCase
@@ -935,6 +937,105 @@ class DesktopApiTest extends TestCase
         ])->assertOk()->assertJsonPath('appointment.subservices', []);
         $this->assertNull($root->refresh()->subservices);
         $this->assertNull($child->refresh()->subservices);
+    }
+
+    public function test_state_exposes_service_slug(): void
+    {
+        $service = $this->subserviceService();
+
+        $this->desktop()->getJson('/api/desktop/state')
+            ->assertJsonPath('services.0.slug', $service->slug);
+    }
+
+    public function test_create_stores_body_regions_canonically_on_package_and_rejects_unknown_keys(): void
+    {
+        $this->mondayHours();
+        $service = $this->subserviceService();
+        $customer = Customer::query()->create(['name' => 'Ayşe']);
+        $payload = [
+            'customer_id' => $customer->id,
+            'service_id' => $service->id,
+            'starts_at' => '2026-09-14T10:00:00+03:00',
+            'duration_min' => 60,
+            'status' => 'requested',
+        ];
+
+        $package = $this->desktop()->postJson('/api/desktop/appointments', $payload + [
+            'body_regions' => ['hand_l', 'forehead', 'hand_l', 'cheek_r'],
+            'session_total' => 3,
+        ])->assertCreated();
+        $this->assertSame(
+            array_fill(0, 3, ['forehead', 'cheek_r', 'hand_l']),
+            array_column($package->json('appointments'), 'body_regions'),
+        );
+
+        $this->desktop()->postJson('/api/desktop/appointments', $payload + ['body_regions' => ['forehead', 'knee']])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['body_regions' => 'Bölgeler geçerli bölge anahtarları olmalı.']);
+        $this->assertDatabaseCount('appointments', 3);
+
+        $this->desktop()->postJson('/api/desktop/appointments', $payload + ['body_regions' => []])
+            ->assertCreated()->assertJsonPath('appointment.body_regions', []);
+    }
+
+    public function test_patch_body_regions_on_root_propagates_rejects_child_and_empty_clears(): void
+    {
+        $this->mondayHours();
+        $service = $this->subserviceService();
+        $other = Service::factory()->create();
+        $customer = Customer::query()->create(['name' => 'Ayşe']);
+        $root = Appointment::query()->create([
+            'customer_id' => $customer->id,
+            'service_id' => $service->id,
+            'starts_at' => '2026-09-14 10:00:00',
+            'duration_min' => 60,
+            'status' => 'requested',
+        ]);
+        AppointmentSessions::split($root, 2, 28);
+        $child = AppointmentSessions::all($root)->last();
+
+        $this->desktop()->patchJson("/api/desktop/appointments/{$root->id}", [
+            'body_regions' => ['neck_back', 'nose'],
+            'revision' => $this->appointmentRevision($root->refresh()),
+        ])->assertOk()->assertJsonPath('appointment.body_regions', ['nose', 'neck_back']);
+        $this->assertSame(['nose', 'neck_back'], $child->refresh()->body_regions);
+
+        $this->desktop()->patchJson("/api/desktop/appointments/{$child->id}", [
+            'body_regions' => [],
+            'revision' => $this->appointmentRevision($child),
+        ])->assertUnprocessable()
+            ->assertJsonValidationErrors(['body_regions' => 'Bölgeler 1. seansta düzenlenir.']);
+
+        $this->desktop()->patchJson("/api/desktop/appointments/{$root->id}", [
+            'service_id' => $other->id,
+            'revision' => $this->appointmentRevision($root->refresh()),
+        ])->assertOk()->assertJsonPath('appointment.body_regions', ['nose', 'neck_back']);
+
+        $this->desktop()->patchJson("/api/desktop/appointments/{$root->id}", [
+            'body_regions' => [],
+            'revision' => $this->appointmentRevision($root->refresh()),
+        ])->assertOk()->assertJsonPath('appointment.body_regions', []);
+        $this->assertNull($root->refresh()->body_regions);
+        $this->assertNull($child->refresh()->body_regions);
+    }
+
+    public function test_panel_shows_root_body_regions_read_only(): void
+    {
+        $root = $this->plainAppointment(['body_regions' => ['forehead', 'hand_l']]);
+        AppointmentSessions::split($root, 2, 28);
+        $child = AppointmentSessions::all($root)->last();
+
+        Livewire::actingAs(User::factory()->create())
+            ->test(Calendar::class)
+            ->call('openEditModal', $child->id)
+            ->assertSet('bodyRegionLabels', 'Alın, Sol el')
+            ->assertSee('Bölgeler')
+            ->call('openEditModal', $this->plainAppointment()->id)
+            ->assertSet('bodyRegionLabels', '')
+            ->call('openEditModal', $root->id)
+            ->call('updateAppointment');
+
+        $this->assertSame(['forehead', 'hand_l'], $root->refresh()->body_regions);
     }
 
     private function subserviceService(): Service

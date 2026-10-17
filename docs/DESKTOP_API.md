@@ -86,6 +86,7 @@ verisini döndürür:
       "note": "Disposable desktop QA appointment.",
       "price": 1500.5,
       "subservices": ["Çatlak Gizleme"],
+      "body_regions": ["forehead", "cheek_r"],
       "photos": ["https://striastudio.com/storage/appointments/abc.jpg"],
       "updated_at": "2026-09-13T15:31:52+03:00",
       "revision": "64-character opaque value",
@@ -95,7 +96,7 @@ verisini döndürür:
     }
   ],
   "services": [
-    { "id": 1, "title": "Masaüstü QA Hizmeti", "duration_min": 60, "subservices": ["Çatlak Gizleme", "Yanık İzi"] }
+    { "id": 1, "slug": "kamuflaj-makyaj", "title": "Masaüstü QA Hizmeti", "duration_min": 60, "subservices": ["Çatlak Gizleme", "Yanık İzi"] }
   ],
   "hours": [
     { "id": 1, "enabled": false, "open": 540, "close": 1140 },
@@ -107,12 +108,14 @@ verisini döndürür:
 
 Müşteriler ada, randevular başlangıç zamanına göre sıralanır. Hizmet listesi tüm
 aktif hizmetleri ve geçmiş randevuların referans verdiği pasif hizmetleri içerir.
-`title`, hizmetin Türkçe adıdır. `subservices`, hizmetin alt uygulama adlarıdır
+`slug`, hizmetin sabit kimliğidir (ör. `kamuflaj-makyaj`; istemci bölge
+seçiciyi buna göre gösterir). `title`, hizmetin Türkçe adıdır. `subservices`, hizmetin alt uygulama adlarıdır
 (`services.subservices_tr[*].name`, tanım sırasıyla); alt uygulaması olmayan
 hizmette `[]`.
 
 Randevudaki `subservices`, randevunun kapsadığı alt uygulama adlarıdır (yoksa
-`[]`). `photos`, randevu fotoğraflarının URL'leridir (yükleme sırasıyla; yoksa
+`[]`). `body_regions`, kamuflaj vücut bölgesi anahtarlarıdır (yoksa `[]`, asla
+`null` değil; aşağıdaki kanonik sırayla). `photos`, randevu fotoğraflarının URL'leridir (yükleme sırasıyla; yoksa
 `[]`); fotoğraflar seans başınadır, pakette yayılmaz.
 
 Çalışma günü kimlikleri Foundation `Calendar` düzenindedir: `1=Pazar`,
@@ -175,7 +178,8 @@ Geçerli durumlar: `confirmed`, `requested`, `cancelled`, `no_show`.
   "status": "confirmed",
   "note": "Not",
   "price": 1500,
-  "subservices": ["Çatlak Gizleme"]
+  "subservices": ["Çatlak Gizleme"],
+  "body_regions": ["forehead", "cheek_r"]
 }
 ```
 
@@ -187,7 +191,7 @@ sayısı (`1500`, `1500.5`) ya da `null`'dır. Create isteğinde
 `revision` yasaktır. Başarılı cevap `201`:
 
 ```json
-{ "appointment": { "id": 2, "customer_id": 1, "service_id": 1, "starts_at": "...", "duration_min": 60, "status": "confirmed", "note": null, "price": null, "subservices": [], "photos": [], "updated_at": "...", "revision": "...", "parent_id": null, "session_no": null, "session_total": null }, "appointments": ["paketin tüm seansları, starts_at ARTAN"] }
+{ "appointment": { "id": 2, "customer_id": 1, "service_id": 1, "starts_at": "...", "duration_min": 60, "status": "confirmed", "note": null, "price": null, "subservices": [], "body_regions": [], "photos": [], "updated_at": "...", "revision": "...", "parent_id": null, "session_no": null, "session_total": null }, "appointments": ["paketin tüm seansları, starts_at ARTAN"] }
 ```
 
 `confirmed` randevu ana sitenin çalışma saatleri içinde olmalı ve başka bir
@@ -228,6 +232,40 @@ kabul edilir. İhlalde `422` `errors.subservices` döner. Sunucu listeyi hizmett
 sırayla ve tekrarsız saklar; `[]` ile `null` aynıdır. Alt uygulamalar hizmet gibi
 paket düzeyindedir: köke yazılır ve tüm seanslara kopyalanır.
 
+`body_regions` opsiyonel: en çok 34 elemanlı anahtar dizisi ya da `null`. Her
+eleman aşağıdaki listeden olmalıdır; bilinmeyen anahtarda `422`
+`errors.body_regions = ["Bölgeler geçerli bölge anahtarları olmalı."]` döner.
+Hizmete göre kısıtlanmaz (seçiciyi ne zaman göstereceğine istemci karar verir).
+Sunucu listeyi kanonik sırayla ve tekrarsız saklar; `[]` ile `null` aynıdır
+(`null` saklanır, `[]` döner). Bölgeler `subservices` gibi paket düzeyindedir:
+köke yazılır ve tüm seanslara kopyalanır.
+
+Anahtarlar (kanonik sıra; `_r`/`_l` müşterinin kendi sağı/solu; tek kaynak
+`backend/app/Support/BodyRegions.php`):
+
+| Anahtar | Ad | Anahtar | Ad |
+|---|---|---|---|
+| `forehead` | Alın | `nose` | Burun |
+| `cheek_r` | Sağ yanak | `cheek_l` | Sol yanak |
+| `lips_chin` | Dudak ve çene | `scalp` | Saçlı deri / baş arkası |
+| `neck_front` | Boyun ön | `neck_back` | Ense |
+| `chest_r` | Sağ göğüs | `chest_l` | Sol göğüs |
+| `abdomen_r` | Karın sağ | `abdomen_l` | Karın sol |
+| `upper_back_r` | Sırt üst sağ | `upper_back_l` | Sırt üst sol |
+| `lower_back_r` | Bel sağ | `lower_back_l` | Bel sol |
+| `buttock_r` | Sağ kalça | `buttock_l` | Sol kalça |
+| `upper_arm_r` | Sağ üst kol | `upper_arm_l` | Sol üst kol |
+| `forearm_r` | Sağ ön kol | `forearm_l` | Sol ön kol |
+| `hand_r` | Sağ el | `hand_l` | Sol el |
+| `thigh_front_r` | Sağ uyluk ön | `thigh_front_l` | Sol uyluk ön |
+| `thigh_back_r` | Sağ uyluk arka | `thigh_back_l` | Sol uyluk arka |
+| `shin_r` | Sağ bacak ön (kaval) | `shin_l` | Sol bacak ön (kaval) |
+| `calf_r` | Sağ baldır | `calf_l` | Sol baldır |
+| `foot_r` | Sağ ayak | `foot_l` | Sol ayak |
+
+Panel takvimi bölgeleri randevu penceresinde salt okunur "Bölgeler" satırı olarak
+gösterir (çocukta kökünkiler); panelden düzenlenmez.
+
 ### `PATCH /appointments/{id}`
 
 Yalnız gönderilen alanları değiştirir; `revision` zorunludur. Değişiklik
@@ -259,6 +297,11 @@ doğrulanır. `service_id` değişip `subservices` gönderilmezse alt uygulamala
 temizlenir. Kökte değişen alt uygulamalar tüm seanslara yayılır. Paketin çocuk
 seansına `subservices` gönderilirse `422` döner:
 `errors.subservices = ["Alt uygulamalar 1. seansta düzenlenir."]`.
+
+`body_regions` create ile aynı kurallarla gönderilir; `[]`/`null` temizler.
+`service_id` değişmesi bölgeleri temizlemez. Kökte değişen bölgeler tüm
+seanslara yayılır. Paketin çocuk seansına `body_regions` gönderilirse `422`
+döner: `errors.body_regions = ["Bölgeler 1. seansta düzenlenir."]`.
 
 ### `POST /appointments/{id}/photos`
 
@@ -373,8 +416,8 @@ kullanıcının değişikliğini yeniden uygulatmalıdır. Saatlerde aynı göre
 - Müşteri yazma uçları yalnız `name`, `phone`, `email`, `notes` alanlarını
   değiştirir. `photos`, `instagram` ve mobil uygulama kullanıcı bağlantısı
   cevapta görünmez ve korunur.
-- Randevu yazma uçları yalnız sözleşmede görünen alanları değiştirir. `price` ve
-  `subservices` yazılabilir (paket kökünde); `photos` yalnız fotoğraf uçlarıyla
+- Randevu yazma uçları yalnız sözleşmede görünen alanları değiştirir. `price`,
+  `subservices` ve `body_regions` yazılabilir (paket kökünde); `photos` yalnız fotoğraf uçlarıyla
   değişir. `is_paid`, `payment_method`, `paid_at`, `campaign_id` ve
   `app_user_id` görünmez ve korunur. Ödeme alanları Meta/Google
   dönüşüm yüklemesini tetiklediği için bilerek kapsam dışıdır.

@@ -838,6 +838,13 @@
                             </div>
                         @endif
 
+                        @if ($bodyRegionLabels !== '')
+                            <div class="stria-field is-full">
+                                <span class="stria-label">Bölgeler</span>
+                                <div class="stria-input">{{ $bodyRegionLabels }}</div>
+                            </div>
+                        @endif
+
                         <div class="stria-field">
                             <label class="stria-label" for="appointment-date">Tarih</label>
                             <input id="appointment-date" type="date" class="stria-input" wire:model="selectedDate" required>

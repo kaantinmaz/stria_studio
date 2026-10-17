@@ -8,6 +8,7 @@ use App\Models\Service;
 use App\Models\Touchpoint;
 use App\Support\AppointmentSessions;
 use App\Support\Attribution;
+use App\Support\BodyRegions;
 use App\Support\CustomerPairing;
 use BackedEnum;
 use Carbon\CarbonImmutable;
@@ -55,6 +56,9 @@ class Calendar extends Page
 
     /** @var array<int, string> seçili alt uygulama adları (services.subservices_tr[*].name) */
     public array $subservices = [];
+
+    /** Kamuflaj bölgeleri, salt okunur (paketin kökünden; panelde düzenlenmez). */
+    public string $bodyRegionLabels = '';
 
     public string $newCustomerName = '';
 
@@ -190,6 +194,9 @@ class Calendar extends Page
         $this->customerId = $appointment->customer_id;
         $this->serviceId = $appointment->service_id;
         $this->subservices = array_values($appointment->subservices ?? []);
+        $this->bodyRegionLabels = BodyRegions::labels(
+            ($appointment->isSessionChild() ? AppointmentSessions::root($appointment) : $appointment)->body_regions,
+        );
         $this->selectedDate = $appointment->starts_at->format('Y-m-d');
         $this->appointmentTime = $appointment->starts_at->format('H:i');
         $this->durationMin = $appointment->duration_min;
@@ -812,6 +819,7 @@ class Calendar extends Page
         $this->customerId = null;
         $this->serviceId = null;
         $this->subservices = [];
+        $this->bodyRegionLabels = '';
         $this->creatingCustomer = false;
         $this->newCustomerName = '';
         $this->newCustomerPhone = '';
