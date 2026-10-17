@@ -265,6 +265,7 @@ struct AppointmentDetailView: View {
                     .padding(.vertical, 2)
                     .listRowBackground(isCurrent ? Color.accentColor.opacity(0.08) : nil)
                 }
+                .appointmentActions(member)
             }
             Button {
                 showSessionDates = true
@@ -294,6 +295,7 @@ struct AppointmentDetailView: View {
                                 StatusChip(status: .from(other.status))
                             }
                         }
+                        .appointmentActions(other)
                     }
                 }
             }

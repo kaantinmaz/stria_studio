@@ -119,6 +119,7 @@ struct AppointmentsView: View {
                     Section {
                         ForEach(group.items) { appt in
                             NavigationLink(value: appt) { AppointmentRow(appt: appt) }
+                                .appointmentActions(appt)
                         }
                     } header: {
                         HStack {

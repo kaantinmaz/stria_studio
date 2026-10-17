@@ -139,6 +139,7 @@ struct CustomerDetailView: View {
                                 StatusChip(status: .from(appt.status))
                             }
                         }
+                        .appointmentActions(appt)
                     }
                     let total = store.totalPrice(for: customerID)
                     if total > 0 {

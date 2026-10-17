@@ -152,6 +152,81 @@ extension View {
     func errorAlert(_ store: AppStore) -> some View {
         modifier(ErrorAlertModifier(store: store))
     }
+
+    /// Long-press menu + trailing swipe for an appointment row: edit, change status,
+    /// and delete (removes just this session when it belongs to a package).
+    func appointmentActions(_ appt: AppointmentDTO) -> some View {
+        modifier(AppointmentActionsModifier(appointmentID: appt.id))
+    }
+}
+
+private struct AppointmentActionsModifier: ViewModifier {
+    @Environment(AppStore.self) private var store
+    let appointmentID: Int
+
+    @State private var confirmDelete = false
+    @State private var showEdit = false
+
+    /// Always act on the latest copy so the revision is current.
+    private var appt: AppointmentDTO? { store.appointments.first { $0.id == appointmentID } }
+
+    func body(content: Content) -> some View {
+        let isPackage = appt?.isPackage ?? false
+        let deleteLabel = isPackage ? "Seansı çıkar" : "Randevuyu sil"
+        content
+            .contextMenu {
+                Button { showEdit = true } label: { Label("Düzenle", systemImage: "pencil") }
+                Menu {
+                    ForEach(AppointmentStatus.allCases) { status in
+                        Button {
+                            Task { await setStatus(status) }
+                        } label: {
+                            if appt.map({ AppointmentStatus.from($0.status) }) == status {
+                                Label(status.label, systemImage: "checkmark")
+                            } else {
+                                Text(status.label)
+                            }
+                        }
+                    }
+                } label: {
+                    Label("Durumu değiştir", systemImage: "circle.badge.checkmark")
+                }
+                Divider()
+                Button(role: .destructive) { confirmDelete = true } label: {
+                    Label(deleteLabel, systemImage: isPackage ? "minus.circle" : "trash")
+                }
+            }
+            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                Button(role: .destructive) { confirmDelete = true } label: {
+                    Label(deleteLabel, systemImage: isPackage ? "minus.circle" : "trash")
+                }
+                Button { showEdit = true } label: { Label("Düzenle", systemImage: "pencil") }
+                    .tint(.gray)
+            }
+            .confirmationDialog(isPackage ? "Bu seans paketten çıkarılsın mı?" : "Randevu silinsin mi?",
+                                isPresented: $confirmDelete, titleVisibility: .visible) {
+                Button(deleteLabel, role: .destructive) {
+                    guard let appt else { return }
+                    Task { _ = await store.deleteAppointment(id: appt.id, revision: appt.revision) }
+                }
+                Button("Vazgeç", role: .cancel) {}
+            } message: {
+                if let appt, let customer = store.customer(appt.customerID) {
+                    Text("\(customer.name) · \(Fmt.dateTime.string(from: appt.startsAt))")
+                }
+            }
+            .sheet(isPresented: $showEdit) {
+                EditAppointmentView(appointmentID: appointmentID)
+            }
+    }
+
+    private func setStatus(_ status: AppointmentStatus) async {
+        guard let appt, AppointmentStatus.from(appt.status) != status else { return }
+        _ = await store.updateAppointment(id: appt.id, revision: appt.revision,
+                                          customerID: appt.customerID, serviceID: appt.serviceID,
+                                          startsAt: appt.startsAt, durationMin: appt.durationMin,
+                                          status: status, note: appt.note)
+    }
 }
 
 private struct ErrorAlertModifier: ViewModifier {
