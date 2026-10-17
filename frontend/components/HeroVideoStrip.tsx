@@ -5,10 +5,12 @@ import { preload } from "react-dom";
 import type { HeroVideo } from "@/lib/serviceHero";
 
 // Cards visible on first paint (mobile shows two and a half). Their posters are the
-// page's LCP, so they are preloaded with high priority. Video files are attached only
-// after the page has loaded: autoplaying ~3 MB of video during load starved the LCP
-// (kaş laminasyon mobile LCP 8 s in Lighthouse).
+// page's LCP, so they are preloaded with high priority. Video files are attached on the
+// visitor's first interaction (scroll, touch, pointer, key): a playing video keeps
+// producing LCP candidates until input, and autoplaying ~3 MB of video pushed the
+// kaş laminasyon mobile LCP to 8–9 s in Lighthouse.
 const ABOVE_FOLD = 3;
+const START_EVENTS = ["scroll", "pointerdown", "pointermove", "touchstart", "keydown"] as const;
 
 // Hizmet sayfası üst bölümü: dikey çekimler yan yana, sessiz ve döngüde oynar.
 // Tıklanan video ekranın ortasında hafif bir büyüme animasyonuyla açılır
@@ -26,16 +28,9 @@ export function HeroVideoStrip({ videos, title }: { videos: HeroVideo[]; title: 
   }, []);
 
   useEffect(() => {
-    let timer: number | undefined;
-    const start = () => {
-      timer = window.setTimeout(() => setLoaded(true), 800);
-    };
-    if (document.readyState === "complete") start();
-    else window.addEventListener("load", start, { once: true });
-    return () => {
-      window.removeEventListener("load", start);
-      window.clearTimeout(timer);
-    };
+    const start = () => setLoaded(true);
+    START_EVENTS.forEach((type) => window.addEventListener(type, start, { once: true, passive: true }));
+    return () => START_EVENTS.forEach((type) => window.removeEventListener(type, start));
   }, []);
 
   useEffect(() => {
