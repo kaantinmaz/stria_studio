@@ -13,6 +13,7 @@ class Setting extends Model
 
     protected $casts = [
         'hours' => 'array',
+        'body_region_prices' => 'array',
         'lat' => 'decimal:7',
         'lng' => 'decimal:7',
         'campaign_enabled' => 'boolean',

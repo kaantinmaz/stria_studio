@@ -52,6 +52,30 @@ final class BodyRegions
     ];
 
     /**
+     * Seans fiyatı kategorileri (masaüstü Ayarlar). Her bölge tam bir kategoride;
+     * sıra kanoniktir: API çıktısı bu sırayla.
+     */
+    public const CATEGORIES = [
+        'face' => ['label' => 'Yüz', 'regions' => ['forehead', 'nose', 'cheek_r', 'cheek_l', 'lips_chin']],
+        'scalp' => ['label' => 'Saçlı deri / baş arkası', 'regions' => ['scalp']],
+        'neck' => ['label' => 'Boyun', 'regions' => ['neck_front', 'neck_back']],
+        'shoulder' => ['label' => 'Omuz', 'regions' => ['shoulder_r', 'shoulder_l']],
+        'chest' => ['label' => 'Göğüs', 'regions' => ['chest_r', 'chest_l']],
+        'abdomen' => ['label' => 'Karın', 'regions' => ['abdomen_r', 'abdomen_l']],
+        'upper_back' => ['label' => 'Sırt', 'regions' => ['upper_back_r', 'upper_back_l']],
+        'lower_back' => ['label' => 'Bel', 'regions' => ['lower_back_r', 'lower_back_l']],
+        'buttock' => ['label' => 'Kalça', 'regions' => ['buttock_r', 'buttock_l']],
+        'upper_arm' => ['label' => 'Üst kol', 'regions' => ['upper_arm_r', 'upper_arm_l']],
+        'forearm' => ['label' => 'Ön kol', 'regions' => ['forearm_r', 'forearm_l']],
+        'hand' => ['label' => 'El', 'regions' => ['hand_r', 'hand_l']],
+        'thigh' => ['label' => 'Uyluk (ön/arka)', 'regions' => ['thigh_front_r', 'thigh_front_l', 'thigh_back_r', 'thigh_back_l']],
+        'thigh_inner' => ['label' => 'İç uyluk', 'regions' => ['thigh_inner_r', 'thigh_inner_l']],
+        'lower_leg' => ['label' => 'Alt bacak (ön/baldır)', 'regions' => ['shin_r', 'shin_l', 'calf_r', 'calf_l']],
+        'leg_inner' => ['label' => 'İç bacak (alt)', 'regions' => ['leg_inner_r', 'leg_inner_l']],
+        'foot' => ['label' => 'Ayak', 'regions' => ['foot_r', 'foot_l']],
+    ];
+
+    /**
      * Kanonik sırada, tekrarsız anahtarlar; boş liste null.
      *
      * @param  array<int, string>|null  $keys

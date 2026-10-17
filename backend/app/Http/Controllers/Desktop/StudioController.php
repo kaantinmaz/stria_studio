@@ -72,6 +72,8 @@ class StudioController extends Controller
                 'subservices' => $service->subserviceNames(),
             ])->values(),
             'hours' => $hours,
+            'region_prices' => DesktopApi::regionPrices($setting),
+            'region_prices_revision' => DesktopApi::revision($setting ?? new Setting),
             'timezone' => config('app.timezone'),
         ]);
     }
@@ -442,6 +444,50 @@ class StudioController extends Controller
             $setting->save();
 
             return response()->json(['hours' => DesktopApi::hours($setting->refresh())]);
+        });
+    }
+
+    public function updateRegionPrices(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'prices' => ['required', 'array', function (string $attribute, mixed $value, $fail): void {
+                if (array_diff_key((array) $value, BodyRegions::CATEGORIES) !== []) {
+                    $fail('Fiyatlar geçerli bölge kategorisi anahtarları olmalı.');
+                }
+            }],
+            'prices.*' => ['nullable', 'numeric', 'min:0', 'max:99999999.99'],
+            'revision' => ['required', 'string', 'size:64'],
+        ]);
+
+        return DB::transaction(function () use ($validated): JsonResponse {
+            $setting = Setting::query()->whereNull('site')->lockForUpdate()->first();
+
+            if (! hash_equals(DesktopApi::revision($setting ?? new Setting), $validated['revision'])) {
+                return response()->json([
+                    'message' => 'Bölge fiyatları başka bir yerde güncellendi.',
+                    'region_prices' => DesktopApi::regionPrices($setting),
+                    'region_prices_revision' => DesktopApi::revision($setting ?? new Setting),
+                ], 409);
+            }
+
+            // Gönderilmeyen kategoriler ayarlanmamış (null) sayılır.
+            $prices = array_map(
+                fn (mixed $price): float => (float) $price,
+                array_filter(
+                    array_intersect_key($validated['prices'], BodyRegions::CATEGORIES),
+                    fn (mixed $price): bool => $price !== null,
+                ),
+            );
+
+            $setting ??= new Setting(['site' => null]);
+            $setting->body_region_prices = $prices === [] ? null : $prices;
+            $setting->save();
+            $setting->refresh();
+
+            return response()->json([
+                'region_prices' => DesktopApi::regionPrices($setting),
+                'region_prices_revision' => DesktopApi::revision($setting),
+            ]);
         });
     }
 

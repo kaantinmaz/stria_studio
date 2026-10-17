@@ -139,6 +139,23 @@ final class DesktopApi
         return array_values($periods);
     }
 
+    /**
+     * Kategori başına seans fiyatı, BodyRegions::CATEGORIES sırasıyla; ayarlanmamış null.
+     *
+     * @return array<string, float|null>
+     */
+    public static function regionPrices(?Setting $setting): array
+    {
+        $stored = $setting?->body_region_prices ?? [];
+        $prices = [];
+
+        foreach (array_keys(BodyRegions::CATEGORIES) as $key) {
+            $prices[$key] = isset($stored[$key]) && is_numeric($stored[$key]) ? (float) $stored[$key] : null;
+        }
+
+        return $prices;
+    }
+
     /** @return array<int, string> */
     public static function dayNames(): array
     {

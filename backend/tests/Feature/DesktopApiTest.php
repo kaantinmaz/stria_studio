@@ -11,6 +11,7 @@ use App\Models\Service;
 use App\Models\Setting;
 use App\Models\User;
 use App\Support\AppointmentSessions;
+use App\Support\BodyRegions;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -1036,6 +1037,85 @@ class DesktopApiTest extends TestCase
             ->call('updateAppointment');
 
         $this->assertSame(['forehead', 'hand_l'], $root->refresh()->body_regions);
+    }
+
+    public function test_state_exposes_all_region_price_categories_null_by_default(): void
+    {
+        $response = $this->desktop()->getJson('/api/desktop/state')->assertOk();
+
+        $this->assertSame(
+            array_fill_keys(array_keys(BodyRegions::CATEGORIES), null),
+            $response->json('region_prices'),
+        );
+        $this->assertStringContainsString('"region_prices":{"face":null', $response->getContent());
+        $this->assertMatchesRegularExpression('/^[a-f0-9]{64}$/', $response->json('region_prices_revision'));
+        $this->assertSame(0, Setting::query()->whereNull('site')->count());
+    }
+
+    public function test_region_prices_update_saves_returns_and_state_reflects_it(): void
+    {
+        $main = Setting::query()->create(['site' => null, 'phone' => '0500']);
+        $revision = $this->desktop()->getJson('/api/desktop/state')->json('region_prices_revision');
+
+        $response = $this->desktop()->putJson('/api/desktop/region-prices', [
+            'prices' => ['face' => 1500, 'hand' => '250.5', 'foot' => null],
+            'revision' => $revision,
+        ])->assertOk()
+            ->assertJsonPath('region_prices.face', 1500)
+            ->assertJsonPath('region_prices.hand', 250.5)
+            ->assertJsonPath('region_prices.foot', null)
+            ->assertJsonPath('region_prices.neck', null);
+        $this->assertStringContainsString('"hand":250.5', $response->getContent());
+        $this->assertNotSame($revision, $response->json('region_prices_revision'));
+        $this->assertSame('0500', $main->refresh()->phone);
+        $this->assertSame(['face' => 1500, 'hand' => 250.5], $main->body_region_prices);
+
+        $this->desktop()->getJson('/api/desktop/state')
+            ->assertJsonPath('region_prices.face', 1500)
+            ->assertJsonPath('region_prices_revision', $response->json('region_prices_revision'));
+
+        // Gönderilmeyen kategoriler temizlenir; hiç fiyat yoksa null saklanır.
+        $this->desktop()->putJson('/api/desktop/region-prices', [
+            'prices' => ['face' => null],
+            'revision' => $response->json('region_prices_revision'),
+        ])->assertOk()->assertJsonPath('region_prices.hand', null);
+        $this->assertNull($main->refresh()->body_region_prices);
+    }
+
+    public function test_region_prices_reject_unknown_keys_negative_values_and_stale_revision(): void
+    {
+        $revision = $this->desktop()->getJson('/api/desktop/state')->json('region_prices_revision');
+
+        $this->desktop()->putJson('/api/desktop/region-prices', [
+            'prices' => ['face' => 100, 'knee' => 100],
+            'revision' => $revision,
+        ])->assertUnprocessable()->assertJsonValidationErrors('prices');
+
+        $this->desktop()->putJson('/api/desktop/region-prices', [
+            'prices' => ['face' => -1],
+            'revision' => $revision,
+        ])->assertUnprocessable()->assertJsonValidationErrors('prices.face');
+        $this->assertSame(0, Setting::query()->whereNull('site')->count());
+
+        $this->desktop()->putJson('/api/desktop/region-prices', [
+            'prices' => ['face' => 100],
+            'revision' => $revision,
+        ])->assertOk();
+
+        $this->desktop()->putJson('/api/desktop/region-prices', [
+            'prices' => ['face' => 200],
+            'revision' => $revision,
+        ])->assertConflict()
+            ->assertJsonPath('message', 'Bölge fiyatları başka bir yerde güncellendi.')
+            ->assertJsonPath('region_prices.face', 100);
+    }
+
+    public function test_region_categories_cover_every_region_exactly_once(): void
+    {
+        $regions = array_merge(...array_column(BodyRegions::CATEGORIES, 'regions'));
+
+        $this->assertSame(count($regions), count(array_unique($regions)));
+        $this->assertEqualsCanonicalizing(array_keys(BodyRegions::LABELS), $regions);
     }
 
     private function subserviceService(): Service
