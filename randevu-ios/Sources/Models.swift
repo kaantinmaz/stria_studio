@@ -110,6 +110,15 @@ struct StateDTO: Codable, Equatable {
     let services: [ServiceDTO]
     let hours: [WorkingDayDTO]
     let timezone: String
+    // Optional so older servers (no such keys) still decode. Keyed by `BodyRegionCategory` key; null = unset.
+    let regionPrices: [String: Decimal?]?
+    let regionPricesRevision: String?
+
+    enum CodingKeys: String, CodingKey {
+        case customers, appointments, services, hours, timezone
+        case regionPrices = "region_prices"
+        case regionPricesRevision = "region_prices_revision"
+    }
 }
 
 // MARK: - Status

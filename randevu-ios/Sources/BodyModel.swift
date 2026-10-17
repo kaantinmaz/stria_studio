@@ -56,6 +56,45 @@ struct BodyRegion: Identifiable, Hashable {
         let set = Set(keys)
         return all.filter { set.contains($0.key) }
     }
+
+    var category: BodyRegionCategory? { BodyRegionCategory.all.first { $0.regions.contains(key) } }
+
+    /// Session price of this region's category; nil when unpriced. `prices` is keyed by category.
+    func price(in prices: [String: Decimal]) -> Decimal? { category.flatMap { prices[$0.key] } }
+
+    /// Per-session price of a selection: each region adds its category price (two regions of one
+    /// category count twice); unpriced regions add 0.
+    static func sessionPrice(_ keys: some Sequence<String>, prices: [String: Decimal]) -> Decimal {
+        ordered(keys).compactMap { $0.price(in: prices) }.reduce(0, +)
+    }
+}
+
+/// Price groups for regions (same keys and order as BodyRegions::CATEGORIES on the server).
+struct BodyRegionCategory: Identifiable {
+    let key: String
+    let label: String
+    let regions: [String]
+    var id: String { key }
+
+    static let all: [BodyRegionCategory] = [
+        .init(key: "face", label: "Yüz", regions: ["forehead", "nose", "cheek_r", "cheek_l", "lips_chin"]),
+        .init(key: "scalp", label: "Saçlı deri / baş arkası", regions: ["scalp"]),
+        .init(key: "neck", label: "Boyun", regions: ["neck_front", "neck_back"]),
+        .init(key: "shoulder", label: "Omuz", regions: ["shoulder_r", "shoulder_l"]),
+        .init(key: "chest", label: "Göğüs", regions: ["chest_r", "chest_l"]),
+        .init(key: "abdomen", label: "Karın", regions: ["abdomen_r", "abdomen_l"]),
+        .init(key: "upper_back", label: "Sırt", regions: ["upper_back_r", "upper_back_l"]),
+        .init(key: "lower_back", label: "Bel", regions: ["lower_back_r", "lower_back_l"]),
+        .init(key: "buttock", label: "Kalça", regions: ["buttock_r", "buttock_l"]),
+        .init(key: "upper_arm", label: "Üst kol", regions: ["upper_arm_r", "upper_arm_l"]),
+        .init(key: "forearm", label: "Ön kol", regions: ["forearm_r", "forearm_l"]),
+        .init(key: "hand", label: "El", regions: ["hand_r", "hand_l"]),
+        .init(key: "thigh", label: "Uyluk (ön/arka)", regions: ["thigh_front_r", "thigh_front_l", "thigh_back_r", "thigh_back_l"]),
+        .init(key: "thigh_inner", label: "İç uyluk", regions: ["thigh_inner_r", "thigh_inner_l"]),
+        .init(key: "lower_leg", label: "Alt bacak (ön/baldır)", regions: ["shin_r", "shin_l", "calf_r", "calf_l"]),
+        .init(key: "leg_inner", label: "İç bacak (alt)", regions: ["leg_inner_r", "leg_inner_l"]),
+        .init(key: "foot", label: "Ayak", regions: ["foot_r", "foot_l"]),
+    ]
 }
 
 /// Region-split human mesh from Resources/BodyModel.bin (built by tools/build_body_model.py).

@@ -13,6 +13,9 @@ final class AppStore {
     private(set) var appointments: [AppointmentDTO] = []
     private(set) var services: [ServiceDTO] = []
     private(set) var hours: [WorkingDayDTO] = []
+    /// Session price per `BodyRegionCategory` key; unpriced categories are absent.
+    private(set) var regionPrices: [String: Decimal] = [:]
+    private(set) var regionPricesRevision = ""
     private(set) var lastRefresh: Date?
 
     // UI
@@ -116,6 +119,14 @@ final class AppStore {
         }
     }
 
+    /// `prices` keyed by category; nil clears that category's price.
+    func updateRegionPrices(_ prices: [String: Decimal?]) async -> Bool {
+        let revision = regionPricesRevision
+        return await mutate { api, token in
+            try await api.updateRegionPrices(prices, revision: revision, token: token)
+        }
+    }
+
     // MARK: Lookups
 
     func customer(_ id: Int) -> CustomerDTO? { customers.first { $0.id == id } }
@@ -163,6 +174,8 @@ final class AppStore {
         appointments = state.appointments
         services = state.services
         hours = state.hours.sorted { $0.id < $1.id }
+        regionPrices = (state.regionPrices ?? [:]).compactMapValues { $0 }
+        regionPricesRevision = state.regionPricesRevision ?? ""
         lastRefresh = Date()
     }
 

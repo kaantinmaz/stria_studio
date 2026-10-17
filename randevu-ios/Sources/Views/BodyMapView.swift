@@ -3,8 +3,10 @@ import SceneKit
 
 /// Rotatable 3D body with `selected` regions highlighted. Tapping a region calls `onToggle`;
 /// nil = read-only (rotation still works, taps are ignored). The corner button opens it full screen.
+/// `sessionTotal` non-nil = show session prices (consultation) under the full-screen model.
 struct BodyMapView: View {
     let selected: Set<String>
+    var sessionTotal: Int? = nil
     var onToggle: ((String) -> Void)? = nil
 
     @State private var camera = CameraRequest(back: false, token: 0)
@@ -30,7 +32,7 @@ struct BodyMapView: View {
             }
             // Content is rebuilt from this view's `selected`, so taps in full screen show up live.
             .fullScreenCover(isPresented: $expanded) {
-                BodyMapFullScreen(mesh: mesh, selected: selected, onToggle: onToggle)
+                BodyMapFullScreen(mesh: mesh, selected: selected, sessionTotal: sessionTotal, onToggle: onToggle)
             }
         } else {
             Text("3D model yüklenemedi").foregroundStyle(.secondary)
@@ -38,11 +40,12 @@ struct BodyMapView: View {
     }
 }
 
-/// Full-screen 3D body plus the chosen regions as chips (removable when editable).
+/// Full-screen 3D body plus the chosen regions (removable when editable) in a short list under it.
 private struct BodyMapFullScreen: View {
     @Environment(\.dismiss) private var dismiss
     let mesh: BodyModel.Mesh
     let selected: Set<String>
+    let sessionTotal: Int?
     let onToggle: ((String) -> Void)?
 
     @State private var camera = CameraRequest(back: false, token: 0)
@@ -52,29 +55,15 @@ private struct BodyMapFullScreen: View {
             VStack(spacing: 8) {
                 BodySceneView(mesh: mesh, selected: selected, onToggle: onToggle, camera: camera)
                 SideButtons(camera: $camera)
-                let regions = BodyRegion.ordered(selected)
-                if regions.isEmpty {
+                if selected.isEmpty {
                     Text("Bölge seçilmedi").font(.caption).foregroundStyle(.secondary)
                 } else {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack {
-                            ForEach(regions) { region in
-                                HStack(spacing: 4) {
-                                    Text(region.label)
-                                    if let onToggle {
-                                        Button { onToggle(region.key) } label: {
-                                            Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary)
-                                        }
-                                        .accessibilityLabel("\(region.label) kaldır")
-                                    }
-                                }
-                                .font(.subheadline)
-                                .padding(.horizontal, 10).padding(.vertical, 6)
-                                .background(Color.accentColor.opacity(0.15), in: Capsule())
-                            }
-                        }
-                        .padding(.horizontal)
+                    // Capped height keeps the model large; the list scrolls.
+                    List {
+                        BodyRegionRows(keys: selected, sessionTotal: sessionTotal, onRemove: onToggle)
                     }
+                    .listStyle(.plain)
+                    .frame(maxHeight: 240)
                 }
             }
             .padding(.bottom, 8)
@@ -103,24 +92,16 @@ private struct SideButtons: View {
     }
 }
 
-/// Editable "Bölgeler" rows: the 3D picker plus the chosen regions, each removable.
+/// Editable "Bölgeler" rows: the 3D picker plus the chosen regions (each removable) and their prices.
 struct BodyRegionPicker: View {
     @Binding var selection: Set<String>
+    let sessionTotal: Int
 
     var body: some View {
-        BodyMapView(selected: selection) { key in
+        BodyMapView(selected: selection, sessionTotal: sessionTotal) { key in
             if selection.contains(key) { selection.remove(key) } else { selection.insert(key) }
         }
-        ForEach(BodyRegion.ordered(selection)) { region in
-            HStack {
-                Text(region.label)
-                Spacer()
-                Button { selection.remove(region.key) } label: {
-                    Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary)
-                }
-                .buttonStyle(.borderless)
-            }
-        }
+        BodyRegionRows(keys: selection, sessionTotal: sessionTotal) { selection.remove($0) }
     }
 }
 
@@ -130,7 +111,61 @@ struct BodyRegionSummary: View {
 
     var body: some View {
         BodyMapView(selected: Set(keys))
-        Text(BodyRegion.ordered(keys).map(\.label).joined(separator: ", "))
+        BodyRegionRows(keys: Set(keys), sessionTotal: nil)
+    }
+}
+
+/// Chosen regions as Form/List rows: colour swatch (same as on the model) and label; with `sessionTotal`
+/// also each region's session price, the per-session sum and the package total.
+struct BodyRegionRows: View {
+    @Environment(AppStore.self) private var store
+    let keys: Set<String>
+    let sessionTotal: Int?
+    var onRemove: ((String) -> Void)? = nil
+
+    var body: some View {
+        let colors = BodyRegion.colors(for: keys)
+        let prices = sessionTotal == nil ? [:] : store.regionPrices
+        ForEach(BodyRegion.ordered(keys)) { region in
+            HStack {
+                Circle().fill(Color(colors[region.key] ?? .clear)).frame(width: 12, height: 12)
+                Text(region.label)
+                Spacer()
+                if !prices.isEmpty {
+                    Text(region.price(in: prices).map { "\(Fmt.price($0)) / seans" } ?? "Fiyat yok")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+                if let onRemove {
+                    Button { onRemove(region.key) } label: {
+                        Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary)
+                    }
+                    .buttonStyle(.borderless)
+                    .accessibilityLabel("\(region.label) kaldır")
+                }
+            }
+        }
+        if let sessionTotal {
+            if prices.isEmpty {
+                Text("Fiyatlar Ayarlar'dan girilir").font(.caption).foregroundStyle(.secondary)
+            } else if !keys.isEmpty {
+                let perSession = BodyRegion.sessionPrice(keys, prices: prices)
+                InfoRow(label: "Seans başı", value: Fmt.price(perSession))
+                InfoRow(label: "Toplam (\(sessionTotal) seans)", value: Fmt.price(perSession * Decimal(sessionTotal)))
+            }
+        }
+    }
+}
+
+extension BodyRegion {
+    /// Distinct highlight colours, cycled when more regions are chosen than there are colours.
+    static let palette: [UIColor] = [
+        0xE53935, 0x1E88E5, 0x43A047, 0x8E24AA, 0xFB8C00, 0x00ACC1, 0xD81B60,
+        0x3949AB, 0xC0CA33, 0x6D4C41, 0x00897B, 0xFDD835, 0x5E35B1, 0x546E7A,
+    ].map { UIColor(red: CGFloat($0 >> 16) / 255, green: CGFloat($0 >> 8 & 0xFF) / 255, blue: CGFloat($0 & 0xFF) / 255, alpha: 1) }
+
+    /// Colour per selected key by its position in canonical order (stable while editing).
+    static func colors(for keys: Set<String>) -> [String: UIColor] {
+        Dictionary(uniqueKeysWithValues: ordered(keys).enumerated().map { ($1.key, palette[$0 % palette.count]) })
     }
 }
 
@@ -199,9 +234,9 @@ private struct BodySceneView: UIViewRepresentable {
     func updateUIView(_ view: SCNView, context: Context) {
         let c = context.coordinator
         c.onToggle = onToggle
-        let accent = UIColor(named: "AccentColor") ?? .tintColor
+        let colors = BodyRegion.colors(for: selected)
         for (key, material) in zip(mesh.keys, c.materials) {
-            material.diffuse.contents = selected.contains(key) ? accent : Self.skin
+            material.diffuse.contents = colors[key] ?? Self.skin
         }
         if camera.token != c.cameraToken {
             c.cameraToken = camera.token

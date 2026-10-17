@@ -77,7 +77,10 @@ struct EditAppointmentView: View {
                     }
                 } else if usesBodyRegions {
                     Section("Bölgeler") {
-                        BodyRegionPicker(selection: $bodyRegions)
+                        // Only the user's edits (not the initial load) refill the price from region prices.
+                        BodyRegionPicker(selection: Binding(get: { bodyRegions },
+                                                            set: { bodyRegions = $0; fillRegionPrice() }),
+                                         sessionTotal: appt?.sessionTotal ?? 1)
                     }
                 }
 
@@ -136,6 +139,11 @@ struct EditAppointmentView: View {
         priceText = appt.price.map(Fmt.amount) ?? ""
         subservices = Set(appt.subservices)
         bodyRegions = Set(appt.bodyRegions)
+    }
+
+    private func fillRegionPrice() {
+        let total = BodyRegion.sessionPrice(bodyRegions, prices: store.regionPrices) * Decimal(appt?.sessionTotal ?? 1)
+        if total > 0 { priceText = Fmt.amount(total) }
     }
 
     private func save() {

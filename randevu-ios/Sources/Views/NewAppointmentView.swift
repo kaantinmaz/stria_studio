@@ -66,7 +66,7 @@ struct NewAppointmentView: View {
 
                 if usesBodyRegions {
                     Section("Bölgeler") {
-                        BodyRegionPicker(selection: $bodyRegions)
+                        BodyRegionPicker(selection: $bodyRegions, sessionTotal: sessionTotal)
                     }
                 }
 
@@ -122,6 +122,9 @@ struct NewAppointmentView: View {
                 Section("Fiyat") {
                     PriceField(text: $priceText, caption: sessionTotal > 1 ? "Paketin toplam fiyatı" : nil)
                 }
+                // Region prices × sessions fill the price; a manual edit stays until the next change.
+                .onChange(of: bodyRegions) { fillRegionPrice() }
+                .onChange(of: sessionTotal) { fillRegionPrice() }
 
                 Section("Not") {
                     TextField("Not", text: $note, axis: .vertical).lineLimit(2...5)
@@ -195,6 +198,11 @@ struct NewAppointmentView: View {
         return (0..<sessionTotal).compactMap {
             Studio.calendar.date(byAdding: .day, value: intervalDays * $0, to: start)
         }
+    }
+
+    private func fillRegionPrice() {
+        let total = BodyRegion.sessionPrice(bodyRegions, prices: store.regionPrices) * Decimal(sessionTotal)
+        if total > 0 { priceText = Fmt.amount(total) }
     }
 
     private func initialize() {

@@ -113,6 +113,11 @@ final class DesktopAPI {
         let _: DiscardResponse = try await send(path: "/appointments/\(id)/photos/\(index)", method: "DELETE", token: token, body: body)
     }
 
+    func updateRegionPrices(_ prices: [String: Decimal?], revision: String, token: String) async throws {
+        let body = RegionPricesWrite(prices: prices, revision: revision)
+        let _: DiscardResponse = try await send(path: "/region-prices", method: "PUT", token: token, body: body)
+    }
+
     // MARK: Core
 
     private func endpoint(_ path: String) -> URL {
@@ -293,5 +298,11 @@ struct SessionAddWrite: Encodable {
 }
 
 struct RevisionWrite: Encodable {
+    let revision: String
+}
+
+/// nil values encode as null (= category unpriced).
+struct RegionPricesWrite: Encodable {
+    let prices: [String: Decimal?]
     let revision: String
 }
