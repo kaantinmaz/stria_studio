@@ -1,13 +1,19 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { preload } from "react-dom";
 import type { HeroVideo } from "@/lib/serviceHero";
+
+// Cards visible on first paint (mobile shows two and a half). Their posters are the
+// page's LCP, so they are preloaded with high priority; later videos don't fetch data early.
+const ABOVE_FOLD = 3;
 
 // Hizmet sayfası üst bölümü: dikey çekimler yan yana, sessiz ve döngüde oynar.
 // Tıklanan video ekranın ortasında hafif bir büyüme animasyonuyla açılır
 // (Esc, arka plan veya kapat düğmesiyle kapanır; açıkken sayfa kaymaz).
 export function HeroVideoStrip({ videos, title }: { videos: HeroVideo[]; title: string }) {
   const [open, setOpen] = useState<number | null>(null);
+  videos.slice(0, ABOVE_FOLD).forEach((video) => preload(video.poster, { as: "image", fetchPriority: "high" }));
   const lastTrigger = useRef<HTMLButtonElement | null>(null);
   const closeRef = useRef<HTMLButtonElement | null>(null);
 
@@ -65,7 +71,7 @@ export function HeroVideoStrip({ videos, title }: { videos: HeroVideo[]; title: 
                 autoPlay
                 loop
                 playsInline
-                preload="metadata"
+                preload={i < ABOVE_FOLD ? "metadata" : "none"}
                 aria-hidden
                 className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04] motion-reduce:transition-none"
               />
