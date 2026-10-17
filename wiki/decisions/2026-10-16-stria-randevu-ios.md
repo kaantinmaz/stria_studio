@@ -19,7 +19,7 @@ Sahip, yalnız stüdyonun kullanacağı bir iPhone uygulaması istedi: gün gün
 
 ## Kapsam dışı (bilinçli)
 
-Fiyat/ödeme, fotoğraf, kampanya bağlama — panelde kalıyor; API bu alanlara dokunmuyor. Canlı push yok: panelde yapılan değişiklik uygulamada yenileyince/ön plana gelince görünür.
+Ödeme durumu (`is_paid`/`payment_method`/`paid_at` — Meta/Google dönüşüm yüklemesini tetikler), fotoğraf, kampanya bağlama — panelde kalıyor; API bunlara dokunmuyor. (Fiyat 2026-10-17'de eklendi, aşağıya bkz.) Canlı push yok: panelde yapılan değişiklik uygulamada yenileyince/ön plana gelince görünür.
 
 ## Güncelleme 2026-10-17 — giriş ekranı kaldırıldı (owner kararı)
 
@@ -30,6 +30,13 @@ Owner: "giriş yapmamız gerekmesin, sadece biz kullanacağız". Seçenekler sun
 - Kaldırılanlar: `LoginView`, `Keychain.swift`/`StoredCredentials`, `login`/`logout` uçları istemcide, `DesktopUser`/`LoginResponse`, sessiz yeniden giriş, Ayarlar'daki Çıkış. Uygulama açılışta doğrudan `/state` çeker; hata alert ile gösterilir.
 - **Risk (kabul edildi):** uygulama paketini ele geçiren panel API'sine tam erişir. İptal: prod `personal_access_tokens` tablosunda o satırı silmek (uygulama 401 → "Uygulama anahtarı geçersiz…").
 - Yeni cihaz (iPhone19,7 / iOS 27) için Xcode 27.1 gerekti (26.6'nın DDI'sinde bu çip yok: `PersonalizedBundleMissingVariantError`).
+
+## Güncelleme 2026-10-17 — tüm randevular, özel seans tarihleri, fiyat (owner istekleri)
+
+- **Randevular ekranı:** açılışta TÜM randevular, gün bölümleri halinde (artan; ilk açılışta bugün/sonrasına kaydırır). Filtre menüsü: Tümü / Bugün / Bu hafta / Bu ay / Özel aralık. Hafta şeridi ve gün kaydırma kaldırıldı.
+- **Özel seans tarihleri:** API `POST /appointments` yeni `session_starts` (2..N. seanslar, ISO 8601+offset, uzunluk `session_total-1`, kesin artan ve kökten sonra; varsa `interval_days` yok sayılır). `AppointmentSessions::splitAt()` tek yol, `split()` ona delege eder. iOS: Yeni randevuda "Tarihleri tek tek seç"; mevcut pakette detayda "Seans tarihlerini düzenle" sayfası (değişen seanslar sırayla `PATCH starts_at`, her çağrıda güncel revision).
+- **Fiyat:** API randevu nesnesinde `price` (sayı/null), POST/PATCH yazılabilir (0..99999999.99, null temizler). Paket fiyatı yalnız kökte — çocuk seansa `price` PATCH → 422 "Paket fiyatı 1. seansta düzenlenir." iOS: Yeni/Düzenle'de Fiyat alanı (çocukta salt okunur), detayda "Fiyat"/"Paket fiyatı", listede ve müşteri geçmişinde fiyat (paket yalnız kök satırında), müşteri geçmişinde "Toplam" (paket bir kez; iptal edilenler de dahil — owner'a soruldu).
+- Testler: `DesktopApi|AppointmentSessions` 39/39, tam suite 281/281. Canlı: monorepo `95fde37`/`8e28f37` → admin `e153166`, plesk fetch/deploy + `optimize:clear` + `package:discover`. Canlı API E2E: 3 seanslı özel tarihli + 4500,5 fiyatlı TEST paketi oluşturuldu (fiyat yalnız kökte, çocukta fiyat PATCH 422), sonra 3 seans silindi (randevu sayısı 10 → 10). Telefona Release build kuruldu; simülatörde canlı veriyle liste ekranı doğrulandı.
 
 ## Kurulum / yeniden derleme
 
