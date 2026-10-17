@@ -64,7 +64,7 @@ final class AppStore {
     func createAppointment(customerID: Int, serviceID: Int?, startsAt: Date, durationMin: Int,
                            status: AppointmentStatus, note: String?, sessionTotal: Int, intervalDays: Int,
                            sessionStarts: [Date]? = nil, price: Decimal? = nil,
-                           subservices: [String]? = nil) async -> Int? {
+                           subservices: [String]? = nil, bodyRegions: [String]? = nil) async -> Int? {
         var payload = AppointmentWrite(customerID: customerID, serviceID: serviceID, startsAt: startsAt,
                                        durationMin: durationMin, status: status.apiValue, note: note.nilIfBlank,
                                        revision: nil,
@@ -73,6 +73,7 @@ final class AppStore {
                                        sessionStarts: sessionTotal > 1 ? sessionStarts : nil)
         if let price { payload.price = .set(price) }
         payload.subservices = subservices
+        payload.bodyRegions = bodyRegions
         return await mutateReturning { api, token in
             try await api.createAppointment(payload, token: token)
         }
@@ -80,11 +81,12 @@ final class AppStore {
 
     func updateAppointment(id: Int, revision: String, customerID: Int, serviceID: Int?, startsAt: Date,
                            durationMin: Int, status: AppointmentStatus, note: String?,
-                           price: PriceWrite = .omit, subservices: [String]? = nil) async -> Bool {
+                           price: PriceWrite = .omit, subservices: [String]? = nil,
+                           bodyRegions: [String]? = nil) async -> Bool {
         let payload = AppointmentWrite(customerID: customerID, serviceID: serviceID, startsAt: startsAt,
                                        durationMin: durationMin, status: status.apiValue, note: note.nilIfBlank,
                                        revision: revision, sessionTotal: nil, intervalDays: nil, sessionStarts: nil,
-                                       price: price, subservices: subservices)
+                                       price: price, subservices: subservices, bodyRegions: bodyRegions)
         return await mutate { api, token in
             try await api.updateAppointment(id: id, payload, token: token)
         }

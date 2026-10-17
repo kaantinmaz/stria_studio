@@ -76,6 +76,12 @@ struct AppointmentDetailView: View {
                 }
             }
 
+            if !appt.bodyRegions.isEmpty {
+                Section("Bölgeler") {
+                    BodyRegionSummary(keys: appt.bodyRegions)
+                }
+            }
+
             quickStatusSection(appt, current: status)
 
             photosSection(appt)

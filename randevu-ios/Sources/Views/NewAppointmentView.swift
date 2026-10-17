@@ -22,11 +22,13 @@ struct NewAppointmentView: View {
     @State private var customStarts: [Date] = [] // sessions 2..N
     @State private var priceText = ""
     @State private var subservices: Set<String> = []
+    @State private var bodyRegions: Set<String> = []
     @State private var pickedPhotos: [PhotosPickerItem] = []
     @State private var isUploading = false
     @State private var didInit = false
 
     private var subserviceOptions: [String] { store.service(serviceID)?.subservices ?? [] }
+    private var usesBodyRegions: Bool { store.service(serviceID)?.usesBodyRegions ?? false }
 
     var body: some View {
         NavigationStack {
@@ -52,12 +54,19 @@ struct NewAppointmentView: View {
                     .onChange(of: serviceID) { _, newValue in
                         if let s = store.service(newValue) { duration = s.durationMin }
                         subservices = []
+                        bodyRegions = []
                     }
                 }
 
                 if !subserviceOptions.isEmpty {
                     Section("Alt uygulamalar") {
                         SubservicePicker(options: subserviceOptions, selection: $subservices)
+                    }
+                }
+
+                if usesBodyRegions {
+                    Section("Bölgeler") {
+                        BodyRegionPicker(selection: $bodyRegions)
                     }
                 }
 
@@ -203,13 +212,14 @@ struct NewAppointmentView: View {
         let starts = DateMerge.combine(day: startDate, time: startTime)
         // Keep the service's order; omit when the service has none.
         let chosen = subserviceOptions.isEmpty ? nil : subserviceOptions.filter(subservices.contains)
+        let regions = usesBodyRegions ? BodyRegion.ordered(bodyRegions).map(\.key) : nil
         Task {
             guard let rootID = await store.createAppointment(customerID: customer.id, serviceID: serviceID,
                                                              startsAt: starts, durationMin: duration, status: status,
                                                              note: note, sessionTotal: sessionTotal, intervalDays: intervalDays,
                                                              sessionStarts: useCustomStarts ? customStarts : nil,
                                                              price: PriceText.parse(priceText),
-                                                             subservices: chosen) else { return }
+                                                             subservices: chosen, bodyRegions: regions) else { return }
             if !pickedPhotos.isEmpty {
                 isUploading = true
                 let jpegs = await PhotoPrep.jpegs(from: pickedPhotos)

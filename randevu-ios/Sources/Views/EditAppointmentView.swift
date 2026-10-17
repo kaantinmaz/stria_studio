@@ -14,11 +14,13 @@ struct EditAppointmentView: View {
     @State private var note = ""
     @State private var priceText = ""
     @State private var subservices: Set<String> = []
+    @State private var bodyRegions: Set<String> = []
     @State private var loaded = false
 
     private var appt: AppointmentDTO? { store.appointments.first { $0.id == appointmentID } }
     private var isChild: Bool { appt?.isChildSession ?? false }
     private var subserviceOptions: [String] { store.service(serviceID)?.subservices ?? [] }
+    private var usesBodyRegions: Bool { store.service(serviceID)?.usesBodyRegions ?? false }
 
     var body: some View {
         NavigationStack {
@@ -62,6 +64,20 @@ struct EditAppointmentView: View {
                 } else if !subserviceOptions.isEmpty {
                     Section("Alt uygulamalar") {
                         SubservicePicker(options: subserviceOptions, selection: $subservices)
+                    }
+                }
+
+                if isChild {
+                    if let appt, !appt.bodyRegions.isEmpty {
+                        Section("Bölgeler") {
+                            BodyRegionSummary(keys: appt.bodyRegions)
+                            Text("Paketin 1. seansında yönetilir")
+                                .font(.caption).foregroundStyle(.secondary)
+                        }
+                    }
+                } else if usesBodyRegions {
+                    Section("Bölgeler") {
+                        BodyRegionPicker(selection: $bodyRegions)
                     }
                 }
 
@@ -119,6 +135,7 @@ struct EditAppointmentView: View {
         note = appt.note ?? ""
         priceText = appt.price.map(Fmt.amount) ?? ""
         subservices = Set(appt.subservices)
+        bodyRegions = Set(appt.bodyRegions)
     }
 
     private func save() {
@@ -128,13 +145,15 @@ struct EditAppointmentView: View {
         let price: PriceWrite = isChild ? .omit : (PriceText.parse(priceText).map { .set($0) } ?? .clear)
         // Same rule for sub-treatments: child omits; root/single sends the full list ([] clears).
         let chosen: [String]? = isChild ? nil : subserviceOptions.filter(subservices.contains)
+        // Body regions likewise; [] when the service no longer uses them.
+        let regions: [String]? = isChild ? nil : (usesBodyRegions ? BodyRegion.ordered(bodyRegions).map(\.key) : [])
         Task {
             let ok = await store.updateAppointment(id: appt.id, revision: appt.revision,
                                                     customerID: appt.customerID,
                                                     serviceID: isChild ? appt.serviceID : serviceID,
                                                     startsAt: starts, durationMin: duration,
                                                     status: status, note: note, price: price,
-                                                    subservices: chosen)
+                                                    subservices: chosen, bodyRegions: regions)
             if ok { dismiss() }
         }
     }

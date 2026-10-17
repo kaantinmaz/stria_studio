@@ -244,9 +244,12 @@ struct AppointmentWrite: Encodable {
     var price: PriceWrite = .omit
     /// nil = omit (child sessions must not send it).
     var subservices: [String]? = nil
+    /// nil = omit (child sessions must not send it).
+    var bodyRegions: [String]? = nil
 
     enum CodingKeys: String, CodingKey {
         case status, note, revision, price, subservices
+        case bodyRegions = "body_regions"
         case customerID = "customer_id"
         case serviceID = "service_id"
         case startsAt = "starts_at"
@@ -274,6 +277,7 @@ struct AppointmentWrite: Encodable {
         case let .set(value): try c.encode(value, forKey: .price)
         }
         if let subservices { try c.encode(subservices, forKey: .subservices) }
+        if let bodyRegions { try c.encode(bodyRegions, forKey: .bodyRegions) }
     }
 }
 
