@@ -12,7 +12,7 @@ struct StriaRandevuApp: App {
                 .task { await store.bootstrap() }
                 .tint(Color("AccentColor"))
                 .onChange(of: scenePhase) { _, phase in
-                    if phase == .active && store.isAuthenticated {
+                    if phase == .active && !store.isBootstrapping {
                         Task { await store.refresh() }
                     }
                 }
@@ -30,13 +30,10 @@ struct RootView: View {
                     ProgressView()
                     Text("Yükleniyor…").foregroundStyle(.secondary)
                 }
-            } else if store.isAuthenticated {
-                MainTabView()
             } else {
-                LoginView()
+                MainTabView()
             }
         }
-        .animation(.default, value: store.isAuthenticated)
         .animation(.default, value: store.isBootstrapping)
     }
 }

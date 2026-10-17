@@ -51,6 +51,26 @@ struct InfoRow: View {
     }
 }
 
+/// Optional TL price input ("1.500", "1500,50"); blank = no price.
+struct PriceField: View {
+    @Binding var text: String
+    var caption: String? = nil
+
+    static func isValid(_ text: String) -> Bool { text.nilIfBlank == nil || PriceText.parse(text) != nil }
+
+    var body: some View {
+        HStack {
+            TextField("Fiyat", text: $text).keyboardType(.decimalPad)
+            Text("₺").foregroundStyle(.secondary)
+        }
+        if !Self.isValid(text) {
+            Text("Geçersiz fiyat (ör. 1.500 veya 1500,50)").font(.caption).foregroundStyle(.red)
+        } else if let caption {
+            Text(caption).font(.caption).foregroundStyle(.secondary)
+        }
+    }
+}
+
 extension View {
     /// Binds the store's errorMessage to a simple alert.
     func errorAlert(_ store: AppStore) -> some View {

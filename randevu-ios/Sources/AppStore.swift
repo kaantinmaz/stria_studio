@@ -4,12 +4,9 @@ import Observation
 @MainActor
 @Observable
 final class AppStore {
-    static let defaultServer = "https://admin.striastudio.com.tr"
+    static let server = URL(string: "https://admin.striastudio.com.tr")!
 
-    // Session
-    private(set) var isAuthenticated = false
     private(set) var isBootstrapping = true
-    private(set) var user: DesktopUser?
 
     // Data
     private(set) var customers: [CustomerDTO] = []
@@ -23,89 +20,23 @@ final class AppStore {
     var isMutating = false
     var errorMessage: String?
 
-    // Login form prefill
-    var savedServer: String { creds?.baseURL ?? Self.defaultServer }
+    /// Studio-only app: authenticates with a non-expiring `desktop:manage` token
+    /// baked in at build time (gitignored `EmbeddedToken.swift`); no login screen.
+    private let api = DesktopAPI(baseURL: AppStore.server)
+    private let token = EmbeddedToken.value
 
-    private var api: DesktopAPI?
-    private var token: String?
-    private var creds: StoredCredentials?
-
-    init() {
-        creds = StoredCredentials.load()
-    }
-
-    // MARK: Bootstrap
+    // MARK: Bootstrap / refresh
 
     func bootstrap() async {
         defer { isBootstrapping = false }
-        guard let creds, let url = DesktopAPI.normalizedBaseURL(creds.baseURL) else {
-            isBootstrapping = false
-            return
-        }
-        api = DesktopAPI(baseURL: url)
-        token = creds.token
-        do {
-            try await loadStateWithRetry()
-            isAuthenticated = true
-        } catch {
-            // Stored session unusable; stay logged out (user re-enters password).
-            isAuthenticated = false
-        }
+        await refresh()
     }
-
-    // MARK: Auth
-
-    func login(server: String, email: String, password: String) async {
-        guard let url = DesktopAPI.normalizedBaseURL(server) else {
-            errorMessage = "Sunucu adresi geçersiz. Örn: https://admin.striastudio.com.tr"
-            return
-        }
-        isLoading = true
-        defer { isLoading = false }
-        let client = DesktopAPI(baseURL: url)
-        do {
-            let login = try await client.login(email: email, password: password)
-            let state = try await client.state(token: login.token)
-            api = client
-            token = login.token
-            user = login.user
-            apply(state)
-            var stored = StoredCredentials(baseURL: url.absoluteString, email: email, password: password, token: login.token)
-            stored.save()
-            creds = stored
-            isAuthenticated = true
-        } catch let APIError.validation(_, fields) {
-            errorMessage = fields.values.first?.first ?? "E-posta veya parola hatalı."
-        } catch {
-            errorMessage = (error as? APIError)?.errorDescription ?? error.localizedDescription
-        }
-    }
-
-    func logout() async {
-        isLoading = true
-        defer { isLoading = false }
-        if let api, let token { try? await api.logout(token: token) }
-        token = nil
-        user = nil
-        api = nil
-        creds = nil
-        customers = []; appointments = []; services = []; hours = []
-        lastRefresh = nil
-        StoredCredentials.clear()
-        isAuthenticated = false
-    }
-
-    // MARK: Refresh
 
     func refresh() async {
-        guard api != nil else { return }
         isLoading = true
         defer { isLoading = false }
         do {
-            try await loadStateWithRetry()
-            isAuthenticated = true
-        } catch APIError.unauthorized {
-            isAuthenticated = false
+            try await loadState()
         } catch {
             present(error)
         }
@@ -130,22 +61,27 @@ final class AppStore {
     }
 
     func createAppointment(customerID: Int, serviceID: Int?, startsAt: Date, durationMin: Int,
-                           status: AppointmentStatus, note: String?, sessionTotal: Int, intervalDays: Int) async -> Bool {
-        let payload = AppointmentWrite(customerID: customerID, serviceID: serviceID, startsAt: startsAt,
+                           status: AppointmentStatus, note: String?, sessionTotal: Int, intervalDays: Int,
+                           sessionStarts: [Date]? = nil, price: Decimal? = nil) async -> Bool {
+        var payload = AppointmentWrite(customerID: customerID, serviceID: serviceID, startsAt: startsAt,
                                        durationMin: durationMin, status: status.apiValue, note: note.nilIfBlank,
                                        revision: nil,
                                        sessionTotal: sessionTotal > 1 ? sessionTotal : nil,
-                                       intervalDays: sessionTotal > 1 ? intervalDays : nil)
+                                       intervalDays: sessionTotal > 1 ? intervalDays : nil,
+                                       sessionStarts: sessionTotal > 1 ? sessionStarts : nil)
+        if let price { payload.price = .set(price) }
         return await mutate { api, token in
             try await api.createAppointment(payload, token: token)
         }
     }
 
     func updateAppointment(id: Int, revision: String, customerID: Int, serviceID: Int?, startsAt: Date,
-                           durationMin: Int, status: AppointmentStatus, note: String?) async -> Bool {
+                           durationMin: Int, status: AppointmentStatus, note: String?,
+                           price: PriceWrite = .omit) async -> Bool {
         let payload = AppointmentWrite(customerID: customerID, serviceID: serviceID, startsAt: startsAt,
                                        durationMin: durationMin, status: status.apiValue, note: note.nilIfBlank,
-                                       revision: revision, sessionTotal: nil, intervalDays: nil)
+                                       revision: revision, sessionTotal: nil, intervalDays: nil, sessionStarts: nil,
+                                       price: price)
         return await mutate { api, token in
             try await api.updateAppointment(id: id, payload, token: token)
         }
@@ -187,18 +123,20 @@ final class AppStore {
             .sorted { $0.startsAt > $1.startsAt }
     }
 
+    /// Package price lives on the root session; for singles it's the appointment's own price.
+    func packagePrice(of appt: AppointmentDTO) -> Decimal? {
+        appt.isChildSession ? appointments.first { $0.id == appt.rootID }?.price : appt.price
+    }
+
+    /// Sum of single and package prices for a customer (each package counted once, via its root).
+    func totalPrice(for customerID: Int) -> Decimal {
+        appointments.filter { $0.customerID == customerID && !$0.isChildSession }
+            .compactMap(\.price)
+            .reduce(0, +)
+    }
+
     func appointments(for customerID: Int) -> [AppointmentDTO] {
         appointments.filter { $0.customerID == customerID }.sorted { $0.startsAt > $1.startsAt }
-    }
-
-    func appointments(on day: Date) -> [AppointmentDTO] {
-        appointments
-            .filter { Studio.calendar.isDate($0.startsAt, inSameDayAs: day) }
-            .sorted { $0.startsAt < $1.startsAt }
-    }
-
-    func hasAppointments(on day: Date) -> Bool {
-        appointments.contains { Studio.calendar.isDate($0.startsAt, inSameDayAs: day) }
     }
 
     // MARK: Internals
@@ -211,53 +149,21 @@ final class AppStore {
         lastRefresh = Date()
     }
 
-    private func loadStateWithRetry() async throws {
-        guard let api else { throw APIError.unauthorized }
-        do {
-            guard let token else { throw APIError.unauthorized }
-            apply(try await api.state(token: token))
-        } catch APIError.unauthorized {
-            try await reloginOnce()
-            guard let token else { throw APIError.unauthorized }
-            apply(try await api.state(token: token))
-        }
+    private func loadState() async throws {
+        apply(try await api.state(token: token))
     }
 
-    /// Re-login silently with stored credentials. Throws if no creds or login fails.
-    private func reloginOnce() async throws {
-        guard let api, let creds else { throw APIError.unauthorized }
-        let login = try await api.login(email: creds.email, password: creds.password)
-        token = login.token
-        user = login.user
-        var updated = creds
-        updated.token = login.token
-        self.creds = updated
-        StoredCredentials.updateToken(login.token)
-    }
-
-    /// Run a write with one silent re-login retry on 401, then re-fetch /state.
+    /// Run a write, then re-fetch /state.
     private func mutate(_ op: @escaping (DesktopAPI, String) async throws -> Void) async -> Bool {
-        guard let api else { errorMessage = APIError.unauthorized.errorDescription; return false }
         isMutating = true
         defer { isMutating = false }
         do {
-            do {
-                guard let token else { throw APIError.unauthorized }
-                try await op(api, token)
-            } catch APIError.unauthorized {
-                try await reloginOnce()
-                guard let token else { throw APIError.unauthorized }
-                try await op(api, token)
-            }
-            try? await loadStateWithRetry()
+            try await op(api, token)
+            try? await loadState()
             return true
         } catch APIError.conflict {
             errorMessage = APIError.conflict.errorDescription
-            try? await loadStateWithRetry()
-            return false
-        } catch APIError.unauthorized {
-            isAuthenticated = false
-            errorMessage = APIError.unauthorized.errorDescription
+            try? await loadState()
             return false
         } catch {
             present(error)
@@ -266,28 +172,15 @@ final class AppStore {
     }
 
     private func mutateReturning(_ op: @escaping (DesktopAPI, String) async throws -> CustomerDTO) async -> CustomerDTO? {
-        guard let api else { errorMessage = APIError.unauthorized.errorDescription; return nil }
         isMutating = true
         defer { isMutating = false }
         do {
-            let result: CustomerDTO
-            do {
-                guard let token else { throw APIError.unauthorized }
-                result = try await op(api, token)
-            } catch APIError.unauthorized {
-                try await reloginOnce()
-                guard let token else { throw APIError.unauthorized }
-                result = try await op(api, token)
-            }
-            try? await loadStateWithRetry()
+            let result = try await op(api, token)
+            try? await loadState()
             return result
         } catch APIError.conflict {
             errorMessage = APIError.conflict.errorDescription
-            try? await loadStateWithRetry()
-            return nil
-        } catch APIError.unauthorized {
-            isAuthenticated = false
-            errorMessage = APIError.unauthorized.errorDescription
+            try? await loadState()
             return nil
         } catch {
             present(error)

@@ -12,6 +12,7 @@ struct EditAppointmentView: View {
     @State private var serviceID: Int?
     @State private var status: AppointmentStatus = .confirmed
     @State private var note = ""
+    @State private var priceText = ""
     @State private var loaded = false
 
     private var appt: AppointmentDTO? { store.appointments.first { $0.id == appointmentID } }
@@ -59,6 +60,16 @@ struct EditAppointmentView: View {
                     .pickerStyle(.segmented)
                 }
 
+                Section("Fiyat") {
+                    if isChild {
+                        InfoRow(label: "Paket fiyatı", value: appt.flatMap { store.packagePrice(of: $0) }.map(Fmt.price) ?? "Belirtilmemiş")
+                        Text("Paketin 1. seansında yönetilir")
+                            .font(.caption).foregroundStyle(.secondary)
+                    } else {
+                        PriceField(text: $priceText, caption: appt?.isPackage == true ? "Paketin toplam fiyatı" : nil)
+                    }
+                }
+
                 Section("Not") {
                     TextField("Not", text: $note, axis: .vertical).lineLimit(2...5)
                 }
@@ -68,7 +79,8 @@ struct EditAppointmentView: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Vazgeç") { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Kaydet") { save() }.disabled(store.isMutating)
+                    Button("Kaydet") { save() }
+                        .disabled(store.isMutating || (!isChild && !PriceField.isValid(priceText)))
                 }
             }
             .onAppear(perform: loadIfNeeded)
@@ -85,17 +97,20 @@ struct EditAppointmentView: View {
         serviceID = appt.serviceID
         status = .from(appt.status)
         note = appt.note ?? ""
+        priceText = appt.price.map(Fmt.amount) ?? ""
     }
 
     private func save() {
         guard let appt else { return }
         let starts = DateMerge.combine(day: startDate, time: startTime)
+        // Child sessions must not send price; root/single sends null to clear it.
+        let price: PriceWrite = isChild ? .omit : (PriceText.parse(priceText).map { .set($0) } ?? .clear)
         Task {
             let ok = await store.updateAppointment(id: appt.id, revision: appt.revision,
                                                     customerID: appt.customerID,
                                                     serviceID: isChild ? appt.serviceID : serviceID,
                                                     startsAt: starts, durationMin: duration,
-                                                    status: status, note: note)
+                                                    status: status, note: note, price: price)
             if ok { dismiss() }
         }
     }

@@ -11,5 +11,8 @@ xcuserdata/
 # Generated project (XcodeGen is the source of truth: project.yml)
 StriaRandevu.xcodeproj/
 
+# Non-expiring API token baked into the build (see wiki decision 2026-10-17)
+Sources/EmbeddedToken.swift
+
 # macOS
 .DS_Store

@@ -3,25 +3,38 @@ import SwiftUI
 struct AppointmentsView: View {
     @Environment(AppStore.self) private var store
 
-    @State private var selectedDay = Studio.calendar.startOfDay(for: Date())
+    @State private var filter: AppointmentFilter = .all
     @State private var showNew = false
+    @State private var showCustomRange = false
+    @State private var didInitialScroll = false
 
-    private var dayAppointments: [AppointmentDTO] { store.appointments(on: selectedDay) }
+    private var today: Date { Studio.calendar.startOfDay(for: Date()) }
+
+    /// Filtered appointments grouped by start-of-day, ascending.
+    private var days: [(day: Date, items: [AppointmentDTO])] {
+        let range = filter.range
+        let filtered = store.appointments.filter { range?.contains($0.startsAt) ?? true }
+        let grouped = Dictionary(grouping: filtered) { Studio.calendar.startOfDay(for: $0.startsAt) }
+        return grouped.keys.sorted().map { day in
+            (day, grouped[day]!.sorted { $0.startsAt < $1.startsAt })
+        }
+    }
+
+    private var newDefaultDay: Date {
+        if let start = filter.range?.lowerBound, start > today { return start }
+        return today
+    }
 
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                header
-                weekStrip
-                Divider()
+                if filter != .all { activeFilter }
                 list
             }
             .navigationTitle("Randevular")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("Bugün") { withAnimation { selectedDay = Studio.calendar.startOfDay(for: Date()) } }
-                }
+                ToolbarItem(placement: .topBarLeading) { filterMenu }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button { showNew = true } label: { Image(systemName: "plus") }
                 }
@@ -30,107 +43,162 @@ struct AppointmentsView: View {
                 AppointmentDetailView(appointmentID: appt.id)
             }
             .sheet(isPresented: $showNew) {
-                NewAppointmentView(defaultDay: selectedDay)
+                NewAppointmentView(defaultDay: newDefaultDay)
+            }
+            .sheet(isPresented: $showCustomRange) {
+                CustomRangeView(initial: filter.range) { filter = $0 }
             }
             .errorAlert(store)
         }
     }
 
-    private var header: some View {
-        HStack {
-            Button { changeDay(by: -1) } label: { Image(systemName: "chevron.left") }
-            Spacer()
-            VStack(spacing: 2) {
-                Text(Fmt.dayHeader.string(from: selectedDay))
-                    .font(.headline)
-                if Studio.calendar.isDateInToday(selectedDay) {
-                    Text("Bugün").font(.caption2).foregroundStyle(Color.accentColor)
+    private var filterMenu: some View {
+        Menu {
+            ForEach([AppointmentFilter.all, .today, .week, .month], id: \.self) { option in
+                Button { filter = option } label: {
+                    if filter == option { Label(option.label, systemImage: "checkmark") } else { Text(option.label) }
                 }
             }
-            Spacer()
-            Button { changeDay(by: 1) } label: { Image(systemName: "chevron.right") }
+            Button { showCustomRange = true } label: {
+                if case .custom = filter { Label("Özel aralık…", systemImage: "checkmark") } else { Text("Özel aralık…") }
+            }
+        } label: {
+            Image(systemName: filter == .all ? "line.3.horizontal.decrease.circle" : "line.3.horizontal.decrease.circle.fill")
         }
-        .font(.title3)
-        .padding(.horizontal)
-        .padding(.vertical, 10)
     }
 
-    private var weekStrip: some View {
-        let days = weekDays(around: selectedDay)
-        return ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                ForEach(days, id: \.self) { day in
-                    let isSelected = Studio.calendar.isDate(day, inSameDayAs: selectedDay)
-                    Button {
-                        withAnimation { selectedDay = day }
-                    } label: {
-                        VStack(spacing: 4) {
-                            Text(Fmt.weekdayShort.string(from: day))
-                                .font(.caption2)
-                                .foregroundStyle(isSelected ? .white : .secondary)
-                            Text("\(Studio.calendar.component(.day, from: day))")
-                                .font(.callout.weight(.semibold))
-                                .foregroundStyle(isSelected ? .white : .primary)
-                            Circle()
-                                .fill(store.hasAppointments(on: day) ? (isSelected ? Color.white : Color.accentColor) : .clear)
-                                .frame(width: 5, height: 5)
-                        }
-                        .frame(width: 42)
-                        .padding(.vertical, 8)
-                        .background(isSelected ? Color.accentColor : Color(.secondarySystemBackground),
-                                    in: RoundedRectangle(cornerRadius: 10))
-                    }
-                    .buttonStyle(.plain)
-                }
+    private var activeFilter: some View {
+        Button { filter = .all } label: {
+            HStack(spacing: 6) {
+                Text(filter.label)
+                Image(systemName: "xmark.circle.fill")
             }
-            .padding(.horizontal)
-            .padding(.bottom, 8)
+            .font(.caption.weight(.semibold))
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
+            .background(Color.accentColor.opacity(0.15), in: Capsule())
+            .foregroundStyle(Color.accentColor)
         }
+        .buttonStyle(.plain)
+        .accessibilityLabel("\(filter.label) filtresini kaldır")
+        .padding(.vertical, 8)
     }
 
     @ViewBuilder
     private var list: some View {
-        if dayAppointments.isEmpty {
-            ContentUnavailableView("Bu gün randevu yok", systemImage: "calendar.badge.plus",
+        let days = days
+        if days.isEmpty {
+            ContentUnavailableView("Randevu yok", systemImage: "calendar.badge.plus",
                                    description: Text("Yeni randevu eklemek için + simgesine dokunun."))
                 .frame(maxHeight: .infinity)
-                .contentShape(Rectangle())
-                .gesture(swipe)
         } else {
-            List {
-                ForEach(dayAppointments) { appt in
-                    NavigationLink(value: appt) { AppointmentRow(appt: appt) }
+            ScrollViewReader { proxy in
+                List {
+                    ForEach(days, id: \.day) { group in
+                        Section {
+                            ForEach(group.items) { appt in
+                                NavigationLink(value: appt) { AppointmentRow(appt: appt) }
+                            }
+                        } header: {
+                            HStack {
+                                Text(Fmt.dayHeader.string(from: group.day))
+                                if group.day == today {
+                                    Text("Bugün").foregroundStyle(Color.accentColor)
+                                }
+                            }
+                        }
+                        .id(group.day)
+                    }
+                }
+                .listStyle(.plain)
+                .refreshable { await store.refresh() }
+                .onAppear {
+                    guard !didInitialScroll else { return }
+                    didInitialScroll = true
+                    scrollToUpcoming(proxy, days: days)
+                }
+                .onChange(of: filter) { _, _ in scrollToUpcoming(proxy, days: self.days) }
+            }
+        }
+    }
+
+    /// Jump to the first day that is today or later (stay at bottom if all are past).
+    private func scrollToUpcoming(_ proxy: ScrollViewProxy, days: [(day: Date, items: [AppointmentDTO])]) {
+        guard let target = days.first(where: { $0.day >= today })?.day ?? days.last?.day else { return }
+        Task { @MainActor in proxy.scrollTo(target, anchor: .top) }
+    }
+}
+
+enum AppointmentFilter: Hashable {
+    case all, today, week, month
+    case custom(from: Date, to: Date) // inclusive start-of-days
+
+    var label: String {
+        switch self {
+        case .all: return "Tümü"
+        case .today: return "Bugün"
+        case .week: return "Bu hafta"
+        case .month: return "Bu ay"
+        case let .custom(from, to): return "\(Fmt.dayShort.string(from: from)) – \(Fmt.dayShort.string(from: to))"
+        }
+    }
+
+    /// Half-open date range covered by the filter; nil = no filtering.
+    var range: Range<Date>? {
+        let cal = Studio.calendar
+        let now = Date()
+        switch self {
+        case .all: return nil
+        case .today: return cal.dateInterval(of: .day, for: now).map { $0.start..<$0.end }
+        case .week: return cal.dateInterval(of: .weekOfYear, for: now).map { $0.start..<$0.end }
+        case .month: return cal.dateInterval(of: .month, for: now).map { $0.start..<$0.end }
+        case let .custom(from, to):
+            let start = cal.startOfDay(for: from)
+            let end = cal.date(byAdding: .day, value: 1, to: cal.startOfDay(for: to)) ?? to
+            return start..<max(start, end)
+        }
+    }
+}
+
+private struct CustomRangeView: View {
+    @Environment(\.dismiss) private var dismiss
+    let initial: Range<Date>?
+    var onApply: (AppointmentFilter) -> Void
+
+    @State private var from = Date()
+    @State private var to = Date()
+    @State private var didInit = false
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                DatePicker("Başlangıç", selection: $from, displayedComponents: .date)
+                DatePicker("Bitiş", selection: $to, in: from..., displayedComponents: .date)
+            }
+            .environment(\.locale, Studio.locale)
+            .environment(\.timeZone, Studio.timeZone)
+            .navigationTitle("Özel aralık")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Vazgeç") { dismiss() } }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Uygula") {
+                        onApply(.custom(from: Studio.calendar.startOfDay(for: from),
+                                        to: Studio.calendar.startOfDay(for: max(from, to))))
+                        dismiss()
+                    }
                 }
             }
-            .listStyle(.plain)
-            .refreshable { await store.refresh() }
-            .gesture(swipe)
-            .id(selectedDay)
-            .transition(.opacity)
-        }
-    }
-
-    private var swipe: some Gesture {
-        DragGesture(minimumDistance: 40)
-            .onEnded { value in
-                if value.translation.width < -50 { changeDay(by: 1) }
-                else if value.translation.width > 50 { changeDay(by: -1) }
+            .onAppear {
+                guard !didInit else { return }
+                didInit = true
+                if let initial {
+                    from = initial.lowerBound
+                    to = initial.upperBound.addingTimeInterval(-1)
+                }
             }
-    }
-
-    private func changeDay(by delta: Int) {
-        if let next = Studio.calendar.date(byAdding: .day, value: delta, to: selectedDay) {
-            withAnimation { selectedDay = Studio.calendar.startOfDay(for: next) }
         }
-    }
-
-    private func weekDays(around day: Date) -> [Date] {
-        let start = Studio.calendar.startOfDay(for: day)
-        // Monday-based week containing `day`.
-        let weekday = Studio.calendar.component(.weekday, from: start) // 1=Sun..7=Sat
-        let offsetToMonday = (weekday + 5) % 7 // days since Monday
-        guard let monday = Studio.calendar.date(byAdding: .day, value: -offsetToMonday, to: start) else { return [start] }
-        return (0..<7).compactMap { Studio.calendar.date(byAdding: .day, value: $0, to: monday) }
+        .presentationDetents([.medium])
     }
 }
 
@@ -165,6 +233,10 @@ struct AppointmentRow: View {
                     StatusChip(status: status)
                     if let no = appt.sessionNo, let total = appt.sessionTotal {
                         SessionBadge(no: no, total: total)
+                    }
+                    // Package price lives on the root only, so it isn't read as per-session.
+                    if let price = appt.price {
+                        Text(Fmt.price(price)).font(.caption).foregroundStyle(.secondary).monospacedDigit()
                     }
                 }
             }

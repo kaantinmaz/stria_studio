@@ -127,6 +127,10 @@ struct CustomerDetailView: View {
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(Fmt.dateTime.string(from: appt.startsAt)).font(.subheadline)
                                     Text(store.serviceTitle(appt.serviceID)).font(.caption).foregroundStyle(.secondary)
+                                    // Root/single only: a package price shown on every session would read as per-session.
+                                    if let price = appt.price {
+                                        Text(Fmt.price(price)).font(.caption).foregroundStyle(.secondary).monospacedDigit()
+                                    }
                                 }
                                 Spacer()
                                 if let no = appt.sessionNo, let total = appt.sessionTotal {
@@ -135,6 +139,10 @@ struct CustomerDetailView: View {
                                 StatusChip(status: .from(appt.status))
                             }
                         }
+                    }
+                    let total = store.totalPrice(for: customerID)
+                    if total > 0 {
+                        InfoRow(label: "Toplam", value: Fmt.price(total)).bold()
                     }
                 }
             }

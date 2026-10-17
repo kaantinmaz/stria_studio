@@ -17,6 +17,9 @@ struct NewAppointmentView: View {
     @State private var note = ""
     @State private var sessionTotal = 1
     @State private var intervalDays = 28
+    @State private var pickDates = false
+    @State private var customStarts: [Date] = [] // sessions 2..N
+    @State private var priceText = ""
     @State private var didInit = false
 
     var body: some View {
@@ -63,9 +66,39 @@ struct NewAppointmentView: View {
                 Section("Seans") {
                     Stepper("Seans sayısı: \(sessionTotal)", value: $sessionTotal, in: 1...12)
                     if sessionTotal > 1 {
-                        Stepper("Seans aralığı: \(intervalDays) gün", value: $intervalDays, in: 1...365)
-                        sessionPreview
+                        Toggle("Tarihleri tek tek seç", isOn: $pickDates)
+                        if pickDates {
+                            ForEach(customStarts.indices, id: \.self) { idx in
+                                DatePicker("\(idx + 2). seans", selection: customStart(idx),
+                                           displayedComponents: [.date, .hourAndMinute])
+                                    .environment(\.locale, Studio.locale)
+                                    .environment(\.timeZone, Studio.timeZone)
+                            }
+                            if !customStartsValid {
+                                Text("Her seans bir öncekinden sonra olmalı.")
+                                    .font(.caption).foregroundStyle(.red)
+                            }
+                        } else {
+                            Stepper("Seans aralığı: \(intervalDays) gün", value: $intervalDays, in: 1...365)
+                            sessionPreview
+                        }
                     }
+                }
+                .onChange(of: pickDates) { _, on in
+                    if on { customStarts = Array(sessionDates().dropFirst()) }
+                }
+                .onChange(of: sessionTotal) { _, total in
+                    guard pickDates else { return }
+                    let target = max(0, total - 1)
+                    if customStarts.count > target { customStarts.removeLast(customStarts.count - target) }
+                    while customStarts.count < target {
+                        let last = customStarts.last ?? DateMerge.combine(day: startDate, time: startTime)
+                        customStarts.append(Studio.calendar.date(byAdding: .day, value: intervalDays, to: last) ?? last)
+                    }
+                }
+
+                Section("Fiyat") {
+                    PriceField(text: $priceText, caption: sessionTotal > 1 ? "Paketin toplam fiyatı" : nil)
                 }
 
                 Section("Not") {
@@ -78,7 +111,8 @@ struct NewAppointmentView: View {
                 ToolbarItem(placement: .cancellationAction) { Button("Vazgeç") { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Kaydet") { save() }
-                        .disabled(store.isMutating || selectedCustomer == nil)
+                        .disabled(store.isMutating || selectedCustomer == nil || (useCustomStarts && !customStartsValid)
+                                  || !PriceField.isValid(priceText))
                 }
             }
             .sheet(isPresented: $showCustomerPicker) {
@@ -100,6 +134,20 @@ struct NewAppointmentView: View {
                 }
             }
         }
+    }
+
+    private var useCustomStarts: Bool { pickDates && sessionTotal > 1 }
+
+    /// Session 2 after session 1, each later than the previous.
+    private var customStartsValid: Bool {
+        let all = [DateMerge.combine(day: startDate, time: startTime)] + customStarts
+        return zip(all, all.dropFirst()).allSatisfy { $0 < $1 }
+    }
+
+    // Bounds-checked: ForEach may read a stale index while sessionTotal shrinks.
+    private func customStart(_ idx: Int) -> Binding<Date> {
+        Binding(get: { idx < customStarts.count ? customStarts[idx] : Date() },
+                set: { if idx < customStarts.count { customStarts[idx] = $0 } })
     }
 
     private func sessionDates() -> [Date] {
@@ -125,7 +173,9 @@ struct NewAppointmentView: View {
         Task {
             let ok = await store.createAppointment(customerID: customer.id, serviceID: serviceID,
                                                     startsAt: starts, durationMin: duration, status: status,
-                                                    note: note, sessionTotal: sessionTotal, intervalDays: intervalDays)
+                                                    note: note, sessionTotal: sessionTotal, intervalDays: intervalDays,
+                                                    sessionStarts: useCustomStarts ? customStarts : nil,
+                                                    price: PriceText.parse(priceText))
             if ok { dismiss() }
         }
     }

@@ -21,6 +21,16 @@ Sahip, yalnız stüdyonun kullanacağı bir iPhone uygulaması istedi: gün gün
 
 Fiyat/ödeme, fotoğraf, kampanya bağlama — panelde kalıyor; API bu alanlara dokunmuyor. Canlı push yok: panelde yapılan değişiklik uygulamada yenileyince/ön plana gelince görünür.
 
+## Güncelleme 2026-10-17 — giriş ekranı kaldırıldı (owner kararı)
+
+Owner: "giriş yapmamız gerekmesin, sadece biz kullanacağız". Seçenekler sunuldu (bir kez giriş + kalıcı oturum / gömülü anahtar); owner **gömülü anahtarı** seçti.
+
+- Prod'da `owner@striastudio.com` (id 1) için `desktop:manage` yetkili, **süresiz** (`expires_at = null`) Sanctum token: ad `Stria Randevu iPhone (gomulu)`. Backend kodu değişmedi — `EnsureDesktopAdmin` yalnız dolu `expires_at`'i kontrol ediyor, `config/sanctum.php` yok (global expiration null).
+- Token `randevu-ios/Sources/EmbeddedToken.swift` içinde (`enum EmbeddedToken { static let value }`), dosya **gitignored** — temiz klondan derlemek için bu dosya yeniden oluşturulmalı (yeni token: prod'da `artisan tinker` dosyası ile `User::find(1)->createToken("…", ["desktop:manage"])`).
+- Kaldırılanlar: `LoginView`, `Keychain.swift`/`StoredCredentials`, `login`/`logout` uçları istemcide, `DesktopUser`/`LoginResponse`, sessiz yeniden giriş, Ayarlar'daki Çıkış. Uygulama açılışta doğrudan `/state` çeker; hata alert ile gösterilir.
+- **Risk (kabul edildi):** uygulama paketini ele geçiren panel API'sine tam erişir. İptal: prod `personal_access_tokens` tablosunda o satırı silmek (uygulama 401 → "Uygulama anahtarı geçersiz…").
+- Yeni cihaz (iPhone19,7 / iOS 27) için Xcode 27.1 gerekti (26.6'nın DDI'sinde bu çip yok: `PersonalizedBundleMissingVariantError`).
+
 ## Kurulum / yeniden derleme
 
 ```bash

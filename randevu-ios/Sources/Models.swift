@@ -17,17 +17,6 @@ enum Studio {
 
 // MARK: - API DTOs
 
-struct DesktopUser: Codable, Equatable, Identifiable {
-    let id: Int
-    let name: String
-    let email: String
-}
-
-struct LoginResponse: Codable, Equatable {
-    let token: String
-    let user: DesktopUser
-}
-
 struct CustomerDTO: Codable, Equatable, Identifiable, Hashable {
     let id: Int
     let name: String
@@ -56,6 +45,7 @@ struct AppointmentDTO: Codable, Equatable, Identifiable, Hashable {
     let parentID: Int?
     let sessionNo: Int?
     let sessionTotal: Int?
+    let price: Decimal?
 
     var endsAt: Date { startsAt.addingTimeInterval(Double(durationMin) * 60) }
     // Root id of the session package (siblings share this).
@@ -64,7 +54,7 @@ struct AppointmentDTO: Codable, Equatable, Identifiable, Hashable {
     var isChildSession: Bool { parentID != nil }
 
     enum CodingKeys: String, CodingKey {
-        case id, status, note, revision
+        case id, status, note, revision, price
         case customerID = "customer_id"
         case serviceID = "service_id"
         case startsAt = "starts_at"
@@ -152,9 +142,8 @@ enum PhoneHelper {
 // MARK: - Formatting
 
 enum Fmt {
-    static let dayHeader: DateFormatter = make("d MMMM EEEE")      // 16 Ekim Cuma
+    static let dayHeader: DateFormatter = make("d MMMM yyyy EEEE") // 16 Ekim 2026 Cuma
     static let dayShort: DateFormatter = make("d MMM")            // 16 Eki
-    static let weekdayShort: DateFormatter = make("EEE")         // Cum
     static let time: DateFormatter = make("HH:mm")
     static let dateTime: DateFormatter = make("d MMMM yyyy, HH:mm")
     static let dateOnly: DateFormatter = make("d MMMM yyyy")
@@ -170,5 +159,30 @@ enum Fmt {
 
     static func timeRange(_ start: Date, _ end: Date) -> String {
         "\(time.string(from: start))–\(time.string(from: end))"
+    }
+
+    /// 1500 → "1.500", 1500.5 → "1.500,50" (no ₺; also valid input for `PriceText.parse`).
+    static func amount(_ value: Decimal) -> String {
+        var v = value, whole = Decimal()
+        NSDecimalRound(&whole, &v, 0, .plain)
+        return value.formatted(.number.locale(Studio.locale).precision(.fractionLength(whole == value ? 0 : 2)))
+    }
+
+    static func price(_ value: Decimal) -> String { "\(amount(value)) ₺" }
+}
+
+// MARK: - Price input
+
+enum PriceText {
+    /// Parses "1500", "1.500", "1500,50", "1.500,50" (and "1500.50"); nil when not a valid amount ≥ 0.
+    static func parse(_ raw: String) -> Decimal? {
+        var s = raw.replacingOccurrences(of: "₺", with: "").filter { !$0.isWhitespace }
+        if s.contains(",") {
+            s = s.replacingOccurrences(of: ".", with: "").replacingOccurrences(of: ",", with: ".")
+        } else if s.range(of: #"^\d{1,3}(\.\d{3})+$"#, options: .regularExpression) != nil {
+            s = s.replacingOccurrences(of: ".", with: "") // "1.500" = thousands grouping
+        }
+        guard s.range(of: #"^\d+(\.\d{1,2})?$"#, options: .regularExpression) != nil else { return nil }
+        return Decimal(string: s, locale: Locale(identifier: "en_US_POSIX"))
     }
 }

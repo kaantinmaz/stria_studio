@@ -9,6 +9,7 @@ struct AppointmentDetailView: View {
 
     @State private var showEdit = false
     @State private var showAddSession = false
+    @State private var showSessionDates = false
     @State private var intervalDays = 28
     @State private var confirmDelete = false
 
@@ -56,6 +57,9 @@ struct AppointmentDetailView: View {
                     }
                     .font(.subheadline)
                 }
+                if let price = store.packagePrice(of: appt) {
+                    InfoRow(label: appt.isPackage ? "Paket fiyatı" : "Fiyat", value: Fmt.price(price))
+                }
                 if let note = appt.note, !note.isEmpty {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Not").font(.subheadline).foregroundStyle(.secondary)
@@ -83,6 +87,9 @@ struct AppointmentDetailView: View {
         }
         .sheet(isPresented: $showEdit) {
             EditAppointmentView(appointmentID: appt.id)
+        }
+        .sheet(isPresented: $showSessionDates) {
+            SessionDatesView(appointmentID: appt.id)
         }
         .alert("Seans ekle", isPresented: $showAddSession) {
             TextField("Aralık (gün)", value: $intervalDays, format: .number)
@@ -188,6 +195,12 @@ struct AppointmentDetailView: View {
                     .listRowBackground(isCurrent ? Color.accentColor.opacity(0.08) : nil)
                 }
             }
+            Button {
+                showSessionDates = true
+            } label: {
+                Label("Seans tarihlerini düzenle", systemImage: "calendar.badge.clock")
+            }
+            .disabled(store.isMutating)
         }
     }
 

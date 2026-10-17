@@ -15,7 +15,7 @@ enum APIError: LocalizedError, Equatable {
         switch self {
         case .invalidBaseURL: return "Sunucu adresi geçersiz."
         case .invalidResponse: return "Sunucudan beklenmeyen bir yanıt alındı."
-        case .unauthorized: return "Oturum süresi doldu. Lütfen yeniden giriş yapın."
+        case .unauthorized: return "Uygulama anahtarı geçersiz ya da iptal edilmiş."
         case .conflict: return "Kayıt başka bir yerde güncellendi, güncel hali yüklendi."
         case let .validation(message, fields):
             if let first = fields.values.first?.first, !first.isEmpty { return first }
@@ -50,28 +50,7 @@ final class DesktopAPI {
         self.session = URLSession(configuration: config)
     }
 
-    static func normalizedBaseURL(_ raw: String) -> URL? {
-        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard var comps = URLComponents(string: trimmed),
-              let scheme = comps.scheme?.lowercased(),
-              let host = comps.host, !host.isEmpty else { return nil }
-        let local = host == "localhost" || host == "127.0.0.1"
-        guard scheme == "https" || (scheme == "http" && local) else { return nil }
-        comps.path = ""
-        comps.query = nil
-        comps.fragment = nil
-        return comps.url
-    }
-
     // MARK: Endpoints
-
-    func login(email: String, password: String) async throws -> LoginResponse {
-        try await send(path: "/login", method: "POST", token: nil, body: ["email": email, "password": password])
-    }
-
-    func logout(token: String) async throws {
-        let _: DiscardResponse = try await send(path: "/logout", method: "POST", token: token, body: Optional<EmptyBody>.none)
-    }
 
     func state(token: String) async throws -> StateDTO {
         try await send(path: "/state", method: "GET", token: token, body: Optional<EmptyBody>.none)
@@ -224,15 +203,18 @@ struct AppointmentWrite: Encodable {
     let revision: String?
     let sessionTotal: Int?
     let intervalDays: Int?
+    let sessionStarts: [Date]?
+    var price: PriceWrite = .omit
 
     enum CodingKeys: String, CodingKey {
-        case status, note, revision
+        case status, note, revision, price
         case customerID = "customer_id"
         case serviceID = "service_id"
         case startsAt = "starts_at"
         case durationMin = "duration_min"
         case sessionTotal = "session_total"
         case intervalDays = "interval_days"
+        case sessionStarts = "session_starts"
     }
 
     func encode(to encoder: Encoder) throws {
@@ -246,7 +228,18 @@ struct AppointmentWrite: Encodable {
         if let revision { try c.encode(revision, forKey: .revision) }
         if let sessionTotal { try c.encode(sessionTotal, forKey: .sessionTotal) }
         if let intervalDays { try c.encode(intervalDays, forKey: .intervalDays) }
+        if let sessionStarts { try c.encode(sessionStarts, forKey: .sessionStarts) }
+        switch price {
+        case .omit: break
+        case .clear: try c.encodeNil(forKey: .price)
+        case let .set(value): try c.encode(value, forKey: .price)
+        }
     }
+}
+
+/// `price` key handling: child sessions must omit it (server 422s), root/single may clear it with null.
+enum PriceWrite {
+    case omit, clear, set(Decimal)
 }
 
 struct SessionAddWrite: Encodable {
