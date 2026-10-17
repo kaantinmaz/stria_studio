@@ -2,32 +2,104 @@ import SwiftUI
 import SceneKit
 
 /// Rotatable 3D body with `selected` regions highlighted. Tapping a region calls `onToggle`;
-/// nil = read-only (rotation still works, taps are ignored).
+/// nil = read-only (rotation still works, taps are ignored). The corner button opens it full screen.
 struct BodyMapView: View {
     let selected: Set<String>
     var onToggle: ((String) -> Void)? = nil
 
     @State private var camera = CameraRequest(back: false, token: 0)
+    @State private var expanded = false
 
     var body: some View {
         if let mesh = BodyModel.mesh {
             VStack(spacing: 8) {
                 BodySceneView(mesh: mesh, selected: selected, onToggle: onToggle, camera: camera)
                     .frame(height: 360)
-                HStack {
-                    // Bordered style keeps the two buttons separately tappable inside a Form row.
-                    Button("Ön") { camera = CameraRequest(back: false, token: camera.token + 1) }
-                    Button("Arka") { camera = CameraRequest(back: true, token: camera.token + 1) }
-                }
-                .buttonStyle(.bordered)
+                    .overlay(alignment: .topTrailing) {
+                        Button { expanded = true } label: {
+                            Image(systemName: "arrow.up.left.and.arrow.down.right")
+                        }
+                        .buttonStyle(.bordered)
+                        .accessibilityLabel("Tam ekran")
+                    }
+                SideButtons(camera: $camera)
                 if onToggle != nil {
                     Text("Bölgeyi seçmek için dokunun, çevirmek için sürükleyin")
                         .font(.caption).foregroundStyle(.secondary)
                 }
             }
+            // Content is rebuilt from this view's `selected`, so taps in full screen show up live.
+            .fullScreenCover(isPresented: $expanded) {
+                BodyMapFullScreen(mesh: mesh, selected: selected, onToggle: onToggle)
+            }
         } else {
             Text("3D model yüklenemedi").foregroundStyle(.secondary)
         }
+    }
+}
+
+/// Full-screen 3D body plus the chosen regions as chips (removable when editable).
+private struct BodyMapFullScreen: View {
+    @Environment(\.dismiss) private var dismiss
+    let mesh: BodyModel.Mesh
+    let selected: Set<String>
+    let onToggle: ((String) -> Void)?
+
+    @State private var camera = CameraRequest(back: false, token: 0)
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 8) {
+                BodySceneView(mesh: mesh, selected: selected, onToggle: onToggle, camera: camera)
+                SideButtons(camera: $camera)
+                let regions = BodyRegion.ordered(selected)
+                if regions.isEmpty {
+                    Text("Bölge seçilmedi").font(.caption).foregroundStyle(.secondary)
+                } else {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack {
+                            ForEach(regions) { region in
+                                HStack(spacing: 4) {
+                                    Text(region.label)
+                                    if let onToggle {
+                                        Button { onToggle(region.key) } label: {
+                                            Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary)
+                                        }
+                                        .accessibilityLabel("\(region.label) kaldır")
+                                    }
+                                }
+                                .font(.subheadline)
+                                .padding(.horizontal, 10).padding(.vertical, 6)
+                                .background(Color.accentColor.opacity(0.15), in: Capsule())
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
+                }
+            }
+            .padding(.bottom, 8)
+            .navigationTitle("Bölgeler")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(onToggle == nil ? "Kapat" : "Bitti") { dismiss() }
+                }
+            }
+        }
+    }
+}
+
+/// Front/back camera buttons.
+private struct SideButtons: View {
+    @Binding var camera: CameraRequest
+
+    var body: some View {
+        HStack {
+            // Bordered style keeps the two buttons separately tappable inside a Form row.
+            Button("Ön") { camera = CameraRequest(back: false, token: camera.token + 1) }
+            Button("Arka") { camera = CameraRequest(back: true, token: camera.token + 1) }
+        }
+        .buttonStyle(.bordered)
     }
 }
 
