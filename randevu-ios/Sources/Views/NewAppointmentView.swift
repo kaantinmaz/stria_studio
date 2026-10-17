@@ -21,6 +21,8 @@ struct NewAppointmentView: View {
     @State private var pickDates = false
     @State private var customStarts: [Date] = [] // sessions 2..N
     @State private var priceText = ""
+    @State private var discount: Discount?
+    @State private var discountBase: Decimal?
     @State private var subservices: Set<String> = []
     @State private var bodyRegions: Set<String> = []
     @State private var pickedPhotos: [PhotosPickerItem] = []
@@ -122,6 +124,7 @@ struct NewAppointmentView: View {
 
                 Section("Fiyat") {
                     PriceField(text: $priceText, caption: quote?.caption ?? (sessionTotal > 1 ? "Paketin toplam fiyatı" : nil))
+                    DiscountControl(priceText: $priceText, discount: $discount, base: $discountBase)
                 }
                 // The service's session price fills the total; a manual edit stays until the next change.
                 .onChange(of: serviceID) { fillPrice() }
@@ -202,8 +205,15 @@ struct NewAppointmentView: View {
         }
     }
 
+    /// Recomputed total goes into Fiyat; an active discount is re-applied to it.
     private func fillPrice() {
-        if let quote { priceText = Fmt.amount(quote.total) }
+        guard let quote else { return }
+        if let discount {
+            discountBase = quote.total
+            priceText = Fmt.amount(discount.apply(to: quote.total))
+        } else {
+            priceText = Fmt.amount(quote.total)
+        }
     }
 
     private func initialize() {

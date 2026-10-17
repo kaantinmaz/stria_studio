@@ -13,6 +13,8 @@ struct EditAppointmentView: View {
     @State private var status: AppointmentStatus = .confirmed
     @State private var note = ""
     @State private var priceText = ""
+    @State private var discount: Discount?
+    @State private var discountBase: Decimal?
     @State private var subservices: Set<String> = []
     @State private var bodyRegions: Set<String> = []
     @State private var loaded = false
@@ -111,6 +113,7 @@ struct EditAppointmentView: View {
                             .font(.caption).foregroundStyle(.secondary)
                     } else {
                         PriceField(text: $priceText, caption: quote?.caption ?? (appt?.isPackage == true ? "Paketin toplam fiyatı" : nil))
+                        DiscountControl(priceText: $priceText, discount: $discount, base: $discountBase)
                     }
                 }
 
@@ -146,8 +149,15 @@ struct EditAppointmentView: View {
         bodyRegions = Set(appt.bodyRegions)
     }
 
+    /// Recomputed total goes into Fiyat; an active discount is re-applied to it.
     private func fillPrice() {
-        if let quote { priceText = Fmt.amount(quote.total) }
+        guard let quote else { return }
+        if let discount {
+            discountBase = quote.total
+            priceText = Fmt.amount(discount.apply(to: quote.total))
+        } else {
+            priceText = Fmt.amount(quote.total)
+        }
     }
 
     private func save() {

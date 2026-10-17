@@ -73,6 +73,135 @@ struct PriceField: View {
     }
 }
 
+/// A discount on the appointment price, either a percentage or a fixed TL amount.
+struct Discount: Equatable {
+    enum Kind: String, CaseIterable, Identifiable {
+        case percent = "%", amount = "₺"
+        var id: String { rawValue }
+    }
+
+    var kind: Kind
+    var value: Decimal
+
+    /// Discounted price, rounded to kuruş and never below zero.
+    func apply(to base: Decimal) -> Decimal {
+        var result = kind == .percent ? base - base * value / 100 : base - value
+        var rounded = Decimal()
+        NSDecimalRound(&rounded, &result, 2, .plain)
+        return max(rounded, 0)
+    }
+
+    var label: String { kind == .percent ? "%\(Fmt.amount(value))" : Fmt.price(value) }
+}
+
+/// "İndirim uygula" button + active-discount row for the Fiyat section.
+/// While a discount is active, `base` holds the undiscounted price and `priceText` the
+/// discounted one; callers that recompute the total must update `base` and re-apply.
+struct DiscountControl: View {
+    @Binding var priceText: String
+    @Binding var discount: Discount?
+    @Binding var base: Decimal?
+
+    @State private var showSheet = false
+
+    /// Price the next discount applies to: the stored base, else what is typed now.
+    private var currentBase: Decimal? { discount == nil ? PriceText.parse(priceText) : base }
+
+    var body: some View {
+        Group {
+            if let discount, let base {
+                HStack {
+                    Label("İndirim \(discount.label)", systemImage: "tag.fill").foregroundStyle(Color.accentColor)
+                    Spacer()
+                    Text("\(Fmt.price(base)) → \(Fmt.price(discount.apply(to: base)))")
+                        .font(.caption).foregroundStyle(.secondary).monospacedDigit()
+                }
+                Button("İndirimi değiştir") { showSheet = true }
+                Button("İndirimi kaldır", role: .destructive) {
+                    priceText = Fmt.amount(base)
+                    self.discount = nil
+                    self.base = nil
+                }
+            } else {
+                Button { showSheet = true } label: { Label("İndirim uygula", systemImage: "tag") }
+                    .disabled((currentBase ?? 0) <= 0)
+            }
+        }
+        .sheet(isPresented: $showSheet) {
+            DiscountSheet(initial: discount, base: currentBase ?? 0) { applied in
+                guard let currentBase else { return }
+                base = currentBase
+                discount = applied
+                priceText = Fmt.amount(applied.apply(to: currentBase))
+            }
+        }
+    }
+}
+
+private struct DiscountSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    let initial: Discount?
+    let base: Decimal
+    let onApply: (Discount) -> Void
+
+    @State private var kind: Discount.Kind = .percent
+    @State private var text = ""
+    @FocusState private var focused: Bool
+
+    private var value: Decimal? { PriceText.parse(text) }
+    private var valid: Bool {
+        guard let value, value > 0 else { return false }
+        return kind == .percent ? value <= 100 : value <= base
+    }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    Picker("Tür", selection: $kind) {
+                        Text("Yüzde (%)").tag(Discount.Kind.percent)
+                        Text("Tutar (₺)").tag(Discount.Kind.amount)
+                    }
+                    .pickerStyle(.segmented)
+                    HStack {
+                        TextField(kind == .percent ? "10" : "500", text: $text)
+                            .keyboardType(.decimalPad)
+                            .focused($focused)
+                        Text(kind.rawValue).foregroundStyle(.secondary)
+                    }
+                } footer: {
+                    if let value, valid {
+                        let discounted = Discount(kind: kind, value: value).apply(to: base)
+                        Text("\(Fmt.price(base)) − \(Discount(kind: kind, value: value).label) = \(Fmt.price(discounted))")
+                    } else if !text.isEmpty {
+                        Text(kind == .percent ? "1 ile 100 arasında bir yüzde yazın." : "İndirim fiyattan büyük olamaz.")
+                            .foregroundStyle(.red)
+                    } else {
+                        Text("Fiyat: \(Fmt.price(base))")
+                    }
+                }
+            }
+            .navigationTitle("İndirim uygula")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Vazgeç") { dismiss() } }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Uygula") {
+                        if let value { onApply(Discount(kind: kind, value: value)) }
+                        dismiss()
+                    }
+                    .disabled(!valid)
+                }
+            }
+            .onAppear {
+                if let initial { kind = initial.kind; text = Fmt.amount(initial.value) }
+                focused = true
+            }
+        }
+        .presentationDetents([.medium])
+    }
+}
+
 /// Multi-select checkmark rows for a service's sub-treatments.
 struct SubservicePicker: View {
     let options: [String]
