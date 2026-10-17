@@ -509,6 +509,27 @@ class ServiceSeeder extends Seeder
                         ],
                     ],
                     [
+                        'slug' => 'bolgesel-kararma-kamuflaji',
+                        'gallery' => [],
+                        'name' => 'Bölgesel Kararma Kamuflajı',
+                        'desc' => 'Koltuk altı, dirsek, diz kapağı, kasık ve yüzdeki stabil kararmaların ton farkı, çevre cilde yaklaşan pigmentlerle dengelenir.',
+                        'seo_title' => 'Bölgesel Kararma Kamuflajı Ankara | Koltuk Altı, Diz',
+                        'seo_desc' => "Ankara'da koltuk altı, dirsek, diz kapağı ve kasık kararmalarının görünümünü kişisel renk analiziyle dengeleyin. Stria Studio'da ön görüşme için bize ulaşın.",
+                        'intro' => "Bölgesel kararma kamuflajı, koltuk altı, dirsek, diz kapağı, kasık, iç bacak, ense ve göz altı ya da bıyık bölgesi gibi alanlarda çevre cilde göre koyu kalan bölgelerin ton farkını azaltmayı amaçlayan bir kamuflaj uygulamasıdır. Sürtünme, tıraş, hormonal değişimler ve genetik yatkınlık bu bölgelerin zamanla koyulaşmasına yol açabilir.\n\nKararmanın kaynağı her zaman kozmetik değildir; özellikle ense ve koltuk altında hızla artan koyulaşma bir sağlık durumunun işareti olabileceğinden önce hekim değerlendirmesi önerilir. Stria Studio'da yalnız uzun süredir değişmeyen, stabil alanlarla çalışılır: cildin alt tonu ölçülür, küçük bir alanda pigment denemesi yapılır ve uygulama kontrollü katmanlarla ilerletilir. İşlem bir tedavi değildir; kararmanın görünümünü dengelemeye yöneliktir.",
+                        'benefits' => [
+                            'Koltuk altı, dirsek, diz kapağı ve kasık gibi kıvrım bölgelerine uyarlanır',
+                            'Göz altı ve bıyık bölgesi gibi yüzdeki lokal koyulukları hedefler',
+                            'Cildin alt tonuna göre kişisel pigment karışımı hazırlanır',
+                            'Günlük kapatıcı ve makyaj ihtiyacını azaltmaya yardımcı olur',
+                        ],
+                        'faq' => [
+                            ['q' => 'Hangi bölgelerde uygulanır?', 'a' => 'En sık koltuk altı, dirsek, diz kapağı, kasık ve iç bacakta; yüzde ise göz altı ve bıyık bölgesinde çalışılır. Uygunluk her bölge için ön görüşmede ayrıca değerlendirilir.'],
+                            ['q' => 'Her kararmaya uygulanır mı?', 'a' => 'Hayır. Yeni başlamış, hızla artan, kaşıntılı ya da renk değiştiren kararmalarda önce hekim değerlendirmesi gerekir. Uygulama yalnız stabil ve tanısı belli alanlarda yapılır.'],
+                            ['q' => 'Kaç seans gerekir?', 'a' => 'Kararmanın koyuluğu ve bölgenin pigmenti tutma biçimine göre çoğunlukla birden fazla seans planlanır; seans sayısı ve aralıklar ön görüşmede belirlenir.'],
+                            ['q' => 'Uygulama sonrası nelere dikkat edilmeli?', 'a' => 'İyileşme döneminde bölgeyi sürtünmeden, tıraş ve ağdadan, terletici sporlardan ve güneşten korumak gerekir. Ayrıntılı bakım talimatı uygulama sonrasında verilir.'],
+                        ],
+                    ],
+                    [
                         'slug' => 'sivilce-izi-kapatma',
                         'gallery' => ['/images/works/sivilce-izi-kapatma-1.png', '/images/works/sivilce-izi-kapatma-2.png'],
                         'name' => 'Sivilce İzi Kapatma',

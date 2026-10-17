@@ -242,7 +242,7 @@ kabul edilir. İhlalde `422` `errors.subservices` döner. Sunucu listeyi hizmett
 sırayla ve tekrarsız saklar; `[]` ile `null` aynıdır. Alt uygulamalar hizmet gibi
 paket düzeyindedir: köke yazılır ve tüm seanslara kopyalanır.
 
-`body_regions` opsiyonel: en çok 40 elemanlı anahtar dizisi ya da `null`. Her
+`body_regions` opsiyonel: en çok 51 elemanlı anahtar dizisi ya da `null`. Her
 eleman aşağıdaki listeden olmalıdır; bilinmeyen anahtarda `422`
 `errors.body_regions = ["Bölgeler geçerli bölge anahtarları olmalı."]` döner.
 Hizmete göre kısıtlanmaz (seçiciyi ne zaman göstereceğine istemci karar verir).
@@ -256,21 +256,27 @@ Anahtarlar (kanonik sıra; `_r`/`_l` müşterinin kendi sağı/solu; tek kaynak
 | Anahtar | Ad | Anahtar | Ad |
 |---|---|---|---|
 | `forehead` | Alın | `nose` | Burun |
+| `under_eye_r` | Sağ göz altı | `under_eye_l` | Sol göz altı |
 | `cheek_r` | Sağ yanak | `cheek_l` | Sol yanak |
-| `lips_chin` | Dudak ve çene | `scalp` | Saçlı deri / baş arkası |
-| `neck_front` | Boyun ön | `neck_back` | Ense |
+| `upper_lip` | Üst dudak üstü (bıyık bölgesi) | `lips_chin` | Dudak ve çene |
+| `scalp` | Saçlı deri / baş arkası | `neck_front` | Boyun ön |
+| `neck_back` | Ense | | |
 | `shoulder_r` | Sağ omuz | `shoulder_l` | Sol omuz |
+| `axilla_r` | Sağ koltuk altı | `axilla_l` | Sol koltuk altı |
 | `chest_r` | Sağ göğüs | `chest_l` | Sol göğüs |
 | `abdomen_r` | Karın sağ | `abdomen_l` | Karın sol |
+| `groin_r` | Sağ kasık | `groin_l` | Sol kasık |
 | `upper_back_r` | Sırt üst sağ | `upper_back_l` | Sırt üst sol |
 | `lower_back_r` | Bel sağ | `lower_back_l` | Bel sol |
 | `buttock_r` | Sağ kalça | `buttock_l` | Sol kalça |
 | `upper_arm_r` | Sağ üst kol | `upper_arm_l` | Sol üst kol |
+| `elbow_r` | Sağ dirsek | `elbow_l` | Sol dirsek |
 | `forearm_r` | Sağ ön kol | `forearm_l` | Sol ön kol |
 | `hand_r` | Sağ el | `hand_l` | Sol el |
 | `thigh_front_r` | Sağ uyluk ön | `thigh_front_l` | Sol uyluk ön |
 | `thigh_inner_r` | Sağ uyluk iç | `thigh_inner_l` | Sol uyluk iç |
 | `thigh_back_r` | Sağ uyluk arka | `thigh_back_l` | Sol uyluk arka |
+| `knee_r` | Sağ diz kapağı | `knee_l` | Sol diz kapağı |
 | `shin_r` | Sağ bacak ön (kaval) | `shin_l` | Sol bacak ön (kaval) |
 | `leg_inner_r` | Sağ bacak iç (alt) | `leg_inner_l` | Sol bacak iç (alt) |
 | `calf_r` | Sağ baldır | `calf_l` | Sol baldır |
