@@ -6,16 +6,31 @@ struct AppointmentsView: View {
     @State private var filter: AppointmentFilter = .all
     @State private var newAppointment: NewAppointmentDay?
     @State private var showCustomRange = false
+    @State private var search = ""
+
+    private var query: String? { search.nilIfBlank }
 
     private var today: Date { Studio.calendar.startOfDay(for: Date()) }
 
-    /// Today-and-later appointments matching the filter, grouped by start-of-day, ascending.
+    /// Without a search: today-and-later appointments matching the filter, ascending.
+    /// With a search: every appointment (past included) of customers whose name or
+    /// phone matches, newest day first.
     private var days: [(day: Date, items: [AppointmentDTO])] {
-        let range = filter.range
-        let today = today
-        let filtered = store.appointments.filter { $0.startsAt >= today && (range?.contains($0.startsAt) ?? true) }
+        let filtered: [AppointmentDTO]
+        if let query {
+            filtered = store.appointments.filter { appt in
+                guard let customer = store.customer(appt.customerID) else { return false }
+                return customer.name.localizedStandardContains(query)
+                    || (customer.phone?.localizedStandardContains(query) ?? false)
+            }
+        } else {
+            let range = filter.range
+            let today = today
+            filtered = store.appointments.filter { $0.startsAt >= today && (range?.contains($0.startsAt) ?? true) }
+        }
         let grouped = Dictionary(grouping: filtered) { Studio.calendar.startOfDay(for: $0.startsAt) }
-        return grouped.keys.sorted().map { day in
+        let keys = query == nil ? grouped.keys.sorted() : grouped.keys.sorted(by: >)
+        return keys.map { day in
             (day, grouped[day]!.sorted { $0.startsAt < $1.startsAt })
         }
     }
@@ -28,11 +43,12 @@ struct AppointmentsView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                if filter != .all { activeFilter }
+                if filter != .all && query == nil { activeFilter }
                 list
             }
             .navigationTitle("Randevular")
             .navigationBarTitleDisplayMode(.inline)
+            .searchable(text: $search, placement: .navigationBarDrawer(displayMode: .always), prompt: "Müşteri adı veya telefon")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) { filterMenu }
                 ToolbarItem(placement: .topBarTrailing) {
@@ -88,9 +104,15 @@ struct AppointmentsView: View {
     private var list: some View {
         let days = days
         if days.isEmpty {
-            ContentUnavailableView("Yaklaşan randevu yok", systemImage: "calendar.badge.plus",
-                                   description: Text("Yeni randevu eklemek için + simgesine dokunun."))
-                .frame(maxHeight: .infinity)
+            Group {
+                if let query {
+                    ContentUnavailableView.search(text: query)
+                } else {
+                    ContentUnavailableView("Yaklaşan randevu yok", systemImage: "calendar.badge.plus",
+                                           description: Text("Yeni randevu eklemek için + simgesine dokunun."))
+                }
+            }
+            .frame(maxHeight: .infinity)
         } else {
             List {
                 ForEach(days, id: \.day) { group in
@@ -105,13 +127,15 @@ struct AppointmentsView: View {
                                 Text("Bugün").foregroundStyle(Color.accentColor)
                             }
                             Spacer()
-                            Button {
-                                newAppointment = NewAppointmentDay(day: group.day)
-                            } label: {
-                                Image(systemName: "plus.circle.fill").font(.title3)
+                            if group.day >= today {
+                                Button {
+                                    newAppointment = NewAppointmentDay(day: group.day)
+                                } label: {
+                                    Image(systemName: "plus.circle.fill").font(.title3)
+                                }
+                                .buttonStyle(.borderless)
+                                .accessibilityLabel("Bu güne randevu ekle")
                             }
-                            .buttonStyle(.borderless)
-                            .accessibilityLabel("Bu güne randevu ekle")
                         }
                     }
                 }
@@ -236,8 +260,8 @@ struct AppointmentRow: View {
                     if let no = appt.sessionNo, let total = appt.sessionTotal {
                         SessionBadge(no: no, total: total)
                     }
-                    // Package price lives on the root only, so it isn't read as per-session.
-                    if let price = appt.price {
+                    // Package price is stored on the root; show it on every session.
+                    if let price = store.packagePrice(of: appt) {
                         Text(Fmt.price(price)).font(.caption).foregroundStyle(.secondary).monospacedDigit()
                     }
                 }

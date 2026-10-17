@@ -292,6 +292,7 @@ struct CustomerPickerView: View {
     }
 }
 
+/// Filled in by the customer on the studio phone, then handed back to staff.
 struct NewCustomerView: View {
     @Environment(AppStore.self) private var store
     @Environment(\.dismiss) private var dismiss
@@ -300,37 +301,125 @@ struct NewCustomerView: View {
     @State private var name = ""
     @State private var phone = ""
     @State private var email = ""
-    @State private var notes = ""
+    @State private var created: CustomerDTO?
+    @FocusState private var focus: Field?
+
+    private enum Field { case name, phone, email }
+
+    private var trimmedName: String { name.trimmingCharacters(in: .whitespaces) }
+    private var phoneDigits: Int { phone.filter(\.isNumber).count }
+    private var phoneValid: Bool { (10...13).contains(phoneDigits) }
+    private var emailValid: Bool { email.nilIfBlank.map { $0.contains("@") && $0.contains(".") } ?? true }
+    private var canSave: Bool { !trimmedName.isEmpty && phoneValid && emailValid && !store.isMutating }
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section("Bilgiler") {
-                    TextField("Ad (zorunlu)", text: $name)
-                    TextField("Telefon", text: $phone).keyboardType(.phonePad)
-                    TextField("E-posta", text: $email).keyboardType(.emailAddress).textInputAutocapitalization(.never)
-                    TextField("Not", text: $notes, axis: .vertical).lineLimit(2...4)
-                }
+            Group {
+                if let created { thankYou(created) } else { form }
             }
-            .navigationTitle("Yeni müşteri")
-            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Vazgeç") { dismiss() } }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Ekle") { create() }
-                        .disabled(store.isMutating || name.trimmingCharacters(in: .whitespaces).isEmpty)
+                if created == nil {
+                    ToolbarItem(placement: .cancellationAction) { Button("Vazgeç") { dismiss() } }
                 }
             }
             .errorAlert(store)
         }
+        .interactiveDismissDisabled()
+    }
+
+    private var form: some View {
+        Form {
+            Section {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Hoş geldiniz").font(.largeTitle.bold())
+                    Text("Randevunuz için lütfen bilgilerinizi doldurun.")
+                        .foregroundStyle(.secondary)
+                }
+                .padding(.vertical, 8)
+                .listRowBackground(Color.clear)
+            }
+
+            Section {
+                TextField("Adınız Soyadınız", text: $name)
+                    .textContentType(.name)
+                    .textInputAutocapitalization(.words)
+                    .submitLabel(.next)
+                    .focused($focus, equals: .name)
+                    .onSubmit { focus = .phone }
+            } header: {
+                Text("Ad Soyad")
+            }
+
+            Section {
+                TextField("05xx xxx xx xx", text: $phone)
+                    .textContentType(.telephoneNumber)
+                    .keyboardType(.phonePad)
+                    .focused($focus, equals: .phone)
+            } header: {
+                Text("Telefon numaranız")
+            } footer: {
+                if !phone.isEmpty && !phoneValid {
+                    Text("Lütfen telefon numaranızı eksiksiz yazın.").foregroundStyle(.red)
+                } else {
+                    Text("Randevu hatırlatmaları için kullanılır.")
+                }
+            }
+
+            Section {
+                TextField("ornek@mail.com", text: $email)
+                    .textContentType(.emailAddress)
+                    .keyboardType(.emailAddress)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .focused($focus, equals: .email)
+            } header: {
+                Text("E-posta adresiniz (isteğe bağlı)")
+            } footer: {
+                if !emailValid { Text("E-posta adresi geçerli görünmüyor.").foregroundStyle(.red) }
+            }
+
+            Section {
+                Button(action: create) {
+                    HStack {
+                        Spacer()
+                        if store.isMutating { ProgressView() } else { Text("Bilgilerimi kaydet").bold() }
+                        Spacer()
+                    }
+                    .padding(.vertical, 6)
+                }
+                .disabled(!canSave)
+            }
+        }
+        .font(.title3)
+        .onAppear { focus = .name }
+    }
+
+    private func thankYou(_ customer: CustomerDTO) -> some View {
+        VStack(spacing: 20) {
+            Spacer()
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 72))
+                .foregroundStyle(Color.accentColor)
+            Text("Teşekkürler, \(customer.name)!").font(.title.bold()).multilineTextAlignment(.center)
+            Text("Bilgileriniz kaydedildi. Telefonu görevliye geri verebilirsiniz.")
+                .font(.title3).foregroundStyle(.secondary).multilineTextAlignment(.center)
+            Spacer()
+            Button {
+                onCreated(customer)
+                dismiss()
+            } label: {
+                Text("Tamam").bold().frame(maxWidth: .infinity).padding(.vertical, 8)
+            }
+            .buttonStyle(.borderedProminent)
+        }
+        .padding(24)
     }
 
     private func create() {
+        focus = nil
         Task {
-            if let created = await store.createCustomer(name: name.trimmingCharacters(in: .whitespaces),
-                                                        phone: phone, email: email, notes: notes) {
-                onCreated(created)
-                dismiss()
+            if let customer = await store.createCustomer(name: trimmedName, phone: phone, email: email, notes: nil) {
+                created = customer
             }
         }
     }

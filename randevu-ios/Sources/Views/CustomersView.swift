@@ -127,8 +127,8 @@ struct CustomerDetailView: View {
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(Fmt.dateTime.string(from: appt.startsAt)).font(.subheadline)
                                     Text(store.serviceTitle(appt.serviceID)).font(.caption).foregroundStyle(.secondary)
-                                    // Root/single only: a package price shown on every session would read as per-session.
-                                    if let price = appt.price {
+                                    // Package price is stored on the root; show it on every session.
+                                    if let price = store.packagePrice(of: appt) {
                                         Text(Fmt.price(price)).font(.caption).foregroundStyle(.secondary).monospacedDigit()
                                     }
                                 }
