@@ -5,7 +5,9 @@ import { preload } from "react-dom";
 import type { HeroVideo } from "@/lib/serviceHero";
 
 // Cards visible on first paint (mobile shows two and a half). Their posters are the
-// page's LCP, so they are preloaded with high priority; later videos don't fetch data early.
+// page's LCP, so they are preloaded with high priority. Video files are attached only
+// after the page has loaded: autoplaying ~3 MB of video during load starved the LCP
+// (kaş laminasyon mobile LCP 8 s in Lighthouse).
 const ABOVE_FOLD = 3;
 
 // Hizmet sayfası üst bölümü: dikey çekimler yan yana, sessiz ve döngüde oynar.
@@ -13,6 +15,7 @@ const ABOVE_FOLD = 3;
 // (Esc, arka plan veya kapat düğmesiyle kapanır; açıkken sayfa kaymaz).
 export function HeroVideoStrip({ videos, title }: { videos: HeroVideo[]; title: string }) {
   const [open, setOpen] = useState<number | null>(null);
+  const [loaded, setLoaded] = useState(false);
   videos.slice(0, ABOVE_FOLD).forEach((video) => preload(video.poster, { as: "image", fetchPriority: "high" }));
   const lastTrigger = useRef<HTMLButtonElement | null>(null);
   const closeRef = useRef<HTMLButtonElement | null>(null);
@@ -20,6 +23,19 @@ export function HeroVideoStrip({ videos, title }: { videos: HeroVideo[]; title: 
   const close = useCallback(() => {
     setOpen(null);
     lastTrigger.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    let timer: number | undefined;
+    const start = () => {
+      timer = window.setTimeout(() => setLoaded(true), 800);
+    };
+    if (document.readyState === "complete") start();
+    else window.addEventListener("load", start, { once: true });
+    return () => {
+      window.removeEventListener("load", start);
+      window.clearTimeout(timer);
+    };
   }, []);
 
   useEffect(() => {
@@ -65,7 +81,7 @@ export function HeroVideoStrip({ videos, title }: { videos: HeroVideo[]; title: 
               className="group relative block aspect-[9/16] w-full cursor-pointer overflow-hidden rounded-[22px] bg-blush shadow-[0_24px_60px_-36px_rgba(229,135,146,0.8)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
               <video
-                src={video.src}
+                src={loaded ? video.src : undefined}
                 poster={video.poster}
                 muted
                 autoPlay
