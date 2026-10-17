@@ -69,7 +69,8 @@ struct NewAppointmentView: View {
 
                 if usesBodyRegions {
                     Section("Bölgeler") {
-                        BodyRegionPicker(selection: $bodyRegions, sessionPrice: store.service(serviceID)?.sessionPrice, sessionTotal: sessionTotal)
+                        BodyRegionPicker(selection: $bodyRegions, sessionPrice: store.service(serviceID)?.sessionPrice, sessionTotal: sessionTotal,
+                                         darkening: subservices.contains(BodyRegion.darkeningSubservice))
                     }
                 }
 

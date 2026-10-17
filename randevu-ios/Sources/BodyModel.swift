@@ -11,18 +11,25 @@ struct BodyRegion: Identifiable, Hashable {
     static let all: [BodyRegion] = [
         .init(key: "forehead", label: "Alın"),
         .init(key: "nose", label: "Burun"),
+        .init(key: "under_eye_r", label: "Sağ göz altı"),
+        .init(key: "under_eye_l", label: "Sol göz altı"),
         .init(key: "cheek_r", label: "Sağ yanak"),
         .init(key: "cheek_l", label: "Sol yanak"),
+        .init(key: "upper_lip", label: "Üst dudak üstü (bıyık bölgesi)"),
         .init(key: "lips_chin", label: "Dudak ve çene"),
         .init(key: "scalp", label: "Saçlı deri / baş arkası"),
         .init(key: "neck_front", label: "Boyun ön"),
         .init(key: "neck_back", label: "Ense"),
         .init(key: "shoulder_r", label: "Sağ omuz"),
         .init(key: "shoulder_l", label: "Sol omuz"),
+        .init(key: "axilla_r", label: "Sağ koltuk altı"),
+        .init(key: "axilla_l", label: "Sol koltuk altı"),
         .init(key: "chest_r", label: "Sağ göğüs"),
         .init(key: "chest_l", label: "Sol göğüs"),
         .init(key: "abdomen_r", label: "Karın sağ"),
         .init(key: "abdomen_l", label: "Karın sol"),
+        .init(key: "groin_r", label: "Sağ kasık"),
+        .init(key: "groin_l", label: "Sol kasık"),
         .init(key: "upper_back_r", label: "Sırt üst sağ"),
         .init(key: "upper_back_l", label: "Sırt üst sol"),
         .init(key: "lower_back_r", label: "Bel sağ"),
@@ -31,6 +38,8 @@ struct BodyRegion: Identifiable, Hashable {
         .init(key: "buttock_l", label: "Sol kalça"),
         .init(key: "upper_arm_r", label: "Sağ üst kol"),
         .init(key: "upper_arm_l", label: "Sol üst kol"),
+        .init(key: "elbow_r", label: "Sağ dirsek"),
+        .init(key: "elbow_l", label: "Sol dirsek"),
         .init(key: "forearm_r", label: "Sağ ön kol"),
         .init(key: "forearm_l", label: "Sol ön kol"),
         .init(key: "hand_r", label: "Sağ el"),
@@ -41,6 +50,8 @@ struct BodyRegion: Identifiable, Hashable {
         .init(key: "thigh_inner_l", label: "Sol uyluk iç"),
         .init(key: "thigh_back_r", label: "Sağ uyluk arka"),
         .init(key: "thigh_back_l", label: "Sol uyluk arka"),
+        .init(key: "knee_r", label: "Sağ diz kapağı"),
+        .init(key: "knee_l", label: "Sol diz kapağı"),
         .init(key: "shin_r", label: "Sağ bacak ön (kaval)"),
         .init(key: "shin_l", label: "Sol bacak ön (kaval)"),
         .init(key: "leg_inner_r", label: "Sağ bacak iç (alt)"),
@@ -49,6 +60,15 @@ struct BodyRegion: Identifiable, Hashable {
         .init(key: "calf_l", label: "Sol baldır"),
         .init(key: "foot_r", label: "Sağ ayak"),
         .init(key: "foot_l", label: "Sol ayak"),
+    ]
+
+    /// Sub-treatment (exact name in the service's subservices) that brings up the quick-pick chips.
+    static let darkeningSubservice = "Bölgesel Kararma Kamuflajı"
+
+    /// Usual spots for regional darkening, offered as one-tap chips (in this order).
+    static let darkeningKeys = [
+        "axilla_r", "axilla_l", "elbow_r", "elbow_l", "knee_r", "knee_l", "groin_r", "groin_l",
+        "thigh_inner_r", "thigh_inner_l", "neck_back", "under_eye_r", "under_eye_l", "upper_lip", "lips_chin",
     ]
 
     /// Known regions among `keys`, in the canonical order above (unknown keys are skipped).

@@ -20,14 +20,14 @@ OUT = os.path.join(HERE, "..", "Resources", "BodyModel.bin")
 
 # Same order as BodyRegion.all in the app.
 REGIONS = [
-    "forehead", "nose", "cheek_r", "cheek_l", "lips_chin", "scalp",
-    "neck_front", "neck_back", "shoulder_r", "shoulder_l",
-    "chest_r", "chest_l", "abdomen_r", "abdomen_l",
+    "forehead", "nose", "under_eye_r", "under_eye_l", "cheek_r", "cheek_l", "upper_lip", "lips_chin", "scalp",
+    "neck_front", "neck_back", "shoulder_r", "shoulder_l", "axilla_r", "axilla_l",
+    "chest_r", "chest_l", "abdomen_r", "abdomen_l", "groin_r", "groin_l",
     "upper_back_r", "upper_back_l", "lower_back_r", "lower_back_l",
     "buttock_r", "buttock_l",
-    "upper_arm_r", "upper_arm_l", "forearm_r", "forearm_l", "hand_r", "hand_l",
+    "upper_arm_r", "upper_arm_l", "elbow_r", "elbow_l", "forearm_r", "forearm_l", "hand_r", "hand_l",
     "thigh_front_r", "thigh_front_l", "thigh_inner_r", "thigh_inner_l", "thigh_back_r", "thigh_back_l",
-    "shin_r", "shin_l", "leg_inner_r", "leg_inner_l", "calf_r", "calf_l", "foot_r", "foot_l",
+    "knee_r", "knee_l", "shin_r", "shin_l", "leg_inner_r", "leg_inner_l", "calf_r", "calf_l", "foot_r", "foot_l",
 ]
 
 
@@ -147,10 +147,14 @@ def main():
             if face or (y < 6.85 and z > 0.05):  # second term: jaw angle below the ear
                 if y > 7.47:
                     return "forehead"
-                if ax < 0.2 and y > 6.95 and z > 1.3:
+                if ax < 0.2 and y > 6.87 and z > 1.3:  # down to the nostrils
                     return "nose"
+                # Crescent under the lower lid, eye joint at |x| 0.31.
+                if 7.02 < y < 7.27 - 0.8 * (ax - 0.31) ** 2 and 0.12 < ax < 0.58:
+                    return "under_eye_" + s
                 if y <= 6.95 and ax < 0.36:
-                    return "lips_chin"
+                    # Moustache area: nose base down to the upper lip line.
+                    return "upper_lip" if y > 6.72 and ax < 0.3 else "lips_chin"
                 return "cheek_" + s
             return "scalp"
 
@@ -158,6 +162,10 @@ def main():
         neck_bottom = 5.42 + (5.78 - 5.42) * max(0.0, min(1.0, (0.6 - z) / 1.0))
         if y > neck_bottom and math.hypot(x, z - 0.18) < 0.9 and ax < 0.62:
             return "neck_front" if z > 0.18 else "neck_back"
+
+        # Armpit hollow: ball around where the arm's underside meets the chest wall.
+        if math.dist((ax, y, z), (1.55, 4.55, 0.12)) < 0.5:
+            return "axilla_" + s
 
         # Arms: outside the torso and close to the shoulder-elbow-wrist-fingertip chain.
         # Beyond |x| 2.4 nothing but arm/hand exists at that height.
@@ -168,6 +176,11 @@ def main():
             # Deltoid cap: top third of the upper arm, except the armpit side.
             if t < 0.36 and toward_midline(p, n, S, E) < 0.5:
                 return "shoulder_" + s
+            # Elbow ring: 12% of the upper-arm length either side of the joint, both sides measured
+            # along the upper arm (the joint sits at the back of the arm, so the forward-tilted
+            # forearm axis would cut the ring short at the crease).
+            if abs(1.0 - t) < 0.12:
+                return "elbow_" + s
             if t < 1.0:
                 return "upper_arm_" + s
             if seg_param(p, E, W) < 1.0:
@@ -178,11 +191,17 @@ def main():
         # Legs: below the groin crease (front) / gluteal fold (back).
         crease = -0.15 + 0.55 * min(ax, 1.9)
         fold = -0.55
+        # Groin: band along the inguinal crease, front only.
+        if front and 0.25 < ax < 1.3 and abs(y - crease) < 0.3:
+            return "groin_" + s
         if y < (crease if front else fold):
             if y < -7.3:
                 return "foot_" + s
             leg_front = z > lerp(y, leg_mid[s])
             H, K, A = J[f"{s}-upper-leg"], J[f"{s}-knee"], J[f"{s}-ankle"]
+            # Kneecap: front of the knee joint (the hollow behind stays thigh_back / calf).
+            if leg_front and abs(y - K[1]) < 0.5 and toward_midline(p, n, *((H, K) if y > K[1] else (K, A))) <= 0.7:
+                return "knee_" + s
             if y > K[1]:
                 if toward_midline(p, n, H, K) > 0.7:
                     return "thigh_inner_" + s

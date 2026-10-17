@@ -4,10 +4,12 @@ import SceneKit
 /// Rotatable 3D body with `selected` regions highlighted. Tapping a region calls `onToggle`;
 /// nil = read-only (rotation still works, taps are ignored). The corner button opens it full screen.
 /// `sessionTotal` non-nil = show session prices (consultation, `sessionPrice` per region) under the full-screen model.
+/// `darkening` = also offer the regional-darkening quick-pick chips (when editable).
 struct BodyMapView: View {
     let selected: Set<String>
     var sessionPrice: Decimal? = nil
     var sessionTotal: Int? = nil
+    var darkening = false
     var onToggle: ((String) -> Void)? = nil
 
     @State private var camera = CameraRequest(back: false, token: 0)
@@ -30,10 +32,14 @@ struct BodyMapView: View {
                     Text("Bölgeyi seçmek için dokunun, çevirmek için sürükleyin")
                         .font(.caption).foregroundStyle(.secondary)
                 }
+                if darkening, let onToggle {
+                    DarkeningChips(selected: selected, scrolls: false, onToggle: onToggle)
+                }
             }
             // Content is rebuilt from this view's `selected`, so taps in full screen show up live.
             .fullScreenCover(isPresented: $expanded) {
-                BodyMapFullScreen(mesh: mesh, selected: selected, sessionPrice: sessionPrice, sessionTotal: sessionTotal, onToggle: onToggle)
+                BodyMapFullScreen(mesh: mesh, selected: selected, sessionPrice: sessionPrice, sessionTotal: sessionTotal,
+                                  darkening: darkening, onToggle: onToggle)
             }
         } else {
             Text("3D model yüklenemedi").foregroundStyle(.secondary)
@@ -48,6 +54,7 @@ private struct BodyMapFullScreen: View {
     let selected: Set<String>
     let sessionPrice: Decimal?
     let sessionTotal: Int?
+    let darkening: Bool
     let onToggle: ((String) -> Void)?
 
     @State private var camera = CameraRequest(back: false, token: 0)
@@ -57,6 +64,10 @@ private struct BodyMapFullScreen: View {
             VStack(spacing: 8) {
                 BodySceneView(mesh: mesh, selected: selected, onToggle: onToggle, camera: camera)
                 SideButtons(camera: $camera)
+                if darkening, let onToggle {
+                    // One scrolling row keeps the model large.
+                    DarkeningChips(selected: selected, scrolls: true, onToggle: onToggle)
+                }
                 if selected.isEmpty {
                     Text("Bölge seçilmedi").font(.caption).foregroundStyle(.secondary)
                     BodyRegionRows(keys: selected, sessionPrice: sessionPrice, sessionTotal: sessionTotal)
@@ -95,14 +106,61 @@ private struct SideButtons: View {
     }
 }
 
+/// "Bölgesel kararma bölgeleri": one-tap chips for `BodyRegion.darkeningKeys`, toggling the same selection
+/// as the model; a chosen chip takes its region's colour. `scrolls` = one horizontal row instead of a grid.
+private struct DarkeningChips: View {
+    let selected: Set<String>
+    let scrolls: Bool
+    let onToggle: (String) -> Void
+
+    var body: some View {
+        let colors = BodyRegion.colors(for: selected)
+        let regions = BodyRegion.darkeningKeys.compactMap { key in BodyRegion.all.first { $0.key == key } }
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Bölgesel kararma bölgeleri").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+            if scrolls {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 6) {
+                        ForEach(regions) { chip($0, color: colors[$0.key]).fixedSize() }
+                    }
+                }
+            } else {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: 6)], spacing: 6) {
+                    ForEach(regions) { chip($0, color: colors[$0.key]).frame(maxWidth: .infinity, minHeight: 34) }
+                }
+            }
+        }
+        .padding(.horizontal, scrolls ? 16 : 0)
+    }
+
+    private func chip(_ region: BodyRegion, color: UIColor?) -> some View {
+        // Borderless keeps each chip separately tappable inside a Form row.
+        Button { onToggle(region.key) } label: {
+            Text(region.label)
+                .font(.caption.weight(color == nil ? .regular : .semibold))
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .minimumScaleFactor(0.8)
+                .padding(.horizontal, 8).padding(.vertical, 6)
+                .frame(maxWidth: scrolls ? nil : .infinity, maxHeight: .infinity)
+                .foregroundStyle(color == nil ? Color.primary : Color.white)
+                .background(color.map(Color.init) ?? Color(.secondarySystemFill), in: RoundedRectangle(cornerRadius: 8))
+        }
+        .buttonStyle(.borderless)
+        .accessibilityAddTraits(color == nil ? [] : .isSelected)
+    }
+}
+
 /// Editable "Bölgeler" rows: the 3D picker plus the chosen regions (each removable) and their prices.
+/// `darkening` = the regional-darkening sub-treatment is chosen, so the quick-pick chips are shown.
 struct BodyRegionPicker: View {
     @Binding var selection: Set<String>
     let sessionPrice: Decimal?
     let sessionTotal: Int
+    var darkening = false
 
     var body: some View {
-        BodyMapView(selected: selection, sessionPrice: sessionPrice, sessionTotal: sessionTotal) { key in
+        BodyMapView(selected: selection, sessionPrice: sessionPrice, sessionTotal: sessionTotal, darkening: darkening) { key in
             if selection.contains(key) { selection.remove(key) } else { selection.insert(key) }
         }
         BodyRegionRows(keys: selection, sessionPrice: sessionPrice, sessionTotal: sessionTotal) { selection.remove($0) }

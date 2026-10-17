@@ -87,7 +87,8 @@ struct EditAppointmentView: View {
                         BodyRegionPicker(selection: Binding(get: { bodyRegions },
                                                             set: { bodyRegions = $0; fillPrice() }),
                                          sessionPrice: store.service(serviceID)?.sessionPrice,
-                                         sessionTotal: appt?.sessionTotal ?? 1)
+                                         sessionTotal: appt?.sessionTotal ?? 1,
+                                         darkening: subservices.contains(BodyRegion.darkeningSubservice))
                     }
                 }
 
