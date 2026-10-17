@@ -13,10 +13,12 @@ struct EditAppointmentView: View {
     @State private var status: AppointmentStatus = .confirmed
     @State private var note = ""
     @State private var priceText = ""
+    @State private var subservices: Set<String> = []
     @State private var loaded = false
 
     private var appt: AppointmentDTO? { store.appointments.first { $0.id == appointmentID } }
     private var isChild: Bool { appt?.isChildSession ?? false }
+    private var subserviceOptions: [String] { store.service(serviceID)?.subservices ?? [] }
 
     var body: some View {
         NavigationStack {
@@ -39,9 +41,27 @@ struct EditAppointmentView: View {
                         }
                     }
                     .disabled(isChild)
+                    .onChange(of: serviceID) { _, _ in
+                        // Keeps the loaded selection; drops names that don't belong to a newly chosen service.
+                        subservices.formIntersection(subserviceOptions)
+                    }
                     if isChild {
                         Text("Paketin 1. seansında yönetilir")
                             .font(.caption).foregroundStyle(.secondary)
+                    }
+                }
+
+                if isChild {
+                    if let appt, !appt.subservices.isEmpty {
+                        Section("Alt uygulamalar") {
+                            Text(appt.subservices.joined(separator: ", "))
+                            Text("Paketin 1. seansında yönetilir")
+                                .font(.caption).foregroundStyle(.secondary)
+                        }
+                    }
+                } else if !subserviceOptions.isEmpty {
+                    Section("Alt uygulamalar") {
+                        SubservicePicker(options: subserviceOptions, selection: $subservices)
                     }
                 }
 
@@ -98,6 +118,7 @@ struct EditAppointmentView: View {
         status = .from(appt.status)
         note = appt.note ?? ""
         priceText = appt.price.map(Fmt.amount) ?? ""
+        subservices = Set(appt.subservices)
     }
 
     private func save() {
@@ -105,12 +126,15 @@ struct EditAppointmentView: View {
         let starts = DateMerge.combine(day: startDate, time: startTime)
         // Child sessions must not send price; root/single sends null to clear it.
         let price: PriceWrite = isChild ? .omit : (PriceText.parse(priceText).map { .set($0) } ?? .clear)
+        // Same rule for sub-treatments: child omits; root/single sends the full list ([] clears).
+        let chosen: [String]? = isChild ? nil : subserviceOptions.filter(subservices.contains)
         Task {
             let ok = await store.updateAppointment(id: appt.id, revision: appt.revision,
                                                     customerID: appt.customerID,
                                                     serviceID: isChild ? appt.serviceID : serviceID,
                                                     startsAt: starts, durationMin: duration,
-                                                    status: status, note: note, price: price)
+                                                    status: status, note: note, price: price,
+                                                    subservices: chosen)
             if ok { dismiss() }
         }
     }

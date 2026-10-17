@@ -1,4 +1,5 @@
 import SwiftUI
+import PhotosUI
 
 struct NewAppointmentView: View {
     @Environment(AppStore.self) private var store
@@ -20,7 +21,12 @@ struct NewAppointmentView: View {
     @State private var pickDates = false
     @State private var customStarts: [Date] = [] // sessions 2..N
     @State private var priceText = ""
+    @State private var subservices: Set<String> = []
+    @State private var pickedPhotos: [PhotosPickerItem] = []
+    @State private var isUploading = false
     @State private var didInit = false
+
+    private var subserviceOptions: [String] { store.service(serviceID)?.subservices ?? [] }
 
     var body: some View {
         NavigationStack {
@@ -45,6 +51,13 @@ struct NewAppointmentView: View {
                     }
                     .onChange(of: serviceID) { _, newValue in
                         if let s = store.service(newValue) { duration = s.durationMin }
+                        subservices = []
+                    }
+                }
+
+                if !subserviceOptions.isEmpty {
+                    Section("Alt uygulamalar") {
+                        SubservicePicker(options: subserviceOptions, selection: $subservices)
                     }
                 }
 
@@ -104,14 +117,32 @@ struct NewAppointmentView: View {
                 Section("Not") {
                     TextField("Not", text: $note, axis: .vertical).lineLimit(2...5)
                 }
+
+                Section("Fotoğraflar") {
+                    if isUploading {
+                        HStack(spacing: 8) {
+                            ProgressView()
+                            Text("Fotoğraflar yükleniyor…").font(.subheadline).foregroundStyle(.secondary)
+                        }
+                    } else {
+                        PhotosPicker(selection: $pickedPhotos, maxSelectionCount: 10, matching: .images) {
+                            Label(pickedPhotos.isEmpty ? "Fotoğraf seç" : "\(pickedPhotos.count) fotoğraf seçildi",
+                                  systemImage: "photo.badge.plus")
+                        }
+                        if sessionTotal > 1 && !pickedPhotos.isEmpty {
+                            Text("1. seansa eklenir").font(.caption).foregroundStyle(.secondary)
+                        }
+                    }
+                }
             }
+            .interactiveDismissDisabled(isUploading)
             .navigationTitle("Yeni randevu")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Vazgeç") { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Kaydet") { save() }
-                        .disabled(store.isMutating || selectedCustomer == nil || (useCustomStarts && !customStartsValid)
+                        .disabled(store.isMutating || isUploading || selectedCustomer == nil || (useCustomStarts && !customStartsValid)
                                   || !PriceField.isValid(priceText))
                 }
             }
@@ -170,13 +201,27 @@ struct NewAppointmentView: View {
     private func save() {
         guard let customer = selectedCustomer else { return }
         let starts = DateMerge.combine(day: startDate, time: startTime)
+        // Keep the service's order; omit when the service has none.
+        let chosen = subserviceOptions.isEmpty ? nil : subserviceOptions.filter(subservices.contains)
         Task {
-            let ok = await store.createAppointment(customerID: customer.id, serviceID: serviceID,
-                                                    startsAt: starts, durationMin: duration, status: status,
-                                                    note: note, sessionTotal: sessionTotal, intervalDays: intervalDays,
-                                                    sessionStarts: useCustomStarts ? customStarts : nil,
-                                                    price: PriceText.parse(priceText))
-            if ok { dismiss() }
+            guard let rootID = await store.createAppointment(customerID: customer.id, serviceID: serviceID,
+                                                             startsAt: starts, durationMin: duration, status: status,
+                                                             note: note, sessionTotal: sessionTotal, intervalDays: intervalDays,
+                                                             sessionStarts: useCustomStarts ? customStarts : nil,
+                                                             price: PriceText.parse(priceText),
+                                                             subservices: chosen) else { return }
+            if !pickedPhotos.isEmpty {
+                isUploading = true
+                let jpegs = await PhotoPrep.jpegs(from: pickedPhotos)
+                // The appointment already exists, so close either way (re-saving would duplicate it).
+                if jpegs.isEmpty {
+                    store.errorMessage = "Randevu kaydedildi, seçilen fotoğraflar okunamadı."
+                } else if !(await store.uploadPhotos(appointmentID: rootID, jpegs: jpegs)) {
+                    store.errorMessage = "Randevu kaydedildi, fotoğraflar yüklenemedi: \(store.errorMessage ?? "")"
+                }
+                isUploading = false
+            }
+            dismiss()
         }
     }
 }

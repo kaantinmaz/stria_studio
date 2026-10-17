@@ -1,4 +1,5 @@
 import SwiftUI
+import PhotosUI
 
 struct AppointmentDetailView: View {
     @Environment(AppStore.self) private var store
@@ -12,6 +13,10 @@ struct AppointmentDetailView: View {
     @State private var showSessionDates = false
     @State private var intervalDays = 28
     @State private var confirmDelete = false
+    @State private var pickedPhotos: [PhotosPickerItem] = []
+    @State private var isUploading = false
+    @State private var viewerPhoto: PhotoRef?
+    @State private var photoToDelete: Int?
 
     private var appt: AppointmentDTO? { store.appointments.first { $0.id == appointmentID } }
 
@@ -40,6 +45,9 @@ struct AppointmentDetailView: View {
 
             Section("Randevu") {
                 InfoRow(label: "Hizmet", value: store.serviceTitle(appt.serviceID))
+                if !appt.subservices.isEmpty {
+                    InfoRow(label: "Alt uygulamalar", value: appt.subservices.joined(separator: ", "))
+                }
                 InfoRow(label: "Tarih", value: Fmt.dateOnly.string(from: appt.startsAt))
                 InfoRow(label: "Saat", value: Fmt.timeRange(appt.startsAt, appt.endsAt))
                 InfoRow(label: "Süre", value: "\(appt.durationMin) dk")
@@ -69,6 +77,8 @@ struct AppointmentDetailView: View {
             }
 
             quickStatusSection(appt, current: status)
+
+            photosSection(appt)
 
             if appt.isPackage {
                 sessionsSection(appt)
@@ -100,6 +110,24 @@ struct AppointmentDetailView: View {
             Button("Vazgeç", role: .cancel) {}
         } message: {
             Text("Yeni seans, son seanstan \(intervalDays) gün sonra aynı saatte oluşturulur.")
+        }
+        .fullScreenCover(item: $viewerPhoto) { PhotoViewer(url: $0.url) }
+        .onChange(of: pickedPhotos) { _, items in
+            guard !items.isEmpty else { return }
+            Task { await upload(items, to: appt.id) }
+        }
+        .confirmationDialog("Fotoğraf silinsin mi?", isPresented: Binding(
+            get: { photoToDelete != nil },
+            set: { if !$0 { photoToDelete = nil } }
+        ), titleVisibility: .visible, presenting: photoToDelete) { index in
+            Button("Sil", role: .destructive) {
+                Task {
+                    // Read the revision at tap time so a refresh in between doesn't 409.
+                    guard let current = self.appt else { return }
+                    _ = await store.deletePhoto(appointmentID: current.id, index: index, revision: current.revision)
+                }
+            }
+            Button("Vazgeç", role: .cancel) {}
         }
         .confirmationDialog(deleteTitle(appt), isPresented: $confirmDelete, titleVisibility: .visible) {
             Button(deleteButton(appt), role: .destructive) {
@@ -160,6 +188,49 @@ struct AppointmentDetailView: View {
                     .tint(s == current ? Color.accentColor : .secondary)
                     .disabled(store.isMutating)
                 }
+            }
+        }
+    }
+
+    private func photosSection(_ appt: AppointmentDTO) -> some View {
+        Section("Fotoğraflar") {
+            if !appt.photos.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(Array(appt.photos.enumerated()), id: \.offset) { index, raw in
+                            if let url = URL(string: raw) {
+                                Button { viewerPhoto = PhotoRef(url: url) } label: {
+                                    AsyncImage(url: url) { image in
+                                        image.resizable().scaledToFill()
+                                    } placeholder: {
+                                        Color.secondary.opacity(0.15)
+                                    }
+                                    .frame(width: 84, height: 84)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                }
+                                .buttonStyle(.plain)
+                                .contextMenu {
+                                    Button(role: .destructive) { photoToDelete = index } label: {
+                                        Label("Sil", systemImage: "trash")
+                                    }
+                                }
+                                .accessibilityLabel("Fotoğraf \(index + 1)")
+                            }
+                        }
+                    }
+                    .padding(.vertical, 4)
+                }
+            }
+            if isUploading {
+                HStack(spacing: 8) {
+                    ProgressView()
+                    Text("Fotoğraflar yükleniyor…").font(.subheadline).foregroundStyle(.secondary)
+                }
+            } else {
+                PhotosPicker(selection: $pickedPhotos, maxSelectionCount: 10, matching: .images) {
+                    Label("Fotoğraf ekle", systemImage: "photo.badge.plus")
+                }
+                .disabled(store.isMutating)
             }
         }
     }
@@ -250,6 +321,17 @@ struct AppointmentDetailView: View {
 
     // MARK: Helpers
 
+    private func upload(_ items: [PhotosPickerItem], to appointmentID: Int) async {
+        isUploading = true
+        defer { isUploading = false; pickedPhotos = [] }
+        let jpegs = await PhotoPrep.jpegs(from: items)
+        guard !jpegs.isEmpty else {
+            store.errorMessage = "Seçilen fotoğraflar okunamadı."
+            return
+        }
+        _ = await store.uploadPhotos(appointmentID: appointmentID, jpegs: jpegs)
+    }
+
     private func applyStatus(_ status: AppointmentStatus, to appt: AppointmentDTO) async {
         _ = await store.updateAppointment(id: appt.id, revision: appt.revision,
                                           customerID: appt.customerID, serviceID: appt.serviceID,
@@ -264,4 +346,9 @@ struct AppointmentDetailView: View {
     private func deleteTitle(_ appt: AppointmentDTO) -> String {
         appt.isPackage ? "Bu seans paketten çıkarılsın mı?" : "Randevu silinsin mi?"
     }
+}
+
+private struct PhotoRef: Identifiable {
+    let url: URL
+    var id: URL { url }
 }

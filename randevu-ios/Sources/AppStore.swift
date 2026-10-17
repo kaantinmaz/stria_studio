@@ -60,9 +60,11 @@ final class AppStore {
         }
     }
 
+    /// Returns the created (root) appointment id, nil on failure.
     func createAppointment(customerID: Int, serviceID: Int?, startsAt: Date, durationMin: Int,
                            status: AppointmentStatus, note: String?, sessionTotal: Int, intervalDays: Int,
-                           sessionStarts: [Date]? = nil, price: Decimal? = nil) async -> Bool {
+                           sessionStarts: [Date]? = nil, price: Decimal? = nil,
+                           subservices: [String]? = nil) async -> Int? {
         var payload = AppointmentWrite(customerID: customerID, serviceID: serviceID, startsAt: startsAt,
                                        durationMin: durationMin, status: status.apiValue, note: note.nilIfBlank,
                                        revision: nil,
@@ -70,18 +72,19 @@ final class AppStore {
                                        intervalDays: sessionTotal > 1 ? intervalDays : nil,
                                        sessionStarts: sessionTotal > 1 ? sessionStarts : nil)
         if let price { payload.price = .set(price) }
-        return await mutate { api, token in
+        payload.subservices = subservices
+        return await mutateReturning { api, token in
             try await api.createAppointment(payload, token: token)
         }
     }
 
     func updateAppointment(id: Int, revision: String, customerID: Int, serviceID: Int?, startsAt: Date,
                            durationMin: Int, status: AppointmentStatus, note: String?,
-                           price: PriceWrite = .omit) async -> Bool {
+                           price: PriceWrite = .omit, subservices: [String]? = nil) async -> Bool {
         let payload = AppointmentWrite(customerID: customerID, serviceID: serviceID, startsAt: startsAt,
                                        durationMin: durationMin, status: status.apiValue, note: note.nilIfBlank,
                                        revision: revision, sessionTotal: nil, intervalDays: nil, sessionStarts: nil,
-                                       price: price)
+                                       price: price, subservices: subservices)
         return await mutate { api, token in
             try await api.updateAppointment(id: id, payload, token: token)
         }
@@ -96,6 +99,18 @@ final class AppStore {
     func deleteAppointment(id: Int, revision: String) async -> Bool {
         await mutate { api, token in
             try await api.deleteAppointment(id: id, revision: revision, token: token)
+        }
+    }
+
+    func uploadPhotos(appointmentID: Int, jpegs: [Data]) async -> Bool {
+        await mutate { api, token in
+            try await api.uploadPhotos(id: appointmentID, jpegs: jpegs, token: token)
+        }
+    }
+
+    func deletePhoto(appointmentID: Int, index: Int, revision: String) async -> Bool {
+        await mutate { api, token in
+            try await api.deletePhoto(id: appointmentID, index: index, revision: revision, token: token)
         }
     }
 
@@ -171,7 +186,7 @@ final class AppStore {
         }
     }
 
-    private func mutateReturning(_ op: @escaping (DesktopAPI, String) async throws -> CustomerDTO) async -> CustomerDTO? {
+    private func mutateReturning<T>(_ op: @escaping (DesktopAPI, String) async throws -> T) async -> T? {
         isMutating = true
         defer { isMutating = false }
         do {

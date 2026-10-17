@@ -19,7 +19,7 @@ Sahip, yalnız stüdyonun kullanacağı bir iPhone uygulaması istedi: gün gün
 
 ## Kapsam dışı (bilinçli)
 
-Ödeme durumu (`is_paid`/`payment_method`/`paid_at` — Meta/Google dönüşüm yüklemesini tetikler), fotoğraf, kampanya bağlama — panelde kalıyor; API bunlara dokunmuyor. (Fiyat 2026-10-17'de eklendi, aşağıya bkz.) Canlı push yok: panelde yapılan değişiklik uygulamada yenileyince/ön plana gelince görünür.
+Ödeme durumu (`is_paid`/`payment_method`/`paid_at` — Meta/Google dönüşüm yüklemesini tetikler), kampanya bağlama — panelde kalıyor; API bunlara dokunmuyor. (Fiyat, fotoğraf ve alt uygulamalar 2026-10-17'de eklendi, aşağıya bkz.) Canlı push yok: panelde yapılan değişiklik uygulamada yenileyince/ön plana gelince görünür.
 
 ## Güncelleme 2026-10-17 — giriş ekranı kaldırıldı (owner kararı)
 
@@ -37,6 +37,13 @@ Owner: "giriş yapmamız gerekmesin, sadece biz kullanacağız". Seçenekler sun
 - **Özel seans tarihleri:** API `POST /appointments` yeni `session_starts` (2..N. seanslar, ISO 8601+offset, uzunluk `session_total-1`, kesin artan ve kökten sonra; varsa `interval_days` yok sayılır). `AppointmentSessions::splitAt()` tek yol, `split()` ona delege eder. iOS: Yeni randevuda "Tarihleri tek tek seç"; mevcut pakette detayda "Seans tarihlerini düzenle" sayfası (değişen seanslar sırayla `PATCH starts_at`, her çağrıda güncel revision).
 - **Fiyat:** API randevu nesnesinde `price` (sayı/null), POST/PATCH yazılabilir (0..99999999.99, null temizler). Paket fiyatı yalnız kökte — çocuk seansa `price` PATCH → 422 "Paket fiyatı 1. seansta düzenlenir." iOS: Yeni/Düzenle'de Fiyat alanı (çocukta salt okunur), detayda "Fiyat"/"Paket fiyatı", listede ve müşteri geçmişinde fiyat (paket yalnız kök satırında), müşteri geçmişinde "Toplam" (paket bir kez; iptal edilenler de dahil — owner'a soruldu).
 - Testler: `DesktopApi|AppointmentSessions` 39/39, tam suite 281/281. Canlı: monorepo `95fde37`/`8e28f37` → admin `e153166`, plesk fetch/deploy + `optimize:clear` + `package:discover`. Canlı API E2E: 3 seanslı özel tarihli + 4500,5 fiyatlı TEST paketi oluşturuldu (fiyat yalnız kökte, çocukta fiyat PATCH 422), sonra 3 seans silindi (randevu sayısı 10 → 10). Telefona Release build kuruldu; simülatörde canlı veriyle liste ekranı doğrulandı.
+
+## Güncelleme 2026-10-17 (2) — yalnız yaklaşan günler, gün başına +, fotoğraf, alt uygulamalar
+
+- **Liste:** geçmiş günler hiçbir filtrede gösterilmez (owner: "geçmiş tarihleri görmemize gerek yok"); Özel aralık bugünden önce başlayamaz. Her gün başlığında `+` → o güne Yeni randevu. Paket "Seanslar" bölümü ve müşteri geçmişi geçmişi göstermeye devam eder.
+- **Fotoğraf:** API `POST /appointments/{id}/photos` (multipart `photos[]`, ≤10 dosya, image ≤10 MB, 201) ve `DELETE /appointments/{id}/photos/{index}` {revision}; randevu nesnesinde `photos` (mutlak URL). Mevcut `appointments.photos` + `public` disk (`appointments/`), Calendar ile aynı model; seans başına (pakette paylaşılmaz). URL mantığı `Appointment::photoUrls()`'ta tek yerde. iOS: detayda Fotoğraflar (PhotosPicker, 2048 px/JPEG 0.8 küçültme, tam ekran, uzun bas → Sil), Yeni randevuda isteğe bağlı fotoğraf (oluşturma sonrası köke yüklenir).
+- **Alt uygulamalar:** migration `2026_10_17_000001_add_subservices_to_appointments_table` (`appointments.subservices` JSON). `/state` hizmetlerinde `subservices` (ad listesi, `services.subservices_tr[*].name`). POST/PATCH `subservices` seçili hizmete ait olmalı (aksi 422); **paket düzeyi** — kökte, `createChild`/`resync` ile çocuklara yayılır (service_id gibi); çocukta PATCH 422. Hizmet değişip `subservices` gönderilmezse temizlenir. Panel takvim modalında da "Alt uygulamalar" checkbox listesi.
+- Testler 286/286. Canlı: monorepo → admin `a4157b2`, plesk fetch/deploy + `migrate --force` + `optimize:clear` + `package:discover`. **GOTCHA:** deploy sonrası yeni rotalar CLI `route:list`'te görünürken web ~1 dk 404 verdi (FPM opcache yeniden doğrulama gecikmesi) — kendiliğinden düzeldi. Canlı E2E: Kamuflaj 2 seanslı TEST paketi (2 alt uygulama iki seansa yayıldı) → fotoğraf yükle (URL 200) → sil (dosya 404) → paket silindi (10 → 10).
 
 ## Kurulum / yeniden derleme
 

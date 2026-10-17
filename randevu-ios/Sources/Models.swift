@@ -46,7 +46,14 @@ struct AppointmentDTO: Codable, Equatable, Identifiable, Hashable {
     let sessionNo: Int?
     let sessionTotal: Int?
     let price: Decimal?
+    // Optional on the wire so older servers (no such keys) still decode.
+    private let photosRaw: [String]?
+    private let subservicesRaw: [String]?
 
+    /// Absolute image URLs of this session's photos.
+    var photos: [String] { photosRaw ?? [] }
+    /// Chosen sub-treatments (package-level, inherited from the root).
+    var subservices: [String] { subservicesRaw ?? [] }
     var endsAt: Date { startsAt.addingTimeInterval(Double(durationMin) * 60) }
     // Root id of the session package (siblings share this).
     var rootID: Int { parentID ?? id }
@@ -63,6 +70,8 @@ struct AppointmentDTO: Codable, Equatable, Identifiable, Hashable {
         case parentID = "parent_id"
         case sessionNo = "session_no"
         case sessionTotal = "session_total"
+        case photosRaw = "photos"
+        case subservicesRaw = "subservices"
     }
 }
 
@@ -70,10 +79,14 @@ struct ServiceDTO: Codable, Equatable, Identifiable, Hashable {
     let id: Int
     let title: String
     let durationMin: Int
+    private let subservicesRaw: [String]?
+
+    var subservices: [String] { subservicesRaw ?? [] }
 
     enum CodingKeys: String, CodingKey {
         case id, title
         case durationMin = "duration_min"
+        case subservicesRaw = "subservices"
     }
 }
 

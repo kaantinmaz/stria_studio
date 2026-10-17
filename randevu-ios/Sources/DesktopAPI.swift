@@ -36,6 +36,11 @@ private struct APIMessage: Decodable {
 struct DiscardResponse: Decodable { init(from decoder: Decoder) throws {} }
 private struct EmptyBody: Encodable {}
 private struct CustomerEnvelope: Decodable { let customer: CustomerDTO }
+/// POST /appointments returns the package root as `appointment`; only its id is needed.
+private struct CreatedAppointmentEnvelope: Decodable {
+    struct Ref: Decodable { let id: Int }
+    let appointment: Ref
+}
 
 final class DesktopAPI {
     let baseURL: URL
@@ -66,8 +71,10 @@ final class DesktopAPI {
         return env.customer
     }
 
-    func createAppointment(_ payload: AppointmentWrite, token: String) async throws {
-        let _: DiscardResponse = try await send(path: "/appointments", method: "POST", token: token, body: payload)
+    /// Returns the created (root) appointment id.
+    func createAppointment(_ payload: AppointmentWrite, token: String) async throws -> Int {
+        let env: CreatedAppointmentEnvelope = try await send(path: "/appointments", method: "POST", token: token, body: payload)
+        return env.appointment.id
     }
 
     func updateAppointment(id: Int, _ payload: AppointmentWrite, token: String) async throws {
@@ -84,6 +91,28 @@ final class DesktopAPI {
         let _: DiscardResponse = try await send(path: "/appointments/\(id)", method: "DELETE", token: token, body: body)
     }
 
+    /// Multipart upload of JPEGs under `photos[]`.
+    func uploadPhotos(id: Int, jpegs: [Data], token: String) async throws {
+        let boundary = "Boundary-\(UUID().uuidString)"
+        var body = Data()
+        for (idx, jpeg) in jpegs.enumerated() {
+            body.append(Data("--\(boundary)\r\nContent-Disposition: form-data; name=\"photos[]\"; filename=\"photo\(idx + 1).jpg\"\r\nContent-Type: image/jpeg\r\n\r\n".utf8))
+            body.append(jpeg)
+            body.append(Data("\r\n".utf8))
+        }
+        body.append(Data("--\(boundary)--\r\n".utf8))
+
+        var request = makeRequest(path: "/appointments/\(id)/photos", method: "POST", token: token)
+        request.httpBody = body
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        let _: DiscardResponse = try await execute(request)
+    }
+
+    func deletePhoto(id: Int, index: Int, revision: String, token: String) async throws {
+        let body = RevisionWrite(revision: revision)
+        let _: DiscardResponse = try await send(path: "/appointments/\(id)/photos/\(index)", method: "DELETE", token: token, body: body)
+    }
+
     // MARK: Core
 
     private func endpoint(_ path: String) -> URL {
@@ -92,17 +121,25 @@ final class DesktopAPI {
         return comps.url!
     }
 
-    private func send<Response: Decodable, Body: Encodable>(path: String, method: String, token: String?, body: Body?) async throws -> Response {
+    private func makeRequest(path: String, method: String, token: String?) -> URLRequest {
         var request = URLRequest(url: endpoint(path))
         request.httpMethod = method
         request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         if let token { request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization") }
+        return request
+    }
+
+    private func send<Response: Decodable, Body: Encodable>(path: String, method: String, token: String?, body: Body?) async throws -> Response {
+        var request = makeRequest(path: path, method: method, token: token)
         if let body {
             request.httpBody = try Self.encoder.encode(body)
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         }
+        return try await execute(request)
+    }
 
+    private func execute<Response: Decodable>(_ request: URLRequest) async throws -> Response {
         let data: Data
         let response: URLResponse
         do {
@@ -205,9 +242,11 @@ struct AppointmentWrite: Encodable {
     let intervalDays: Int?
     let sessionStarts: [Date]?
     var price: PriceWrite = .omit
+    /// nil = omit (child sessions must not send it).
+    var subservices: [String]? = nil
 
     enum CodingKeys: String, CodingKey {
-        case status, note, revision, price
+        case status, note, revision, price, subservices
         case customerID = "customer_id"
         case serviceID = "service_id"
         case startsAt = "starts_at"
@@ -234,6 +273,7 @@ struct AppointmentWrite: Encodable {
         case .clear: try c.encodeNil(forKey: .price)
         case let .set(value): try c.encode(value, forKey: .price)
         }
+        if let subservices { try c.encode(subservices, forKey: .subservices) }
     }
 }
 

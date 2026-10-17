@@ -1,4 +1,6 @@
 import SwiftUI
+import PhotosUI
+import ImageIO
 
 struct StatusChip: View {
     let status: AppointmentStatus
@@ -68,6 +70,80 @@ struct PriceField: View {
         } else if let caption {
             Text(caption).font(.caption).foregroundStyle(.secondary)
         }
+    }
+}
+
+/// Multi-select checkmark rows for a service's sub-treatments.
+struct SubservicePicker: View {
+    let options: [String]
+    @Binding var selection: Set<String>
+
+    var body: some View {
+        ForEach(options, id: \.self) { name in
+            Button {
+                if selection.contains(name) { selection.remove(name) } else { selection.insert(name) }
+            } label: {
+                HStack {
+                    Text(name).foregroundStyle(.primary)
+                    Spacer()
+                    if selection.contains(name) {
+                        Image(systemName: "checkmark").foregroundStyle(Color.accentColor)
+                    }
+                }
+            }
+        }
+    }
+}
+
+enum PhotoPrep {
+    /// Loads picked images, downscales to ≤2048 px long edge and JPEG-encodes (~0.8). Unreadable items are skipped.
+    static func jpegs(from items: [PhotosPickerItem]) async -> [Data] {
+        var result: [Data] = []
+        for item in items {
+            guard let data = try? await item.loadTransferable(type: Data.self),
+                  let jpeg = jpeg(from: data) else { continue }
+            result.append(jpeg)
+        }
+        return result
+    }
+
+    // ImageIO thumbnailing avoids decoding the full-size image; the transform option bakes in EXIF orientation.
+    private static func jpeg(from data: Data) -> Data? {
+        let options: [CFString: Any] = [
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceCreateThumbnailWithTransform: true,
+            kCGImageSourceThumbnailMaxPixelSize: 2048,
+        ]
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil),
+              let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else { return nil }
+        return UIImage(cgImage: cgImage).jpegData(compressionQuality: 0.8)
+    }
+}
+
+/// Full-screen photo; tap anywhere to close.
+struct PhotoViewer: View {
+    @Environment(\.dismiss) private var dismiss
+    let url: URL
+
+    var body: some View {
+        ZStack {
+            Color.black.ignoresSafeArea()
+            AsyncImage(url: url) { phase in
+                switch phase {
+                case let .success(image): image.resizable().scaledToFit()
+                case .failure: Image(systemName: "photo").font(.largeTitle).foregroundStyle(.secondary)
+                default: ProgressView().tint(.white)
+                }
+            }
+        }
+        .overlay(alignment: .topTrailing) {
+            Button { dismiss() } label: {
+                Image(systemName: "xmark.circle.fill").font(.title).symbolRenderingMode(.hierarchical).foregroundStyle(.white)
+            }
+            .padding()
+            .accessibilityLabel("Kapat")
+        }
+        .onTapGesture { dismiss() }
     }
 }
 
