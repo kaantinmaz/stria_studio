@@ -11,7 +11,6 @@ use App\Models\Service;
 use App\Models\Setting;
 use App\Models\User;
 use App\Support\AppointmentSessions;
-use App\Support\BodyRegions;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -1039,83 +1038,51 @@ class DesktopApiTest extends TestCase
         $this->assertSame(['forehead', 'hand_l'], $root->refresh()->body_regions);
     }
 
-    public function test_state_exposes_all_region_price_categories_null_by_default(): void
+    public function test_state_exposes_service_session_price(): void
     {
-        $response = $this->desktop()->getJson('/api/desktop/state')->assertOk();
+        Service::factory()->create(['name_tr' => 'Kamuflaj', 'sort_order' => 1, 'session_price' => '6000.50']);
+        Service::factory()->create(['name_tr' => 'Laminasyon', 'sort_order' => 2]);
 
-        $this->assertSame(
-            array_fill_keys(array_keys(BodyRegions::CATEGORIES), null),
-            $response->json('region_prices'),
-        );
-        $this->assertStringContainsString('"region_prices":{"face":null', $response->getContent());
-        $this->assertMatchesRegularExpression('/^[a-f0-9]{64}$/', $response->json('region_prices_revision'));
-        $this->assertSame(0, Setting::query()->whereNull('site')->count());
+        $response = $this->desktop()->getJson('/api/desktop/state')
+            ->assertOk()
+            ->assertJsonPath('services.0.session_price', 6000.5)
+            ->assertJsonPath('services.1.session_price', null);
+        $this->assertStringContainsString('"session_price":6000.5', $response->getContent());
     }
 
-    public function test_region_prices_update_saves_returns_and_state_reflects_it(): void
+    public function test_service_prices_update_listed_services_only(): void
     {
-        $main = Setting::query()->create(['site' => null, 'phone' => '0500']);
-        $revision = $this->desktop()->getJson('/api/desktop/state')->json('region_prices_revision');
+        $a = Service::factory()->create(['sort_order' => 1, 'session_price' => 100]);
+        $b = Service::factory()->create(['sort_order' => 2, 'session_price' => 200]);
+        $c = Service::factory()->create(['sort_order' => 3, 'session_price' => 300]);
 
-        $response = $this->desktop()->putJson('/api/desktop/region-prices', [
-            'prices' => ['face' => 1500, 'hand' => '250.5', 'foot' => null],
-            'revision' => $revision,
+        $this->desktop()->putJson('/api/desktop/service-prices', [
+            'prices' => [(string) $a->id => '2000', (string) $b->id => null],
         ])->assertOk()
-            ->assertJsonPath('region_prices.face', 1500)
-            ->assertJsonPath('region_prices.hand', 250.5)
-            ->assertJsonPath('region_prices.foot', null)
-            ->assertJsonPath('region_prices.neck', null);
-        $this->assertStringContainsString('"hand":250.5', $response->getContent());
-        $this->assertNotSame($revision, $response->json('region_prices_revision'));
-        $this->assertSame('0500', $main->refresh()->phone);
-        $this->assertSame(['face' => 1500, 'hand' => 250.5], $main->body_region_prices);
+            ->assertJsonPath('services.0.id', $a->id)
+            ->assertJsonPath('services.0.session_price', 2000)
+            ->assertJsonPath('services.1.session_price', null)
+            ->assertJsonPath('services.2.session_price', 300);
 
-        $this->desktop()->getJson('/api/desktop/state')
-            ->assertJsonPath('region_prices.face', 1500)
-            ->assertJsonPath('region_prices_revision', $response->json('region_prices_revision'));
-
-        // Gönderilmeyen kategoriler temizlenir; hiç fiyat yoksa null saklanır.
-        $this->desktop()->putJson('/api/desktop/region-prices', [
-            'prices' => ['face' => null],
-            'revision' => $response->json('region_prices_revision'),
-        ])->assertOk()->assertJsonPath('region_prices.hand', null);
-        $this->assertNull($main->refresh()->body_region_prices);
+        $this->assertSame('2000.00', $a->refresh()->session_price);
+        $this->assertNull($b->refresh()->session_price);
+        $this->assertSame('300.00', $c->refresh()->session_price);
+        $this->desktop()->getJson('/api/desktop/state')->assertJsonPath('services.0.session_price', 2000);
     }
 
-    public function test_region_prices_reject_unknown_keys_negative_values_and_stale_revision(): void
+    public function test_service_prices_reject_unknown_ids_and_negative_values(): void
     {
-        $revision = $this->desktop()->getJson('/api/desktop/state')->json('region_prices_revision');
+        $service = Service::factory()->create(['session_price' => 100]);
 
-        $this->desktop()->putJson('/api/desktop/region-prices', [
-            'prices' => ['face' => 100, 'knee' => 100],
-            'revision' => $revision,
+        $this->desktop()->putJson('/api/desktop/service-prices', [
+            'prices' => [(string) $service->id => 500, '999999' => 500],
         ])->assertUnprocessable()->assertJsonValidationErrors('prices');
 
-        $this->desktop()->putJson('/api/desktop/region-prices', [
-            'prices' => ['face' => -1],
-            'revision' => $revision,
-        ])->assertUnprocessable()->assertJsonValidationErrors('prices.face');
-        $this->assertSame(0, Setting::query()->whereNull('site')->count());
+        $this->desktop()->putJson('/api/desktop/service-prices', [
+            'prices' => [(string) $service->id => -1],
+        ])->assertUnprocessable()->assertJsonValidationErrors('prices.'.$service->id);
 
-        $this->desktop()->putJson('/api/desktop/region-prices', [
-            'prices' => ['face' => 100],
-            'revision' => $revision,
-        ])->assertOk();
-
-        $this->desktop()->putJson('/api/desktop/region-prices', [
-            'prices' => ['face' => 200],
-            'revision' => $revision,
-        ])->assertConflict()
-            ->assertJsonPath('message', 'Bölge fiyatları başka bir yerde güncellendi.')
-            ->assertJsonPath('region_prices.face', 100);
-    }
-
-    public function test_region_categories_cover_every_region_exactly_once(): void
-    {
-        $regions = array_merge(...array_column(BodyRegions::CATEGORIES, 'regions'));
-
-        $this->assertSame(count($regions), count(array_unique($regions)));
-        $this->assertEqualsCanonicalizing(array_keys(BodyRegions::LABELS), $regions);
+        $this->assertSame('100.00', $service->refresh()->session_price);
     }
 
     private function subserviceService(): Service

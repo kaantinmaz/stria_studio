@@ -16,6 +16,7 @@ use DomainException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -41,18 +42,6 @@ class StudioController extends Controller
         }
 
         $appointments = Appointment::query()->orderBy('starts_at')->orderBy('id')->get();
-        $serviceIds = $appointments->pluck('service_id')->filter()->unique()->values();
-        $services = Service::query()
-            ->where(function ($query) use ($serviceIds): void {
-                $query->where('is_active', true);
-
-                if ($serviceIds->isNotEmpty()) {
-                    $query->orWhereIn('id', $serviceIds);
-                }
-            })
-            ->orderBy('sort_order')
-            ->orderBy('id')
-            ->get(['id', 'slug', 'name_tr', 'duration_min', 'subservices_tr']);
 
         return response()->json([
             'customers' => Customer::query()
@@ -64,16 +53,8 @@ class StudioController extends Controller
             'appointments' => $appointments
                 ->map(fn (Appointment $appointment): array => DesktopApi::appointment($appointment))
                 ->values(),
-            'services' => $services->map(fn (Service $service): array => [
-                'id' => $service->id,
-                'slug' => $service->slug,
-                'title' => $service->name_tr,
-                'duration_min' => $service->duration_min,
-                'subservices' => $service->subserviceNames(),
-            ])->values(),
+            'services' => $this->services(),
             'hours' => $hours,
-            'region_prices' => DesktopApi::regionPrices($setting),
-            'region_prices_revision' => DesktopApi::revision($setting ?? new Setting),
             'timezone' => config('app.timezone'),
         ]);
     }
@@ -447,48 +428,55 @@ class StudioController extends Controller
         });
     }
 
-    public function updateRegionPrices(Request $request): JsonResponse
+    public function updateServicePrices(Request $request): JsonResponse
     {
         $validated = $request->validate([
             'prices' => ['required', 'array', function (string $attribute, mixed $value, $fail): void {
-                if (array_diff_key((array) $value, BodyRegions::CATEGORIES) !== []) {
-                    $fail('Fiyatlar geçerli bölge kategorisi anahtarları olmalı.');
+                $ids = array_keys((array) $value);
+                $valid = array_filter($ids, fn (int|string $id): bool => ctype_digit((string) $id));
+
+                if (count($valid) !== count($ids) || Service::query()->whereIn('id', $valid)->count() !== count($ids)) {
+                    $fail('Fiyatlar mevcut hizmet kimlikleriyle gönderilmeli.');
                 }
             }],
             'prices.*' => ['nullable', 'numeric', 'min:0', 'max:99999999.99'],
-            'revision' => ['required', 'string', 'size:64'],
         ]);
 
-        return DB::transaction(function () use ($validated): JsonResponse {
-            $setting = Setting::query()->whereNull('site')->lockForUpdate()->first();
-
-            if (! hash_equals(DesktopApi::revision($setting ?? new Setting), $validated['revision'])) {
-                return response()->json([
-                    'message' => 'Bölge fiyatları başka bir yerde güncellendi.',
-                    'region_prices' => DesktopApi::regionPrices($setting),
-                    'region_prices_revision' => DesktopApi::revision($setting ?? new Setting),
-                ], 409);
+        // Son yazan kazanır: fiyat listesi için revizyon tutulmuyor.
+        DB::transaction(function () use ($validated): void {
+            foreach ($validated['prices'] as $id => $price) {
+                Service::query()->whereKey($id)->update(['session_price' => $price]);
             }
-
-            // Gönderilmeyen kategoriler ayarlanmamış (null) sayılır.
-            $prices = array_map(
-                fn (mixed $price): float => (float) $price,
-                array_filter(
-                    array_intersect_key($validated['prices'], BodyRegions::CATEGORIES),
-                    fn (mixed $price): bool => $price !== null,
-                ),
-            );
-
-            $setting ??= new Setting(['site' => null]);
-            $setting->body_region_prices = $prices === [] ? null : $prices;
-            $setting->save();
-            $setting->refresh();
-
-            return response()->json([
-                'region_prices' => DesktopApi::regionPrices($setting),
-                'region_prices_revision' => DesktopApi::revision($setting),
-            ]);
         });
+
+        return response()->json(['services' => $this->services()]);
+    }
+
+    /** Aktif hizmetler + randevularda geçen pasifler (/state ile aynı liste). */
+    private function services(): Collection
+    {
+        $serviceIds = Appointment::query()->whereNotNull('service_id')->distinct()->pluck('service_id');
+
+        return Service::query()
+            ->where(function ($query) use ($serviceIds): void {
+                $query->where('is_active', true);
+
+                if ($serviceIds->isNotEmpty()) {
+                    $query->orWhereIn('id', $serviceIds);
+                }
+            })
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->get(['id', 'slug', 'name_tr', 'duration_min', 'subservices_tr', 'session_price'])
+            ->map(fn (Service $service): array => [
+                'id' => $service->id,
+                'slug' => $service->slug,
+                'title' => $service->name_tr,
+                'duration_min' => $service->duration_min,
+                'subservices' => $service->subserviceNames(),
+                'session_price' => $service->session_price === null ? null : (float) $service->session_price,
+            ])
+            ->values();
     }
 
     /** @return array<string, mixed> */

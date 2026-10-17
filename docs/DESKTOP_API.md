@@ -96,14 +96,12 @@ verisini döndürür:
     }
   ],
   "services": [
-    { "id": 1, "slug": "kamuflaj-makyaj", "title": "Masaüstü QA Hizmeti", "duration_min": 60, "subservices": ["Çatlak Gizleme", "Yanık İzi"] }
+    { "id": 1, "slug": "kamuflaj-makyaj", "title": "Masaüstü QA Hizmeti", "duration_min": 60, "subservices": ["Çatlak Gizleme", "Yanık İzi"], "session_price": 6000 }
   ],
   "hours": [
     { "id": 1, "enabled": false, "open": 540, "close": 1140 },
     { "id": 2, "enabled": true, "open": 540, "close": 1140 }
   ],
-  "region_prices": { "face": 1500, "scalp": null, "neck": 750.5, "...": null, "foot": null },
-  "region_prices_revision": "64 karakter",
   "timezone": "Europe/Istanbul"
 }
 ```
@@ -113,7 +111,17 @@ aktif hizmetleri ve geçmiş randevuların referans verdiği pasif hizmetleri i�
 `slug`, hizmetin sabit kimliğidir (ör. `kamuflaj-makyaj`; istemci bölge
 seçiciyi buna göre gösterir). `title`, hizmetin Türkçe adıdır. `subservices`, hizmetin alt uygulama adlarıdır
 (`services.subservices_tr[*].name`, tanım sırasıyla); alt uygulaması olmayan
-hizmette `[]`.
+hizmette `[]`. `session_price`, randevu uygulamasının seans fiyatıdır (₺,
+sayı; girilmemişse `null`; panelde "Seans fiyatı" alanı, sitede gösterilmez).
+
+İstemci fiyatı şöyle hesaplar (sunucu hesaplamaz, randevu `price` alanı yine
+istemcinin gönderdiği değerdir):
+
+- Normal hizmet: seans başı = `session_price`; toplam = seans başı × seans sayısı.
+- `kamuflaj-makyaj`: fiyat bölge başınadır; seans başı = `session_price` ×
+  fiyatlanan bölge sayısı (bölge seçilmemişse 1); toplam = seans başı × seans sayısı.
+  Sağ/sol karşılıklı bölgeler (`_r`/`_l` çifti, ör. `leg_inner_r` + `leg_inner_l`)
+  **tek bölge** sayılır. Ör. sağ + sol iç bacak + karın sağ = 2 bölge × 6.000 ₺ × 4 seans = 48.000 ₺.
 
 Randevudaki `subservices`, randevunun kapsadığı alt uygulama adlarıdır (yoksa
 `[]`). `body_regions`, kamuflaj vücut bölgesi anahtarlarıdır (yoksa `[]`, asla
@@ -125,12 +133,6 @@ Randevudaki `subservices`, randevunun kapsadığı alt uygulama adlarıdır (yok
 dakika sayısıdır. Kapalı günlerde `open=540`, `close=1140` varsayılanları gönderilir; `enabled=false` günü kapalı tutar. Backend'deki mevcut
 saatler yinelenen ya da bölünmüş günler içeriyorsa masaüstü veri kaybetmeden bu
 şekle çeviremez; `/state` `409` ve `code=hours_not_roundtrippable` döndürür.
-
-`region_prices`, aşağıdaki 17 bölge kategorisinin hepsini tablo sırasıyla
-içeren bir JSON nesnesidir (hiç fiyat yoksa da nesne): değer kategori başına
-seans fiyatıdır (sayı, ör. `1500` / `1500.5`) ya da ayarlanmamışsa `null`.
-`region_prices_revision`, `PUT /region-prices` için 64 karakterli opak
-değerdir (ana ayarlar satırının revizyonu; saatler değişince de değişir).
 
 ## Müşteriler
 
@@ -412,57 +414,23 @@ değiştiyse `409` ve güncel `hours` döner. Başarılı cevap:
 { "hours": ["seven canonical day objects"] }
 ```
 
-## Bölge fiyatları
+## Hizmet seans fiyatları
 
-### `PUT /region-prices`
-
-```json
-{
-  "prices": { "face": 1500, "hand": 250.5, "foot": null },
-  "revision": "son /state veya PUT cevabındaki region_prices_revision"
-}
-```
-
-`prices` zorunlu bir nesnedir; anahtarlar aşağıdaki kategori anahtarlarıdır.
-Bilinmeyen anahtar `422` (`errors.prices`), her değer `null` ya da
-`0...99999999.99` aralığında sayı olmalıdır (aksi `422`, `errors.prices.<kategori>`).
-Gönderilmeyen kategoriler ayarlanmamış (`null`) olur; yani istemci tam listeyi
-gönderir. `revision` zorunlu, 64 karakter. Ayarlar arada değiştiyse `409`:
+### `PUT /service-prices`
 
 ```json
-{ "message": "Bölge fiyatları başka bir yerde güncellendi.", "region_prices": { "...": null }, "region_prices_revision": "güncel" }
+{ "prices": { "1": 6000, "4": 2000, "7": null } }
 ```
 
-Başarılı cevap: `{ "region_prices": { ... }, "region_prices_revision": "yeni" }`.
+Anahtarlar mevcut hizmet kimlikleridir; bilinmeyen kimlik `422`
+`errors.prices` döner. Değerler `null` (fiyatı temizler) ya da `0...99999999.99`
+sayıdır; ihlalde `422` `errors.prices.<id>`. Yalnız listelenen hizmetler
+güncellenir. Revizyon yoktur: son yazan kazanır. Başarılı cevap `/state` ile aynı
+hizmet listesidir:
 
-| Kategori | Etiket | Bölgeler |
-|---|---|---|
-| `face` | Yüz | `forehead`, `nose`, `cheek_r`, `cheek_l`, `lips_chin` |
-| `scalp` | Saçlı deri / baş arkası | `scalp` |
-| `neck` | Boyun | `neck_front`, `neck_back` |
-| `shoulder` | Omuz | `shoulder_r`, `shoulder_l` |
-| `chest` | Göğüs | `chest_r`, `chest_l` |
-| `abdomen` | Karın | `abdomen_r`, `abdomen_l` |
-| `upper_back` | Sırt | `upper_back_r`, `upper_back_l` |
-| `lower_back` | Bel | `lower_back_r`, `lower_back_l` |
-| `buttock` | Kalça | `buttock_r`, `buttock_l` |
-| `upper_arm` | Üst kol | `upper_arm_r`, `upper_arm_l` |
-| `forearm` | Ön kol | `forearm_r`, `forearm_l` |
-| `hand` | El | `hand_r`, `hand_l` |
-| `thigh` | Uyluk (ön/arka) | `thigh_front_r`, `thigh_front_l`, `thigh_back_r`, `thigh_back_l` |
-| `thigh_inner` | İç uyluk | `thigh_inner_r`, `thigh_inner_l` |
-| `lower_leg` | Alt bacak (ön/baldır) | `shin_r`, `shin_l`, `calf_r`, `calf_l` |
-| `leg_inner` | İç bacak (alt) | `leg_inner_r`, `leg_inner_l` |
-| `foot` | Ayak | `foot_r`, `foot_l` |
-
-Her bölge tam bir kategoridedir (kaynak: `App\Support\BodyRegions::CATEGORIES`).
-
-Fiyat hesabı istemcide yapılır, backend hesaplamaz:
-
-- seans fiyatı = seçili her bölgenin kategori fiyatının TOPLAMI (aynı
-  kategoriden iki bölge iki kez sayılır; fiyatı olmayan kategori 0 katar);
-- toplam = seans fiyatı × seans sayısı;
-- sonuç randevunun `price` alanını otomatik doldurur, kullanıcı düzenleyebilir.
+```json
+{ "services": ["/state services listesi, session_price dahil"] }
+```
 
 ## Eşzamanlı değişiklikler
 

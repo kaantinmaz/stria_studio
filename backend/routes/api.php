@@ -96,7 +96,7 @@ Route::prefix('desktop')->group(function () {
             Route::delete('/appointments/{id}/photos/{index}', [DesktopStudioController::class, 'destroyPhoto'])->whereNumber('index');
             Route::delete('/appointments/{id}', [DesktopStudioController::class, 'destroyAppointment']);
             Route::put('/hours', [DesktopStudioController::class, 'updateHours']);
-            Route::put('/region-prices', [DesktopStudioController::class, 'updateRegionPrices']);
+            Route::put('/service-prices', [DesktopStudioController::class, 'updateServicePrices']);
         });
 });
 

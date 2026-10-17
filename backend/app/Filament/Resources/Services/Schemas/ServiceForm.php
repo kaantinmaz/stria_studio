@@ -176,6 +176,12 @@ class ServiceForm
                                     ->step(5)
                                     ->default(60)
                                     ->helperText('Randevu saatleri buna göre açılır. 100 dk girilirse 10:00 alınan randevu 11:00 slotunu da kapatır.'),
+                                TextInput::make('session_price')
+                                    ->label('Seans fiyatı (₺, randevu uygulaması)')
+                                    ->numeric()
+                                    ->minValue(0)
+                                    ->maxValue(99999999.99)
+                                    ->helperText('Sitede gösterilmez. Kamuflaj makyajında bölge başına seans fiyatıdır.'),
                                 Toggle::make('is_active')
                                     ->default(true),
                             ]),

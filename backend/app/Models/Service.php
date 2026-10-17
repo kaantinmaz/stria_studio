@@ -28,6 +28,7 @@ class Service extends Model
         'gallery' => 'array',
         'gallery_updated_at' => 'datetime',
         'related' => 'array',
+        'session_price' => 'decimal:2',
     ];
 
     protected static function booted(): void
