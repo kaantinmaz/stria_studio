@@ -3,9 +3,10 @@ import SceneKit
 
 /// Rotatable 3D body with `selected` regions highlighted. Tapping a region calls `onToggle`;
 /// nil = read-only (rotation still works, taps are ignored). The corner button opens it full screen.
-/// `sessionTotal` non-nil = show session prices (consultation) under the full-screen model.
+/// `sessionTotal` non-nil = show session prices (consultation, `sessionPrice` per region) under the full-screen model.
 struct BodyMapView: View {
     let selected: Set<String>
+    var sessionPrice: Decimal? = nil
     var sessionTotal: Int? = nil
     var onToggle: ((String) -> Void)? = nil
 
@@ -32,7 +33,7 @@ struct BodyMapView: View {
             }
             // Content is rebuilt from this view's `selected`, so taps in full screen show up live.
             .fullScreenCover(isPresented: $expanded) {
-                BodyMapFullScreen(mesh: mesh, selected: selected, sessionTotal: sessionTotal, onToggle: onToggle)
+                BodyMapFullScreen(mesh: mesh, selected: selected, sessionPrice: sessionPrice, sessionTotal: sessionTotal, onToggle: onToggle)
             }
         } else {
             Text("3D model yüklenemedi").foregroundStyle(.secondary)
@@ -45,6 +46,7 @@ private struct BodyMapFullScreen: View {
     @Environment(\.dismiss) private var dismiss
     let mesh: BodyModel.Mesh
     let selected: Set<String>
+    let sessionPrice: Decimal?
     let sessionTotal: Int?
     let onToggle: ((String) -> Void)?
 
@@ -57,10 +59,11 @@ private struct BodyMapFullScreen: View {
                 SideButtons(camera: $camera)
                 if selected.isEmpty {
                     Text("Bölge seçilmedi").font(.caption).foregroundStyle(.secondary)
+                    BodyRegionRows(keys: selected, sessionPrice: sessionPrice, sessionTotal: sessionTotal)
                 } else {
                     // Capped height keeps the model large; the list scrolls.
                     List {
-                        BodyRegionRows(keys: selected, sessionTotal: sessionTotal, onRemove: onToggle)
+                        BodyRegionRows(keys: selected, sessionPrice: sessionPrice, sessionTotal: sessionTotal, onRemove: onToggle)
                     }
                     .listStyle(.plain)
                     .frame(maxHeight: 240)
@@ -95,13 +98,14 @@ private struct SideButtons: View {
 /// Editable "Bölgeler" rows: the 3D picker plus the chosen regions (each removable) and their prices.
 struct BodyRegionPicker: View {
     @Binding var selection: Set<String>
+    let sessionPrice: Decimal?
     let sessionTotal: Int
 
     var body: some View {
-        BodyMapView(selected: selection, sessionTotal: sessionTotal) { key in
+        BodyMapView(selected: selection, sessionPrice: sessionPrice, sessionTotal: sessionTotal) { key in
             if selection.contains(key) { selection.remove(key) } else { selection.insert(key) }
         }
-        BodyRegionRows(keys: selection, sessionTotal: sessionTotal) { selection.remove($0) }
+        BodyRegionRows(keys: selection, sessionPrice: sessionPrice, sessionTotal: sessionTotal) { selection.remove($0) }
     }
 }
 
@@ -111,28 +115,33 @@ struct BodyRegionSummary: View {
 
     var body: some View {
         BodyMapView(selected: Set(keys))
-        BodyRegionRows(keys: Set(keys), sessionTotal: nil)
+        BodyRegionRows(keys: Set(keys), sessionPrice: nil, sessionTotal: nil)
     }
 }
 
 /// Chosen regions as Form/List rows: colour swatch (same as on the model) and label; with `sessionTotal`
-/// also each region's session price, the per-session sum and the package total.
+/// also the per-region session price, the per-session sum and the package total.
 struct BodyRegionRows: View {
-    @Environment(AppStore.self) private var store
     let keys: Set<String>
+    let sessionPrice: Decimal?
     let sessionTotal: Int?
     var onRemove: ((String) -> Void)? = nil
 
     var body: some View {
         let colors = BodyRegion.colors(for: keys)
-        let prices = sessionTotal == nil ? [:] : store.regionPrices
-        ForEach(BodyRegion.ordered(keys)) { region in
+        let quote = sessionTotal.flatMap { total in
+            sessionPrice.map { PriceQuote(unit: $0, regionCount: BodyRegion.pricedCount(keys), sessions: total) }
+        }
+        let regions = BodyRegion.ordered(keys)
+        ForEach(Array(regions.enumerated()), id: \.element.id) { index, region in
+            // The second side of a right/left pair shares the first side's price.
+            let isPairedSecond = regions[..<index].contains { BodyRegion.pairBase($0.key) == BodyRegion.pairBase(region.key) }
             HStack {
                 Circle().fill(Color(colors[region.key] ?? .clear)).frame(width: 12, height: 12)
                 Text(region.label)
                 Spacer()
-                if !prices.isEmpty {
-                    Text(region.price(in: prices).map { "\(Fmt.price($0)) / seans" } ?? "Fiyat yok")
+                if let quote {
+                    Text(isPairedSecond ? "karşılığıyla tek fiyat" : "\(Fmt.price(quote.unit)) / seans")
                         .font(.caption).foregroundStyle(.secondary)
                 }
                 if let onRemove {
@@ -144,14 +153,16 @@ struct BodyRegionRows: View {
                 }
             }
         }
-        if let sessionTotal {
-            if prices.isEmpty {
-                Text("Fiyatlar Ayarlar'dan girilir").font(.caption).foregroundStyle(.secondary)
-            } else if !keys.isEmpty {
-                let perSession = BodyRegion.sessionPrice(keys, prices: prices)
-                InfoRow(label: "Seans başı", value: Fmt.price(perSession))
-                InfoRow(label: "Toplam (\(sessionTotal) seans)", value: Fmt.price(perSession * Decimal(sessionTotal)))
+        if let quote {
+            if keys.isEmpty {
+                Text("\(Fmt.price(quote.unit)) / seans, bölge başına — her seçilen bölge fiyatı çarpar")
+                    .font(.caption).foregroundStyle(.secondary)
+            } else {
+                InfoRow(label: "Seans başı (\(quote.regions ?? 1) bölge × \(Fmt.price(quote.unit)))", value: Fmt.price(quote.perSession))
+                InfoRow(label: "Toplam (\(quote.sessions) seans)", value: Fmt.price(quote.total))
             }
+        } else if sessionTotal != nil {
+            Text("Seans fiyatı Ayarlar'dan girilir").font(.caption).foregroundStyle(.secondary)
         }
     }
 }

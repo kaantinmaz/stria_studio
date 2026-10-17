@@ -21,6 +21,9 @@ struct EditAppointmentView: View {
     private var isChild: Bool { appt?.isChildSession ?? false }
     private var subserviceOptions: [String] { store.service(serviceID)?.subservices ?? [] }
     private var usesBodyRegions: Bool { store.service(serviceID)?.usesBodyRegions ?? false }
+    private var quote: PriceQuote? {
+        store.service(serviceID)?.quote(regionCount: BodyRegion.pricedCount(bodyRegions), sessions: appt?.sessionTotal ?? 1)
+    }
 
     var body: some View {
         NavigationStack {
@@ -36,7 +39,8 @@ struct EditAppointmentView: View {
                 }
 
                 Section("Hizmet") {
-                    Picker("Hizmet", selection: $serviceID) {
+                    // Only the user's choice (not the initial load) refills the price.
+                    Picker("Hizmet", selection: Binding(get: { serviceID }, set: { serviceID = $0; fillPrice() })) {
                         Text("Belirtilmemiş").tag(Int?.none)
                         ForEach(store.services) { s in
                             Text(s.title).tag(Int?.some(s.id))
@@ -77,9 +81,10 @@ struct EditAppointmentView: View {
                     }
                 } else if usesBodyRegions {
                     Section("Bölgeler") {
-                        // Only the user's edits (not the initial load) refill the price from region prices.
+                        // Only the user's edits (not the initial load) refill the price.
                         BodyRegionPicker(selection: Binding(get: { bodyRegions },
-                                                            set: { bodyRegions = $0; fillRegionPrice() }),
+                                                            set: { bodyRegions = $0; fillPrice() }),
+                                         sessionPrice: store.service(serviceID)?.sessionPrice,
                                          sessionTotal: appt?.sessionTotal ?? 1)
                     }
                 }
@@ -105,7 +110,7 @@ struct EditAppointmentView: View {
                         Text("Paketin 1. seansında yönetilir")
                             .font(.caption).foregroundStyle(.secondary)
                     } else {
-                        PriceField(text: $priceText, caption: appt?.isPackage == true ? "Paketin toplam fiyatı" : nil)
+                        PriceField(text: $priceText, caption: quote?.caption ?? (appt?.isPackage == true ? "Paketin toplam fiyatı" : nil))
                     }
                 }
 
@@ -141,9 +146,8 @@ struct EditAppointmentView: View {
         bodyRegions = Set(appt.bodyRegions)
     }
 
-    private func fillRegionPrice() {
-        let total = BodyRegion.sessionPrice(bodyRegions, prices: store.regionPrices) * Decimal(appt?.sessionTotal ?? 1)
-        if total > 0 { priceText = Fmt.amount(total) }
+    private func fillPrice() {
+        if let quote { priceText = Fmt.amount(quote.total) }
     }
 
     private func save() {

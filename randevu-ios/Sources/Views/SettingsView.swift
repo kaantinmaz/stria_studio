@@ -11,7 +11,7 @@ struct SettingsView: View {
                 }
 
                 Section {
-                    NavigationLink("Bölge seans fiyatları") { RegionPricesView() }
+                    NavigationLink("Hizmet seans fiyatları") { ServicePricesView() }
                 }
 
                 if let last = store.lastRefresh {
@@ -32,51 +32,48 @@ struct SettingsView: View {
     }
 }
 
-/// Session price per body-region category, used to price camouflage consultations.
-struct RegionPricesView: View {
+/// One session price per service (camouflage: per region), used to fill appointment prices.
+struct ServicePricesView: View {
     @Environment(AppStore.self) private var store
     @Environment(\.dismiss) private var dismiss
 
-    @State private var texts: [String: String] = [:]
+    @State private var texts: [Int: String] = [:]
     @State private var loaded = false
 
     private var isValid: Bool { texts.values.allSatisfy(PriceField.isValid) }
 
     var body: some View {
         Form {
-            Section {
-                Text("Kamuflaj randevusunda seçilen her bölge için seans başı fiyat")
-                    .font(.caption).foregroundStyle(.secondary)
-            }
-            ForEach(BodyRegionCategory.all) { category in
-                Section(category.label) {
-                    PriceField(text: Binding(get: { texts[category.key] ?? "" },
-                                             set: { texts[category.key] = $0 }))
+            ForEach(store.services) { service in
+                Section(service.title) {
+                    PriceField(text: Binding(get: { texts[service.id] ?? "" },
+                                             set: { texts[service.id] = $0 }),
+                               caption: service.usesBodyRegions ? "Bölge başına, seans başı" : "Seans başı")
                 }
             }
         }
-        .navigationTitle("Bölge seans fiyatları")
+        .navigationTitle("Hizmet seans fiyatları")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Button("Kaydet") { save() }
-                    .disabled(store.isMutating || !isValid)
+                    .disabled(store.isMutating || store.services.isEmpty || !isValid)
             }
         }
         .onAppear {
             guard !loaded else { return }
             loaded = true
-            texts = store.regionPrices.mapValues(Fmt.amount)
+            texts = Dictionary(uniqueKeysWithValues: store.services.map { ($0.id, $0.sessionPrice.map(Fmt.amount) ?? "") })
         }
     }
 
     private func save() {
-        // Every category is sent; blank = null (unpriced).
-        let prices = Dictionary(uniqueKeysWithValues: BodyRegionCategory.all.map {
-            ($0.key, (texts[$0.key] ?? "").nilIfBlank.flatMap(PriceText.parse))
+        // Every listed service is sent; blank = null (no price).
+        let prices = Dictionary(uniqueKeysWithValues: store.services.map {
+            ($0.id, (texts[$0.id] ?? "").nilIfBlank.flatMap(PriceText.parse))
         })
         Task {
-            if await store.updateRegionPrices(prices) { dismiss() }
+            if await store.updateServicePrices(prices) { dismiss() }
         }
     }
 }

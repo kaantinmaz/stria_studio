@@ -113,9 +113,9 @@ final class DesktopAPI {
         let _: DiscardResponse = try await send(path: "/appointments/\(id)/photos/\(index)", method: "DELETE", token: token, body: body)
     }
 
-    func updateRegionPrices(_ prices: [String: Decimal?], revision: String, token: String) async throws {
-        let body = RegionPricesWrite(prices: prices, revision: revision)
-        let _: DiscardResponse = try await send(path: "/region-prices", method: "PUT", token: token, body: body)
+    func updateServicePrices(_ prices: [Int: Decimal?], token: String) async throws {
+        let body = ServicePricesWrite(prices: Dictionary(uniqueKeysWithValues: prices.map { (String($0), $1) }))
+        let _: DiscardResponse = try await send(path: "/service-prices", method: "PUT", token: token, body: body)
     }
 
     // MARK: Core
@@ -301,8 +301,7 @@ struct RevisionWrite: Encodable {
     let revision: String
 }
 
-/// nil values encode as null (= category unpriced).
-struct RegionPricesWrite: Encodable {
+/// Keyed by service id as a string (JSON object keys); nil values encode as null (= price cleared).
+struct ServicePricesWrite: Encodable {
     let prices: [String: Decimal?]
-    let revision: String
 }

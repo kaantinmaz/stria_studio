@@ -29,6 +29,7 @@ struct NewAppointmentView: View {
 
     private var subserviceOptions: [String] { store.service(serviceID)?.subservices ?? [] }
     private var usesBodyRegions: Bool { store.service(serviceID)?.usesBodyRegions ?? false }
+    private var quote: PriceQuote? { store.service(serviceID)?.quote(regionCount: BodyRegion.pricedCount(bodyRegions), sessions: sessionTotal) }
 
     var body: some View {
         NavigationStack {
@@ -66,7 +67,7 @@ struct NewAppointmentView: View {
 
                 if usesBodyRegions {
                     Section("Bölgeler") {
-                        BodyRegionPicker(selection: $bodyRegions, sessionTotal: sessionTotal)
+                        BodyRegionPicker(selection: $bodyRegions, sessionPrice: store.service(serviceID)?.sessionPrice, sessionTotal: sessionTotal)
                     }
                 }
 
@@ -120,11 +121,12 @@ struct NewAppointmentView: View {
                 }
 
                 Section("Fiyat") {
-                    PriceField(text: $priceText, caption: sessionTotal > 1 ? "Paketin toplam fiyatı" : nil)
+                    PriceField(text: $priceText, caption: quote?.caption ?? (sessionTotal > 1 ? "Paketin toplam fiyatı" : nil))
                 }
-                // Region prices × sessions fill the price; a manual edit stays until the next change.
-                .onChange(of: bodyRegions) { fillRegionPrice() }
-                .onChange(of: sessionTotal) { fillRegionPrice() }
+                // The service's session price fills the total; a manual edit stays until the next change.
+                .onChange(of: serviceID) { fillPrice() }
+                .onChange(of: bodyRegions) { fillPrice() }
+                .onChange(of: sessionTotal) { fillPrice() }
 
                 Section("Not") {
                     TextField("Not", text: $note, axis: .vertical).lineLimit(2...5)
@@ -200,9 +202,8 @@ struct NewAppointmentView: View {
         }
     }
 
-    private func fillRegionPrice() {
-        let total = BodyRegion.sessionPrice(bodyRegions, prices: store.regionPrices) * Decimal(sessionTotal)
-        if total > 0 { priceText = Fmt.amount(total) }
+    private func fillPrice() {
+        if let quote { priceText = Fmt.amount(quote.total) }
     }
 
     private func initialize() {

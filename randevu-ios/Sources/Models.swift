@@ -85,6 +85,8 @@ struct ServiceDTO: Codable, Equatable, Identifiable, Hashable {
     let durationMin: Int
     let slug: String?
     private let subservicesRaw: [String]?
+    /// TL per session (camouflage: per region per session); nil = not set. Absent on older servers.
+    let sessionPrice: Decimal?
 
     var subservices: [String] { subservicesRaw ?? [] }
     /// Camouflage make-up appointments record the treated body regions.
@@ -94,6 +96,33 @@ struct ServiceDTO: Codable, Equatable, Identifiable, Hashable {
         case id, title, slug
         case durationMin = "duration_min"
         case subservicesRaw = "subservices"
+        case sessionPrice = "session_price"
+    }
+
+    /// Price for `regionCount` selected regions over `sessions`; nil when the service has no session price.
+    func quote(regionCount: Int, sessions: Int) -> PriceQuote? {
+        sessionPrice.map { PriceQuote(unit: $0, regionCount: usesBodyRegions ? regionCount : nil, sessions: sessions) }
+    }
+}
+
+/// The one place session prices are multiplied out. `regions` non-nil = priced per region (camouflage).
+struct PriceQuote: Equatable {
+    let unit: Decimal
+    let regions: Int?
+    let sessions: Int
+
+    /// No regions chosen yet still prices one region.
+    init(unit: Decimal, regionCount: Int?, sessions: Int) {
+        self.unit = unit
+        regions = regionCount.map { max($0, 1) }
+        self.sessions = sessions
+    }
+
+    var perSession: Decimal { unit * Decimal(regions ?? 1) }
+    var total: Decimal { perSession * Decimal(sessions) }
+    /// "2.000 ₺ × 4 seans = 8.000 ₺" / "2 bölge × 6.000 ₺ × 4 seans = 48.000 ₺"
+    var caption: String {
+        "\(regions.map { "\($0) bölge × " } ?? "")\(Fmt.price(unit)) × \(sessions) seans = \(Fmt.price(total))"
     }
 }
 
@@ -110,15 +139,6 @@ struct StateDTO: Codable, Equatable {
     let services: [ServiceDTO]
     let hours: [WorkingDayDTO]
     let timezone: String
-    // Optional so older servers (no such keys) still decode. Keyed by `BodyRegionCategory` key; null = unset.
-    let regionPrices: [String: Decimal?]?
-    let regionPricesRevision: String?
-
-    enum CodingKeys: String, CodingKey {
-        case customers, appointments, services, hours, timezone
-        case regionPrices = "region_prices"
-        case regionPricesRevision = "region_prices_revision"
-    }
 }
 
 // MARK: - Status
