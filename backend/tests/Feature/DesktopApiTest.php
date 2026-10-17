@@ -520,6 +520,97 @@ class DesktopApiTest extends TestCase
         $this->assertDatabaseCount('appointments', 1);
     }
 
+    public function test_create_package_with_custom_session_starts(): void
+    {
+        CarbonImmutable::setTestNow('2026-09-13 09:00:00');
+        $this->mondayHours();
+        $customer = Customer::query()->create(['name' => 'Ayşe']);
+
+        $response = $this->desktop()->postJson('/api/desktop/appointments', [
+            'customer_id' => $customer->id,
+            'service_id' => null,
+            'starts_at' => '2026-09-14T10:00:00+03:00',
+            'duration_min' => 60,
+            'status' => 'confirmed',
+            'note' => null,
+            'session_total' => 3,
+            'interval_days' => 28,
+            'session_starts' => ['2026-09-21T12:00:00+03:00', '2026-11-02T08:00:00Z'],
+        ])->assertCreated()->assertJsonCount(3, 'appointments');
+
+        $members = $response->json('appointments');
+        $this->assertSame([1, 2, 3], array_column($members, 'session_no'));
+        $this->assertSame([3, 3, 3], array_column($members, 'session_total'));
+        $this->assertSame([
+            '2026-09-14T10:00:00+03:00',
+            '2026-09-21T12:00:00+03:00',
+            '2026-11-02T11:00:00+03:00',
+        ], array_column($members, 'starts_at'));
+        $this->assertDatabaseCount('appointments', 3);
+    }
+
+    public function test_create_rejects_invalid_session_starts(): void
+    {
+        CarbonImmutable::setTestNow('2026-09-13 09:00:00');
+        $this->mondayHours();
+        $customer = Customer::query()->create(['name' => 'Ayşe']);
+        $base = [
+            'customer_id' => $customer->id,
+            'service_id' => null,
+            'starts_at' => '2026-09-14T10:00:00+03:00',
+            'duration_min' => 60,
+            'status' => 'confirmed',
+            'note' => null,
+            'session_total' => 3,
+        ];
+
+        foreach ([
+            'wrong length' => ['2026-09-21T10:00:00+03:00'],
+            'single appointment' => ['session_total' => 1, 'session_starts' => []],
+            'not after root' => ['2026-09-14T10:00:00+03:00', '2026-09-28T10:00:00+03:00'],
+            'non-increasing' => ['2026-09-28T10:00:00+03:00', '2026-09-21T10:00:00+03:00'],
+            'equal to previous' => ['2026-09-21T10:00:00+03:00', '2026-09-21T10:00:00+03:00'],
+            'no timezone' => ['2026-09-21T10:00:00', '2026-09-28T10:00:00+03:00'],
+        ] as $input) {
+            $payload = array_key_exists('session_starts', $input)
+                ? [...$base, ...$input]
+                : [...$base, 'session_starts' => $input];
+
+            $this->desktop()->postJson('/api/desktop/appointments', $payload)
+                ->assertUnprocessable()
+                ->assertJsonValidationErrors('session_starts');
+        }
+
+        $this->assertDatabaseCount('appointments', 0);
+    }
+
+    public function test_create_package_with_custom_starts_rolls_back_on_overlap(): void
+    {
+        CarbonImmutable::setTestNow('2026-09-13 09:00:00');
+        $this->mondayHours();
+        $customer = Customer::query()->create(['name' => 'Ayşe']);
+        // Blocker overlaps the custom session 2 (2026-09-21 10:00-11:00).
+        Appointment::query()->create([
+            'customer_id' => $customer->id,
+            'starts_at' => '2026-09-21 10:30:00',
+            'duration_min' => 60,
+            'status' => 'confirmed',
+        ]);
+
+        $this->desktop()->postJson('/api/desktop/appointments', [
+            'customer_id' => $customer->id,
+            'service_id' => null,
+            'starts_at' => '2026-09-14T10:00:00+03:00',
+            'duration_min' => 60,
+            'status' => 'confirmed',
+            'note' => null,
+            'session_total' => 2,
+            'session_starts' => ['2026-09-21T10:00:00+03:00'],
+        ])->assertUnprocessable()->assertJsonValidationErrors('starts_at');
+
+        $this->assertDatabaseCount('appointments', 1);
+    }
+
     public function test_add_session_appends_with_revision_guard(): void
     {
         CarbonImmutable::setTestNow('2026-09-13 09:00:00');
@@ -628,6 +719,83 @@ class DesktopApiTest extends TestCase
         ])->assertOk()
             ->assertJsonPath('deleted_id', $appointment->id)
             ->assertJsonCount(0, 'appointments');
+        $this->assertDatabaseCount('appointments', 0);
+    }
+
+    public function test_create_stores_price_on_single_appointment_and_package_root_only(): void
+    {
+        CarbonImmutable::setTestNow('2026-09-13 09:00:00');
+        $this->mondayHours();
+        $customer = Customer::query()->create(['name' => 'Ayşe']);
+        $payload = [
+            'customer_id' => $customer->id,
+            'starts_at' => '2026-09-14T10:00:00+03:00',
+            'duration_min' => 60,
+            'status' => 'requested',
+        ];
+
+        $single = $this->desktop()->postJson('/api/desktop/appointments', $payload + ['price' => 1500.5])
+            ->assertCreated()
+            ->assertJsonPath('appointment.price', 1500.5);
+        $this->assertSame('1500.50', Appointment::query()->find($single->json('appointment.id'))->price);
+        $this->desktop()->getJson('/api/desktop/state')
+            ->assertJsonPath('appointments.0.price', 1500.5);
+
+        $package = $this->desktop()->postJson('/api/desktop/appointments', [
+            ...$payload,
+            'starts_at' => '2026-09-14T15:00:00+03:00',
+            'price' => 3000,
+            'session_total' => 3,
+        ])->assertCreated()
+            ->assertJsonPath('appointment.price', 3000);
+        $this->assertSame([3000, null, null], array_column($package->json('appointments'), 'price'));
+    }
+
+    public function test_patch_price_updates_and_clears_root_and_rejects_child(): void
+    {
+        $this->mondayHours();
+        $customer = Customer::query()->create(['name' => 'Ayşe']);
+        $root = Appointment::query()->create([
+            'customer_id' => $customer->id,
+            'starts_at' => '2026-09-14 10:00:00',
+            'duration_min' => 60,
+            'status' => 'confirmed',
+        ]);
+        AppointmentSessions::split($root, 2, 28);
+
+        $this->desktop()->patchJson("/api/desktop/appointments/{$root->id}", [
+            'price' => 2500,
+            'revision' => $this->appointmentRevision($root->refresh()),
+        ])->assertOk()->assertJsonPath('appointment.price', 2500);
+        $this->assertSame('2500.00', $root->refresh()->price);
+
+        $this->desktop()->patchJson("/api/desktop/appointments/{$root->id}", [
+            'price' => null,
+            'revision' => $this->appointmentRevision($root),
+        ])->assertOk()->assertJsonPath('appointment.price', null);
+        $this->assertNull($root->refresh()->price);
+
+        $child = AppointmentSessions::all($root)->last();
+        $this->desktop()->patchJson("/api/desktop/appointments/{$child->id}", [
+            'price' => 100,
+            'revision' => $this->appointmentRevision($child),
+        ])->assertUnprocessable()
+            ->assertJsonValidationErrors(['price' => 'Paket fiyatı 1. seansta düzenlenir.']);
+        $this->assertNull($child->refresh()->price);
+    }
+
+    public function test_negative_price_is_rejected(): void
+    {
+        $this->mondayHours();
+        $customer = Customer::query()->create(['name' => 'Ayşe']);
+
+        $this->desktop()->postJson('/api/desktop/appointments', [
+            'customer_id' => $customer->id,
+            'starts_at' => '2026-09-14T10:00:00+03:00',
+            'duration_min' => 60,
+            'status' => 'requested',
+            'price' => -1,
+        ])->assertUnprocessable()->assertJsonValidationErrors('price');
         $this->assertDatabaseCount('appointments', 0);
     }
 

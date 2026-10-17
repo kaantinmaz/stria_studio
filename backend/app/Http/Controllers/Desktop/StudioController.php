@@ -109,8 +109,9 @@ class StudioController extends Controller
         $startsAt = $this->startsAt($validated['starts_at']);
         $total = (int) ($validated['session_total'] ?? 1);
         $interval = (int) ($validated['interval_days'] ?? 28);
+        $sessionStarts = $this->sessionStarts($validated, $startsAt, $total);
 
-        return DB::transaction(function () use ($validated, $startsAt, $total, $interval): JsonResponse {
+        return DB::transaction(function () use ($validated, $startsAt, $total, $interval, $sessionStarts): JsonResponse {
             // Every desktop writer locks the same main settings row before its
             // overlap query. This serializes desktop creates on MySQL.
             $setting = Setting::query()->whereNull('site')->lockForUpdate()->first();
@@ -126,14 +127,19 @@ class StudioController extends Controller
                 'duration_min' => $validated['duration_min'],
                 'status' => $validated['status'],
                 'note' => $this->nullableString($validated['note'] ?? null),
+                'price' => $validated['price'] ?? null,
             ]);
 
             if ($total >= 2) {
-                AppointmentSessions::split($appointment, $total, $interval);
+                if ($sessionStarts !== null) {
+                    AppointmentSessions::splitAt($appointment, $sessionStarts);
+                } else {
+                    AppointmentSessions::split($appointment, $total, $interval);
+                }
 
                 if ($validated['status'] === 'confirmed') {
                     // The created appointment is the root (earliest session); the
-                    // children split() added must also fit hours and not overlap.
+                    // children split()/splitAt() added must also fit hours and not overlap.
                     foreach (AppointmentSessions::all($appointment) as $session) {
                         $this->validateSession($session, $setting);
                     }
@@ -277,6 +283,13 @@ class StudioController extends Controller
                 ], 409);
             }
 
+            // Package money lives on the root only (see AppointmentSessions).
+            if ($appointment->isSessionChild() && array_key_exists('price', $validated)) {
+                throw ValidationException::withMessages([
+                    'price' => ['Paket fiyatı 1. seansta düzenlenir.'],
+                ]);
+            }
+
             $root = $appointment->isSessionChild()
                 ? AppointmentSessions::root($appointment)
                 : $appointment;
@@ -390,8 +403,18 @@ class StudioController extends Controller
             'duration_min' => [$presence, 'integer', 'between:5,1440'],
             'status' => [$presence, 'string', Rule::in(self::STATUSES)],
             'note' => ['sometimes', 'nullable', 'string', 'max:10000'],
+            'price' => ['sometimes', 'nullable', 'numeric', 'min:0', 'max:99999999.99'],
             'session_total' => $patch ? ['prohibited'] : ['sometimes', 'integer', 'between:1,12'],
             'interval_days' => $patch ? ['prohibited'] : ['sometimes', 'integer', 'between:1,365'],
+            'session_starts' => $patch ? ['prohibited'] : ['sometimes', 'array', 'max:11', function (string $attribute, mixed $value, $fail): void {
+                foreach ((array) $value as $item) {
+                    if (! is_string($item) || $this->parseStartsAt($item) === null) {
+                        $fail('Seans başlangıç zamanları saat dilimi içeren geçerli ISO 8601 tarihleri olmalı.');
+
+                        return;
+                    }
+                }
+            }],
             'revision' => $patch ? ['required', 'string', 'size:64'] : ['prohibited'],
         ];
     }
@@ -417,7 +440,7 @@ class StudioController extends Controller
     private function appointmentPayload(array $validated, Appointment $appointment, Appointment $root): array
     {
         $payload = Arr::only($validated, [
-            'customer_id', 'service_id', 'duration_min', 'status', 'note',
+            'customer_id', 'service_id', 'duration_min', 'status', 'note', 'price',
         ]);
 
         if (array_key_exists('starts_at', $validated)) {
@@ -461,6 +484,39 @@ class StudioController extends Controller
 
             return compact('id', 'enabled', 'open', 'close');
         })->all();
+    }
+
+    /**
+     * 2..N. seansların özel başlangıç zamanları; gönderilmediyse null.
+     *
+     * @param  array<string, mixed>  $validated
+     * @return array<int, CarbonImmutable>|null
+     */
+    private function sessionStarts(array $validated, CarbonImmutable $startsAt, int $total): ?array
+    {
+        if (! array_key_exists('session_starts', $validated)) {
+            return null;
+        }
+
+        if ($total < 2 || count($validated['session_starts']) !== $total - 1) {
+            throw ValidationException::withMessages([
+                'session_starts' => ['Seans başlangıçları yalnızca çok seanslı pakette ve seans sayısının bir eksiği kadar gönderilmeli.'],
+            ]);
+        }
+
+        $previous = $startsAt;
+        $sessionStarts = [];
+        foreach (array_values($validated['session_starts']) as $value) {
+            $sessionStart = $this->startsAt($value);
+            if ($sessionStart->lessThanOrEqualTo($previous)) {
+                throw ValidationException::withMessages([
+                    'session_starts' => ['Her seans, ilk seanstan ve bir önceki seanstan sonra başlamalı.'],
+                ]);
+            }
+            $sessionStarts[] = $previous = $sessionStart;
+        }
+
+        return $sessionStarts;
     }
 
     private function startsAt(string $value): CarbonImmutable

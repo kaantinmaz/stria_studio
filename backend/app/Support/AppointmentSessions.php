@@ -57,17 +57,34 @@ final class AppointmentSessions
         }
         self::assertInterval($intervalDays);
 
+        $startsAts = [];
+        for ($k = 1; $k < $total; $k++) {
+            $startsAts[] = $appointment->starts_at->copy()->addDays($intervalDays * $k);
+        }
+
+        return self::splitAt($appointment, $startsAts);
+    }
+
+    /**
+     * Tek randevuyu pakete böler; $startsAts 2..N. seansların başlangıç zamanlarıdır
+     * (1..11 adet). Kalan alanlar split() ile aynıdır. Randevu zaten paketin üyesiyse
+     * hiçbir şey yapmaz ve false döner.
+     *
+     * @param  array<int, \DateTimeInterface>  $startsAts
+     */
+    public static function splitAt(Appointment $appointment, array $startsAts): bool
+    {
+        if ($startsAts === [] || count($startsAts) > 11) {
+            throw new InvalidArgumentException('Seans sayısı 2 ile 12 arasında olmalı.');
+        }
+
         if ($appointment->parent_id !== null || $appointment->sessions()->exists()) {
             return false;
         }
 
-        DB::transaction(function () use ($appointment, $total, $intervalDays): void {
-            for ($k = 1; $k < $total; $k++) {
-                self::createChild(
-                    $appointment,
-                    $appointment->id,
-                    $appointment->starts_at->copy()->addDays($intervalDays * $k),
-                );
+        DB::transaction(function () use ($appointment, $startsAts): void {
+            foreach ($startsAts as $startsAt) {
+                self::createChild($appointment, $appointment->id, $startsAt);
             }
 
             self::resync($appointment);

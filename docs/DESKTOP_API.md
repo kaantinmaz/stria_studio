@@ -84,6 +84,7 @@ verisini döndürür:
       "duration_min": 60,
       "status": "confirmed",
       "note": "Disposable desktop QA appointment.",
+      "price": 1500.5,
       "updated_at": "2026-09-13T15:31:52+03:00",
       "revision": "64-character opaque value",
       "parent_id": null,
@@ -164,16 +165,20 @@ Geçerli durumlar: `confirmed`, `requested`, `cancelled`, `no_show`.
   "starts_at": "2026-09-14T15:00:00+03:00",
   "duration_min": 60,
   "status": "confirmed",
-  "note": "Not"
+  "note": "Not",
+  "price": 1500
 }
 ```
 
 `customer_id`, `starts_at`, `duration_min` ve `status` zorunludur. `service_id`
-ve `note` `null` olabilir. Süre 5–1440 dakika aralığındadır. Create isteğinde
+ve `note` `null` olabilir. Süre 5–1440 dakika aralığındadır. `price` opsiyonel
+TL tutarıdır: `null` ya da 0–99999999.99 arası sayı (iki ondalık basamakla
+saklanır); negatif değerde `422` `errors.price` döner. Cevaptaki `price` JSON
+sayısı (`1500`, `1500.5`) ya da `null`'dır. Create isteğinde
 `revision` yasaktır. Başarılı cevap `201`:
 
 ```json
-{ "appointment": { "id": 2, "customer_id": 1, "service_id": 1, "starts_at": "...", "duration_min": 60, "status": "confirmed", "note": null, "updated_at": "...", "revision": "...", "parent_id": null, "session_no": null, "session_total": null }, "appointments": ["paketin tüm seansları, starts_at ARTAN"] }
+{ "appointment": { "id": 2, "customer_id": 1, "service_id": 1, "starts_at": "...", "duration_min": 60, "status": "confirmed", "note": null, "price": null, "updated_at": "...", "revision": "...", "parent_id": null, "session_no": null, "session_total": null }, "appointments": ["paketin tüm seansları, starts_at ARTAN"] }
 ```
 
 `confirmed` randevu ana sitenin çalışma saatleri içinde olmalı ve başka bir
@@ -187,6 +192,13 @@ Opsiyonel olarak seans paketi oluşturulabilir:
 - `interval_days` 1–365 arası tam sayı, varsayılan 28; yalnız `session_total >= 2`
   iken anlamlıdır. Her seans bir öncekinden `interval_days` gün sonra, aynı
   saat/süre/müşteri/hizmetle oluşturulur.
+- `session_starts` opsiyonel dizi: 2..N. seansların başlangıç zamanları, sırayla.
+  Her eleman `starts_at` ile aynı biçimdedir (saat dilimi içeren ISO 8601).
+  Yalnız `session_total >= 2` iken gönderilebilir; uzunluğu tam olarak
+  `session_total - 1` olmalı ve her eleman hem `starts_at`'ten hem bir önceki
+  elemandan kesinlikle sonra olmalıdır. Gönderildiğinde `interval_days` yok
+  sayılır ve seanslar tam bu zamanlarda oluşturulur. İhlallerde `422`
+  `errors.session_starts` döner. `PATCH` isteğinde yasaktır.
 
 `session_total >= 2` iken oluşturulan randevu 1. seans (kök) olur ve kalan
 seanslar aynı işlemle eklenir. Durum `confirmed` ise üretilen her seans çalışma
@@ -196,6 +208,9 @@ olarak geri alınır ve `422` seansı adlandıran bir mesaj döndürür:
 
 Cevabın `appointments` alanı paketin tüm seanslarını `starts_at` ARTAN sırayla
 içerir; tek randevuda yalnız o randevuyu içerir.
+
+Pakette `price` yalnız köke (1. seans, `parent_id = null`) yazılır; çocuk
+seansların `price` değeri `null`'dır. Paket fiyatı istemcide kökten okunur.
 
 ### `PATCH /appointments/{id}`
 
@@ -217,6 +232,11 @@ Bir seans paketinin çocuk randevusunda `customer_id` ve `service_id` paketin
 kökünden alınır; çocuk bu alanlarla başka müşteriye veya hizmete taşınamaz.
 Paket üyesi düzenlenince mevcut `AppointmentSessions` kurallarıyla paket yeniden
 senkronize edilir.
+
+`price` create ile aynı kurallarla gönderilebilir; `null` fiyatı temizler. Fiyat
+değişikliği tek başına çalışma saati/çakışma denetimini tetiklemez. Paketin çocuk
+seansına `price` gönderilirse `422` döner:
+`errors.price = ["Paket fiyatı 1. seansta düzenlenir."]`.
 
 ### `POST /appointments/{id}/sessions`
 
@@ -305,8 +325,10 @@ kullanıcının değişikliğini yeniden uygulatmalıdır. Saatlerde aynı göre
 - Müşteri yazma uçları yalnız `name`, `phone`, `email`, `notes` alanlarını
   değiştirir. `photos`, `instagram` ve mobil uygulama kullanıcı bağlantısı
   cevapta görünmez ve korunur.
-- Randevu yazma uçları yalnız sözleşmede görünen alanları değiştirir. `price`,
-  `is_paid`, `payment_method`, `photos`, `campaign_id` ve `app_user_id` korunur.
+- Randevu yazma uçları yalnız sözleşmede görünen alanları değiştirir. `price`
+  yazılabilir (paket kökünde); `is_paid`, `payment_method`, `paid_at`, `photos`,
+  `campaign_id` ve `app_user_id` görünmez ve korunur. Ödeme alanları Meta/Google
+  dönüşüm yüklemesini tetiklediği için bilerek kapsam dışıdır.
 - `parent_id`, `session_no`, `session_total` istemci tarafından yazılamayan,
   sunucunun ürettiği salt okunur alanlardır. Masaüstü API bunları doğrudan
   değiştiremez; seans paketleri yalnız `POST /appointments` (`session_total >= 2`),
