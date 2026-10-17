@@ -200,7 +200,7 @@ class DesktopApiTest extends TestCase
         ])->assertUnprocessable()->assertJsonValidationErrors(['starts_at', 'duration_min', 'status']);
     }
 
-    public function test_confirmed_create_uses_timezone_hours_and_ignores_cancelled_appointments_for_overlap(): void
+    public function test_confirmed_create_allows_any_time_and_ignores_cancelled_appointments_for_overlap(): void
     {
         CarbonImmutable::setTestNow('2026-09-13 09:00:00');
         $this->mondayHours();
@@ -239,23 +239,28 @@ class DesktopApiTest extends TestCase
             'note' => null,
         ])->assertUnprocessable()->assertJsonValidationErrors('starts_at');
 
+        // Outside working hours and on a closed day (only Monday is open) are allowed.
         $this->desktop()->postJson('/api/desktop/appointments', [
             'customer_id' => $customer->id,
             'service_id' => null,
-            'starts_at' => '2026-09-14T09:00:00+03:00',
+            'starts_at' => '2026-09-14T08:00:00+03:00',
             'duration_min' => 60,
             'status' => 'confirmed',
             'note' => null,
-        ])->assertUnprocessable()->assertJsonValidationErrors('starts_at');
+        ])->assertCreated();
+        $this->desktop()->postJson('/api/desktop/appointments', [
+            'customer_id' => $customer->id,
+            'service_id' => null,
+            'starts_at' => '2026-09-15T22:00:00+03:00',
+            'duration_min' => 60,
+            'status' => 'confirmed',
+            'note' => null,
+        ])->assertCreated();
     }
 
-    public function test_strict_dates_and_malformed_server_hours_return_validation_errors(): void
+    public function test_strict_dates_return_validation_errors(): void
     {
         $customer = Customer::query()->create(['name' => 'Ayşe']);
-        Setting::query()->create([
-            'site' => null,
-            'hours' => [['days' => 'Monday', 'open' => 'bad', 'close' => '19:00']],
-        ]);
         $payload = [
             'customer_id' => $customer->id,
             'service_id' => null,
@@ -264,10 +269,6 @@ class DesktopApiTest extends TestCase
             'status' => 'confirmed',
             'note' => null,
         ];
-
-        $this->desktop()->postJson('/api/desktop/appointments', $payload)
-            ->assertUnprocessable()
-            ->assertJsonValidationErrors('starts_at');
 
         $payload['starts_at'] = '2026-02-30T10:00:00+03:00';
         $this->desktop()->postJson('/api/desktop/appointments', $payload)
@@ -308,7 +309,7 @@ class DesktopApiTest extends TestCase
         ])->assertOk()->assertJsonPath('appointment.status', 'cancelled');
     }
 
-    public function test_appointment_patch_has_revision_conflict_and_schedule_checks_only_relevant_changes(): void
+    public function test_appointment_patch_has_revision_conflict_and_allows_moving_outside_hours(): void
     {
         $this->mondayHours();
         $customer = Customer::query()->create(['name' => 'Ayşe']);
@@ -330,7 +331,7 @@ class DesktopApiTest extends TestCase
         $this->desktop()->patchJson("/api/desktop/appointments/{$appointment->id}", [
             'starts_at' => '2026-09-14T03:00:00+03:00',
             'revision' => $freshRevision,
-        ])->assertUnprocessable()->assertJsonValidationErrors('starts_at');
+        ])->assertOk()->assertJsonPath('appointment.starts_at', '2026-09-14T03:00:00+03:00');
     }
 
     public function test_package_edit_resyncs_root_fields_and_preserves_money_photos_campaign_and_app_links(): void

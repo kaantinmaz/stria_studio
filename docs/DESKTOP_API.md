@@ -204,9 +204,9 @@ sayısı (`1500`, `1500.5`) ya da `null`'dır. Create isteğinde
 { "appointment": { "id": 2, "customer_id": 1, "service_id": 1, "starts_at": "...", "duration_min": 60, "status": "confirmed", "note": null, "price": null, "subservices": [], "body_regions": [], "photos": [], "updated_at": "...", "revision": "...", "parent_id": null, "session_no": null, "session_total": null }, "appointments": ["paketin tüm seansları, starts_at ARTAN"] }
 ```
 
-`confirmed` randevu ana sitenin çalışma saatleri içinde olmalı ve başka bir
-`confirmed` randevuyla çakışmamalıdır. Bu iki kural ihlalinde `422` döner.
-Diğer durumlar bu takvim kontrolüne tabi değildir.
+`confirmed` randevu başka bir `confirmed` randevuyla çakışmamalıdır; ihlalde `422`
+döner. Çalışma saatleri **kısıt değildir** (2026-10-17 owner kararı: personel kapalı
+günlere ve saat dışına da randevu ekleyebilir). Diğer durumlar çakışma kontrolüne tabi değildir.
 
 Opsiyonel olarak seans paketi oluşturulabilir:
 
@@ -283,7 +283,7 @@ gösterir (çocukta kökünkiler); panelden düzenlenmez.
 
 Yalnız gönderilen alanları değiştirir; `revision` zorunludur. Değişiklik
 sonucunda randevu `confirmed` ise ve zaman, süre, hizmet veya durum değişiyorsa
-çalışma saati ve çakışma denetimi yeniden yapılır. Başarılı cevap `200` ve create
+çakışma denetimi yeniden yapılır. Başarılı cevap `200` ve create
 ile aynı `appointment` zarfıdır.
 
 Kayıt arada değiştiyse `409` güncel nesneyi döndürür:
@@ -301,7 +301,7 @@ Paket üyesi düzenlenince mevcut `AppointmentSessions` kurallarıyla paket yeni
 senkronize edilir.
 
 `price` create ile aynı kurallarla gönderilebilir; `null` fiyatı temizler. Fiyat
-değişikliği tek başına çalışma saati/çakışma denetimini tetiklemez. Paketin çocuk
+değişikliği tek başına çakışma denetimini tetiklemez. Paketin çocuk
 seansına `price` gönderilirse `422` döner:
 `errors.price = ["Paket fiyatı 1. seansta düzenlenir."]`.
 
@@ -353,7 +353,7 @@ Pakete bir seans ekler (tek randevuysa 2 seanslı pakete dönüştürür):
 `revision` zorunludur; `interval_days` 1–365 arası tam sayı olup gönderilmezse
 28 kullanılır. Yeni seans son seanstan `interval_days` gün sonra, aynı
 saat/süre/müşteri/hizmetle oluşturulur. Kayıt arada değiştiyse `409` güncel
-nesneyi döndürür (yukarıdaki biçim). Yeni seans `confirmed` ise çalışma saati ve
+nesneyi döndürür (yukarıdaki biçim). Yeni seans `confirmed` ise
 çakışma denetimine tabidir; başarısızlıkta işlem geri alınır ve seansı adlandıran
 `422` döner. Başarılı cevap `201`:
 

@@ -101,10 +101,10 @@ class StudioController extends Controller
         return DB::transaction(function () use ($validated, $startsAt, $total, $interval, $sessionStarts): JsonResponse {
             // Every desktop writer locks the same main settings row before its
             // overlap query. This serializes desktop creates on MySQL.
-            $setting = Setting::query()->whereNull('site')->lockForUpdate()->first();
+            Setting::query()->whereNull('site')->lockForUpdate()->first();
 
             if ($validated['status'] === 'confirmed') {
-                $this->schedule->validate($startsAt, $validated['duration_min'], setting: $setting);
+                $this->schedule->validate($startsAt, $validated['duration_min']);
             }
 
             $appointment = Appointment::query()->create([
@@ -128,9 +128,9 @@ class StudioController extends Controller
 
                 if ($validated['status'] === 'confirmed') {
                     // The created appointment is the root (earliest session); the
-                    // children split()/splitAt() added must also fit hours and not overlap.
+                    // children split()/splitAt() added must not overlap either.
                     foreach (AppointmentSessions::all($appointment) as $session) {
-                        $this->validateSession($session, $setting);
+                        $this->validateSession($session);
                     }
                 }
             }
@@ -156,7 +156,7 @@ class StudioController extends Controller
 
         return DB::transaction(function () use ($validated, $id, $interval): JsonResponse {
             // Same lock order as creates/updates: studio lock, then row lock.
-            $setting = Setting::query()->whereNull('site')->lockForUpdate()->first();
+            Setting::query()->whereNull('site')->lockForUpdate()->first();
             $appointment = Appointment::query()->lockForUpdate()->findOrFail($id);
 
             if (! hash_equals(DesktopApi::revision($appointment), $validated['revision'])) {
@@ -169,7 +169,7 @@ class StudioController extends Controller
             $child = AppointmentSessions::add($appointment, $interval);
 
             if ($child->status === 'confirmed') {
-                $this->validateSession($child, $setting);
+                $this->validateSession($child);
             }
 
             $root = AppointmentSessions::root($appointment->refresh());
@@ -285,7 +285,7 @@ class StudioController extends Controller
      * Validate one session against hours/overlap and, on failure, rethrow a 422
      * naming the session: "N. seans (d.m.Y H:i): <original message>".
      */
-    private function validateSession(Appointment $session, ?Setting $setting): void
+    private function validateSession(Appointment $session): void
     {
         if ($session->status !== 'confirmed') {
             return;
@@ -296,7 +296,6 @@ class StudioController extends Controller
                 $session->starts_at->toImmutable(),
                 $session->duration_min,
                 $session,
-                $setting,
             );
         } catch (ValidationException $exception) {
             $messages = $exception->errors()['starts_at'] ?? ['Randevu doğrulanamadı.'];
@@ -318,7 +317,7 @@ class StudioController extends Controller
 
         return DB::transaction(function () use ($validated, $id): JsonResponse {
             // Keep lock ordering aligned with creates: studio lock, then row lock.
-            $setting = Setting::query()->whereNull('site')->lockForUpdate()->first();
+            Setting::query()->whereNull('site')->lockForUpdate()->first();
             $appointment = Appointment::query()->lockForUpdate()->findOrFail($id);
 
             if (! hash_equals(DesktopApi::revision($appointment), $validated['revision'])) {
@@ -364,7 +363,6 @@ class StudioController extends Controller
                     $payload['starts_at'] ?? $appointment->starts_at->toImmutable(),
                     $payload['duration_min'] ?? $appointment->duration_min,
                     $appointment,
-                    $setting,
                 );
             }
 

@@ -3,52 +3,21 @@
 namespace App\Support;
 
 use App\Models\Appointment;
-use App\Models\Setting;
 use Carbon\CarbonImmutable;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * Desktop/iOS staff may book any time (owner rule 2026-10-17, also on closed days and
+ * outside working hours); only overlaps with other confirmed appointments are rejected.
+ */
 final class DesktopAppointmentSchedule
 {
     public function validate(
         CarbonImmutable $startsAt,
         int $durationMin,
         ?Appointment $except = null,
-        ?Setting $setting = null,
     ): void {
         $endsAt = $startsAt->addMinutes($durationMin);
-        $period = collect($setting?->hours ?? [])->first(function (mixed $period) use ($startsAt, $endsAt): bool {
-            if (! is_array($period)
-                || ! is_array($period['days'] ?? null)
-                || ! in_array($startsAt->format('l'), $period['days'], true)
-                || ! is_string($period['open'] ?? null)
-                || ! is_string($period['close'] ?? null)
-                || preg_match('/^(?:[01]\d|2[0-3]):[0-5]\d$/', $period['open']) !== 1
-                || preg_match('/^(?:[01]\d|2[0-3]):[0-5]\d$/', $period['close']) !== 1) {
-                return false;
-            }
-
-            $open = CarbonImmutable::createFromFormat(
-                '!Y-m-d H:i',
-                $startsAt->format('Y-m-d').' '.$period['open'],
-                config('app.timezone'),
-            );
-            $close = CarbonImmutable::createFromFormat(
-                '!Y-m-d H:i',
-                $startsAt->format('Y-m-d').' '.$period['close'],
-                config('app.timezone'),
-            );
-
-            return $close->greaterThan($open)
-                && $startsAt->greaterThanOrEqualTo($open)
-                && $endsAt->lessThanOrEqualTo($close);
-        });
-
-        if ($period === null) {
-            throw ValidationException::withMessages([
-                'starts_at' => ['Randevu çalışma saatlerinin içinde olmalı.'],
-            ]);
-        }
-
         $overlaps = Appointment::query()
             ->where('status', 'confirmed')
             ->where('starts_at', '<', $endsAt)
