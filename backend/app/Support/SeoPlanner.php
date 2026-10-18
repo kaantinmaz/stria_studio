@@ -80,7 +80,9 @@ final class SeoPlanner
             ->mapWithKeys(fn (string $q): array => [QueryCoverage::normalize($q) => true])
             ->all();
 
-        $limit = (int) config('seo.topics_per_week');
+        // The cap is per week, not per run: topics added by an earlier run this week count.
+        $limit = max(0, (int) config('seo.topics_per_week') - SearchQuery::where('period', $queryPeriod)
+            ->where('source', 'serp')->where('created_at', '>=', now()->subDays(6))->count());
         $out = [];
 
         foreach ($raw as $text) {
@@ -162,7 +164,7 @@ final class SeoPlanner
                 'reason' => $t['reason'],
                 'query' => $row?->query ?? (string) $t['post']->title_tr,
             ];
-        }, array_slice([...$drops, ...$striking], 0, (int) $cfg['max_per_week']));
+        }, array_slice([...$drops, ...$striking], 0, max(0, (int) $cfg['max_per_week'] - $this->revisedInPeriod($period, 'blog-refresh'))));
     }
 
     /**
@@ -174,6 +176,9 @@ final class SeoPlanner
     public function faqCandidates(Service $service, string $period): array
     {
         $existing = (array) ($service->faq_tr ?? []);
+        if ($this->revisedInPeriod($period, 'service-faq', $service) > 0) {
+            return []; // one FAQ batch per service per week, however often the command runs
+        }
         $limit = max(0, min(
             (int) config('seo.service.faq_new_per_week'),
             (int) config('seo.service.faq_max') - count($existing),
@@ -245,6 +250,9 @@ final class SeoPlanner
     public function copyTarget(string $period): ?Service
     {
         $cfg = config('seo.service');
+        if ($this->revisedInPeriod($period, 'service-meta') > 0) {
+            return null; // at most one meta rewrite per week
+        }
         $pages = $this->mainHostPages($period);
         $best = null;
         $bestImpressions = -1;
@@ -309,6 +317,15 @@ final class SeoPlanner
             ->where('reason', $reason)
             ->where('created_at', '>=', now()->subDays(self::COOLDOWN_DAYS))
             ->exists();
+    }
+
+    /** Automatic changes of this kind already made in the period (optionally for one item). */
+    private function revisedInPeriod(string $period, string $reason, Post|Service|null $model = null): int
+    {
+        return ContentRevision::where('period', $period)
+            ->where('reason', $reason)
+            ->when($model, fn ($q) => $q->where('revisable_type', $model->getMorphClass())->where('revisable_id', $model->getKey()))
+            ->count();
     }
 
     private function isNavigational(string $norm): bool

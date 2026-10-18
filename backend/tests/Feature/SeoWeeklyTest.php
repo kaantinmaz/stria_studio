@@ -226,6 +226,14 @@ class SeoWeeklyTest extends TestCase
 
         config(['seo.refresh.max_per_week' => 10]);
         $this->assertSame(['b', 'a', 'c', 'd', 'g'], array_column($this->planner()->refreshTargets(self::PERIOD, self::PREV), 'slug'));
+
+        // A second run in the same week only gets what is left of the weekly budget.
+        config(['seo.refresh.max_per_week' => 3]);
+        foreach ([$post('x'), $post('y')] as $done) {
+            ContentRevision::create(['revisable_type' => $done->getMorphClass(), 'revisable_id' => $done->getKey(),
+                'period' => self::PERIOD, 'reason' => 'blog-refresh', 'before' => []]);
+        }
+        $this->assertSame(['b'], array_column($this->planner()->refreshTargets(self::PERIOD, self::PREV), 'slug'));
     }
 
     public function test_faq_candidates_fuzzy_dedupe_weekly_cap_and_total_cap(): void
