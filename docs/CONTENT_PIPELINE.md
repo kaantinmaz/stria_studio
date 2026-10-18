@@ -135,6 +135,13 @@ ilk 10 organik sonuç, kendi pozisyonumuz (`config('seo.own_hosts')`: ana site +
 mikrositeler), PAA soruları, ilgili aramalar, answer box ve yerel sonuçlar
 yazılır. Tek sorgunun hatası diğerlerini durdurmaz.
 
+**Serper kısıtı (2026-10-18'de doğrulandı):** `gl` veya `location` verilince
+Serper "Diğer sorular" ve ilgili aramaları **hiç döndürmüyor**. Bu yüzden
+konumlu sıralama çağrısı bunları içermezse, ilk `SERPER_DISCOVERY_LIMIT`
+(varsayılan 20) sorgu için yalnız `hl=tr` ile ikinci bir "keşif" çağrısı
+yapılır. Haftada en çok `SERPER_WEEKLY_LIMIT + SERPER_DISCOVERY_LIMIT` kredi
+harcanır.
+
 ### `seo:weekly {--dry-run}`
 
 Seçim mantığı `App\Support\SeoPlanner`'dadır (yalnızca okur):
@@ -200,7 +207,8 @@ alın.
 | `GSC_CREDENTIALS` | Servis hesabı JSON anahtarının **mutlak yolu** (webroot ve repo dışında). Boşsa `gsc:sync` atlanır. |
 | `GSC_SITE_URL` | Search Console mülk kimliği: `sc-domain:striastudio.com.tr` veya `https://striastudio.com.tr/`. |
 | `SERPER_API_KEY` | serper.dev API anahtarı. Boşsa `serp:sync` atlanır. |
-| `SERPER_WEEKLY_LIMIT` | Haftalık en fazla SERP sorgusu (= kredi), varsayılan 60. |
+| `SERPER_WEEKLY_LIMIT` | Haftalık en fazla SERP sıralama sorgusu (= kredi), varsayılan 60. |
+| `SERPER_DISCOVERY_LIMIT` | Bunlardan PAA/ilgili aramalar için ek keşif çağrısı yapılacak en fazla sorgu, varsayılan 20. |
 
 Sınırlar (`refresh.*`, `service.*`, `topics_per_week`) `config/seo.php`'dedir.
 

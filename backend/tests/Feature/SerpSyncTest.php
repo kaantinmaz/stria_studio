@@ -161,4 +161,29 @@ class SerpSyncTest extends TestCase
         $this->artisan('serp:sync')->assertFailed();
         Http::assertNothingSent();
     }
+
+    public function test_localized_call_without_paa_triggers_capped_discovery_call(): void
+    {
+        // Serper drops PAA/related when gl/location is set; only an hl-only call returns them.
+        config(['seo.serper.discovery_limit' => 1]);
+        $this->gscQuery('microblading', 100);
+        $this->gscQuery('kaş pudralama', 50);
+
+        Http::fake(function (Request $request) {
+            if (isset($request['location'])) {
+                return Http::response(['organic' => [['title' => 'R', 'link' => 'https://rakip.com/', 'position' => 1]], 'credits' => 1]);
+            }
+
+            return Http::response($this->serp());
+        });
+
+        $this->artisan('serp:sync')->assertSuccessful();
+
+        $first = SerpResult::where('query', 'microblading')->firstOrFail();
+        $this->assertSame('Microblading kaç gün sürer?', $first->people_also_ask[0]['question']);
+        $this->assertSame(['microblading fiyat', 'microblading ankara'], $first->related_searches);
+        // Discovery budget (1) used up: the second query keeps the empty localized result.
+        $this->assertSame([], SerpResult::where('query', 'kaş pudralama')->firstOrFail()->people_also_ask);
+        Http::assertSentCount(3);
+    }
 }

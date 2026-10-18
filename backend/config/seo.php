@@ -30,8 +30,12 @@ return [
 
     'serper' => [
         'key' => env('SERPER_API_KEY'),
-        // Haftalık sorgu (= kredi) bütçesi.
+        // Haftalık sıralama sorgusu (= kredi) bütçesi.
         'weekly_limit' => (int) env('SERPER_WEEKLY_LIMIT', 60),
+        // Bunlardan ilk N'i için ek "keşif" çağrısı (yalnız hl): Serper gl/location
+        // verilince "Diğer sorular" ve ilgili aramaları döndürmüyor. Haftada en çok
+        // weekly_limit + discovery_limit kredi harcanır.
+        'discovery_limit' => (int) env('SERPER_DISCOVERY_LIMIT', 20),
         // İstekler arası bekleme (ms).
         'delay_ms' => 300,
         'gl' => 'tr',

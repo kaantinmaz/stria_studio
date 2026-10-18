@@ -45,6 +45,7 @@ class SyncSerp extends Command
         $skipped = 0;
         $credits = 0;
         $first = true;
+        $discoveryLeft = (int) config('seo.serper.discovery_limit', 0);
 
         foreach ($this->candidates($limit) as $query) {
             if (SerpResult::where('query', $query)->where('period', $period)->exists()) {
@@ -78,8 +79,30 @@ class SyncSerp extends Command
                 continue;
             }
 
-            $this->store($query, $period, (array) $response->json());
-            $credits += (int) $response->json('credits', 0);
+            $data = (array) $response->json();
+            $credits += (int) ($data['credits'] ?? 0);
+
+            // Serper omits "Diğer sorular" and related searches whenever gl/location is set
+            // (verified 2026-10-18), so the localized ranking call never carries them. One extra
+            // call with only hl=tr fetches them for the first discovery_limit queries.
+            if ($discoveryLeft > 0 && empty($data['peopleAlsoAsk']) && empty($data['relatedSearches'])) {
+                $discoveryLeft--;
+                try {
+                    $extra = Http::withHeaders(['X-API-KEY' => $key])->timeout(20)->post('https://google.serper.dev/search', [
+                        'q' => $query,
+                        'hl' => config('seo.serper.hl'),
+                    ]);
+                    if ($extra->successful()) {
+                        $data['peopleAlsoAsk'] = $extra->json('peopleAlsoAsk', []);
+                        $data['relatedSearches'] = $extra->json('relatedSearches', []);
+                        $credits += (int) $extra->json('credits', 0);
+                    }
+                } catch (\Exception $e) {
+                    Log::warning('serp:sync: keşif sorgusu başarısız', ['query' => $query, 'error' => $e->getMessage()]);
+                }
+            }
+
+            $this->store($query, $period, $data);
             $done++;
         }
 
