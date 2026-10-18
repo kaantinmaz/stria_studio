@@ -51,6 +51,7 @@ class SeoWeeklyTest extends TestCase
         Carbon::setTestNow();
 
         @unlink(storage_path('app/seo-reports/'.self::PERIOD.'.md'));
+        @unlink(storage_path('app/seo-reports/'.self::PERIOD.'-dry-run.md'));
         foreach ($this->tempFiles as $file) {
             @unlink($file);
         }
@@ -352,7 +353,8 @@ class SeoWeeklyTest extends TestCase
         $this->artisan('seo:weekly', ['--dry-run' => true])->assertSuccessful();
 
         $this->assertSame(0, SearchQuery::count());
-        $this->assertFileExists(storage_path('app/seo-reports/'.self::PERIOD.'.md'));
+        $this->assertFileExists(storage_path('app/seo-reports/'.self::PERIOD.'-dry-run.md'));
+        $this->assertFileDoesNotExist(storage_path('app/seo-reports/'.self::PERIOD.'.md'));
     }
 
     public function test_failed_refresh_records_no_revision_and_is_reported(): void

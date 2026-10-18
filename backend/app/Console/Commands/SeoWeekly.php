@@ -370,8 +370,14 @@ class SeoWeekly extends Command
             mkdir($dir, 0775, true);
         }
 
-        $path = $dir."/{$period}.md";
-        file_put_contents($path, implode("\n", $lines)."\n");
+        // Dry runs get their own file; a second real run in the same week appends, so the
+        // run that actually changed content is never overwritten by a later no-op run.
+        $path = $dir."/{$period}".($dry ? '-dry-run' : '').'.md';
+        $body = implode("\n", $lines)."\n";
+        if (! $dry && is_file($path)) {
+            $body = "\n---\n\n".$body;
+        }
+        file_put_contents($path, $body, $dry ? 0 : FILE_APPEND);
 
         return $path;
     }

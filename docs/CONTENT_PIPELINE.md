@@ -178,7 +178,7 @@ Seçim mantığı `App\Support\SeoPlanner`'dadır (yalnızca okur):
   hizmet (son 28 günde meta'sı yeniden yazılmış olan atlanır).
   `content:service-copy <slug> --apply --seo-only` çağrılır: tam kopya üretilip
   doğrulanır ama yalnızca `seo_title_tr` ve `seo_desc_tr` yazılır.
-- **Rapor:** `storage/app/seo-reports/<dönem>.md` — pencere, en çok
+- **Rapor:** `storage/app/seo-reports/<dönem>.md` (aynı haftadaki sonraki gerçek çalışmalar sona eklenir; `--dry-run` → `<dönem>-dry-run.md`) — pencere, en çok
   yükselen/düşen 5 sorgu (≥10 gösterim), SERP'te kendi pozisyonumuz ve önceki
   haftaya göre değişim (`yeni` / `kayıp` / `+n` = n sıra yükseldi), eklenen
   konular, tazelenen yazılar, SSS/meta güncellemeleri, kullanılan Serper kredisi.
