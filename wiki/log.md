@@ -127,3 +127,5 @@ Append-only timeline. Newest at top. One line per operation: `YYYY-MM-DD — OP 
 
 - 2026-10-09: Kirpik carousel (`socialMediaPosts/kir*.png`) "My Lamination" (kirpik laminasyonu ürün/işlem adı) metinleriyle güncellendi → `socialMediaPosts/guncel/`. Orijinaller korunuyor. Eski metin OpenCV inpaint ile silinip Playfair Display 800 (başlık) + Montserrat (gövde) ile yeniden yazıldı.
 - 2026-10-09: Rubaab Beauty Salon'un "Lashes of Luxury" postu referans alınarak `socialMediaPosts/guncel/kirpik-laminasyon.png` (1080×1350) üretildi. Önce Higgsfield `gpt_image_2_5` (job `b249f334-2b7b-4950-9793-bc056e9ee8bd`, 2.75 kredi) ile görseldeki tüm yazı ve logolar silinip temiz bir zemin elde edildi. Üzerine "Kirpik Laminasyon" başlığı Playfair Display 560 yatayda %64 daraltılarak, cyan/kırmızı kaydırmalı glitch efektiyle yazıldı; Stria logosu ve STRIASTUDIO.COM.TR eklendi. **Risk:** fotoğraf başka bir salonun/fotoğrafçının, yayın hakkı belirsiz.
+
+- 2026-10-18: Haftalık SEO döngüsü kararı eklendi → decisions/2026-10-18-haftalik-seo-dongusu.md (gsc:sync, serp:sync, seo:weekly, seo:revert).

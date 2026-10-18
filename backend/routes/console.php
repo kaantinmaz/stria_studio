@@ -43,3 +43,12 @@ Schedule::command('content:write')
     ->timezone('Europe/Istanbul')
     ->withoutOverlapping(30)
     ->appendOutputTo(storage_path('logs/content-write.log'));
+
+// Haftalık SEO döngüsü (Pazartesi sabahı): GSC + SERP senkronu, yeni konular,
+// yazı tazeleme, hizmet SSS/meta güncellemesi ve rapor. Onay adımı yok; her
+// değişikliğin önce/sonra kopyası content_revisions'ta (seo:revert ile geri alınır).
+Schedule::command('seo:weekly')
+    ->weeklyOn(1, '06:00')
+    ->timezone('Europe/Istanbul')
+    ->withoutOverlapping(120)
+    ->appendOutputTo(storage_path('logs/seo-weekly.log'));

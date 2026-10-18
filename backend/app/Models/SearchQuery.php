@@ -17,6 +17,8 @@ class SearchQuery extends Model
         'ctr',
         'position',
         'period',
+        'top_page',
+        'source',
     ];
 
     protected $casts = [

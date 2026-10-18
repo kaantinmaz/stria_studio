@@ -22,7 +22,8 @@ class RewriteServiceCopy extends Command
 {
     protected $signature = 'content:service-copy {slug : Hizmet slug\'ı}
         {--apply : Değişen alanları veritabanına yaz (varsayılan: yalnızca öneri)}
-        {--retries=2 : Doğrulama başarısız olursa yeniden deneme sayısı}';
+        {--retries=2 : Doğrulama başarısız olursa yeniden deneme sayısı}
+        {--seo-only : Yalnızca seo_title_tr ve seo_desc_tr alanlarını yaz (seo:weekly otomatik yolu)}';
 
     protected $description = 'Bir hizmet sayfasının Türkçe kopyası için Claude CLI ile doğrulanmış yeni metin önerir (--apply ile yazar)';
 
@@ -149,7 +150,9 @@ class RewriteServiceCopy extends Command
         $changed = [];
         $unchanged = [];
 
-        foreach (self::FIELDS as $field) {
+        $fields = $this->option('seo-only') ? ['seo_title_tr', 'seo_desc_tr'] : self::FIELDS;
+
+        foreach ($fields as $field) {
             if ($field === 'faq_tr') {
                 $oldItems = array_map(
                     static fn (array $x): string => trim(($x['q'] ?? '').' — '.($x['a'] ?? '')),

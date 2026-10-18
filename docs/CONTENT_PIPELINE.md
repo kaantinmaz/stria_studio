@@ -25,8 +25,12 @@ GSC dışa aktarımı (CSV)
 
 Sahibi periyodik olarak GSC'den yeni bir sorgu dışa aktarımı alır (`query`,
 `clicks`, `impressions` sütunları; eski aktarımlarda ek `TO` yüzdesi ve
-`Pozisyon`). İçe aktarım ve hizmet metni güncellemeleri **manuel**; blog üretimi
-**otomatiktir**.
+`Pozisyon`). Blog üretimi **günlük otomatiktir**. GSC kimliği tanımlıysa sorgu
+verisi artık **haftalık otomatik** gelir (`gsc:sync`, CSV içe aktarımı yedek
+olarak çalışmaya devam eder); hizmet SSS eklemeleri ve düşük TO'lu hizmetin
+SEO başlık/açıklaması da **haftalık otomatik** güncellenir (bkz.
+[Haftalık SEO döngüsü](#haftalık-seo-döngüsü)). Manuel
+`content:service-copy` aynen çalışır.
 
 ## Otomatik günlük üretim (15:00)
 
@@ -62,6 +66,167 @@ Log: `backend/storage/logs/content-write.log`. Cron (Plesk, dakikalık):
 
 Zamanlanmış çalışmayı beklemeden denemek için:
 `php artisan schedule:test --name="content:write"`.
+
+## Haftalık SEO döngüsü
+
+Her **Pazartesi 06:00 (Europe/Istanbul)** `seo:weekly` çalışır. **Onay adımı
+yoktur** (sahibinin kararı); bunun yerine her otomatik değişikliğin önce/sonra
+kopyası `content_revisions` tablosuna yazılır ve `seo:revert` ile geri alınır.
+
+```
+php artisan seo:weekly
+        │
+        ├──► gsc:sync      # GSC API → search_queries (+top_page) + search_pages   (kimlik yoksa atlanır)
+        ├──► serp:sync     # Serper.dev → serp_results (PAA, ilgili aramalar, kendi pozisyonumuz)  (anahtar yoksa atlanır)
+        │
+        ├──► yeni konular  # PAA + ilgili aramalar → search_queries (source='serp', gösterim 0)
+        │                  #   günlük content:write önce gerçek GSC sorgularını, sonra bunları yazar
+        ├──► yazı tazeleme # pozisyon kaybı / vurucu mesafe → content:write --slug --force
+        ├──► hizmet SSS    # hizmet anahtar kelimesinin PAA soruları → Claude (service-faq) → faq_tr'ye ekle
+        ├──► hizmet meta   # vurucu mesafe + düşük TO, TEK hizmet → content:service-copy --apply --seo-only
+        │
+        └──► rapor         # storage/app/seo-reports/<dönem>.md + Telegram özeti
+```
+
+Alt senkronlardan biri hata verirse uyarı basılır, döngü eldeki (önceki) veriyle
+devam eder. Hiçbir adım komutu durdurmaz; komut her zaman başarı koduyla biter.
+
+### Zamanlama
+
+```php
+Schedule::command('seo:weekly')
+    ->weeklyOn(1, '06:00')
+    ->timezone('Europe/Istanbul')
+    ->withoutOverlapping(120)
+    ->appendOutputTo(storage_path('logs/seo-weekly.log'));
+```
+
+Log: `backend/storage/logs/seo-weekly.log`. Elle denemek için:
+`php artisan schedule:test --name="seo:weekly"` veya önce
+`php artisan seo:weekly --dry-run`.
+
+### Dönem biçimi
+
+Haftalık dönem kimliği **`YYYYWww`** (ör. `2026W42`): son tam 28 günlük GSC
+penceresinin (bitiş = bugün − 3 gün) **bitiş gününün ISO haftası**. Eski CSV
+dönemleri `YYYY-MM`'dir. `'-'` (0x2D) `'W'`'den (0x57) küçük olduğundan aynı yıl
+içinde **sözlük sırasıyla `max('period')` haftalık dönemi seçer**; `content:plan`,
+`content:write` ve `content:service-copy` değişmeden en yeni haftalık veriyle
+çalışır. "Önceki dönem" karşılaştırmaları yalnızca `____W__` biçimli dönemlere
+bakar.
+
+### `gsc:sync {--period=}`
+
+Search Console Search Analytics API'sinden son tam pencerenin verisini çeker
+(servis hesabı JWT, ek bağımlılık yok, `dataState: final`): `query`,
+`query+page` ve `page` boyutları. `search_queries` `(query, period)` üzerinde
+güncellenir (`source='gsc'`, `top_page` = sorgunun en çok tıklanan sayfası);
+`search_pages` `(page, period)` üzerinde güncellenir. Kimlik yoksa hata koduyla
+döner (`seo:weekly` bu durumda hiç çağırmaz).
+
+### `serp:sync {--period=} {--limit=}`
+
+Serper.dev ile Google TR SERP'ini (Ankara konumu) çeker. Önce **tüm aktif
+hizmetlerin `keywords_tr`'si**, sonra en yeni dönemin gösterimi en yüksek GSC
+sorguları (marka sorguları hariç) alınır; toplam `--limit` /
+`SERPER_WEEKLY_LIMIT` ile sınırlıdır (sorgu başına ~1 kredi). Dönemde zaten
+satırı olan sorgu atlanır (yeniden çalıştırma kredi harcamaz). `serp_results`'a
+ilk 10 organik sonuç, kendi pozisyonumuz (`config('seo.own_hosts')`: ana site +
+mikrositeler), PAA soruları, ilgili aramalar, answer box ve yerel sonuçlar
+yazılır. Tek sorgunun hatası diğerlerini durdurmaz.
+
+### `seo:weekly {--dry-run}`
+
+Seçim mantığı `App\Support\SeoPlanner`'dadır (yalnızca okur):
+
+- **Yeni konular:** dönemin PAA soruları + ilgili aramaları; 10–120 karakter,
+  2–12 kelime; marka/gezinme (`stria`, `instagram`, `adres`, `telefon`,
+  `iletisim`, `yol tarifi`, `nerede`, `com`, `www`) ve İngilizce sorular elenir;
+  `QueryCoverage` sınıfı `new` olmalı ve aynı niyetli yazı olmamalı; dönemde
+  zaten olan sorgular atlanır. Haftada en fazla `topics_per_week` (10).
+  Konular **en son GSC dönemine** eklenir (GSC API yoksa son CSV dönemi, ör.
+  `2026-09`): kendi haftalık dönemlerine yazılsalar `max('period')` o döneme
+  kayar ve `content:write` gerçek GSC sorgularını görmezdi.
+- **Yazı tazeleme:** ana sitenin `/blog/<slug>` sayfaları. Önceki haftaya göre
+  ortalama pozisyon `refresh.position_drop` (3) veya daha fazla kötüleştiyse
+  **`drop`**; değilse pozisyon `striking_min`–`striking_max` (8–20) ve gösterim
+  ≥ `min_impressions` (50) ise **`striking`**. Önce düşüşler (büyükten küçüğe),
+  sonra vurucu mesafedekiler (gösterime göre); haftada en fazla
+  `refresh.max_per_week` (3). Son 28 günde tazelenmiş yazı atlanır. Hedef sorgu:
+  `top_page`'i bu yazı olan en yüksek gösterimli sorgu, yoksa yazı başlığı.
+  Üretim `content:write` ile yapılır (aynı doğrulama); başarısız tazelemede
+  revizyon yazılmaz, raporda `başarısız` görünür.
+- **Hizmet SSS:** hizmetin `keywords_tr`'sinden biriyle çekilmiş SERP'in PAA
+  soruları; hizmete denk düşmeli (`content:service-copy` ile aynı kural), mevcut
+  SSS'lerle bulanık tekrar (≥%80 benzerlik) olmamalı. Hizmet başına haftada en
+  fazla `service.faq_new_per_week` (2), toplam en fazla `service.faq_max` (16)
+  SSS. Cevaplar `resources/prompts/service-faq.md` ile **yalnızca sayfadaki
+  olgulardan** üretilir; içerik cevabı taşımıyorsa model boş cevap döner ve
+  soru eklenmez. `ContentGuard::faqViolations` (cevap 60–500 karakter, HTML yok,
+  yasaklı ifade yok) geçmezse bir kez düzeltme istenir, yine geçmezse hiçbir şey
+  eklenmez.
+- **Hizmet meta:** ana sitedeki `/hizmetler/<slug>` sayfası pozisyon
+  `service.striking_min`–`striking_max` (4–15), gösterim ≥ `min_impressions`
+  (100) ve TO < `ctr_below` (%2) olan hizmetlerden gösterimi en yüksek **tek**
+  hizmet (son 28 günde meta'sı yeniden yazılmış olan atlanır).
+  `content:service-copy <slug> --apply --seo-only` çağrılır: tam kopya üretilip
+  doğrulanır ama yalnızca `seo_title_tr` ve `seo_desc_tr` yazılır.
+- **Rapor:** `storage/app/seo-reports/<dönem>.md` — pencere, en çok
+  yükselen/düşen 5 sorgu (≥10 gösterim), SERP'te kendi pozisyonumuz ve önceki
+  haftaya göre değişim (`yeni` / `kayıp` / `+n` = n sıra yükseldi), eklenen
+  konular, tazelenen yazılar, SSS/meta güncellemeleri, kullanılan Serper kredisi.
+  Kısa özet Telegram'a gider.
+
+`--dry-run`: senkron, DB yazımı ve Claude çağrısı yapmaz; planı basar ve raporu
+yazar.
+
+### `seo:revert {id?} {--list}`
+
+```
+php artisan seo:revert --list    # son 20 revizyon: id, tarih, neden, içerik#id
+php artisan seo:revert 42        # revizyonun `before` alanlarını içeriğe geri yazar
+```
+
+Nedenler: `blog-refresh` (yazının başlık/özet/gövde/meta'sı), `service-faq`
+(`faq_tr`), `service-meta` (`seo_title_tr`, `seo_desc_tr`). Bir revizyon yalnızca
+bir kez geri alınır (`reverted_at`). Geri alma, sonraki otomatik değişiklikleri
+de ezer; aynı içeriğe birden fazla revizyon varsa en yeniden eskiye doğru geri
+alın.
+
+### Ortam değişkenleri (`config/seo.php`)
+
+| Değişken | Anlamı |
+|----------|--------|
+| `GSC_CREDENTIALS` | Servis hesabı JSON anahtarının **mutlak yolu** (webroot ve repo dışında). Boşsa `gsc:sync` atlanır. |
+| `GSC_SITE_URL` | Search Console mülk kimliği: `sc-domain:striastudio.com.tr` veya `https://striastudio.com.tr/`. |
+| `SERPER_API_KEY` | serper.dev API anahtarı. Boşsa `serp:sync` atlanır. |
+| `SERPER_WEEKLY_LIMIT` | Haftalık en fazla SERP sorgusu (= kredi), varsayılan 60. |
+
+Sınırlar (`refresh.*`, `service.*`, `topics_per_week`) `config/seo.php`'dedir.
+
+### Sunucu kurulumu (GSC servis hesabı)
+
+1. Google Cloud Console'da bir proje seçin/oluşturun, **Google Search Console
+   API**'yi etkinleştirin.
+2. **IAM → Servis hesapları** altında bir servis hesabı oluşturun (rol
+   gerekmez) ve **JSON anahtarı** indirin.
+3. Search Console → mülk → **Ayarlar → Kullanıcılar ve izinler** → servis
+   hesabının e-postasını (`…@….iam.gserviceaccount.com`) **kısıtlı** kullanıcı
+   olarak ekleyin.
+4. JSON'u **webroot ve repo dışına** koyun ve yalnızca abonelik kullanıcısının
+   okuyabileceği şekilde izin verin:
+
+   ```
+   mkdir -p /var/www/vhosts/striastudio.com.tr/private
+   mv gsc.json /var/www/vhosts/striastudio.com.tr/private/gsc.json
+   chown striastudio.com.tr_xn8csnuygii /var/www/vhosts/striastudio.com.tr/private/gsc.json
+   chmod 600 /var/www/vhosts/striastudio.com.tr/private/gsc.json
+   ```
+
+5. `.env`: `GSC_CREDENTIALS=/var/www/vhosts/striastudio.com.tr/private/gsc.json`,
+   `GSC_SITE_URL=sc-domain:striastudio.com.tr`, `SERPER_API_KEY=…`; ardından
+   `php artisan config:cache`.
+6. Doğrulayın: `php artisan gsc:sync` ve `php artisan serp:sync --limit=1`.
 
 ## Kapak görselleri
 
@@ -174,7 +339,7 @@ php artisan content:write "kaş pudralama ve microblading arasındaki fark" \
 `--dry-run` slug, başlık, meta, kelime sayısı, türe göre gruplanmış iç linkler
 ve tam `body_tr`'yi basar; hiçbir şey yazmaz.
 
-### `content:service-copy {slug} {--apply} {--retries=2}`
+### `content:service-copy {slug} {--apply} {--retries=2} {--seo-only}`
 
 Bir hizmet sayfasının Türkçe kopyası için yeniden yazım **önerir**.
 
@@ -189,6 +354,8 @@ Bir hizmet sayfasının Türkçe kopyası için yeniden yazım **önerir**.
 - **Varsayılan davranış öneridir; hiçbir şey yazılmaz.** Yalnızca `--apply` ile
   değişen alanlar DB'ye kaydedilir. `is_active`, `gallery`, `related`,
   `sort_order`, `duration_min` ve tüm `_en` alanlarına dokunulmaz.
+- `--seo-only`: fark ve yazma yalnızca `seo_title_tr` ve `seo_desc_tr` için
+  yapılır (`seo:weekly`'nin otomatik meta yolu).
 
 ```
 # Öneriyi (fark) gör:
@@ -307,8 +474,15 @@ Sunucuda CLI'nin **abonelik kullanıcısı olarak** oturum açmış olması gere
 
 - **Blog yazıları anında yayımlanır.** `content:write` (`--draft` olmadan)
   `is_published=true`, `published_at=now()` yazar ve IndexNow ping'i atar.
-- **Hizmet kopyası bir öneridir.** `content:service-copy` yalnızca fark basar;
-  DB'ye yazmak için `--apply` gerekir.
+- **Hizmet kopyası (manuel) bir öneridir.** `content:service-copy` yalnızca fark
+  basar; DB'ye yazmak için `--apply` gerekir.
+- **Hizmet SSS ve SEO meta'sı haftalık otomatik güncellenir.** `seo:weekly`
+  onay beklemeden SSS ekler ve tek bir hizmetin `seo_title_tr`/`seo_desc_tr`'sini
+  yeniden yazar; her değişikliğin önce/sonra kopyası `content_revisions`'tadır
+  (`seo:revert` ile geri alınır).
+- **Dikkat:** manuel tam `content:service-copy --apply` şema gereği **en fazla 8
+  SSS** döndürür; otomatik eklenmiş SSS'lerle 8'i aşan bir sayfada çalıştırılırsa
+  fazlası **ezilir**. Gerekirse önce `seo:revert --list` ile kayıtları not edin.
 
 ## Sorun giderme
 

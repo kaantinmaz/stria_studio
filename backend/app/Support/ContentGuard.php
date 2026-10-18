@@ -298,6 +298,44 @@ final class ContentGuard
     }
 
     /**
+     * seo:weekly'nin hizmet sayfasına eklediği SSS maddeleri: düz metin,
+     * cevap 60-500 karakter, yasaklı ifade yok.
+     *
+     * @param  array<int, mixed>  $faqs
+     * @return list<string>
+     */
+    public function faqViolations(array $faqs): array
+    {
+        $errors = [];
+
+        foreach (array_values($faqs) as $i => $item) {
+            $q = is_array($item) && is_string($item['q'] ?? null) ? trim($item['q']) : '';
+            $a = is_array($item) && is_string($item['a'] ?? null) ? trim($item['a']) : '';
+
+            if ($q === '' || $a === '') {
+                $errors[] = "faqs[{$i}] q ve a alanları dolu olmalı.";
+
+                continue;
+            }
+
+            $len = mb_strlen($a);
+            if ($len < 60 || $len > 500) {
+                $errors[] = "faqs[{$i}] cevabı 60-500 karakter olmalı ({$len}).";
+            }
+
+            if (preg_match('/<[a-z\/!][^>]*>/i', $q.' '.$a)) {
+                $errors[] = "faqs[{$i}] düz metin olmalı; HTML/etiket içeremez.";
+            }
+
+            foreach ($this->forbiddenViolations($q.' '.$a) as $violation) {
+                $errors[] = "faqs[{$i}] ".$violation;
+            }
+        }
+
+        return $errors;
+    }
+
+    /**
      * @return list<string>
      */
     private function tagViolations(string $body): array
