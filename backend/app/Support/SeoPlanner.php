@@ -209,6 +209,12 @@ final class SeoPlanner
                     continue;
                 }
 
+                // Prices are never published on the site (ContentGuard bans "tl"), and each service
+                // page already answers "fiyatı ne kadar?" — a price PAA can only fail validation.
+                if (preg_match('/\b(fiyat\w*|ucret\w*|tl|lira|kaca|indirim\w*|kampanya\w*)\b/', $norm)) {
+                    continue;
+                }
+
                 // RewriteServiceCopy::queries ile aynı eşleme kuralı.
                 $maps = $this->coverage->classify($question)['target'] === $serviceUrl
                     || ($normName !== '' && str_contains($norm, $normName));
@@ -216,8 +222,10 @@ final class SeoPlanner
                     continue;
                 }
 
+                // "ne kadar sürer / kalır / kalıcı / gider" are one question; compare on a folded form.
+                $folded = preg_replace('/\b(surer|kalir|kalici|kalicidir|gider|dayanir|etkisi)\b/', 'sure', $norm);
                 foreach ($known as $k) {
-                    similar_text($norm, $k, $percent);
+                    similar_text($folded, preg_replace('/\b(surer|kalir|kalici|kalicidir|gider|dayanir|etkisi)\b/', 'sure', $k), $percent);
                     if ($percent >= 80) {
                         continue 2;
                     }

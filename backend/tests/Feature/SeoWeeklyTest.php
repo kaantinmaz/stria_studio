@@ -255,6 +255,22 @@ class SeoWeeklyTest extends TestCase
         $this->assertSame([], $this->planner()->faqCandidates($service, self::PERIOD));
     }
 
+    public function test_faq_candidates_skip_price_questions_and_duration_synonyms(): void
+    {
+        // Real PAA from the first live run: price questions always failed ContentGuard ("tl").
+        $service = $this->microblading();
+        $service->faq_tr = [['q' => 'Microblading ne kadar kalıcı?', 'a' => 'x']];
+
+        $this->serp('Microblading Ankara', [
+            'Microblading kaç TL?',
+            'Microblading fiyatları 2026',
+            'Microblading etkisi ne kadar sürer?',   // same question as "ne kadar kalıcı?"
+            'Microblading acıtır mı?',
+        ]);
+
+        $this->assertSame(['Microblading acıtır mı?'], $this->planner()->faqCandidates($service, self::PERIOD));
+    }
+
     public function test_copy_target_picks_single_highest_impression_service(): void
     {
         $a = Service::factory()->create(['slug' => 'a']);
