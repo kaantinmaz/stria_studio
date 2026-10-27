@@ -18,7 +18,7 @@ class LinkSeeder extends Seeder
         }
 
         $items = [
-            ['label_tr' => 'Randevu Al · WhatsApp', 'label_en' => 'Book on WhatsApp', 'subtitle_tr' => 'Ücretsiz ön görüşme ve fiyat bilgisi', 'url' => 'https://wa.me/905077323026', 'icon' => 'whatsapp', 'is_featured' => true],
+            ['label_tr' => 'Randevu Al · WhatsApp', 'label_en' => 'Book on WhatsApp', 'subtitle_tr' => 'Ücretsiz ön görüşme ve fiyat bilgisi', 'url' => 'https://wa.me/905306863028', 'icon' => 'whatsapp', 'is_featured' => true],
             ['label_tr' => 'Tüm Hizmetler', 'label_en' => 'All Services', 'url' => '/hizmetler', 'icon' => 'web'],
             ['label_tr' => 'Altın Oran Kaş Alım', 'label_en' => 'Golden Ratio Brow Shaping', 'subtitle_tr' => 'Ölçümle şekillendirme · 30 dk', 'url' => '/hizmetler/altin-oran-kas-alim', 'icon' => 'web'],
             ['label_tr' => 'Kirpik Lifting', 'label_en' => 'Lash Lifting', 'url' => '/hizmetler/kirpik-lifting', 'icon' => 'web'],

@@ -37,9 +37,9 @@ export type Settings = {
 };
 
 export const SETTINGS_FALLBACK: Settings = {
-  phone: "+90 507 732 30 26",
-  phone_local: "0507 732 30 26",
-  whatsapp: "https://wa.me/905077323026",
+  phone: "+90 530 686 30 28",
+  phone_local: "0530 686 30 28",
+  whatsapp: "https://wa.me/905306863028",
   instagram: "https://instagram.com/striabeautystudio",
   instagram_handle: "@striabeautystudio",
   address: "Uğur Mumcu Cad. No:34 Kat:1 D:2, Gaziosmanpaşa, Çankaya/Ankara",

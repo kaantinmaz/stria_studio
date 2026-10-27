@@ -173,7 +173,7 @@ export const UI: Record<Lang, Dict> = {
     footerRights: "Tüm hakları saklıdır.",
     info: [
       { label: "Adres", value: "Büyükesat Mah. Uğur Mumcu Cad. No:34 Kat:1 Daire:2, Gaziosmanpaşa, Çankaya/Ankara" },
-      { label: "Telefon", value: "+90 507 732 30 26" },
+      { label: "Telefon", value: "+90 530 686 30 28" },
       { label: "Instagram", value: "@striabeautystudio" },
       { label: "Çalışma Saatleri", value: "Sal – Paz · 09:00 – 20:00 (Pazartesi kapalı)" },
     ],
@@ -260,7 +260,7 @@ export const UI: Record<Lang, Dict> = {
     footerRights: "All rights reserved.",
     info: [
       { label: "Address", value: "Büyükesat Mah., Uğur Mumcu Cad. No:34, Floor 1, Apt 2, Gaziosmanpaşa, Çankaya/Ankara" },
-      { label: "Phone", value: "+90 507 732 30 26" },
+      { label: "Phone", value: "+90 530 686 30 28" },
       { label: "Instagram", value: "@striabeautystudio" },
       { label: "Hours", value: "Tue – Sun · 09:00 – 20:00 (closed Mondays)" },
     ],
