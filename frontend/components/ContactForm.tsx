@@ -6,6 +6,7 @@ import { site } from "@/lib/site";
 import { useServices } from "@/components/ServicesProvider";
 import { pickLang } from "@/lib/content";
 import { metaContext, newEventId, trackLead } from "@/lib/metaPixel";
+import { gtagEvent } from "@/lib/gtag";
 import { getAttribution } from "@/lib/attribution";
 
 type Status = "idle" | "sending" | "ok" | "err";
@@ -47,6 +48,7 @@ export function ContactForm() {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       // Yalnız başarılı kayıtta dönüşüm sayılır (Pixel + sunucu aynı event_id).
       trackLead(window.location.pathname, eventId, service);
+      gtagEvent("generate_lead", { page_path: window.location.pathname, service: service ?? undefined });
       setStatus("ok");
       form.reset();
     } catch {
