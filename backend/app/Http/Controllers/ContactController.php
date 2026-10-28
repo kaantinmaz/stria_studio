@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Lead;
 use App\Support\Attribution;
+use App\Support\ConversionValue;
 use App\Support\MetaConversions;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -31,7 +32,8 @@ class ContactController extends Controller
 
         $meta->dispatch('Lead', $metaBlock, $request,
             ['email' => $data['email'] ?? null, 'phone' => $data['phone']],
-            array_filter(['content_name' => $data['service'] ?? null]));
+            array_filter(['content_name' => $data['service'] ?? null])
+                + ConversionValue::fields(ConversionValue::forServiceName($data['service'] ?? null)));
 
         return response()->json(['ok' => true, 'id' => $lead->id], 201);
     }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Appointment;
 use App\Models\Touchpoint;
 use App\Support\Attribution;
+use App\Support\ConversionValue;
 use Illuminate\Http\Response;
 
 /**
@@ -24,10 +25,9 @@ class GoogleOfflineConversionsController extends Controller
         abort_if($expected === '' || ! hash_equals($expected, $token), 404);
 
         $name = (string) config('services.google_ads.conversion_name');
-        $default = (float) config('services.meta.default_purchase_value', 2500);
 
         $rows = Appointment::query()
-            ->with('customer.touchpoint')
+            ->with(['customer.touchpoint', 'service'])
             ->where('is_paid', true)
             ->whereNull('parent_id')
             ->where('paid_at', '>=', now()->subDays(Attribution::WINDOW_DAYS))
@@ -46,12 +46,13 @@ class GoogleOfflineConversionsController extends Controller
             if (! $gclid && $phone === null && $email === '') {
                 continue;
             }
+            $value = ConversionValue::forAppointment($a);
             fputcsv($out, [
                 $gclid ?? '',
                 $name,
                 $a->paid_at->timezone('Europe/Istanbul')->format('Y-m-d H:i:sP'),
-                number_format($a->price !== null ? (float) $a->price : $default, 2, '.', ''),
-                'TRY',
+                $value !== null ? number_format($value, 2, '.', '') : '',
+                $value !== null ? 'TRY' : '',
                 $email !== '' ? hash('sha256', $email) : '',
                 $phone !== null ? hash('sha256', '+'.$phone) : '',
             ]);

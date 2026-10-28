@@ -6,6 +6,8 @@ import { gtagEvent, gtagPageview } from "@/lib/gtag";
 import { metaContext, newEventId, trackContact, trackFindLocation } from "@/lib/metaPixel";
 import { captureAttribution, getAttribution, newRefCode, withRef } from "@/lib/attribution";
 import { site } from "@/lib/site";
+import { serviceValueForPath } from "@/lib/conversionValue";
+import type { ServiceListItem } from "@/lib/content";
 
 function post(body: Record<string, unknown>) {
   try {
@@ -23,7 +25,7 @@ function post(body: Record<string, unknown>) {
 // Harita / yol tarifi bağlantıları (Google Maps, Apple Maps, Yandex Haritalar).
 const MAPS_HREF = /google\.[a-z.]+\/maps|maps\.google\.|maps\.app\.goo\.gl|goo\.gl\/maps|maps\.apple\.com|yandex\.[a-z.]+\/maps/i;
 
-export function Analytics() {
+export function Analytics({ services }: { services: ServiceListItem[] }) {
   const pathname = usePathname();
 
   // pageview on every route change
@@ -52,10 +54,12 @@ export function Analytics() {
       const href = a.getAttribute("href") ?? "";
       const path = window.location.pathname;
       const eventId = newEventId();
+      // Hizmet sayfasındaki iletişim tıklaması o hizmetin dönüşüm değerini taşır.
+      const value = serviceValueForPath(path, services);
       if (href.startsWith("tel:")) {
         post({ type: "event", name: "call_click", path, meta: metaContext(eventId), attr: getAttribution() });
-        gtagEvent("call_click", { page_path: path });
-        trackContact("phone", path, eventId);
+        gtagEvent("call_click", { page_path: path, ...value });
+        trackContact("phone", path, eventId, value);
       } else if (href.includes("wa.me") || href.includes("whatsapp")) {
         // Mesaja kısa kod eklenir; panelde müşteriye girilince ödeme doğru reklama yazılır.
         // Taban bağlantı saklanır ki tekrar tıklamada kodlar üst üste eklenmesin.
@@ -63,8 +67,8 @@ export function Analytics() {
         a.dataset.waBase ??= href;
         a.setAttribute("href", withRef(a.dataset.waBase, ref));
         post({ type: "event", name: "whatsapp_click", path, ref, meta: metaContext(eventId), attr: getAttribution() });
-        gtagEvent("whatsapp_click", { page_path: path });
-        trackContact("whatsapp", path, eventId);
+        gtagEvent("whatsapp_click", { page_path: path, ...value });
+        trackContact("whatsapp", path, eventId, value);
       } else if (MAPS_HREF.test(href)) {
         post({ type: "event", name: "maps_click", path, meta: metaContext(eventId) });
         gtagEvent("maps_click", { page_path: path });
@@ -73,7 +77,7 @@ export function Analytics() {
     };
     document.addEventListener("click", onClick, true);
     return () => document.removeEventListener("click", onClick, true);
-  }, []);
+  }, [services]);
 
   return null;
 }

@@ -22,6 +22,7 @@ class ServiceListResource extends JsonResource
             'duration_min' => (int) $this->duration_min,
             'rating_avg' => $this->rating_avg !== null ? round((float) $this->rating_avg, 1) : null,
             'rating_count' => (int) $this->rating_count,
+            'conversion_value' => $this->conversion_value,
             'url' => '/hizmetler/'.$this->slug,
         ];
     }

@@ -75,6 +75,20 @@ class AttributionTest extends TestCase
         $this->assertNotNull($a->fresh()->meta_purchase_sent_at);
     }
 
+    public function test_purchase_value_falls_back_to_service_value_and_is_omitted_without_one(): void
+    {
+        $lam = Service::factory()->create(['conversion_value' => 2500]);
+        $this->paidAppointment(Customer::create(['name' => 'A', 'phone' => '05000000001']), ['price' => null, 'service_id' => $lam->id]);
+        $this->paidAppointment(Customer::create(['name' => 'B', 'phone' => '05000000002']), ['price' => 4000, 'service_id' => $lam->id]);
+        $this->paidAppointment(Customer::create(['name' => 'C', 'phone' => '05000000003']), ['price' => null]);
+
+        [$byService, $byPrice, $none] = $this->purchases();
+        $this->assertSame([2500.0, 'TRY'], [$byService['custom_data']['value'], $byService['custom_data']['currency']]);
+        $this->assertSame(4000.0, $byPrice['custom_data']['value']);
+        $this->assertArrayNotHasKey('value', $none['custom_data'] ?? []);
+        $this->assertArrayNotHasKey('currency', $none['custom_data'] ?? []);
+    }
+
     public function test_unpaid_and_kamuflaj_appointments_send_nothing(): void
     {
         $c = Customer::create(['name' => 'B', 'phone' => '05000000000']);
@@ -103,16 +117,21 @@ class AttributionTest extends TestCase
         $this->paidAppointment($linked);
         $this->paidAppointment(Customer::create(['name' => 'B', 'phone' => '05551112233']), ['price' => null]);
         $this->paidAppointment(Customer::create(['name' => 'C']), ['is_paid' => false]);
+        $lifting = Service::factory()->create(['conversion_value' => 2000]);
+        $this->paidAppointment(Customer::create(['name' => 'D', 'phone' => '05554443322']), ['price' => null, 'service_id' => $lifting->id]);
 
         $this->get('/api/conversions/google/wrong.csv')->assertNotFound();
 
         $csv = $this->get('/api/conversions/google/secret-token.csv')->assertOk()->getContent();
         $lines = array_values(array_filter(explode("\n", $csv)));
         $this->assertSame('"Google Click ID","Conversion Name","Conversion Time","Conversion Value","Conversion Currency",Email,"Phone Number"', $lines[0]);
-        $this->assertCount(3, $lines);
+        $this->assertCount(4, $lines);
         $this->assertStringStartsWith('GCLID-1,"Stria Müşteri (ödeme)"', $lines[1]);
         $this->assertMatchesRegularExpression('/,"\d{4}-\d\d-\d\d \d\d:\d\d:\d\d\+03:00",2750\.00,TRY,/', $lines[1]);
-        $this->assertStringContainsString(',2500.00,TRY,,'.hash('sha256', '+905551112233'), $lines[2]);
+        // Fiyat da hizmet değeri de yok → değer ve para birimi boş.
+        $this->assertStringContainsString(',,,,'.hash('sha256', '+905551112233'), $lines[2]);
+        // Fiyat yok → hizmetin dönüşüm değeri.
+        $this->assertStringContainsString(',2000.00,TRY,,'.hash('sha256', '+905554443322'), $lines[3]);
     }
 
     public function test_calendar_new_customer_with_pasted_whatsapp_message_is_linked_before_purchase(): void

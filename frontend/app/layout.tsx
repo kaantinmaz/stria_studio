@@ -97,7 +97,7 @@ export default async function RootLayout({
             <ChatWidget whatsappUrl={(settings ?? SETTINGS_FALLBACK).whatsapp} />
             <WhatsAppFab />
             <MobileActionBar />
-            <Analytics />
+            <Analytics services={services} />
             <MetaPixel />
             <Clarity />
           </SettingsProvider>

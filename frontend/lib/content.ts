@@ -83,6 +83,7 @@ export type ServiceListItem = {
   url: string;
   rating_avg: number | null;
   rating_count: number;
+  conversion_value?: number | null;
 };
 
 export type SubService = {

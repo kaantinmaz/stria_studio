@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use App\Models\Visit;
 use App\Support\Attribution;
+use App\Support\ConversionValue;
 use App\Support\MetaConversions;
 use App\Support\TrafficSource;
 use Illuminate\Http\Request;
@@ -59,7 +60,11 @@ class TrackController extends Controller
             // Yalnız ana site (pixel yalnız orada); mikrositeler Meta'ya gitmez.
             $metaEvent = self::META_EVENTS[$data['name']] ?? null;
             if ($metaEvent !== null && $site === null) {
-                $meta->dispatch($metaEvent[0], $data['meta'] ?? null, $request, [], $metaEvent[1]);
+                // İletişim tıklaması hizmet sayfasındaysa o hizmetin dönüşüm değeri eklenir.
+                $custom = $metaEvent[0] === 'Contact'
+                    ? $metaEvent[1] + ConversionValue::fields(ConversionValue::forPath($data['path']))
+                    : $metaEvent[1];
+                $meta->dispatch($metaEvent[0], $data['meta'] ?? null, $request, [], $custom);
             }
             $channel = self::CHANNELS[$data['name']] ?? null;
             if ($channel !== null) {

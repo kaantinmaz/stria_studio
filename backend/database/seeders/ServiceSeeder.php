@@ -12,6 +12,7 @@ class ServiceSeeder extends Seeder
         $services = [
             [
                 'slug' => 'microblading',
+                'conversion_value' => 5000,
                 'sort_order' => 4,
                 'name_tr' => 'Microblading', 'name_en' => 'Microblading',
                 'tag_tr' => 'Kaş', 'tag_en' => 'Brows',
@@ -49,6 +50,7 @@ class ServiceSeeder extends Seeder
             ],
             [
                 'slug' => 'kas-pudralama',
+                'conversion_value' => 5000,
                 'sort_order' => 3,
                 'name_tr' => 'Kaş Pudralama', 'name_en' => 'Powder Brows',
                 'tag_tr' => 'Kaş', 'tag_en' => 'Brows',
@@ -153,6 +155,7 @@ class ServiceSeeder extends Seeder
             ],
             [
                 'slug' => 'dudak-renklendirme',
+                'conversion_value' => 5000,
                 'sort_order' => 7,
                 'name_tr' => 'Dudak Renklendirme', 'name_en' => 'Lip Blush',
                 'tag_tr' => 'Dudak', 'tag_en' => 'Lips',
@@ -187,6 +190,7 @@ class ServiceSeeder extends Seeder
             ],
             [
                 'slug' => 'kas-laminasyon',
+                'conversion_value' => 2500,
                 'sort_order' => 0,
                 'name_tr' => 'Kaş Laminasyon', 'name_en' => 'Brow Lamination',
                 'tag_tr' => 'Kaş', 'tag_en' => 'Brows',
@@ -230,6 +234,7 @@ class ServiceSeeder extends Seeder
             ],
             [
                 'slug' => 'kirpik-lifting',
+                'conversion_value' => 2000,
                 'sort_order' => 1,
                 'name_tr' => 'Kirpik Lifting', 'name_en' => 'Lash Lift',
                 'tag_tr' => 'Kirpik', 'tag_en' => 'Lashes',
@@ -278,6 +283,7 @@ class ServiceSeeder extends Seeder
             ],
             [
                 'slug' => 'kamuflaj-makyaj',
+                'conversion_value' => 6000,
                 'sort_order' => 2,
                 'name_tr' => 'Kamuflaj Makyaj', 'name_en' => 'Camouflage Makeup',
                 'tag_tr' => 'Cilt', 'tag_en' => 'Skin',

@@ -118,7 +118,6 @@ final class MetaConversions
             return false;
         }
         $tp = $customer->touchpoint;
-        $value = $appointment->price !== null ? (float) $appointment->price : (float) config('services.meta.default_purchase_value', 2500);
 
         $payload = $this->payload('Purchase', [
             'event_id' => 'purchase-'.$appointment->id,
@@ -128,7 +127,8 @@ final class MetaConversions
             'url' => $tp?->landing_url,
         ], $tp?->ip, (string) ($tp?->user_agent ?? ''),
             ['email' => $customer->email, 'phone' => $customer->phone],
-            array_filter(['value' => $value, 'currency' => 'TRY', 'content_name' => $appointment->service?->slug]),
+            ConversionValue::fields(ConversionValue::forAppointment($appointment))
+                + array_filter(['content_name' => $appointment->service?->slug]),
             'physical_store');
         if ($payload === null) {
             return false;

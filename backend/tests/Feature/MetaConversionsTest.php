@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Service;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
@@ -72,6 +73,25 @@ class MetaConversionsTest extends TestCase
 
         Http::assertSentCount(1);
         Http::assertSent(fn (Request $r) => $r['data'][0]['event_name'] === 'Contact' && $r['data'][0]['custom_data']['method'] === 'whatsapp');
+    }
+
+    public function test_contact_carries_service_value_only_on_valued_service_paths(): void
+    {
+        Service::factory()->create(['slug' => 'kas-laminasyon', 'conversion_value' => 2500]);
+        $this->postJson('/api/track', ['type' => 'event', 'name' => 'whatsapp_click', 'path' => '/hizmetler/kas-laminasyon', 'meta' => $this->meta(['event_id' => 'c1'])]);
+        $this->postJson('/api/track', ['type' => 'event', 'name' => 'call_click', 'path' => '/blog/x', 'meta' => $this->meta(['event_id' => 'c2'])]);
+
+        $sent = Http::recorded()->mapWithKeys(fn ($p) => [$p[0]['data'][0]['event_id'] => $p[0]['data'][0]['custom_data']]);
+        $this->assertSame(['method' => 'whatsapp', 'value' => 2500, 'currency' => 'TRY'], $sent['c1']);
+        $this->assertSame(['method' => 'phone'], $sent['c2']);
+    }
+
+    public function test_lead_carries_value_when_service_name_matches(): void
+    {
+        Service::factory()->create(['name_tr' => 'Kaş Laminasyon', 'name_en' => 'Brow Lamination', 'conversion_value' => 2500]);
+        $this->postJson('/api/contact', ['name' => 'Ayşe', 'phone' => '05077323026', 'service' => 'Brow Lamination', 'meta' => $this->meta()])->assertCreated();
+
+        Http::assertSent(fn (Request $r) => $r['data'][0]['custom_data'] === ['content_name' => 'Brow Lamination', 'value' => 2500, 'currency' => 'TRY']);
     }
 
     public function test_maps_click_sends_find_location(): void

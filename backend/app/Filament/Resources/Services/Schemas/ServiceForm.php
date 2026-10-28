@@ -182,6 +182,12 @@ class ServiceForm
                                     ->minValue(0)
                                     ->maxValue(99999999.99)
                                     ->helperText('Sitede gösterilmez. Kamuflaj makyajında bölge başına seans fiyatıdır.'),
+                                TextInput::make('conversion_value')
+                                    ->label('Dönüşüm değeri (₺)')
+                                    ->numeric()
+                                    ->integer()
+                                    ->minValue(0)
+                                    ->helperText('Reklam dönüşümlerine (WhatsApp/arama/form/ödeme) gönderilen değer. Boşsa değer gönderilmez.'),
                                 Toggle::make('is_active')
                                     ->default(true),
                             ]),
