@@ -9,7 +9,9 @@ use Illuminate\Http\Response;
 
 /**
  * Google Ads çevrimdışı dönüşüm dosyası (CSV): son 90 günde ödemesi alınan
- * randevular. Ads › Yüklemeler › Zaman planlaması bu adresi her gün çeker.
+ * randevular. Ads › Veri yöneticisi › HTTPS bağlantısı bu adresi her gün çeker;
+ * Veri yöneticisi ilk satırı sütun başlığı sayar, bu yüzden "Parameters:"
+ * satırı yok ve saat dilimi her zamanın içinde (+03:00).
  * Satırda gclid varsa kesin eşleşme; yoksa SHA-256 telefon/e-posta ile
  * "potansiyel müşteriler için gelişmiş dönüşümler" eşleşmesi. Google aynı
  * gclid + ad + zaman satırını yinelenen sayıp tekrar saymaz.
@@ -34,7 +36,6 @@ class GoogleOfflineConversionsController extends Controller
             ->get();
 
         $out = fopen('php://temp', 'r+');
-        fwrite($out, "Parameters:TimeZone=Europe/Istanbul\n");
         fputcsv($out, ['Google Click ID', 'Conversion Name', 'Conversion Time', 'Conversion Value', 'Conversion Currency', 'Email', 'Phone Number']);
 
         foreach ($rows as $a) {
@@ -48,7 +49,7 @@ class GoogleOfflineConversionsController extends Controller
             fputcsv($out, [
                 $gclid ?? '',
                 $name,
-                $a->paid_at->timezone('Europe/Istanbul')->format('Y-m-d H:i:s'),
+                $a->paid_at->timezone('Europe/Istanbul')->format('Y-m-d H:i:sP'),
                 number_format($a->price !== null ? (float) $a->price : $default, 2, '.', ''),
                 'TRY',
                 $email !== '' ? hash('sha256', $email) : '',

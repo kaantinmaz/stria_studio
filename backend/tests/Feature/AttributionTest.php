@@ -108,11 +108,11 @@ class AttributionTest extends TestCase
 
         $csv = $this->get('/api/conversions/google/secret-token.csv')->assertOk()->getContent();
         $lines = array_values(array_filter(explode("\n", $csv)));
-        $this->assertSame('Parameters:TimeZone=Europe/Istanbul', $lines[0]);
-        $this->assertCount(4, $lines);
-        $this->assertStringStartsWith('GCLID-1,"Stria Müşteri (ödeme)"', $lines[2]);
-        $this->assertStringContainsString(',2750.00,TRY,', $lines[2]);
-        $this->assertStringContainsString(',2500.00,TRY,,'.hash('sha256', '+905551112233'), $lines[3]);
+        $this->assertSame('"Google Click ID","Conversion Name","Conversion Time","Conversion Value","Conversion Currency",Email,"Phone Number"', $lines[0]);
+        $this->assertCount(3, $lines);
+        $this->assertStringStartsWith('GCLID-1,"Stria Müşteri (ödeme)"', $lines[1]);
+        $this->assertMatchesRegularExpression('/,"\d{4}-\d\d-\d\d \d\d:\d\d:\d\d\+03:00",2750\.00,TRY,/', $lines[1]);
+        $this->assertStringContainsString(',2500.00,TRY,,'.hash('sha256', '+905551112233'), $lines[2]);
     }
 
     public function test_calendar_new_customer_with_pasted_whatsapp_message_is_linked_before_purchase(): void
