@@ -8,7 +8,7 @@ export function Breadcrumbs({
   return (
     <nav
       aria-label="breadcrumb"
-      className="mx-auto max-w-[1160px] px-[clamp(18px,5vw,56px)] pt-[128px] text-[12px] text-muted"
+      className="mx-auto max-w-[1160px] px-[clamp(18px,5vw,56px)] pt-[84px] text-[12px] text-muted md:pt-[128px]"
     >
       {items.map((it, i) => {
         const last = i === items.length - 1;

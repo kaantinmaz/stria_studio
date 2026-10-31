@@ -95,28 +95,29 @@ export function ServicePage({
     <main>
       {/* header — videolu sayfalarda mobilde sıra: başlık → videolar → metin/CTA;
           masaüstünde videolar sağ sütunda iki satırı kaplar. */}
-      <header className="mx-auto grid max-w-[1160px] grid-cols-1 items-center gap-x-[clamp(28px,4.5vw,64px)] px-[clamp(18px,5vw,56px)] pb-12 pt-8 md:grid-cols-[1.05fr_0.95fr]">
-        <div className="md:col-start-1 md:row-start-1 md:self-end">
-          <div className="mb-4 flex flex-wrap items-center gap-2">
-            <div className="inline-flex items-center gap-2 rounded-[22px] bg-pink px-4 py-2 text-[11px] uppercase tracking-[0.14em] text-accent">
+      <header className="mx-auto grid max-w-[1160px] grid-cols-1 items-center gap-x-[clamp(28px,4.5vw,64px)] px-[clamp(18px,5vw,56px)] pb-12 pt-4 md:grid-cols-[1.05fr_0.95fr] md:pt-8">
+        <div className={`md:col-start-1 md:row-start-1 md:self-end ${hero ? "" : "mb-4 md:mb-5"}`}>
+          <div className="mb-3 flex flex-wrap items-center gap-[6px] md:mb-4 md:gap-2">
+            <div className="inline-flex items-center gap-2 rounded-[22px] bg-pink px-3 py-[6px] text-[10px] uppercase tracking-[0.14em] text-accent md:px-4 md:py-2 md:text-[11px]">
               {svc.tag_tr} · Ankara
             </div>
             {mlScope && (
-              <div className="inline-flex items-center gap-2 rounded-[22px] border border-line bg-white px-4 py-[7px] text-[12px] text-ink">
+              <div className="inline-flex items-center gap-2 rounded-[22px] border border-line bg-white px-3 py-[5px] text-[11px] text-ink md:px-4 md:py-[7px] md:text-[12px]">
                 <ItalyFlag />
-                İtalya üretimi · Avrupa standartlarında My Lamination ürünleri
+                <span className="md:hidden">İtalya üretimi · My Lamination</span>
+                <span className="hidden md:inline">İtalya üretimi · Avrupa standartlarında My Lamination ürünleri</span>
               </div>
             )}
           </div>
-          <h1 className="mb-5 text-[clamp(32px,4.6vw,58px)] leading-[1.05]">
+          <h1 className="text-[clamp(32px,4.6vw,58px)] leading-[1.05]">
             {name} <span className="text-accent">Ankara</span>
           </h1>
           {hero && (
-            <ul className="mb-5 flex flex-wrap gap-2" aria-label={`${name} öne çıkanlar`}>
+            <ul className="mb-5 mt-3 flex flex-wrap gap-[6px] md:mt-4 md:gap-2" aria-label={`${name} öne çıkanlar`}>
               {hero.highlights.map((h) => (
                 <li
                   key={h}
-                  className="inline-flex items-center gap-[7px] rounded-[18px] bg-blush px-[13px] py-[6px] text-[13px] text-ink"
+                  className="inline-flex items-center gap-[6px] rounded-[18px] bg-blush px-[10px] py-[5px] text-[12.5px] text-ink md:gap-[7px] md:px-[13px] md:py-[6px] md:text-[13px]"
                 >
                   <span className="text-[11px] text-accent" aria-hidden>
                     ✓
@@ -128,12 +129,12 @@ export function ServicePage({
           )}
         </div>
         {hero && (
-          <div className="mb-7 min-w-0 md:col-start-2 md:row-span-2 md:row-start-1 md:mb-0 md:self-center">
+          <div className="mb-6 min-w-0 md:col-start-2 md:row-span-2 md:row-start-1 md:mb-0 md:self-center">
             <HeroVideoStrip videos={hero.videos} title={name} animation={hero.animation} />
           </div>
         )}
         <div className="md:col-start-1 md:row-start-2 md:self-start">
-          <div className="mb-5 flex flex-wrap items-center gap-x-5 gap-y-2">
+          <div className="mb-5 flex flex-wrap items-center gap-x-5 gap-y-2 empty:hidden">
             <RatingBadge value={svc.rating_avg} count={svc.rating_count} size={15} />
             <GoogleRatingBadge />
           </div>
