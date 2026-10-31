@@ -125,7 +125,7 @@ export function Nav() {
       </div>
 
       {/* main nav */}
-      <nav className="flex items-center justify-between border-b border-ink/[0.06] bg-cream/[0.88] px-[clamp(18px,5vw,56px)] py-[12px] backdrop-blur-[14px]">
+      <nav className="relative flex items-center justify-between border-b border-ink/[0.06] bg-cream/[0.88] px-[clamp(18px,5vw,56px)] py-[12px] backdrop-blur-[14px]">
         <a href="/" aria-label="Stria Studio" className="flex items-center">
           <Image
             src="/Stria_Studio_Logo.svg"

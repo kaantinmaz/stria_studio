@@ -60,6 +60,10 @@ export type Dict = {
   featuredLabel: string;
   featuredName: string;
   featuredHint: string;
+  navPersonalKicker: string;
+  navPersonalTitle: string;
+  navPersonalSteps: string[];
+  navPersonalCta: string;
   servicesKicker: string;
   servicesTitle: string;
   servicesText: string;
@@ -137,6 +141,14 @@ export const UI: Record<Lang, Dict> = {
     featuredLabel: "Öne çıkan hizmet",
     featuredName: "Kaş Laminasyon",
     featuredHint: "İğnesiz · ~6 hafta etki",
+    navPersonalKicker: "Kişiye özel",
+    navPersonalTitle: "Her yüz farklı, her işlem size özel.",
+    navPersonalSteps: [
+      "Yüz analizi ve altın oran ölçümü",
+      "Size özel şekil ve renk tasarımı",
+      "Onayınızla, kişiye özel uygulama",
+    ],
+    navPersonalCta: "Ücretsiz ön görüşme →",
     servicesKicker: "Hizmetlerimiz",
     servicesTitle: "Sana özel dokunuşlar",
     servicesText:
@@ -223,6 +235,14 @@ export const UI: Record<Lang, Dict> = {
     featuredLabel: "Featured service",
     featuredName: "Brow Lamination",
     featuredHint: "Needle-free · ~6 weeks",
+    navPersonalKicker: "Made for you",
+    navPersonalTitle: "Every face is different — every treatment is yours.",
+    navPersonalSteps: [
+      "Face analysis & golden-ratio mapping",
+      "Shape and shade designed for you",
+      "Applied only after your approval",
+    ],
+    navPersonalCta: "Free consultation →",
     servicesKicker: "Our Services",
     servicesTitle: "Touches made for you",
     servicesText:

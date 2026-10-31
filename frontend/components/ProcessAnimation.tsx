@@ -1,16 +1,22 @@
-import type { CSSProperties } from "react";
-import type { ProcessAnimationData } from "@/lib/serviceHero";
+import type { ComponentType, CSSProperties } from "react";
+import type { KamuflajVariant, ProcessAnimationData } from "@/lib/serviceHero";
 import { KasLaminasyonScene } from "@/components/process-scenes/KasLaminasyon";
 import { KirpikLiftingScene } from "@/components/process-scenes/KirpikLifting";
+import { KamuflajScene } from "@/components/process-scenes/Kamuflaj";
 
 // Hizmet şeridinin ilk kartı: işlemi adım adım anlatan tek SVG sahne.
 // Tüm fazlar tek döngülü zaman çizelgesinde (--dur) eşit dilimlere bölünür;
 // altyazıdaki adımlar aynı süreyi `pa-step` ile paylaşır, böylece metin ve sahne
-// hep senkron kalır. Keyframe'ler globals.css'te (`pa-` / `pa-kl-` / `pa-kp-` blokları).
+// hep senkron kalır. Keyframe'ler globals.css'te (`pa-` / `pa-kl-` / `pa-kp-` / `pa-km-` blokları).
 // Sahneler process-scenes/ altında; geometri sabit tohumlu üreteçle modül yüklenirken
 // bir kez hesaplanır: sunucu ve tarayıcı aynı çıktıyı üretir (hydration uyuşmazlığı yok).
 
-const SCENES = { "kas-laminasyon": KasLaminasyonScene, "kirpik-lifting": KirpikLiftingScene };
+// Kamuflaj sahnesi kusur varyantını alır; diğerleri prop kullanmaz.
+const SCENES: Record<ProcessAnimationData["kind"], ComponentType<{ variant?: KamuflajVariant }>> = {
+  "kas-laminasyon": KasLaminasyonScene,
+  "kirpik-lifting": KirpikLiftingScene,
+  kamuflaj: KamuflajScene,
+};
 
 export function ProcessAnimation({
   animation,
@@ -40,7 +46,7 @@ export function ProcessAnimation({
           ))}
         </span>
       </figcaption>
-      <Scene />
+      <Scene variant={animation.variant} />
     </figure>
   );
 }

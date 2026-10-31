@@ -12,6 +12,8 @@ import { phoneHref, type ServiceFull, type SubService } from "@/lib/content";
 import { RatingBadge } from "@/components/RatingBadge";
 import { ServiceReviews } from "@/components/ServiceReviews";
 import { whatsappHref, serviceWhatsappText } from "@/lib/whatsapp";
+import { ProcessAnimation } from "@/components/ProcessAnimation";
+import { KAMUFLAJ_SUB_VARIANT, kamuflajAnimation } from "@/lib/serviceHero";
 
 // Giriş metni — mobilde kısaltılır, "Devamını oku" ile açılır. Paragraflar
 // SEO için her zaman DOM'da; mobilde yalnızca CSS ile yükseklik kısıtlanır.
@@ -83,12 +85,20 @@ export function SubServicePage({ svc, sub }: { svc: ServiceFull; sub: SubService
             </a>
           </div>
         </div>
-        <div className="relative h-[320px] overflow-hidden rounded-[32px] shadow-[0_40px_90px_-50px_rgba(229,135,146,0.7)] md:h-[min(56vh,460px)]">
-          <HeroCarousel
-            images={svc.hero_images?.length ? svc.hero_images : (svc.image ? [svc.image] : [])}
-            alt={`${sub.name} — Stria Studio Ankara`}
+        {svc.slug === "kamuflaj-makyaj" ? (
+          // Kamuflaj alt sayfaları: fotoğraf yerine alt sayfanın kusurunu çizen adım adım animasyon.
+          <ProcessAnimation
+            animation={kamuflajAnimation(KAMUFLAJ_SUB_VARIANT[sub.slug ?? ""] ?? "iz", sub.name)}
+            className="mx-auto aspect-[10/11] md:max-w-[420px]"
           />
-        </div>
+        ) : (
+          <div className="relative h-[320px] overflow-hidden rounded-[32px] shadow-[0_40px_90px_-50px_rgba(229,135,146,0.7)] md:h-[min(56vh,460px)]">
+            <HeroCarousel
+              images={svc.hero_images?.length ? svc.hero_images : (svc.image ? [svc.image] : [])}
+              alt={`${sub.name} — Stria Studio Ankara`}
+            />
+          </div>
+        )}
       </header>
 
       <section

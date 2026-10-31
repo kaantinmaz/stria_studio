@@ -57,6 +57,15 @@ export function HeroVideoStrip({
     };
   }, [open, close]);
 
+  // Videosuz hizmet (kamuflaj): yalnızca animasyon kartı, eski fotoğraf kutusu yüksekliğinde.
+  if (!videos.length && animation) {
+    return (
+      <div className="min-w-0">
+        <ProcessAnimation animation={animation} className="mx-auto aspect-[10/11] md:max-w-[420px]" />
+      </div>
+    );
+  }
+
   const active = open === null ? null : videos[open];
   // 2 video: yarım; 3: üçte bir; daha fazlası ya da animasyon kartı varsa: şerit kayar,
   // son kart kenardan görünür (kaydırma ipucu).

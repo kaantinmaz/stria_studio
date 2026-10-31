@@ -339,13 +339,87 @@ h3 {
   41%, 100% { opacity: 0; transform: translate(244px, 178px) rotate(-6deg); }
 }
 
+/* Kamuflaj: 1 analiz 0–20 · 2 renk analizi 20–40 · 3 test 40–60 · 4 steril uygulama 60–80 · 5 iyileşme 80–100.
+   Kusur kendi maskesiyle (pa-km-hide) kapanır: kalem yolu boyunca kalın iz (stroke-dashoffset, 60.5–76)
+   kusuru ~%25'e indirir, 5. fazda kalan iz söner. Kalem keyframe'leri varyanta göre yol uzunluğuyla
+   orantılı üretilir (Kamuflaj.tsx'te satır içi <style>, pa-km-pen-<varyant>). Kusur gizliyken (88–100)
+   maske sıfırlanır, kusur döngü başında yumuşakça geri gelir: başa dönüşte sıçrama yok. */
+.pa-km-frame, .pa-km-scan, .pa-km-swatch, .pa-km-ring, .pa-km-mix, .pa-km-blend, .pa-km-test, .pa-km-check, .pa-km-pen, .pa-km-stipple, .pa-km-glow, .pa-km-spark { opacity: 0; }
+.pa-km-defect { animation: pa-km-defect var(--dur) infinite; }
+.pa-km-frame { transform-box: fill-box; transform-origin: center; animation: pa-km-frame var(--dur) infinite; }
+.pa-km-ticks { animation: pa-kl-ticks var(--dur) infinite; }
+.pa-km-scan { animation: pa-km-scan var(--dur) infinite; }
+.pa-km-swatch { transform-box: fill-box; transform-origin: center; animation: pa-km-swatch var(--dur) infinite both; }
+.pa-km-ring { transform-box: fill-box; transform-origin: center; animation: pa-km-ring var(--dur) infinite; }
+.pa-km-mix { animation: pa-km-mix var(--dur) infinite; }
+.pa-km-blend { transform-box: fill-box; transform-origin: center; animation: pa-km-blend var(--dur) infinite; }
+.pa-km-test { transform-box: fill-box; transform-origin: center; animation: pa-km-test var(--dur) infinite; }
+.pa-km-testfill { transform-box: fill-box; transform-origin: center; transform: scale(0); animation: pa-km-testfill var(--dur) infinite; }
+.pa-km-check { transform-box: fill-box; transform-origin: center; animation: pa-km-check var(--dur) infinite; }
+.pa-km-wipe { stroke-dasharray: 1 2; stroke-dashoffset: 1.02; animation: pa-km-wipe var(--dur) infinite; }
+.pa-km-pen { animation-duration: var(--dur); animation-iteration-count: infinite; }
+.pa-km-stipple { animation: pa-km-stipple var(--dur) infinite; }
+.pa-km-glow { animation: pa-km-glow var(--dur) infinite; }
+.pa-km-spark { transform-box: fill-box; transform-origin: center; animation: pa-kl-spark var(--dur) infinite both; }
+
+@keyframes pa-km-defect { 0% { opacity: 0; } 3%, 80% { opacity: 1; } 88%, 100% { opacity: 0; } }
+@keyframes pa-km-frame {
+  0% { opacity: 0; transform: scale(1.12); }
+  4%, 17% { opacity: 1; transform: none; }
+  20%, 100% { opacity: 0; transform: none; }
+}
+/* Tarama çizgisi kutunun üstünden altına (--sh = kutu yüksekliği) iner, geri döner. */
+@keyframes pa-km-scan {
+  0%, 3% { opacity: 0; transform: none; }
+  4% { opacity: .8; transform: none; animation-timing-function: ease-in-out; }
+  10% { transform: translateY(var(--sh)); animation-timing-function: ease-in-out; }
+  16% { opacity: .8; transform: none; }
+  18%, 100% { opacity: 0; transform: none; }
+}
+@keyframes pa-km-swatch {
+  0%, 20% { opacity: 0; transform: translateY(12px) scale(.6); }
+  23%, 38% { opacity: 1; transform: none; }
+  41%, 100% { opacity: 0; transform: none; }
+}
+@keyframes pa-km-ring {
+  0%, 26% { opacity: 0; transform: scale(1.7); }
+  29%, 38% { opacity: 1; transform: none; }
+  41%, 100% { opacity: 0; transform: none; }
+}
+@keyframes pa-km-mix { 0%, 23% { opacity: 0; } 26%, 38% { opacity: 1; } 41%, 100% { opacity: 0; } }
+@keyframes pa-km-blend {
+  0%, 29% { opacity: 0; transform: scale(.3); }
+  35%, 38% { opacity: 1; transform: none; }
+  41%, 100% { opacity: 0; transform: none; }
+}
+@keyframes pa-km-test {
+  0%, 42% { opacity: 0; transform: scale(.3); }
+  46%, 57% { opacity: 1; transform: none; }
+  60%, 100% { opacity: 0; transform: none; }
+}
+@keyframes pa-km-testfill { 0%, 43% { transform: scale(0); } 47%, 92% { transform: none; } 93%, 100% { transform: scale(0); } }
+@keyframes pa-km-check {
+  0%, 49% { opacity: 0; transform: scale(.4); }
+  52%, 57% { opacity: 1; transform: none; }
+  60%, 100% { opacity: 0; transform: none; }
+}
+/* 1.02: başlangıçta yuvarlak uç bile görünmesin. */
+@keyframes pa-km-wipe {
+  0%, 60.5% { stroke-dashoffset: 1.02; animation-timing-function: linear; }
+  76%, 92% { stroke-dashoffset: 0; }
+  93%, 100% { stroke-dashoffset: 1.02; }
+}
+@keyframes pa-km-stipple { 0%, 60% { opacity: 0; } 61%, 80% { opacity: .7; } 88%, 100% { opacity: 0; } }
+@keyframes pa-km-glow { 0%, 81% { opacity: 0; } 87%, 93% { opacity: .55; } 98%, 100% { opacity: 0; } }
+
 /* Hareket azaltılmışsa: son adım metni + işlem sonrası son hal, hareketsiz. */
 @media (prefers-reduced-motion: reduce) {
-  .pa-steps > span, .pa-kl *, .pa-kp * { animation: none !important; }
+  .pa-steps > span, .pa-kl *, .pa-kp *, .pa-km * { animation: none !important; }
   .pa-steps > span:last-child { opacity: 1; }
   .pa-kl-hair { transform: rotate(var(--r1)); }
   .pa-kl-hairs { stroke: #4a2a20; }
-  .pa-kl-spark, .pa-kp-spark { opacity: 1; transform: none; }
+  .pa-kl-spark, .pa-kp-spark, .pa-km-spark { opacity: 1; transform: none; }
+  .pa-km-defect { opacity: 0; }
   .pa-kp-lash { transform: rotate(var(--r1)); }
   .pa-kp-lashes { stroke: #1f120d; }
 }
