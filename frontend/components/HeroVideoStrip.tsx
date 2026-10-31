@@ -58,17 +58,17 @@ export function HeroVideoStrip({
   }, [open, close]);
 
   const active = open === null ? null : videos[open];
-  // 2 video: yarım; 3: üçte bir; daha fazlası: son video kenardan görünür (kaydırma ipucu).
-  const itemWidth =
-    videos.length <= 2
+  // 2 video: yarım; 3: üçte bir; daha fazlası ya da animasyon kartı varsa: şerit kayar,
+  // son kart kenardan görünür (kaydırma ipucu).
+  const scrolls = Boolean(animation) || videos.length > 3;
+  const itemWidth = scrolls
+    ? "w-[44%] md:w-[30%]"
+    : videos.length <= 2
       ? "w-[calc((100%-12px)/2)]"
-      : videos.length === 3
-        ? "w-[44%] md:w-[calc((100%-24px)/3)]"
-        : "w-[44%] md:w-[30%]";
+      : "w-[44%] md:w-[calc((100%-24px)/3)]";
   // Animasyon kartı videolarla aynı yükseklikte ama daha geniş: genişlik × 16/9 × 9/10
-  // (44% → 70.4%, 30% → 48%). 2–3 videoda video genişliğinde 9/16 karta düşer.
-  const animClass =
-    videos.length > 3 ? "w-[70.4%] md:w-[48%] aspect-[9/10]" : `${itemWidth} aspect-[9/16]`;
+  // (44% → 70.4%, 30% → 48%).
+  const animClass = "w-[70.4%] md:w-[48%] aspect-[9/10]";
 
   return (
     <div className="min-w-0">
@@ -115,7 +115,7 @@ export function HeroVideoStrip({
       </div>
       <p className="mt-2 text-[12.5px] text-muted">
         Stüdyomuzdan gerçek uygulama çekimleri · büyütmek için videoya dokunun
-        {videos.length > 3 ? " · yana kaydırın" : ""}
+        {scrolls ? " · yana kaydırın" : ""}
       </p>
 
       {active && (

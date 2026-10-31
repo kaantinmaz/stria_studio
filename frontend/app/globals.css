@@ -259,11 +259,167 @@ h3 {
   97%, 100% { opacity: 0; transform: scale(0); }
 }
 
-/* Hareket azaltılmışsa: son adım metni + laminasyonlu son hal, hareketsiz. */
+/* Kirpik lifting: 1 analiz 0–20 · 2 temizlik/ped/sarma 20–40 · 3 Lifting 40–60 · 4 Neutralising 60–80 · 5 bakım 80–100.
+   Kirpikler kökleri etrafında döner (--r0 → --r1); scaleY(-1 → 1) öne doğru devrilmeyi verir,
+   böylece kirpik yana savrulmadan aşağıdan yukarı kalkar. animation-delay (≤0.9 s) çubukla
+   birlikte içten dışa sıralı sarma. Kaştaki ile aynı olan fazlar pa-kl- keyframe'lerini kullanır;
+   krem bantları ve aplikatör kendi pa-kp- keyframe'leriyle. */
+.pa-kp-lash {
+  transform-box: view-box;
+  transform: rotate(var(--r0)) scaleY(-1);
+  animation: pa-kp-lash var(--dur) infinite both;
+}
+.pa-kp-lashes { stroke: #4a2a20; animation: pa-kp-tone var(--dur) infinite; }
+.pa-kp-guide, .pa-kp-ruler, .pa-kp-shield, .pa-kp-pad, .pa-kp-foam, .pa-kp-lift, .pa-kp-neutral, .pa-kp-shine, .pa-kp-stick, .pa-kp-applicator, .pa-kp-spark { opacity: 0; }
+.pa-kp-guide { animation: pa-kl-plan var(--dur) infinite; }
+.pa-kp-draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: pa-kl-draw var(--dur) infinite; }
+.pa-kp-ruler { animation: pa-kl-ticks var(--dur) infinite; }
+.pa-kp-shield { transform-box: fill-box; transform-origin: center bottom; animation: pa-kp-shield var(--dur) infinite; }
+.pa-kp-pad { animation: pa-kp-pad var(--dur) infinite; }
+.pa-kp-foam { transform-box: fill-box; transform-origin: center; animation: pa-kp-foam var(--dur) infinite both; }
+.pa-kp-lift { animation: pa-kp-lift var(--dur) infinite; }
+.pa-kp-neutral { animation: pa-kp-neutral var(--dur) infinite; }
+.pa-kp-lift path, .pa-kp-neutral path { stroke-dasharray: 1 2; stroke-dashoffset: 1; }
+.pa-kp-lift path { animation: pa-kp-wipe-lift var(--dur) infinite; }
+.pa-kp-neutral path { animation: pa-kp-wipe-neutral var(--dur) infinite; }
+.pa-kp-applicator { transform: translate(62px, 186px) rotate(-24deg); animation: pa-kp-applicator var(--dur) infinite; }
+.pa-kp-shine { animation: pa-kl-shine var(--dur) infinite; }
+.pa-kp-stick { transform: translate(56px, 190px) rotate(-24deg); animation: pa-kp-stick var(--dur) infinite; }
+.pa-kp-spark { transform-box: fill-box; transform-origin: center; animation: pa-kl-spark var(--dur) infinite both; }
+
+@keyframes pa-kp-lash {
+  0%, 30% { transform: rotate(var(--r0)) scaleY(-1); animation-timing-function: cubic-bezier(.45, 0, .25, 1); }
+  35%, 97% { transform: rotate(var(--r1)) scaleY(1); }
+  100% { transform: rotate(var(--r0)) scaleY(-1); }
+}
+@keyframes pa-kp-tone {
+  0%, 80% { stroke: #4a2a20; }
+  86%, 97% { stroke: #1f120d; }
+  100% { stroke: #4a2a20; }
+}
+/* Krem bantları: soldan sağa sürülür (40–46 / 60–66), bekler, faz sonunda söner (57–60 / 77–80). */
+@keyframes pa-kp-lift { 0%, 40% { opacity: 0; } 40.5%, 57% { opacity: .75; } 60%, 100% { opacity: 0; } }
+@keyframes pa-kp-neutral { 0%, 60% { opacity: 0; } 60.5%, 77% { opacity: .75; } 80%, 100% { opacity: 0; } }
+@keyframes pa-kp-wipe-lift { 0%, 40% { stroke-dashoffset: 1; animation-timing-function: linear; } 46%, 100% { stroke-dashoffset: 0; } }
+@keyframes pa-kp-wipe-neutral { 0%, 60% { stroke-dashoffset: 1; animation-timing-function: linear; } 66%, 100% { stroke-dashoffset: 0; } }
+/* Aplikatör ucu krem bandı üzerinde: (62,186) → (106,194) → (150,196) → (194,191) → (238,180). */
+@keyframes pa-kp-applicator {
+  0%, 40%, 60% { opacity: 0; transform: translate(62px, 186px) rotate(-24deg); animation-timing-function: linear; }
+  40.5%, 60.5% { opacity: 1; transform: translate(62px, 186px) rotate(-24deg); animation-timing-function: linear; }
+  42%, 62% { transform: translate(106px, 194px) rotate(-20deg); animation-timing-function: linear; }
+  43.5%, 63.5% { transform: translate(150px, 196px) rotate(-16deg); animation-timing-function: linear; }
+  45%, 65% { transform: translate(194px, 191px) rotate(-12deg); animation-timing-function: linear; }
+  46%, 66% { opacity: 1; transform: translate(238px, 180px) rotate(-8deg); }
+  48%, 59.9%, 68%, 100% { opacity: 0; transform: translate(244px, 172px) rotate(-8deg); }
+}
+@keyframes pa-kp-shield {
+  0%, 8% { opacity: 0; transform: translateY(-6px) scale(.96); }
+  14%, 81% { opacity: 1; transform: none; }
+  87%, 100% { opacity: 0; transform: translateY(-6px) scale(.96); }
+}
+@keyframes pa-kp-pad {
+  0%, 23% { opacity: 0; transform: translateY(22px); }
+  28%, 81% { opacity: 1; transform: none; }
+  87%, 100% { opacity: 0; transform: translateY(14px); }
+}
+@keyframes pa-kp-foam {
+  0%, 20% { opacity: 0; transform: scale(.2); }
+  22.5% { opacity: .95; transform: scale(1); }
+  25% { transform: translate(.8px, -1px) scale(1.04); }
+  27% { opacity: .9; transform: translateY(-2px) scale(1); }
+  29.5%, 100% { opacity: 0; transform: translateY(-4px) scale(.8); }
+}
+/* Çubuk ucu kirpik dibinin biraz üstünde: iç köşe (56,190) → orta (150,206) → dış köşe (244,184);
+   kirpiklerin devrilme ortasıyla (32.5% + u·6%) eşzamanlı. */
+@keyframes pa-kp-stick {
+  0%, 30% { opacity: 0; transform: translate(56px, 190px) rotate(-24deg); }
+  32.5% { opacity: 1; transform: translate(56px, 190px) rotate(-24deg); }
+  35.5% { transform: translate(150px, 206px) rotate(-14deg); }
+  38.5% { opacity: 1; transform: translate(244px, 184px) rotate(-6deg); }
+  41%, 100% { opacity: 0; transform: translate(244px, 178px) rotate(-6deg); }
+}
+
+/* Hareket azaltılmışsa: son adım metni + işlem sonrası son hal, hareketsiz. */
 @media (prefers-reduced-motion: reduce) {
-  .pa-steps > span, .pa-kl * { animation: none !important; }
+  .pa-steps > span, .pa-kl *, .pa-kp * { animation: none !important; }
   .pa-steps > span:last-child { opacity: 1; }
   .pa-kl-hair { transform: rotate(var(--r1)); }
   .pa-kl-hairs { stroke: #4a2a20; }
-  .pa-kl-spark { opacity: 1; transform: none; }
+  .pa-kl-spark, .pa-kp-spark { opacity: 1; transform: none; }
+  .pa-kp-lash { transform: rotate(var(--r1)); }
+  .pa-kp-lashes { stroke: #1f120d; }
+}
+
+/* Nav "Hizmetler" mega-menü: panel girişi + "kişiye özel" kart animasyonu.
+   Tek döngü 9s; temel (animasyonsuz) durum = son çizilmiş hal, böylece
+   reduced-motion'da yalnızca animasyonu kapatmak yetiyor. */
+.nm-panel { animation: nm-panel 220ms ease-out both; }
+@keyframes nm-panel {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: none; }
+}
+.nm-col { animation: nm-col 320ms ease-out both; }
+@keyframes nm-col {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+.nm-loop { animation: nm-loop 9s ease-in-out infinite; }
+@keyframes nm-loop {
+  0%, 85% { opacity: 1; }
+  92%, 100% { opacity: 0; }
+}
+.nm-guide {
+  stroke-dasharray: 1;
+  animation: nm-guide 9s ease-out infinite;
+}
+@keyframes nm-guide {
+  0%, 3% { stroke-dashoffset: 1; }
+  18%, 100% { stroke-dashoffset: 0; }
+}
+.nm-dot {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: nm-dot 9s ease-out var(--d, 0s) infinite backwards;
+}
+@keyframes nm-dot {
+  0%, 19% { transform: scale(0); }
+  22% { transform: scale(1.4); }
+  24%, 100% { transform: scale(1); }
+}
+.nm-brow {
+  stroke-dasharray: 1;
+  fill-opacity: 0.35;
+  animation: nm-brow 9s ease-in-out infinite;
+}
+@keyframes nm-brow {
+  0%, 28% { stroke-dashoffset: 1; fill-opacity: 0; }
+  50% { stroke-dashoffset: 0; fill-opacity: 0; }
+  60%, 100% { stroke-dashoffset: 0; fill-opacity: 0.35; }
+}
+.nm-steps > span {
+  grid-area: 1 / 1;
+  opacity: 0;
+  animation: nm-step 9s calc(var(--i) * 3s) infinite backwards;
+}
+@keyframes nm-step {
+  0% { opacity: 0; transform: translateY(4px); }
+  3%, 30% { opacity: 1; transform: none; }
+  33%, 100% { opacity: 0; }
+}
+.nm-bar {
+  transform-origin: left;
+  animation: nm-bar 3s linear infinite;
+}
+@keyframes nm-bar {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* Hareket azaltılmışsa: son çizilmiş hal + ilk adım metni, hareketsiz. */
+@media (prefers-reduced-motion: reduce) {
+  .nm-panel, .nm-col, .nm-loop, .nm-guide, .nm-dot, .nm-brow, .nm-steps > span, .nm-bar {
+    animation: none !important;
+  }
+  .nm-steps > span:first-child { opacity: 1; }
 }

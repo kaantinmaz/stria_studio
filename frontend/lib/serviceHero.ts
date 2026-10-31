@@ -9,7 +9,7 @@ export type HeroVideo = { src: string; poster: string; label: string };
 // Şeridin ilk kartı: adım adım SVG anlatım (bkz. ProcessAnimation.tsx).
 // `steps` sırası sahnedeki eşit süreli fazlarla birebir eşleşir.
 export type ProcessAnimationData = {
-  kind: "kas-laminasyon";
+  kind: "kas-laminasyon" | "kirpik-lifting";
   kicker: string;
   label: string;
   seconds: number;
@@ -58,5 +58,20 @@ export const SERVICE_HERO: Record<string, ServiceHero> = {
       v("kirpik-2", "Kirpik lifting uygulaması"),
     ],
     highlights: ["Takma kirpik yok", "45–60 dakika", "6–8 hafta"],
+    // Süreçle birebir: analiz + silikon kalıp → temizlik, göz altı koruması, sarma →
+    // Lifting / Neutralising Cream → Lashbrow vitamin bakımı ve Hydrating Serum.
+    animation: {
+      kind: "kirpik-lifting",
+      kicker: "Nasıl uygulanır?",
+      label: "Kirpik lifting adım adım animasyon",
+      seconds: 15,
+      steps: [
+        "Kirpik analizi ve silikon kalıp seçimi",
+        "Temizlik, göz altı koruması, kalıba sarma",
+        "Lifting Cream kirpikleri kalıp üzerinde kıvırır",
+        "Neutralising Cream kıvrımı sabitler",
+        "Vitamin bakımı ve serum: kökten kıvrık kirpikler",
+      ],
+    },
   },
 };
