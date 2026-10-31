@@ -171,3 +171,99 @@ h3 {
     transform: scaleX(1);
   }
 }
+
+/* ---- Process animation (ProcessAnimation.tsx) ----
+   Tek döngü: --dur (kart inline'da), --n adım; adım i, i·dur/n anında görünür.
+   Sahne fazları aynı süreyi eşit dilimlere böler (5 adım → %20'lik fazlar). */
+.pa-card {
+  /* Cilt tüm kartta: altyazı ile sahne arasında dikiş yok; kaş üstünde kenarsız hafif ışık. */
+  background:
+    radial-gradient(60% 32% at 50% 55%, rgb(255 255 255 / 0.22), rgb(255 255 255 / 0)),
+    linear-gradient(180deg, #f9e4d6 0%, #f6d8c6 45%, #eebfa5 100%);
+}
+.pa-steps > span {
+  grid-area: 1 / 1;
+  opacity: 0;
+  animation: pa-step var(--dur) calc(var(--i) * var(--dur) / var(--n)) infinite backwards;
+}
+@keyframes pa-step {
+  0% { opacity: 0; transform: translateY(6px); }
+  2%, 18% { opacity: 1; transform: none; }
+  20%, 100% { opacity: 0; }
+}
+
+/* Kaş laminasyonu: 1 analiz 0–20 · 2 köpük 20–40 · 3 Lifting 40–60 · 4 Neutralising 60–80 · 5 bakım 80–100.
+   Kıllar kökleri etrafında döner (--r0 dağınık → --r1 laminasyon); küçük animation-delay
+   (≤1.6 s) fırçayla birlikte baştan kuyruğa sıralı tarama verir, döngü periyodu değişmez. */
+.pa-kl-hair {
+  transform-box: view-box;
+  transform: rotate(var(--r0));
+  animation: pa-kl-hair var(--dur) infinite both;
+}
+.pa-kl-hairs { stroke: #8a5a44; animation: pa-kl-tone var(--dur) infinite; }
+.pa-kl-plan, .pa-kl-ticks, .pa-kl-foam, .pa-kl-lift, .pa-kl-neutral, .pa-kl-shine, .pa-kl-brush, .pa-kl-spark { opacity: 0; }
+.pa-kl-plan { animation: pa-kl-plan var(--dur) infinite; }
+.pa-kl-draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: pa-kl-draw var(--dur) infinite; }
+.pa-kl-ticks { animation: pa-kl-ticks var(--dur) infinite; }
+.pa-kl-foam { transform-box: fill-box; transform-origin: center; animation: pa-kl-foam var(--dur) infinite both; }
+.pa-kl-lift { animation: pa-kl-lift var(--dur) infinite; }
+.pa-kl-neutral { animation: pa-kl-neutral var(--dur) infinite; }
+.pa-kl-shine { animation: pa-kl-shine var(--dur) infinite; }
+.pa-kl-brush { transform: translate(48px, 156px) rotate(-30deg); animation: pa-kl-brush var(--dur) infinite; }
+.pa-kl-spark { transform-box: fill-box; transform-origin: center; animation: pa-kl-spark var(--dur) infinite both; }
+
+@keyframes pa-kl-hair {
+  0%, 43% { transform: rotate(var(--r0)); animation-timing-function: cubic-bezier(.45, 0, .25, 1); }
+  49%, 97% { transform: rotate(var(--r1)); }
+  100% { transform: rotate(var(--r0)); }
+}
+@keyframes pa-kl-tone {
+  0%, 80% { stroke: #8a5a44; }
+  86%, 97% { stroke: #4a2a20; }
+  100% { stroke: #8a5a44; }
+}
+@keyframes pa-kl-plan { 0% { opacity: 0; } 1%, 17% { opacity: 1; } 20%, 100% { opacity: 0; } }
+@keyframes pa-kl-draw { 0% { stroke-dashoffset: 1; } 13%, 100% { stroke-dashoffset: 0; } }
+@keyframes pa-kl-ticks { 0%, 3% { opacity: 0; } 7%, 100% { opacity: .75; } }
+@keyframes pa-kl-foam {
+  0%, 20% { opacity: 0; transform: scale(.2); }
+  24% { opacity: .95; transform: scale(1); }
+  27% { transform: translate(.8px, -1px) scale(1.04); }
+  30% { transform: translate(-.8px, 0) scale(.97); }
+  33% { transform: translate(.6px, -2px) scale(1.05); }
+  36% { opacity: .9; transform: translateY(-3px) scale(1); }
+  39%, 100% { opacity: 0; transform: translateY(-5px) scale(.8); }
+}
+@keyframes pa-kl-lift { 0%, 41% { opacity: 0; } 45%, 58% { opacity: .42; } 62%, 100% { opacity: 0; } }
+@keyframes pa-kl-neutral { 0%, 59% { opacity: 0; } 63%, 78% { opacity: .4; } 82%, 100% { opacity: 0; } }
+@keyframes pa-kl-shine {
+  0%, 64% { opacity: 0; transform: translateX(0); }
+  66% { opacity: .55; transform: translateX(30px); }
+  76% { opacity: .55; transform: translateX(290px); }
+  78%, 100% { opacity: 0; transform: translateX(320px); }
+}
+/* Fırça başlığı kaş merkez çizgisi üzerinde: baş (42,152) → kemer (193,118) → kuyruk (264,140). */
+@keyframes pa-kl-brush {
+  0%, 40% { opacity: 0; transform: translate(48px, 156px) rotate(-30deg); }
+  43% { opacity: 1; transform: translate(48px, 156px) rotate(-30deg); }
+  47% { transform: translate(108px, 136px) rotate(-34deg); }
+  52% { transform: translate(192px, 122px) rotate(-40deg); }
+  55% { opacity: 1; transform: translate(262px, 142px) rotate(-46deg); }
+  58%, 100% { opacity: 0; transform: translate(262px, 142px) rotate(-46deg); }
+}
+@keyframes pa-kl-spark {
+  0%, 81% { opacity: 0; transform: scale(0); }
+  85% { opacity: 1; transform: scale(1); }
+  89% { opacity: 1; transform: scale(.5); }
+  93% { opacity: 1; transform: scale(1.1); }
+  97%, 100% { opacity: 0; transform: scale(0); }
+}
+
+/* Hareket azaltılmışsa: son adım metni + laminasyonlu son hal, hareketsiz. */
+@media (prefers-reduced-motion: reduce) {
+  .pa-steps > span, .pa-kl * { animation: none !important; }
+  .pa-steps > span:last-child { opacity: 1; }
+  .pa-kl-hair { transform: rotate(var(--r1)); }
+  .pa-kl-hairs { stroke: #4a2a20; }
+  .pa-kl-spark { opacity: 1; transform: none; }
+}

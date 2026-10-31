@@ -6,9 +6,20 @@
 
 export type HeroVideo = { src: string; poster: string; label: string };
 
+// Şeridin ilk kartı: adım adım SVG anlatım (bkz. ProcessAnimation.tsx).
+// `steps` sırası sahnedeki eşit süreli fazlarla birebir eşleşir.
+export type ProcessAnimationData = {
+  kind: "kas-laminasyon";
+  kicker: string;
+  label: string;
+  seconds: number;
+  steps: string[];
+};
+
 export type ServiceHero = {
   videos: HeroVideo[];
   highlights: string[];
+  animation?: ProcessAnimationData;
 };
 
 const v = (name: string, label: string): HeroVideo => ({
@@ -26,6 +37,20 @@ export const SERVICE_HERO: Record<string, ServiceHero> = {
       v("kas-4", "Kaş laminasyonu adım adım"),
     ],
     highlights: ["İğnesiz, pigmentsiz", "45–60 dakika", "Ortalama 6 hafta"],
+    // process_tr ile birebir: analiz → Cleansing Foam → Lifting / Neutralising Cream → vitamin bakımı.
+    animation: {
+      kind: "kas-laminasyon",
+      kicker: "Nasıl uygulanır?",
+      label: "Kaş laminasyonu adım adım animasyon",
+      seconds: 15,
+      steps: [
+        "Kaş analizi ve şekil planı",
+        "Cleansing Foam ile temizlik",
+        "Lifting Cream kılları yumuşatır, yukarı taranır",
+        "Neutralising Cream şekli sabitler",
+        "Vitamin bakımı: düzenli, dolgun kaşlar",
+      ],
+    },
   },
   "kirpik-lifting": {
     videos: [

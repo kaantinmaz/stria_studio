@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { preload } from "react-dom";
-import type { HeroVideo } from "@/lib/serviceHero";
+import type { HeroVideo, ProcessAnimationData } from "@/lib/serviceHero";
+import { ProcessAnimation } from "@/components/ProcessAnimation";
 
 // Cards visible on first paint (mobile shows two and a half). Their posters are the
 // page's LCP, so they are preloaded with high priority. Video files are attached on the
@@ -15,7 +16,15 @@ const START_EVENTS = ["scroll", "pointerdown", "pointermove", "touchstart", "key
 // Hizmet sayfası üst bölümü: dikey çekimler yan yana, sessiz ve döngüde oynar.
 // Tıklanan video ekranın ortasında hafif bir büyüme animasyonuyla açılır
 // (Esc, arka plan veya kapat düğmesiyle kapanır; açıkken sayfa kaymaz).
-export function HeroVideoStrip({ videos, title }: { videos: HeroVideo[]; title: string }) {
+export function HeroVideoStrip({
+  videos,
+  title,
+  animation,
+}: {
+  videos: HeroVideo[];
+  title: string;
+  animation?: ProcessAnimationData;
+}) {
   const [open, setOpen] = useState<number | null>(null);
   const [loaded, setLoaded] = useState(false);
   videos.slice(0, ABOVE_FOLD).forEach((video) => preload(video.poster, { as: "image", fetchPriority: "high" }));
@@ -56,6 +65,10 @@ export function HeroVideoStrip({ videos, title }: { videos: HeroVideo[]; title: 
       : videos.length === 3
         ? "w-[44%] md:w-[calc((100%-24px)/3)]"
         : "w-[44%] md:w-[30%]";
+  // Animasyon kartı videolarla aynı yükseklikte ama daha geniş: genişlik × 16/9 × 9/10
+  // (44% → 70.4%, 30% → 48%). 2–3 videoda video genişliğinde 9/16 karta düşer.
+  const animClass =
+    videos.length > 3 ? "w-[70.4%] md:w-[48%] aspect-[9/10]" : `${itemWidth} aspect-[9/16]`;
 
   return (
     <div className="min-w-0">
@@ -64,6 +77,11 @@ export function HeroVideoStrip({ videos, title }: { videos: HeroVideo[]; title: 
         role="list"
         aria-label={`${title} videoları`}
       >
+        {animation && (
+          <div role="listitem" className={`flex-none snap-start ${animClass}`}>
+            <ProcessAnimation animation={animation} className="h-full" />
+          </div>
+        )}
         {videos.map((video, i) => (
           <div key={video.src} role="listitem" className={`flex-none snap-start ${itemWidth}`}>
             <button

@@ -129,7 +129,7 @@ export function ServicePage({
         </div>
         {hero && (
           <div className="mb-7 min-w-0 md:col-start-2 md:row-span-2 md:row-start-1 md:mb-0 md:self-center">
-            <HeroVideoStrip videos={hero.videos} title={name} />
+            <HeroVideoStrip videos={hero.videos} title={name} animation={hero.animation} />
           </div>
         )}
         <div className="md:col-start-1 md:row-start-2 md:self-start">
