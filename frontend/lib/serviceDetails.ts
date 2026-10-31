@@ -136,9 +136,9 @@ export const SERVICE_DETAILS: Record<string, ServiceDetails> = {
       { label: "Uygulama türü", value: "Kamuflaj (kalıcı makyaj) uygulaması; medikal işlem değildir, tedavi yerine geçmez" },
       { label: "Amaç", value: "İzi yok etmek değil, çevre ciltle ton farkını belirgin şekilde azaltmak" },
       { label: "Seans süresi", value: "Bölgenin büyüklüğüne göre 1–3 saat" },
-      { label: "Seans sayısı", value: "Genellikle birden fazla; ilk seanstan sonra rötuş planlanır" },
+      { label: "Seans sayısı", value: "En az 3 seans; seanslar genellikle 4–6 hafta arayla planlanır" },
       { label: "Rengin oturması", value: "4–6 hafta" },
-      { label: "Kalıcılık", value: "Uzun süreli (yarı kalıcı); renk zamanla açılabilir, rötuşla korunur" },
+      { label: "Kalıcılık", value: "Uzun süreli (yarı kalıcı); doğru bakım ile uzun süreli kalıcılık sağlanması hedeflenir" },
       { label: "Pigment", value: "Cilt tonunuza göre hazırlanan karışım; önce küçük bir alanda test edilir" },
       { label: "Ön görüşme", value: "Ücretsiz ve gizli" },
     ],
@@ -161,14 +161,20 @@ export const SERVICE_DETAILS: Record<string, ServiceDetails> = {
       rows: [
         {
           label: "Nasıl yapılır?",
-          values: ["Pigment cildin üst katmanına işlenir", "Kapatıcı ürün her gün cilde sürülür"],
+          values: ["Kişiye özel hazırlanan pigmentler, cilt altına işlenir", "Kapatıcı ürün her gün cilde sürülür"],
         },
-        { label: "Kalıcılık", values: ["Uzun süreli, rötuşla korunur", "Gün sonunda temizlenir"] },
+        {
+          label: "Kalıcılık",
+          values: ["Doğru bakım ile uzun süreli kalıcılık sağlanması hedeflenir", "Gün sonunda temizlenir"],
+        },
         { label: "Su ve tere dayanım", values: ["Dayanıklı", "Su, ter ve sürtünmeyle akabilir"] },
         { label: "Günlük uğraş", values: ["Yok", "Her gün yeniden uygulanır"] },
         {
           label: "Kimler için?",
-          values: ["Uzun süreli bir ton dengesi isteyenler", "Geçici ya da ara sıra kapatmak isteyenler"],
+          values: [
+            "Çatlak, yara, ameliyat ve kesik izleri, koyu lekeler ve bölgesel kararmalarda uzun süreli cilt tonu eşitliği isteyenler",
+            "Geçici ya da ara sıra kapatmak isteyenler",
+          ],
         },
       ],
     },

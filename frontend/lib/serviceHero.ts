@@ -99,7 +99,7 @@ export const SERVICE_HERO: Record<string, ServiceHero> = {
     },
   },
   // Video yok: şeritte yalnızca animasyon kartı. Öne çıkanlar process_tr (DB) ile birebir:
-  // Konsültasyon → Renk analizi + test → Steril uygulama 1–3 saat → İyileşme ve rötuş, renk 4–6 haftada oturur.
+  // Ön görüşme → Renk analizi + test → Steril uygulama 1–3 saat → İyileşme ve seans süreci (renk 4–6 haftada oturur, en az 3 seans).
   "kamuflaj-makyaj": {
     videos: [],
     highlights: ["Size özel pigment karışımı", "1–3 saat", "Renk 4–6 haftada oturur"],
@@ -155,10 +155,10 @@ export function kamuflajAnimation(variant: KamuflajVariant, name: string): Proce
     seconds: 15,
     steps: [
       KAMUFLAJ_ANALYSIS[variant],
-      "Ten ve alt ton ölçülür, size özel pigment karışımı hazırlanır",
+      "Cilt tonu ve alt tonu analiz edilerek kişiye özel pigment hazırlanır",
       "Küçük bir alanda test uygulaması",
       "Steril, tek kullanımlık ekipmanla uygulama",
-      "Renk 4–6 haftada oturur, kontrolde rötuş",
+      "Pigment 4–6 haftada oturur, en az 3 seans uygulanarak renk eşitliği hedeflenir",
     ],
   };
 }
