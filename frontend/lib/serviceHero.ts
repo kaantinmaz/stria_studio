@@ -80,6 +80,7 @@ export const SERVICE_HERO: Record<string, ServiceHero> = {
     videos: [
       v("kirpik-1", "Kirpik lifting sonrası kıvrık kirpikler"),
       v("kirpik-2", "Kirpik lifting uygulaması"),
+      v("kirpik-3", "Kirpik lifting öncesi ve sonrası"),
     ],
     highlights: ["Takma kirpik yok", "45–60 dakika", "6–8 hafta"],
     // Süreçle birebir: analiz + silikon kalıp → temizlik, göz altı koruması, sarma →
