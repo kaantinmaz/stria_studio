@@ -20,7 +20,9 @@ export const site = {
   // Microsoft Clarity (ısı haritası + oturum kaydı) — proje "Stria Studio Web".
   // Aynı gerekçe: kamusal değer. Boş string verilirse Clarity tamamen kapalı.
   clarityId: process.env.NEXT_PUBLIC_CLARITY_ID ?? "yv3acyzmqz",
-  gbpUrl: "", // owner: paste the Google Business Profile URL when live
+  // Google İşletme Profili (kamislinilsu@gmail.com, 2026-11 doğrulandı).
+  // CID bağlantısı kalıcıdır; Place ID: ChIJZ5-TMTBP0xQRCjK8otGUWTs.
+  gbpUrl: "https://www.google.com/maps?cid=4276612949264314890",
   // Facebook sayfası (2026-10-07'de "Çatlak Kamuflaj Makyaj" → "Stria Studio").
   facebookUrl: "https://www.facebook.com/striastudioankara",
   nap: {
