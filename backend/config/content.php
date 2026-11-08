@@ -72,6 +72,10 @@ return [
         'meta_desc_max' => 170,
         'excerpt_max' => 200,
         'min_h2' => 4,
+        // Artık verilmeyen hizmetler (eyeliner + dipliner 2026-10-08'de
+        // kaldırıldı). Normalize edilmiş sorgu bunlardan birini içeriyorsa
+        // otomatik üretim o sorguyu seçmez; yazım hataları da dahil.
+        'excluded_terms' => ['eyeliner', 'eyelayner', 'aylayn', 'aylanir', 'dipliner'],
     ],
 
     /*

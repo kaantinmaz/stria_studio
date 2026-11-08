@@ -22,7 +22,7 @@ final class PostWriter
      *   site, slug, title_tr, title_en, excerpt_tr, excerpt_en, body_tr, body_en,
      *   meta_title_tr, meta_title_en, meta_desc_tr, meta_desc_en,
      *   category, category_name_tr, category_name_en, tags,
-     *   is_published, published_at, cover_path
+     *   is_published, published_at, cover_path, source_query
      */
     public function upsert(array $attributes): Post
     {
@@ -69,6 +69,11 @@ final class PostWriter
             ['site' => $site, 'slug' => $attributes['slug']],
             $values
         );
+
+        // Tazelemede ilk üretim sorgusu korunur; yalnız boşsa yazılır.
+        if (($attributes['source_query'] ?? null) !== null && $post->source_query === null) {
+            $post->forceFill(['source_query' => $attributes['source_query']])->save();
+        }
 
         $tagIds = collect($attributes['tags'] ?? [])->map(function (string $name) {
             return Tag::firstOrCreate(

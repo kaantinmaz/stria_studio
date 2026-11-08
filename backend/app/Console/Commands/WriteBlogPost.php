@@ -103,6 +103,22 @@ class WriteBlogPost extends Command
         // başlığında taşıyan yayınlanmış bir yazı varsa yeni sayfa açmak yerine
         // onu tazelemek gerekir. --slug ile hedef verildiyse zaten tazeliyoruz.
         $forcedSlug = $this->option('slug') ?: null;
+        if (! $this->option('force') && $coverage->isExcluded($query)) {
+            $this->error('Bu sorgu artık verilmeyen bir hizmetle ilgili (content.post.excluded_terms). Yine de yazmak için: --force');
+
+            return self::FAILURE;
+        }
+
+        if ($forcedSlug === null && ! $this->option('force')) {
+            $written = $coverage->alreadyWritten($query);
+            if ($written !== null) {
+                $this->error("Bu sorgu için zaten yazı üretildi: /blog/{$written->slug}");
+                $this->line('Tazelemek için: php artisan content:write "'.$query.'" --slug='.$written->slug);
+
+                return self::FAILURE;
+            }
+        }
+
         if ($forcedSlug === null && ! $this->option('force')) {
             $rivals = $coverage->sameIntentPosts($query);
             if ($rivals !== []) {
@@ -210,6 +226,7 @@ class WriteBlogPost extends Command
             'tags' => $post['tags'] ?? [],
             'is_published' => $published,
             'published_at' => $existing?->published_at ?? now(),
+            'source_query' => QueryCoverage::normalize($query),
         ]);
 
         if ($existing !== null) {
@@ -266,7 +283,9 @@ class WriteBlogPost extends Command
                 continue;
             }
 
-            if ($coverage->sameIntentPosts($row->query) !== []) {
+            if ($coverage->sameIntentPosts($row->query) !== []
+                || $coverage->alreadyWritten($row->query) !== null
+                || $coverage->isExcluded($row->query)) {
                 continue;
             }
 
@@ -396,6 +415,10 @@ class WriteBlogPost extends Command
         $best = null;
 
         foreach (SearchQuery::where('period', $period)->opportunity()->take(25)->get() as $row) {
+            if ($coverage->isExcluded($row->query)) {
+                continue;
+            }
+
             $result = $coverage->classify($row->query);
             $target = $result['target'];
 

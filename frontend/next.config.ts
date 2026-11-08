@@ -27,6 +27,20 @@ const nextConfig: NextConfig = {
       "kalici-eyeliner-uygulama-iyilesme",
       "kalici-eyeliner-kac-yil-kalici",
       "dipliner-mi-eyeliner-mi",
+      // Blog otomasyonunun 2026-10 sonu tekrar ürettiği eyeliner/dipliner
+      // yazıları (yayından alındı).
+      "kalici-dipliner-kalicilik-suresi",
+      "dipliner-ve-eyeliner-arasindaki-fark",
+      "kalici-eyeliner-dipliner-ne-kadar-surer",
+      "kalici-eyeliner-ne-kadar-surer",
+      "kalici-eyeliner-ne-kadar-surer-fiyat-2026",
+      "kalici-eyeliner-sure-kalicilik-rehberi",
+      "kalici-eyeliner-ne-kadar-surer-dipliner-kas-pudralama",
+      "kalici-eyeliner-dipliner-sure-rehberi-2026",
+      "kalici-eyeliner-dipliner-sure-fiyat-rehberi-2026",
+      "kalici-eyeliner-dipliner-sure-kalicilik-2026",
+      "kalici-eyeliner-dipliner-sure-kas-pudralama-fiyat",
+      "kalici-eyeliner-ne-kadar-surer-kapsamli-rehber",
     ];
     return [
       { source: "/hizmetler/eyeliner", destination: "/hizmetler", permanent: true },

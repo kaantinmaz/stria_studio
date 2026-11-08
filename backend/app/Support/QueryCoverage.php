@@ -2,6 +2,8 @@
 
 namespace App\Support;
 
+use App\Models\Post;
+
 /**
  * Bir arama sorgusunun mevcut içerikle ne kadar örtüştüğünü tamamen kural
  * tabanlı (yapay zekâsız, deterministik) olarak sınıflandırır. Hizmet sayfası
@@ -167,6 +169,34 @@ final class QueryCoverage
         }
 
         return $matches;
+    }
+
+    /**
+     * Bu sorgu için daha önce yazı üretilmiş mi? Yayında olmayan yazılar da
+     * sayılır: yayından alınmış bir tekrarı yeniden üretmek aynı hatadır.
+     * Başlık token'larına bakmaz; yazım hatalı sorgular ("kalıcı aylaynır")
+     * başlıkla hiç örtüşmediği için tek güvenilir kayıt `source_query`'dir.
+     */
+    public function alreadyWritten(string $query): ?Post
+    {
+        return Post::whereNull('site')->where('source_query', self::normalize($query))->first();
+    }
+
+    /**
+     * Artık verilmeyen hizmetlerin (config content.post.excluded_terms)
+     * sorgularına yazı üretilmez.
+     */
+    public function isExcluded(string $query): bool
+    {
+        $normalized = self::normalize($query);
+
+        foreach ((array) config('content.post.excluded_terms', []) as $term) {
+            if ($term !== '' && str_contains($normalized, $term)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
